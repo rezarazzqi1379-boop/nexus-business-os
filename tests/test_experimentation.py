@@ -1,4 +1,5 @@
 import pytest
+from hypothesis import given, strategies as st
 
 from nexus_core.experimentation import ExperimentSpec, record_result, select_experiments, validate_experiment
 
@@ -49,3 +50,58 @@ def test_failed_experiment_does_not_auto_kill_without_learning():
     result = record_result(spec(), passed=False, observed_signal="No measurable improvement.", evidence_refs=("ci:run:1",))
     assert result.status == "failed"
     assert result.recommendation == "modify"
+
+
+def test_non_string_or_duplicate_refs_fail_closed():
+    assert "evidence_refs requires unique non-empty string references" in validate_experiment(spec(evidence_refs=(123,)))
+    assert "evidence_refs requires unique non-empty string references" in validate_experiment(spec(evidence_refs=("ref:1", "ref:1")))
+
+
+_malformed_scalar = st.one_of(
+    st.none(),
+    st.integers(),
+    st.floats(allow_nan=True, allow_infinity=True),
+    st.lists(st.integers(), max_size=3),
+    st.dictionaries(st.text(max_size=4), st.integers(), max_size=3),
+)
+
+
+@given(value=_malformed_scalar)
+def test_validator_never_raises_for_malformed_evidence_class(value):
+    errors = validate_experiment(spec(evidence_class=value))
+    assert isinstance(errors, list)
+    assert "evidence_class must be supported" in errors
+
+
+@given(value=_malformed_scalar)
+def test_validator_never_raises_for_malformed_status(value):
+    errors = validate_experiment(spec(status=value))
+    assert isinstance(errors, list)
+    assert "status must be supported" in errors
+
+
+@given(value=_malformed_scalar)
+def test_validator_never_raises_for_malformed_reversibility(value):
+    errors = validate_experiment(spec(reversibility=value))
+    assert isinstance(errors, list)
+    assert "reversibility must be boolean" in errors
+
+
+@given(
+    refs=st.one_of(
+        st.none(),
+        st.integers(),
+        st.lists(st.one_of(st.text(max_size=8), st.integers()), max_size=5),
+        st.tuples(st.one_of(st.none(), st.integers(), st.just(""))),
+    )
+)
+def test_validator_never_raises_for_malformed_reference_collections(refs):
+    errors = validate_experiment(spec(evidence_refs=refs))
+    assert isinstance(errors, list)
+    assert "evidence_refs requires unique non-empty string references" in errors
+
+
+@given(value=_malformed_scalar)
+def test_record_result_rejects_non_boolean_passed(value):
+    with pytest.raises(ValueError, match="passed must be boolean"):
+        record_result(spec(), passed=value, observed_signal="measured", evidence_refs=("ci:run:1",))

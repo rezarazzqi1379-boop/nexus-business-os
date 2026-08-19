@@ -43,6 +43,8 @@ class Assertion:
             errors.append("assertion_id is required")
         if not self.path.strip():
             errors.append("path is required")
+        elif any(not segment for segment in self.path.split(".")):
+            errors.append("path segments must be nonblank")
         if self.operator not in _ALLOWED_OPERATORS:
             errors.append("operator is unsupported")
         if self.operator in {"present", "absent"} and self.expected is not None:
@@ -67,6 +69,8 @@ class EvaluationCase:
             errors.append("name is required")
         if not self.input_ref.strip():
             errors.append("input_ref is required")
+        if not isinstance(self.observations, Mapping):
+            errors.append("observations must be a mapping")
         if not self.assertions:
             errors.append("at least one assertion is required")
         if not self.evidence_refs:
@@ -116,10 +120,15 @@ class EvaluationSuiteResult:
     passed_cases: int
     failed_cases: int
     results: tuple[EvaluationResult, ...]
+    validation_errors: tuple[str, ...] = ()
 
     @property
     def passed(self) -> bool:
-        return self.total_cases > 0 and self.failed_cases == 0
+        return (
+            self.total_cases > 0
+            and self.failed_cases == 0
+            and not self.validation_errors
+        )
 
 
 def _resolve_path(observations: Mapping[str, Any], path: str) -> tuple[bool, Any]:
@@ -131,14 +140,18 @@ def _resolve_path(observations: Mapping[str, Any], path: str) -> tuple[bool, Any
     return True, current
 
 
-def _contains(container: Any, expected: Any) -> bool:
+def _membership(container: Any, expected: Any) -> tuple[bool, bool]:
+    """Return (supported, contains) and never guess membership semantics."""
+
     if isinstance(container, str):
-        return isinstance(expected, str) and expected in container
+        if not isinstance(expected, str):
+            return False, False
+        return True, expected in container
     if isinstance(container, Mapping):
-        return expected in container
+        return True, expected in container
     if isinstance(container, (list, tuple, set, frozenset)):
-        return expected in container
-    return False
+        return True, expected in container
+    return False, False
 
 
 def _evaluate_assertion(
@@ -161,12 +174,17 @@ def _evaluate_assertion(
     elif assertion.operator == "not_equals":
         passed = observed != assertion.expected
         message = "values differ" if passed else "unexpected equality"
-    elif assertion.operator == "contains":
-        passed = _contains(observed, assertion.expected)
-        message = "expected member found" if passed else "expected member not found"
-    elif assertion.operator == "not_contains":
-        passed = not _contains(observed, assertion.expected)
-        message = "forbidden member absent" if passed else "forbidden member found"
+    elif assertion.operator in {"contains", "not_contains"}:
+        supported, contains = _membership(observed, assertion.expected)
+        if not supported:
+            passed = False
+            message = "membership unsupported for observed value"
+        elif assertion.operator == "contains":
+            passed = contains
+            message = "expected member found" if passed else "expected member not found"
+        else:
+            passed = not contains
+            message = "forbidden member absent" if passed else "forbidden member found"
     else:  # guarded by validate(); retained as a safe fallback.
         passed = False
         message = "unsupported operator"
@@ -205,9 +223,23 @@ def evaluate_suite(cases: Sequence[EvaluationCase]) -> EvaluationSuiteResult:
     results = tuple(evaluate_case(case) for case in cases)
     passed_cases = sum(1 for result in results if result.passed)
     total_cases = len(results)
+
+    seen_case_ids: set[str] = set()
+    duplicate_case_ids: set[str] = set()
+    for case in cases:
+        if case.case_id in seen_case_ids:
+            duplicate_case_ids.add(case.case_id)
+        seen_case_ids.add(case.case_id)
+
+    suite_errors = tuple(
+        f"duplicate case_id: {case_id}"
+        for case_id in sorted(duplicate_case_ids)
+    )
+
     return EvaluationSuiteResult(
         total_cases=total_cases,
         passed_cases=passed_cases,
         failed_cases=total_cases - passed_cases,
         results=results,
+        validation_errors=suite_errors,
     )

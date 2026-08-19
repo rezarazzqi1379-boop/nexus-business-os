@@ -55,4 +55,26 @@ def test_naive_draft_timestamp_fails_closed():
         messages=(),
     )
     assert decision.allowed is False
-    assert decision.reason == "naive_draft_timestamp"
+    assert decision.reason == "invalid_draft_timestamp"
+
+
+def test_wrong_draft_timestamp_type_fails_closed():
+    decision = evaluate_send_against_thread(draft_created_at="2026-08-20", thread_id="t1", messages=())
+    assert decision.allowed is False
+    assert decision.reason == "invalid_draft_timestamp"
+
+
+def test_non_boolean_sent_flag_fails_closed():
+    decision = evaluate_send_against_thread(
+        draft_created_at=dt(0),
+        thread_id="t1",
+        messages=(ThreadMessageState("m1", "t1", dt(10), 1),),
+    )
+    assert decision.allowed is False
+    assert decision.reason == "invalid_message_state"
+
+
+def test_non_iterable_messages_fail_closed():
+    decision = evaluate_send_against_thread(draft_created_at=dt(0), thread_id="t1", messages=None)
+    assert decision.allowed is False
+    assert decision.reason == "invalid_messages"

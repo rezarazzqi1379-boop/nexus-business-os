@@ -40,7 +40,7 @@ def test_complete_inconclusive_learning_loop_is_valid():
     observation = OutcomeObservation(
         observation_id="observation:yaxing-2026-08-22",
         decision_id=decision.decision_id,
-        observed_at="2026-08-22",
+        observed_at="2026-08-22T10:00:00+00:00",
         result="Engineering input is still incomplete; supplier route remains open but final quotation is blocked.",
         source_refs=("gmail:message:future-engineer-or-supplier-evidence",),
         kind="fact",
@@ -76,7 +76,7 @@ def test_broken_observation_link_is_rejected():
     observation = OutcomeObservation(
         observation_id="observation:wrong-link",
         decision_id="decision:other",
-        observed_at="2026-08-22",
+        observed_at="2026-08-22T10:00:00+00:00",
         result="reply received",
         source_refs=("gmail:message:example",),
         kind="fact",
@@ -109,9 +109,117 @@ def test_claim_observation_can_be_preserved_without_becoming_fact():
     observation = OutcomeObservation(
         observation_id="observation:supplier-claim",
         decision_id=decision.decision_id,
-        observed_at="2026-08-22",
+        observed_at="2026-08-22T10:00:00+00:00",
         result="Supplier states that a custom 120 MPa solution is feasible.",
         source_refs=("gmail:message:supplier-claim",),
         kind="claim",
     )
     assert validate_decision_chain(decision, observation) == []
+
+
+def test_malformed_decision_id_type_fails_closed_without_crashing():
+    decision = make_yaxing_decision()
+    malformed = DecisionRecord(
+        decision_id=123,  # type: ignore[arg-type]
+        subject=decision.subject,
+        decision=decision.decision,
+        rationale=decision.rationale,
+        expected_outcome=decision.expected_outcome,
+        success_criterion=decision.success_criterion,
+        review_at=decision.review_at,
+        evidence_refs=decision.evidence_refs,
+        status=decision.status,
+    )
+    errors = validate_decision_chain(malformed)
+    assert "decision.decision_id must be a string" in errors
+
+
+def test_unicode_formatting_in_decision_id_is_rejected():
+    decision = make_yaxing_decision()
+    malformed = DecisionRecord(
+        decision_id="decision:yaxing\u202e-hidden",
+        subject=decision.subject,
+        decision=decision.decision,
+        rationale=decision.rationale,
+        expected_outcome=decision.expected_outcome,
+        success_criterion=decision.success_criterion,
+        review_at=decision.review_at,
+        evidence_refs=decision.evidence_refs,
+        status=decision.status,
+    )
+    assert (
+        "decision.decision_id cannot contain control or formatting characters"
+        in validate_decision_chain(malformed)
+    )
+
+
+def test_padded_reference_is_rejected():
+    decision = make_yaxing_decision()
+    malformed = DecisionRecord(
+        decision_id=decision.decision_id,
+        subject=decision.subject,
+        decision=decision.decision,
+        rationale=decision.rationale,
+        expected_outcome=decision.expected_outcome,
+        success_criterion=decision.success_criterion,
+        review_at=decision.review_at,
+        evidence_refs=(" gmail:message:example ",),
+        status=decision.status,
+    )
+    assert (
+        "decision.evidence_refs cannot have leading or trailing whitespace"
+        in validate_decision_chain(malformed)
+    )
+
+
+def test_duplicate_references_are_rejected():
+    decision = make_yaxing_decision()
+    malformed = DecisionRecord(
+        decision_id=decision.decision_id,
+        subject=decision.subject,
+        decision=decision.decision,
+        rationale=decision.rationale,
+        expected_outcome=decision.expected_outcome,
+        success_criterion=decision.success_criterion,
+        review_at=decision.review_at,
+        evidence_refs=("gmail:message:example", "gmail:message:example"),
+        status=decision.status,
+    )
+    assert (
+        "decision.evidence_refs cannot contain duplicate references"
+        in validate_decision_chain(malformed)
+    )
+
+
+def test_naive_observation_timestamp_is_rejected():
+    decision = make_yaxing_decision(status="active")
+    observation = OutcomeObservation(
+        observation_id="observation:naive-time",
+        decision_id=decision.decision_id,
+        observed_at="2026-08-22T10:00:00",
+        result="reply received",
+        source_refs=("gmail:message:example",),
+        kind="fact",
+    )
+    assert (
+        "observation.observed_at must include a timezone offset"
+        in validate_decision_chain(decision, observation)
+    )
+
+
+def test_malformed_epistemic_kind_type_fails_closed():
+    decision = make_yaxing_decision(status="active")
+    observation = OutcomeObservation(
+        observation_id="observation:bad-kind",
+        decision_id=decision.decision_id,
+        observed_at="2026-08-22T10:00:00+00:00",
+        result="reply received",
+        source_refs=("gmail:message:example",),
+        kind=[],  # type: ignore[arg-type]
+    )
+    assert "observation.kind must be a string" in validate_decision_chain(decision, observation)
+
+
+def test_non_observation_runtime_value_is_rejected():
+    errors = validate_decision_chain(make_yaxing_decision(), observation="bad")  # type: ignore[arg-type]
+    assert errors == ["observation must be an OutcomeObservation"]

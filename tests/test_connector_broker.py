@@ -25,3 +25,26 @@ def test_duplicate_route_fails_closed():
     ]
     with pytest.raises(ValueError):
         choose_route(routes, "read")
+
+
+def test_rejects_runtime_type_confusion_and_unsupported_values():
+    with pytest.raises(ValueError):
+        choose_route([ConnectorRoute("a", ("read",), "healthy", True, 1, 100)], "read")
+    with pytest.raises(ValueError):
+        choose_route([ConnectorRoute("a", ("read",), "healthy", 1, True, 100)], "read")
+    with pytest.raises(ValueError):
+        choose_route([ConnectorRoute("a", ("read",), "mystery", 1, 1, 100)], "read")
+    with pytest.raises(ValueError):
+        choose_route([ConnectorRoute("a", ("bogus",), "healthy", 1, 1, 100)], "read")
+
+
+def test_consequential_write_request_is_validated_before_route_selection():
+    with pytest.raises(ValueError):
+        choose_route([], "research", consequential_write=True)
+    with pytest.raises(ValueError):
+        choose_route([], "send", consequential_write=1)
+
+
+def test_non_iterable_routes_fail_closed():
+    with pytest.raises(ValueError):
+        choose_route(None, "read")

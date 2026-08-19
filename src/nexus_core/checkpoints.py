@@ -30,6 +30,7 @@ _DISALLOWED_UNICODE_CATEGORIES = {"Cc", "Cf", "Zl", "Zp"}
 class SnapshotEntry:
     artifact_ref: str
     source_ref: str
+    source_version_ref: str
     category: SnapshotCategory
     content_sha256: str
 
@@ -45,11 +46,12 @@ class CheckpointManifest:
 
 @dataclass(frozen=True)
 class BackupReceipt:
-    """Evidence that one checkpoint artifact was written to a storage backend.
+    """Evidence that one exact source version was written to a storage backend.
 
-    The receipt is intentionally metadata-only. It proves the destination reference and
-    the source-content digest that was claimed at write time; it does not make the
-    backend canonical NEXUS state and it does not authorize restore or deletion.
+    The receipt is intentionally metadata-only. A digest match alone is not freshness
+    proof: the receipt must bind to the exact source_version_ref captured in the
+    manifest. This does not make the backend canonical NEXUS state and it does not
+    authorize restore or deletion.
     """
 
     checkpoint_id: str
@@ -57,6 +59,7 @@ class BackupReceipt:
     backend: str
     stored_artifact_ref: str
     stored_at: str
+    source_version_ref: str
     source_content_sha256: str
 
 
@@ -97,39 +100,27 @@ def _timezone_error(name: str, value: object) -> str | None:
 
 
 def validate_checkpoint(manifest: CheckpointManifest) -> list[str]:
-    """Validate backup metadata without assuming any storage backend."""
     if not isinstance(manifest, CheckpointManifest):
         return ["manifest must be a CheckpointManifest"]
-
     errors: list[str] = []
-    for name, value in (
-        ("checkpoint_id", manifest.checkpoint_id),
-        ("scope", manifest.scope),
-        ("idempotency_key", manifest.idempotency_key),
-    ):
+    for name, value in (("checkpoint_id", manifest.checkpoint_id), ("scope", manifest.scope), ("idempotency_key", manifest.idempotency_key)):
         error = _meta_error(name, value)
         if error:
             errors.append(error)
-
     captured_error = _timezone_error("captured_at", manifest.captured_at)
     if captured_error:
         errors.append(captured_error)
-
     if not isinstance(manifest.entries, tuple):
         return errors + ["entries must be a tuple"]
     if not manifest.entries:
         errors.append("entries requires at least one snapshot entry")
         return errors
-
     seen_artifacts: set[str] = set()
     for entry in manifest.entries:
         if not isinstance(entry, SnapshotEntry):
             errors.append("entries must contain SnapshotEntry values")
             continue
-        for name, value in (
-            ("artifact_ref", entry.artifact_ref),
-            ("source_ref", entry.source_ref),
-        ):
+        for name, value in (("artifact_ref", entry.artifact_ref), ("source_ref", entry.source_ref), ("source_version_ref", entry.source_version_ref)):
             error = _meta_error(name, value)
             if error:
                 errors.append(error)
@@ -142,41 +133,27 @@ def validate_checkpoint(manifest: CheckpointManifest) -> list[str]:
             if entry.artifact_ref in seen_artifacts:
                 errors.append("checkpoint cannot contain duplicate artifact_ref values")
             seen_artifacts.add(entry.artifact_ref)
-
     return errors
 
 
 def validate_backup_receipt(receipt: BackupReceipt) -> list[str]:
-    """Fail closed on ambiguous or malformed storage-write evidence."""
     if not isinstance(receipt, BackupReceipt):
         return ["receipt must be a BackupReceipt"]
-
     errors: list[str] = []
-    for name, value in (
-        ("checkpoint_id", receipt.checkpoint_id),
-        ("artifact_ref", receipt.artifact_ref),
-        ("backend", receipt.backend),
-        ("stored_artifact_ref", receipt.stored_artifact_ref),
-    ):
+    for name, value in (("checkpoint_id", receipt.checkpoint_id), ("artifact_ref", receipt.artifact_ref), ("backend", receipt.backend), ("stored_artifact_ref", receipt.stored_artifact_ref), ("source_version_ref", receipt.source_version_ref)):
         error = _meta_error(name, value)
         if error:
             errors.append(error)
-
     stored_at_error = _timezone_error("stored_at", receipt.stored_at)
     if stored_at_error:
         errors.append(stored_at_error)
-
     digest_error = _sha256_error(receipt.source_content_sha256)
     if digest_error:
         errors.append(digest_error.replace("content_sha256", "source_content_sha256"))
     return errors
 
 
-def receipt_covers_manifest_entry(
-    receipt: BackupReceipt,
-    manifest: CheckpointManifest,
-) -> bool:
-    """True only when storage evidence matches an exact manifest entry digest."""
+def receipt_covers_manifest_entry(receipt: BackupReceipt, manifest: CheckpointManifest) -> bool:
     if validate_backup_receipt(receipt) or validate_checkpoint(manifest):
         return False
     if receipt.checkpoint_id != manifest.checkpoint_id:
@@ -184,44 +161,26 @@ def receipt_covers_manifest_entry(
     matching = [entry for entry in manifest.entries if entry.artifact_ref == receipt.artifact_ref]
     if len(matching) != 1:
         return False
-    return matching[0].content_sha256 == receipt.source_content_sha256
+    entry = matching[0]
+    return entry.source_version_ref == receipt.source_version_ref and entry.content_sha256 == receipt.source_content_sha256
 
 
-def checkpoint_matches(
-    manifest: CheckpointManifest,
-    previous: CheckpointManifest | None,
-) -> bool:
-    """Return True only when the same idempotency key represents identical snapshot content."""
+def checkpoint_matches(manifest: CheckpointManifest, previous: CheckpointManifest | None) -> bool:
     if previous is None:
         return False
     if validate_checkpoint(manifest) or validate_checkpoint(previous):
         return False
     if manifest.idempotency_key != previous.idempotency_key:
         return False
-    current = tuple(
-        (entry.artifact_ref, entry.source_ref, entry.category, entry.content_sha256)
-        for entry in manifest.entries
-    )
-    prior = tuple(
-        (entry.artifact_ref, entry.source_ref, entry.category, entry.content_sha256)
-        for entry in previous.entries
-    )
+    current = tuple((entry.artifact_ref, entry.source_ref, entry.source_version_ref, entry.category, entry.content_sha256) for entry in manifest.entries)
+    prior = tuple((entry.artifact_ref, entry.source_ref, entry.source_version_ref, entry.category, entry.content_sha256) for entry in previous.entries)
     return current == prior
 
 
-def changed_artifact_refs(
-    manifest: CheckpointManifest,
-    previous: CheckpointManifest | None,
-) -> tuple[str, ...]:
-    """Identify changed/new artifacts for incremental backup without deleting old snapshots."""
+def changed_artifact_refs(manifest: CheckpointManifest, previous: CheckpointManifest | None) -> tuple[str, ...]:
     if validate_checkpoint(manifest):
         return ()
     previous_by_ref = {}
     if previous is not None and not validate_checkpoint(previous):
-        previous_by_ref = {entry.artifact_ref: entry.content_sha256 for entry in previous.entries}
-    changed = [
-        entry.artifact_ref
-        for entry in manifest.entries
-        if previous_by_ref.get(entry.artifact_ref) != entry.content_sha256
-    ]
-    return tuple(changed)
+        previous_by_ref = {entry.artifact_ref: (entry.source_version_ref, entry.content_sha256) for entry in previous.entries}
+    return tuple(entry.artifact_ref for entry in manifest.entries if previous_by_ref.get(entry.artifact_ref) != (entry.source_version_ref, entry.content_sha256))

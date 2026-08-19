@@ -43,14 +43,20 @@ def cross_ai_review_work_item(*, source_ref: str, review_key: str, code_change_r
 
 
 def customer_network_research_work_item(*, source_ref: str, market_key: str, commercially_relevant: bool) -> WorkItem:
+    """Create network research only when it can end in a qualified commercial path.
+
+    A name, follower, invitation, generic directory entry or job title is not a network
+    outcome. The research must connect company fit, credible buying/project evidence and
+    a direct or warm path to a relevant role before it can count as success.
+    """
     return WorkItem(
         f"customer-network:{market_key}", "customer_network",
-        "Map and qualify potential customers, buyers, integrators and decision-maker paths using retrievable evidence; prepare candidates for human-reviewed outreach only.",
+        "Map and qualify potential customers, buyers, integrators, OEM/referral nodes and decision-maker paths. For each retained candidate, verify company fit, a credible buying/project/installed-base need signal, the relevant role, and a direct or warm contact path with retrievable evidence. Deduplicate against existing relationships and prepare candidates for human-reviewed outreach only; never treat invitation volume, generic directories or unverifiable names as opportunity evidence.",
         "research", ("web.search", "exa.search", "linkedin.read"), (source_ref,),
         "high" if commercially_relevant else "medium", "medium", "partial", "medium", False, True,
         goal_ref=f"goal:customer-network:{market_key}",
-        success_signal="At least one prospect has a verified company fit plus a retrievable buyer/decision-maker or contact path suitable for human review.",
-        failure_signal="Research produces only unverified names, generic directories, duplicate leads or no credible purchasing/fit evidence; kill or narrow the search loop.",
+        success_signal="At least one non-duplicate candidate has verified company fit, credible buying/project/need evidence, a relevant buyer/decision-maker or referral role, and a retrievable direct or warm contact path suitable for human review.",
+        failure_signal="Research produces only unverified names, generic directories, invitation counts, duplicate leads, role-without-buying-fit, contact-without-need evidence, or no credible path; kill, narrow or change the segment instead of inflating the lead list.",
     )
 
 

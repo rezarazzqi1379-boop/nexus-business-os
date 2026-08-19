@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from nexus_core.outreach_controller import (
     OutreachBatch,
     OutreachTarget,
+    PreparedFollowUp,
     PreparedMessage,
     authorize_outreach_release,
     outreach_action_id,
@@ -56,7 +57,65 @@ def test_exact_one_click_approval_releases_only_reviewed_batch() -> None:
         now=datetime(2026, 8, 19, 20, 30, tzinfo=timezone.utc),
     )
     assert release.gate.allowed_now
-    assert release.approved_message_ids == ("t1",)
+    assert release.approved_message_ids == ("t1:initial",)
+
+
+def test_one_click_can_release_finite_pre_reviewed_sequence() -> None:
+    batch = replace(
+        _batch(),
+        followups=(
+            PreparedFollowUp("t1", 1, 72, "Re: OCTG equipment sourcing", "Following up on the sourcing requirement."),
+            PreparedFollowUp("t1", 2, 168, "Re: OCTG equipment sourcing", "Final follow-up for this sourcing cycle."),
+        ),
+    )
+    approval = ActionApproval(action_id=outreach_action_id(batch), approved=True)
+    release = authorize_outreach_release(
+        batch,
+        approval=approval,
+        now=datetime(2026, 8, 19, 20, 30, tzinfo=timezone.utc),
+    )
+    assert release.gate.allowed_now
+    assert release.approved_message_ids == ("t1:initial", "t1:followup:1", "t1:followup:2")
+
+
+def test_followup_mutation_invalidates_previous_approval() -> None:
+    batch = replace(
+        _batch(),
+        followups=(PreparedFollowUp("t1", 1, 72, "Re: OCTG equipment sourcing", "Original follow-up"),),
+    )
+    approval = ActionApproval(action_id=outreach_action_id(batch), approved=True)
+    changed = replace(
+        batch,
+        followups=(PreparedFollowUp("t1", 1, 72, "Re: OCTG equipment sourcing", "Changed after review"),),
+    )
+    release = authorize_outreach_release(
+        changed,
+        approval=approval,
+        now=datetime(2026, 8, 19, 20, 30, tzinfo=timezone.utc),
+    )
+    assert not release.gate.allowed_now
+    assert release.approved_message_ids == ()
+
+
+def test_followup_must_stop_on_reply() -> None:
+    batch = replace(
+        _batch(),
+        followups=(PreparedFollowUp("t1", 1, 72, "Re: OCTG equipment sourcing", "Follow-up", stop_on_reply=False),),
+    )
+    assert "followups must stop_on_reply" in validate_outreach_batch(batch)
+
+
+def test_followup_steps_and_delays_must_progress_deterministically() -> None:
+    batch = replace(
+        _batch(),
+        followups=(
+            PreparedFollowUp("t1", 2, 72, "Re: OCTG", "Skipped step one"),
+            PreparedFollowUp("t1", 3, 48, "Re: OCTG", "Delay moved backwards"),
+        ),
+    )
+    errors = validate_outreach_batch(batch)
+    assert "followup steps must be contiguous per target" in errors
+    assert "followup delays must increase per target" in errors
 
 
 def test_message_mutation_invalidates_previous_approval() -> None:

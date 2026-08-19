@@ -174,9 +174,25 @@ def test_real_shadow_control_chain_can_be_reconstructed_from_metadata_only_event
     assert validation.valid is True
     assert validation.errors == ()
 
-    # Audit metadata preserves the important distinction: eval/promotion integrity
-    # can pass while the external action remains blocked by a separate human gate.
     assert events[-2].result_class == "accepted"
     assert events[-1].result_class == "blocked"
     assert events[-1].action_ref == intent.action_id
     assert all(not hasattr(event, "payload") for event in events)
+
+
+def test_integration_rejects_covert_payload_in_metadata_reference():
+    event = AuditEvent(
+        event_id="event:privacy-regression",
+        trace_id="trace:hydrotester-shadow",
+        event_type="evidence_observed",
+        occurred_at="2026-08-19T14:35:00+00:00",
+        actor_type="external_source",
+        subject_ref="gmail:message:1a018c1b2c80c8e3",
+        result_class="observed",
+        evidence_refs=(
+            "gmail:message:1a018c1b2c80c8e3\nthis must never become an embedded email body",
+        ),
+    )
+    validation = validate_audit_trace((event,))
+    assert validation.valid is False
+    assert any("evidence_refs cannot contain control characters" in error for error in validation.errors)

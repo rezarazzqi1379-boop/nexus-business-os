@@ -15,9 +15,10 @@ def make_suppliertr_record() -> ProcurementVerticalRecord:
             evidence_id="ev-suppliertr-1",
             source="gmail",
             source_ref="gmail:thread:suppliertr",
-            summary="SupplierTR confirmed engineering evaluation",
+            summary="SupplierTR stated that engineering evaluation had started",
             observed_at="2026-08-19",
             confidence=0.95,
+            kind="claim",
         ),
         relationship=Relationship(
             relationship_id="rel-atf-suppliertr",
@@ -129,6 +130,7 @@ def test_missing_evidence_source_ref_is_rejected():
             summary=record.evidence.summary,
             observed_at=record.evidence.observed_at,
             confidence=record.evidence.confidence,
+            kind=record.evidence.kind,
         ),
         relationship=record.relationship,
         signal=record.signal,
@@ -156,3 +158,24 @@ def test_missing_stable_identifier_is_rejected():
         outcome=record.outcome,
     )
     assert "signal.signal_id is required" in broken.validate()
+
+
+def test_unsupported_evidence_kind_is_rejected():
+    record = make_suppliertr_record()
+    broken = ProcurementVerticalRecord(
+        case_id=record.case_id,
+        evidence=Evidence(
+            evidence_id=record.evidence.evidence_id,
+            source=record.evidence.source,
+            source_ref=record.evidence.source_ref,
+            summary=record.evidence.summary,
+            observed_at=record.evidence.observed_at,
+            confidence=record.evidence.confidence,
+            kind="certain",  # type: ignore[arg-type]
+        ),
+        relationship=record.relationship,
+        signal=record.signal,
+        opportunity=record.opportunity,
+        outcome=record.outcome,
+    )
+    assert "evidence.kind must be a supported epistemic class" in broken.validate()

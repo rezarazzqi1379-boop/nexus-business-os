@@ -32,8 +32,8 @@ class QualifiedCandidate:
     reasons: tuple[str, ...]
 
 
-def _valid_refs(values: object) -> bool:
-    return isinstance(values, tuple) and all(isinstance(value, str) and value.strip() for value in values) and len(values) == len(set(values))
+def _valid_refs(values: object, *, allow_empty: bool = True) -> bool:
+    return isinstance(values, tuple) and (allow_empty or bool(values)) and all(isinstance(value, str) and value.strip() for value in values) and len(values) == len(set(values))
 
 
 def validate_commercial_candidate(item: CommercialCandidate) -> tuple[str, ...]:
@@ -41,11 +41,11 @@ def validate_commercial_candidate(item: CommercialCandidate) -> tuple[str, ...]:
     for name, value in (("candidate_id", item.candidate_id), ("company_name", item.company_name), ("market", item.market)):
         if not isinstance(value, str) or not value.strip():
             errors.append(f"invalid_{name}")
-    for name, values in (("product_fit", item.product_fit), ("need_signals", item.need_signals), ("role_signals", item.role_signals), ("contact_paths", item.contact_paths), ("evidence_refs", item.evidence_refs)):
+    for name, values in (("product_fit", item.product_fit), ("need_signals", item.need_signals), ("role_signals", item.role_signals), ("contact_paths", item.contact_paths)):
         if not _valid_refs(values):
             errors.append(f"invalid_{name}")
-    if not item.evidence_refs:
-        errors.append("missing_evidence_refs")
+    if not _valid_refs(item.evidence_refs, allow_empty=False):
+        errors.append("missing_evidence_refs" if not item.evidence_refs else "invalid_evidence_refs")
     if item.evidence_strength not in _ALLOWED_EVIDENCE:
         errors.append("invalid_evidence_strength")
     if item.path_type not in _ALLOWED_PATHS:

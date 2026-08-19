@@ -46,14 +46,6 @@ class CheckpointManifest:
 
 @dataclass(frozen=True)
 class BackupReceipt:
-    """Evidence that one exact source version was written to a storage backend.
-
-    The receipt is intentionally metadata-only. A digest match alone is not freshness
-    proof: the receipt must bind to the exact source_version_ref captured in the
-    manifest. This does not make the backend canonical NEXUS state and it does not
-    authorize restore or deletion.
-    """
-
     checkpoint_id: str
     artifact_ref: str
     backend: str
@@ -65,13 +57,6 @@ class BackupReceipt:
 
 @dataclass(frozen=True)
 class RestoreProof:
-    """Evidence that a stored snapshot was read back and reconstructed exactly.
-
-    This proves byte/content reconstruction for one manifest entry only. It does not
-    prove application-level semantic recovery, production readiness, or authorize a
-    destructive restore into canonical state.
-    """
-
     checkpoint_id: str
     artifact_ref: str
     backend: str
@@ -124,40 +109,27 @@ def _timezone_error(name: str, value: object) -> str | None:
 
 
 def validate_checkpoint(manifest: CheckpointManifest) -> list[str]:
-    """Validate backup metadata without assuming any storage backend."""
     if not isinstance(manifest, CheckpointManifest):
         return ["manifest must be a CheckpointManifest"]
-
     errors: list[str] = []
-    for name, value in (
-        ("checkpoint_id", manifest.checkpoint_id),
-        ("scope", manifest.scope),
-        ("idempotency_key", manifest.idempotency_key),
-    ):
+    for name, value in (("checkpoint_id", manifest.checkpoint_id), ("scope", manifest.scope), ("idempotency_key", manifest.idempotency_key)):
         error = _meta_error(name, value)
         if error:
             errors.append(error)
-
     captured_error = _timezone_error("captured_at", manifest.captured_at)
     if captured_error:
         errors.append(captured_error)
-
     if not isinstance(manifest.entries, tuple):
         return errors + ["entries must be a tuple"]
     if not manifest.entries:
         errors.append("entries requires at least one snapshot entry")
         return errors
-
     seen_artifacts: set[str] = set()
     for entry in manifest.entries:
         if not isinstance(entry, SnapshotEntry):
             errors.append("entries must contain SnapshotEntry values")
             continue
-        for name, value in (
-            ("artifact_ref", entry.artifact_ref),
-            ("source_ref", entry.source_ref),
-            ("source_version_ref", entry.source_version_ref),
-        ):
+        for name, value in (("artifact_ref", entry.artifact_ref), ("source_ref", entry.source_ref), ("source_version_ref", entry.source_version_ref)):
             error = _meta_error(name, value)
             if error:
                 errors.append(error)
@@ -170,31 +142,20 @@ def validate_checkpoint(manifest: CheckpointManifest) -> list[str]:
             if entry.artifact_ref in seen_artifacts:
                 errors.append("checkpoint cannot contain duplicate artifact_ref values")
             seen_artifacts.add(entry.artifact_ref)
-
     return errors
 
 
 def validate_backup_receipt(receipt: BackupReceipt) -> list[str]:
-    """Fail closed on ambiguous or stale storage-write evidence."""
     if not isinstance(receipt, BackupReceipt):
         return ["receipt must be a BackupReceipt"]
-
     errors: list[str] = []
-    for name, value in (
-        ("checkpoint_id", receipt.checkpoint_id),
-        ("artifact_ref", receipt.artifact_ref),
-        ("backend", receipt.backend),
-        ("stored_artifact_ref", receipt.stored_artifact_ref),
-        ("source_version_ref", receipt.source_version_ref),
-    ):
+    for name, value in (("checkpoint_id", receipt.checkpoint_id), ("artifact_ref", receipt.artifact_ref), ("backend", receipt.backend), ("stored_artifact_ref", receipt.stored_artifact_ref), ("source_version_ref", receipt.source_version_ref)):
         error = _meta_error(name, value)
         if error:
             errors.append(error)
-
     stored_at_error = _timezone_error("stored_at", receipt.stored_at)
     if stored_at_error:
         errors.append(stored_at_error)
-
     digest_error = _sha256_error(receipt.source_content_sha256)
     if digest_error:
         errors.append(digest_error.replace("content_sha256", "source_content_sha256"))
@@ -202,42 +163,24 @@ def validate_backup_receipt(receipt: BackupReceipt) -> list[str]:
 
 
 def validate_restore_proof(proof: RestoreProof) -> list[str]:
-    """Fail closed on ambiguous, malformed, or unverifiable reconstruction evidence."""
     if not isinstance(proof, RestoreProof):
         return ["proof must be a RestoreProof"]
-
     errors: list[str] = []
-    for name, value in (
-        ("checkpoint_id", proof.checkpoint_id),
-        ("artifact_ref", proof.artifact_ref),
-        ("backend", proof.backend),
-        ("stored_artifact_ref", proof.stored_artifact_ref),
-        ("restored_artifact_ref", proof.restored_artifact_ref),
-        ("source_version_ref", proof.source_version_ref),
-    ):
+    for name, value in (("checkpoint_id", proof.checkpoint_id), ("artifact_ref", proof.artifact_ref), ("backend", proof.backend), ("stored_artifact_ref", proof.stored_artifact_ref), ("restored_artifact_ref", proof.restored_artifact_ref), ("source_version_ref", proof.source_version_ref)):
         error = _meta_error(name, value)
         if error:
             errors.append(error)
-
     restored_at_error = _timezone_error("restored_at", proof.restored_at)
     if restored_at_error:
         errors.append(restored_at_error)
-
-    for name, value in (
-        ("expected_content_sha256", proof.expected_content_sha256),
-        ("restored_content_sha256", proof.restored_content_sha256),
-    ):
+    for name, value in (("expected_content_sha256", proof.expected_content_sha256), ("restored_content_sha256", proof.restored_content_sha256)):
         digest_error = _sha256_error(value)
         if digest_error:
             errors.append(digest_error.replace("content_sha256", name))
     return errors
 
 
-def receipt_covers_manifest_entry(
-    receipt: BackupReceipt,
-    manifest: CheckpointManifest,
-) -> bool:
-    """True only when storage evidence matches one exact manifest source version."""
+def receipt_covers_manifest_entry(receipt: BackupReceipt, manifest: CheckpointManifest) -> bool:
     if validate_backup_receipt(receipt) or validate_checkpoint(manifest):
         return False
     if receipt.checkpoint_id != manifest.checkpoint_id:
@@ -248,75 +191,43 @@ def receipt_covers_manifest_entry(
     if len(matching) != 1:
         return False
     entry = matching[0]
-    return (
-        entry.source_version_ref == receipt.source_version_ref
-        and entry.content_sha256 == receipt.source_content_sha256
-    )
+    return entry.source_version_ref == receipt.source_version_ref and entry.content_sha256 == receipt.source_content_sha256
 
 
-def restore_proves_reconstruction(
-    proof: RestoreProof,
-    receipt: BackupReceipt,
-    manifest: CheckpointManifest,
-) -> bool:
-    """True only when read-back evidence reconstructs the exact stored manifest content."""
+def restore_proves_reconstruction(proof: RestoreProof, receipt: BackupReceipt, manifest: CheckpointManifest) -> bool:
     if validate_restore_proof(proof):
         return False
     if not receipt_covers_manifest_entry(receipt, manifest):
         return False
     if _parse_timestamp(proof.restored_at) < _parse_timestamp(receipt.stored_at):
         return False
-    if (
-        proof.checkpoint_id != receipt.checkpoint_id
-        or proof.artifact_ref != receipt.artifact_ref
-        or proof.backend != receipt.backend
-        or proof.stored_artifact_ref != receipt.stored_artifact_ref
-        or proof.source_version_ref != receipt.source_version_ref
-        or proof.expected_content_sha256 != receipt.source_content_sha256
-    ):
+    if proof.checkpoint_id != receipt.checkpoint_id or proof.artifact_ref != receipt.artifact_ref or proof.backend != receipt.backend or proof.stored_artifact_ref != receipt.stored_artifact_ref or proof.source_version_ref != receipt.source_version_ref or proof.expected_content_sha256 != receipt.source_content_sha256:
         return False
     return proof.restored_content_sha256 == proof.expected_content_sha256
 
 
-def checkpoint_matches(
-    manifest: CheckpointManifest,
-    previous: CheckpointManifest | None,
-) -> bool:
-    """Return True only when the same idempotency key represents identical source versions and content."""
+def checkpoint_matches(manifest: CheckpointManifest, previous: CheckpointManifest | None) -> bool:
     if previous is None:
         return False
     if validate_checkpoint(manifest) or validate_checkpoint(previous):
         return False
     if manifest.idempotency_key != previous.idempotency_key:
         return False
-    current = tuple(
-        (entry.artifact_ref, entry.source_ref, entry.source_version_ref, entry.category, entry.content_sha256)
-        for entry in manifest.entries
-    )
-    prior = tuple(
-        (entry.artifact_ref, entry.source_ref, entry.source_version_ref, entry.category, entry.content_sha256)
-        for entry in previous.entries
-    )
+    current = tuple((entry.artifact_ref, entry.source_ref, entry.source_version_ref, entry.category, entry.content_sha256) for entry in manifest.entries)
+    prior = tuple((entry.artifact_ref, entry.source_ref, entry.source_version_ref, entry.category, entry.content_sha256) for entry in previous.entries)
     return current == prior
 
 
-def changed_artifact_refs(
-    manifest: CheckpointManifest,
-    previous: CheckpointManifest | None,
-) -> tuple[str, ...]:
-    """Identify changed/new source versions for incremental backup without deleting old snapshots."""
+def changed_artifact_refs(manifest: CheckpointManifest, previous: CheckpointManifest | None) -> tuple[str, ...] | None:
+    """Return changed refs, `()` for valid no-change, or `None` for invalid current state.
+
+    `None` deliberately distinguishes malformed current metadata from a valid manifest
+    with no changed artifacts. A malformed current manifest must never be interpreted
+    as proof that there is nothing to back up.
+    """
     if validate_checkpoint(manifest):
-        return ()
+        return None
     previous_by_ref = {}
     if previous is not None and not validate_checkpoint(previous):
-        previous_by_ref = {
-            entry.artifact_ref: (entry.source_version_ref, entry.content_sha256)
-            for entry in previous.entries
-        }
-    changed = [
-        entry.artifact_ref
-        for entry in manifest.entries
-        if previous_by_ref.get(entry.artifact_ref)
-        != (entry.source_version_ref, entry.content_sha256)
-    ]
-    return tuple(changed)
+        previous_by_ref = {entry.artifact_ref: (entry.source_version_ref, entry.content_sha256) for entry in previous.entries}
+    return tuple(entry.artifact_ref for entry in manifest.entries if previous_by_ref.get(entry.artifact_ref) != (entry.source_version_ref, entry.content_sha256))

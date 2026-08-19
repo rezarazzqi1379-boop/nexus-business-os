@@ -12,6 +12,27 @@ def test_unverified_name_does_not_become_opportunity(): assert qualify_commercia
 def test_weak_evidence_never_qualifies_even_with_complete_shape(): assert qualify_commercial_network((candidate(evidence_strength="weak"),))[0].state == "research_more"
 def test_unverified_direct_path_gets_no_verified_path_bonus(): assert "verified_direct_or_warm_path" not in qualify_commercial_network((candidate(evidence_strength="unverified"),))[0].reasons
 
+def test_future_intermediary_can_be_retained_without_becoming_pipeline():
+    result = qualify_commercial_network((candidate(product_fit=(), need_signals=(), role_signals=(), network_roles=("intermediary",), future_themes=("octg", "industrial-machinery")),))[0]
+    assert result.state == "reserve"
+    assert "future_network_reserve" in result.reasons
+
+
+def test_unverified_future_node_is_not_retained_as_network_capital():
+    result = qualify_commercial_network((candidate(product_fit=(), need_signals=(), role_signals=(), network_roles=("referral",), future_themes=("fertilizer",), evidence_strength="unverified"),))[0]
+    assert result.state == "reject"
+
+
+def test_future_node_without_contact_path_is_not_actionable_reserve():
+    result = qualify_commercial_network((candidate(product_fit=(), need_signals=(), role_signals=(), contact_paths=(), network_roles=("epc",), future_themes=("heat-treatment",)),))[0]
+    assert result.state == "reject"
+
+
+def test_invalid_network_role_fails_closed():
+    result = qualify_commercial_network((candidate(network_roles=("magic-broker",)),))[0]
+    assert result.state == "reject" and "invalid_network_roles" in result.reasons
+
+
 def test_duplicate_is_rejected():
     result = qualify_commercial_network((candidate(duplicate_of="existing:1"),))[0]; assert result.state == "reject" and "duplicate_candidate" in result.reasons
 

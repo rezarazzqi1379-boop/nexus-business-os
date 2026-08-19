@@ -8,7 +8,7 @@ This file is the code-repository current-state manifest. It does not replace the
 
 - **ChatGPT / NEXUS HQ** — control plane, orchestration, analysis, execution when a connected tool supports the action. Not the sole memory store.
 - **GitHub** — canonical source of truth for NEXUS code, tests, CI configuration, and version history.
-- **Notion** — human-readable operational coordination, canonical-object map, decisions, and Cross-AI Handoff Log.
+- **Notion** — human-readable operational coordination, canonical-object map, decisions, relationship signals, outcome learning, and Cross-AI Handoff Log.
 - **Gmail** — primary evidence for live commercial communications and supplier replies.
 - **Supabase/PostgreSQL** — structured runtime/state store already implemented, but currently connector-degraded because even a minimal `select now()` returns a permission error. Do not infer live schema while access is degraded.
 - **Vercel** — deployment layer. A production project is READY, but the existing deployment must not be assumed to contain the latest GitHub Vertical 01 code until a new deployment is explicitly verified.
@@ -16,17 +16,27 @@ This file is the code-repository current-state manifest. It does not replace the
 
 ## Vertical 01 maturity
 
-Current chain:
+Current main chain:
 
 `Evidence -> Relationship -> Signal -> Opportunity -> Outcome`
 
 Implemented in GitHub with stable IDs, provenance checks, entity consistency, outcome-state invariants, and real evidence-linked fixtures for SupplierTR, GH Petro, and YAXING.
 
-Maturity label:
+Current maturity:
 
-`Implemented in GitHub -> local logic/tests exercised -> GitHub Actions configured -> successful CI run not yet independently verified -> Supabase adapter pending verified schema access -> not production`
+`Implemented in GitHub -> local structural validation passed -> GitHub Actions operational and verified on draft PR #1 -> Supabase adapter pending verified schema access -> not deployed as current Vercel runtime -> not production`
 
-Local re-validation on 2026-08-19 confirmed all three real structural fixtures return zero invariant errors. This is not a substitute for repository CI.
+Verified CI proof: draft PR #1 (`feature/evidence-classification`) triggered GitHub Actions run `32243906968`; job `pytest` completed successfully, including checkout, Python setup, editable install and `pytest -q`.
+
+Draft PR #1 is **not merged**. It proposes explicit epistemic evidence classes (`fact | claim | estimate | inference | hypothesis | assumption | unknown`) so supplier statements cannot silently become verified facts. Claude review remains pending.
+
+## First measured loop proof
+
+Notion now contains evidence-backed Relationship Signals for SupplierTR, GH Petro and YAXING, each linked to canonical Entity Registry entries and Gmail evidence.
+
+A YAXING micro-outcome was also written to the canonical Outcome Ledger: technical engagement/catalog receipt progressed the route, but the next bottleneck was identified as buyer-side engineering data (final Hydrotester pipe-length and wall-thickness/ID range). This is an **Inconclusive / Retest** micro-outcome, not supplier qualification.
+
+This is stronger proof than a structural fixture alone because Evidence -> Relationship Signal -> Opportunity/Next Action -> Outcome/Learning is represented against a live supplier interaction outside the code testbed.
 
 ## Current hard gates
 
@@ -37,6 +47,7 @@ Local re-validation on 2026-08-19 confirmed all three real structural fixtures r
 5. No external consequential action without human approval.
 6. No claim that current GitHub code is deployed on Vercel until deployment parity is verified.
 7. No production AI-agent runtime before the first procurement loop is measurable and repeatable.
+8. Draft PR #1 must not be merged only because CI passed; independent review and classification correctness still matter.
 
 ## Drift rules
 
@@ -49,7 +60,7 @@ Local re-validation on 2026-08-19 confirmed all three real structural fixtures r
 
 ### GitHub Actions
 
-Official GitHub documentation confirms workflow runs emit Checks and can be inspected from run history/logs. The NEXUS test workflow now has `workflow_dispatch` plus explicit least-privilege `contents: read`. A successful run is still UNKNOWN because the available connector exposes no workflow-run/check result for current main.
+The NEXUS test workflow has `workflow_dispatch`, `pull_request`, main-push execution and explicit least-privilege `contents: read`. CI is now verified operational through PR run `32243906968`, which completed with conclusion `success`.
 
 ### Supabase security/access
 
@@ -57,18 +68,22 @@ Official Supabase documentation separates object grants from Row Level Security:
 
 ### Future agent/runtime direction
 
-Current OpenAI Agents SDK guidance favors a small set of primitives: agents, tools/handoffs, guardrails, human-in-the-loop, sessions, and tracing. NEXUS should not create a large agent fleet. If/when agentic runtime is justified, start with one manager/orchestrator plus specialist tools or handoffs and make tracing/evaluation mandatory. Sensitive model/tool payload capture should default off for commercial data. OpenTelemetry GenAI conventions are still evolving, so keep internal trace/event contracts portable rather than binding the database schema to experimental telemetry names.
+Current agent-runtime direction stays deliberately small: manager/orchestrator + tools/specialist handoffs + guardrails + human gate + tracing/evaluation. No large agent fleet before measurable closed-loop value. Sensitive trace/model payload capture should default off for commercial data, and internal event contracts should remain portable rather than being coupled to evolving telemetry conventions.
 
 ### Hydrotester feasibility research
 
-Official manufacturer pages show that the 120 MPa class is technically credible: Fives Taylor-Wilson describes stable testing from 35 bar to over 1,750 bar and accommodates varying pipe lengths/end conditions; YAXING publishes customized hydrotesters up to 150 MPa and pipe lengths up to 25 m. These sources support feasibility of the pressure class, not compliance of any specific offered machine. Marley has independently asked for pipe length and wall-thickness ranges before quotation, reinforcing that geometry remains a decision-critical engineering input.
+Official manufacturer material supports technical credibility of the 120 MPa class, but not compliance of any specific offered machine. Marley independently asked for pipe-length and wall-thickness ranges before quotation. Final Hydrotester geometry therefore remains a decision-critical internal engineering blocker.
+
+### Future Signal Registry canonicalization
+
+`NEXUS Future Signal Registry` at `5f728db4-2dfb-4ece-9c80-29707a118383` / `collection://ae665f6a-e726-4936-8e31-2b67e45b7ba9` remains the canonical write target. A unique source-less regional logistics Watch item from sibling `65efe565...` was re-researched against current IMO evidence, corrected at source, and merged into the canonical registry. The sibling remains lineage/recovery and should receive no new writes.
 
 ## Near-term proof targets
 
-1. Verify CI success on current main; if the connector remains blind, manually inspect Actions when Work/Codex access is available.
-2. Receive Claude KEEP/CHANGE/STOP review of Vertical 01 v0.2.
-3. Restore Supabase read access; inspect integration role/grants/RLS before changing policies or code.
-4. Turn the three structural fixtures into synchronized runtime records once DB access is verified.
-5. Obtain Hydrotester pipe-length and wall-thickness range from engineering and advance Marley / Yedi Mavi / ANZ without specification drift.
-6. Convert at least one supplier interaction into a measured closed loop with outcome/next-action evidence before Proposal Ingestion v0.2 expands.
-7. Produce a final Work-migration parity checkpoint before changing orchestration surface.
+1. Receive Claude KEEP/CHANGE/STOP review of draft PR #1 / Vertical 01 evidence classification.
+2. Restore Supabase read access; inspect integration role/grants/RLS before changing policies or code.
+3. Obtain Hydrotester pipe-length and wall-thickness/ID range from engineering and advance Marley / Yedi Mavi / ANZ without specification drift.
+4. Record the next supplier reply/quote/referral as a measured outcome and compare expected vs actual Next Best Action.
+5. Verify Vercel deployment parity only when a deliberate deployment is justified; do not deploy merely to show activity.
+6. Only after repeated loop proof, start Proposal Ingestion / deviation extraction v0.2.
+7. Produce one final Work-migration parity checkpoint before changing orchestration surface.

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass
 from typing import Literal, Sequence
 
@@ -44,24 +45,26 @@ def choose_provider_route(
 ) -> RouteDecision:
     """Select the best verified route and fail over deterministically.
 
-    Degraded/blocked/unknown routes are never selected merely because they have a
-    better nominal priority. This lets NEXUS keep working when a preferred vendor
-    or connector breaks while preserving fail-closed behavior for write actions.
+    Duplicate provider IDs are treated as ambiguous control-plane state and are
+    removed entirely. A degraded preferred provider therefore cannot block a
+    verified secondary route, while write actions still require explicit write
+    capability evidence on the selected provider.
     """
     candidates = [r for r in routes if isinstance(r, ProviderRoute) and r.capability == capability]
-    ordered = sorted(candidates, key=lambda r: (r.priority, r.provider_id))
-    attempted: list[str] = []
-    blocked: list[str] = []
+    counts = Counter(r.provider_id for r in candidates)
+    duplicate_ids = {provider_id for provider_id, count in counts.items() if count > 1}
+    ordered = sorted(
+        (r for r in candidates if r.provider_id not in duplicate_ids),
+        key=lambda r: (r.priority, r.provider_id),
+    )
 
-    seen_ids: set[str] = set()
+    attempted: list[str] = []
+    blocked: list[str] = sorted(duplicate_ids)
     for route in ordered:
-        if route.provider_id in seen_ids:
-            blocked.append(route.provider_id)
-            continue
-        seen_ids.add(route.provider_id)
         attempted.append(route.provider_id)
         if _usable(route, write_required=write_required):
             return RouteDecision(route.provider_id, tuple(attempted), tuple(blocked), "selected first verified healthy route")
         blocked.append(route.provider_id)
 
-    return RouteDecision(None, tuple(attempted), tuple(blocked), "no verified healthy route satisfies requested capability")
+    reason = "ambiguous duplicate provider routes" if duplicate_ids and not ordered else "no verified healthy route satisfies requested capability"
+    return RouteDecision(None, tuple(attempted), tuple(blocked), reason)

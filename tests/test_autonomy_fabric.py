@@ -1,3 +1,5 @@
+from hypothesis import given, strategies as st
+
 from nexus_core.autonomy import WorkItem, plan_autonomy
 from nexus_core.capabilities import Capability
 
@@ -87,3 +89,24 @@ def test_malformed_evidence_tier_fails_closed_before_action_gate():
     assert len(plan.blocked) == 1
     assert "evidence must be supported" in plan.blocked[0].blockers
     assert plan.blocked[0].selected_capability_ids == ()
+
+
+def test_unsupported_action_kind_is_blocked_before_capability_selection():
+    task = WorkItem("bad-action-kind", "research", "Malformed action kinds must not reach capability planning.", "invent-permission", ("github.write",), ("source:test",), write_required=True)  # type: ignore[arg-type]
+    plan = plan_autonomy((task,), capabilities())
+    assert plan.runnable == ()
+    assert plan.human_gated == ()
+    assert len(plan.blocked) == 1
+    assert "action_kind must be supported" in plan.blocked[0].blockers
+    assert plan.blocked[0].selected_capability_ids == ()
+
+
+@given(st.one_of(st.none(), st.integers(), st.lists(st.text(max_size=5)), st.dictionaries(st.text(max_size=5), st.integers(), max_size=3)))
+def test_malformed_action_kind_never_reaches_capability_selection(value):
+    task = WorkItem("property-bad-action-kind", "research", "Generated malformed action kinds must fail before capability planning.", value, ("github.write",), ("source:property-test",), write_required=True)  # type: ignore[arg-type]
+    plan = plan_autonomy((task,), capabilities())
+    assert plan.runnable == ()
+    assert plan.human_gated == ()
+    assert len(plan.blocked) == 1
+    assert plan.blocked[0].selected_capability_ids == ()
+    assert any(blocker.startswith("action_kind") for blocker in plan.blocked[0].blockers)

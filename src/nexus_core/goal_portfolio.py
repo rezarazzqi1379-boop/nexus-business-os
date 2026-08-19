@@ -138,17 +138,23 @@ def route_goal_portfolio(goals: Sequence[GoalTrack]) -> GoalPortfolio:
     review: list[GoalTrack] = []
     paused: list[GoalTrack] = []
     invalid: list[tuple[GoalTrack, tuple[str, ...]]] = []
-    seen: set[str] = set()
+    seen_valid_refs: set[str] = set()
 
     for goal in goals:
         errors = validate_goal_track(goal)
-        if isinstance(goal, GoalTrack) and isinstance(goal.goal_ref, str):
-            if goal.goal_ref in seen:
-                errors.append("goal_ref must be unique within a portfolio cycle")
-            seen.add(goal.goal_ref)
         if errors:
             invalid.append((goal, tuple(errors)))
             continue
+
+        # Only structurally valid goals participate in uniqueness. A malformed/tampered
+        # goal must not reserve an identifier and poison a later valid goal in the same cycle.
+        assert isinstance(goal, GoalTrack)
+        assert isinstance(goal.goal_ref, str)
+        if goal.goal_ref in seen_valid_refs:
+            invalid.append((goal, ("goal_ref must be unique within a portfolio cycle",)))
+            continue
+        seen_valid_refs.add(goal.goal_ref)
+
         if goal.state == "next_action":
             ready.append(goal)
         elif goal.state == "waiting_blocked":

@@ -63,7 +63,11 @@ def test_customer_network_research_is_outcome_bound_but_never_outreach_authorize
     assert task.action_kind == "research" and task.write_required is False and task.domain == "customer_network"
     assert task.goal_ref == "goal:customer-network:buyer-map"
     assert "verified company fit" in task.success_signal
-    assert "kill or narrow" in task.failure_signal
+    assert "credible buying/project/need evidence" in task.success_signal
+    assert "direct or warm contact path" in task.success_signal
+    assert "invitation counts" in task.failure_signal
+    assert "kill, narrow or change the segment" in task.failure_signal
+    assert "human-reviewed outreach only" in task.objective
 
 
 def test_inbox_reply_is_bound_to_blocker_resolution_not_activity():

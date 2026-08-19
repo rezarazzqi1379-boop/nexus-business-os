@@ -41,7 +41,11 @@ def validate_commercial_candidate(item: CommercialCandidate) -> tuple[str, ...]:
 
 
 def qualify_commercial_network(candidates: Iterable[CommercialCandidate]) -> tuple[QualifiedCandidate, ...]:
-    """Rank commercial paths without treating names or contact data as opportunity proof."""
+    """Rank commercial paths without treating names or contact data as opportunity proof.
+
+    Qualification is structural and evidence-gated rather than dependent on a
+    pseudo-precise score threshold. The score is retained only for ordering.
+    """
     results: list[QualifiedCandidate] = []; seen_ids: set[str] = set()
     for item in candidates:
         errors = validate_commercial_candidate(item)
@@ -55,15 +59,20 @@ def qualify_commercial_network(candidates: Iterable[CommercialCandidate]) -> tup
         if item.need_signals: score += min(30, 10 * len(item.need_signals)); reasons.append("need_signal")
         if item.role_signals: score += min(20, 10 * len(item.role_signals)); reasons.append("relevant_role")
         if item.contact_paths: score += 10; reasons.append("contact_path")
-        if item.evidence_strength in {"strong", "partial"} and item.path_type in {"direct", "warm"}: score += 10; reasons.append("verified_direct_or_warm_path")
+        verified_relationship_path = item.evidence_strength in {"strong", "partial"} and item.path_type in {"direct", "warm"}
+        if verified_relationship_path: score += 10; reasons.append("verified_direct_or_warm_path")
         if item.evidence_strength == "strong": score += 10
         elif item.evidence_strength == "partial": score += 5
         elif item.evidence_strength == "unverified": score -= 15; reasons.append("unverified_evidence")
 
         hard_qualified = bool(item.product_fit and item.need_signals and item.role_signals and item.contact_paths)
-        if hard_qualified and score >= 60 and item.evidence_strength in {"strong", "partial"}: state = "qualified"
-        elif item.evidence_strength == "unverified": state = "reject"
-        elif item.product_fit or item.need_signals or item.role_signals or item.contact_paths: state = "research_more"
-        else: state = "reject"
+        if hard_qualified and verified_relationship_path:
+            state = "qualified"
+        elif item.evidence_strength == "unverified":
+            state = "reject"
+        elif item.product_fit or item.need_signals or item.role_signals or item.contact_paths:
+            state = "research_more"
+        else:
+            state = "reject"
         results.append(QualifiedCandidate(item, max(0, score), state, tuple(reasons)))
     return tuple(sorted(results, key=lambda x: (-x.score, x.candidate.company_name.casefold(), x.candidate.candidate_id)))

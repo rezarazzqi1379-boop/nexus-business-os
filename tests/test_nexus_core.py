@@ -254,3 +254,78 @@ def test_blanket_or_mismatched_approval_does_not_unlock_future_action():
     )
     assert decision.allowed_now is False
     assert decision.requires_human_approval is True
+
+
+def test_padded_action_id_is_rejected_before_approval_matching():
+    intent = ActionIntent(
+        action_id=" merge-1 ",
+        kind="merge_code",
+        description="Merge reviewed feature branch to main",
+    )
+    decision = evaluate_action(intent, approval=ActionApproval(action_id=" merge-1 "))
+    assert decision.allowed_now is False
+    assert decision.reason == "action_id cannot have leading or trailing whitespace"
+
+
+def test_unicode_formatting_character_in_action_id_fails_closed():
+    decision = evaluate_action(
+        ActionIntent(
+            action_id="merge\u202e-1",
+            kind="merge_code",
+            description="Merge reviewed feature branch to main",
+        ),
+        approval=ActionApproval(action_id="merge\u202e-1"),
+    )
+    assert decision.allowed_now is False
+    assert decision.reason == "action_id cannot contain control or formatting characters"
+
+
+def test_non_boolean_approval_cannot_unlock_gated_action():
+    decision = evaluate_action(
+        ActionIntent(
+            action_id="payment-3",
+            kind="payment",
+            description="Release supplier payment",
+        ),
+        approval=ActionApproval(action_id="payment-3", approved="yes"),  # type: ignore[arg-type]
+    )
+    assert decision.allowed_now is False
+    assert decision.requires_human_approval is True
+    assert decision.reason == "approval.approved must be a boolean"
+
+
+def test_malformed_action_id_type_fails_closed_without_crashing():
+    decision = evaluate_action(
+        ActionIntent(
+            action_id=123,  # type: ignore[arg-type]
+            kind="send_external_message",
+            description="Send supplier reply",
+        )
+    )
+    assert decision.allowed_now is False
+    assert decision.reason == "action_id must be a string"
+
+
+def test_malformed_kind_type_fails_closed_without_set_membership_crash():
+    decision = evaluate_action(
+        ActionIntent(
+            action_id="send-2",
+            kind=[],  # type: ignore[arg-type]
+            description="Send supplier reply",
+        )
+    )
+    assert decision.allowed_now is False
+    assert decision.reason == "kind must be a string"
+
+
+def test_non_boolean_reversible_flag_fails_closed():
+    decision = evaluate_action(
+        ActionIntent(
+            action_id="internal-1",
+            kind="branch_commit",
+            description="Commit tested code",
+            reversible="false",  # type: ignore[arg-type]
+        )
+    )
+    assert decision.allowed_now is False
+    assert decision.reason == "reversible must be a boolean"

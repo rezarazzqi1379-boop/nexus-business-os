@@ -198,3 +198,38 @@ def test_malformed_metadata_fails_closed():
     )
     assert len(plan.blocked) == 1
     assert any("control or formatting" in blocker for blocker in plan.blocked[0].blockers)
+
+
+def test_malformed_priority_tier_fails_closed_instead_of_crashing_sort():
+    task = WorkItem(
+        task_id="bad-priority",
+        domain="research",
+        objective="Malformed priority must be blocked before execution.",
+        action_kind="research",
+        acceptable_capability_ids=("gmail.read",),
+        evidence_refs=("source:test",),
+        value="not-a-tier",  # type: ignore[arg-type]
+    )
+    plan = plan_autonomy((task,), capabilities())
+    assert plan.runnable == ()
+    assert len(plan.blocked) == 1
+    assert "value must be supported" in plan.blocked[0].blockers
+
+
+def test_malformed_evidence_tier_fails_closed_before_action_gate():
+    task = WorkItem(
+        task_id="bad-evidence",
+        domain="research",
+        objective="Malformed evidence tier must never reach capability execution.",
+        action_kind="send_external_message",
+        acceptable_capability_ids=("notion.write",),
+        evidence_refs=("source:test",),
+        evidence=object(),  # type: ignore[arg-type]
+        write_required=True,
+    )
+    plan = plan_autonomy((task,), capabilities())
+    assert plan.runnable == ()
+    assert plan.human_gated == ()
+    assert len(plan.blocked) == 1
+    assert "evidence must be supported" in plan.blocked[0].blockers
+    assert plan.blocked[0].selected_capability_ids == ()

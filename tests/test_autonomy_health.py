@@ -105,6 +105,36 @@ def test_duplicate_health_records_fail_closed():
     assert "capability health unavailable: gmail.read" in plan.blocked[0].blockers
 
 
+def test_duplicate_capability_registry_ids_fail_closed():
+    duplicate_a = _capability("gmail.read")
+    duplicate_b = _capability("gmail.read")
+    plan = plan_autonomy_with_health(
+        (_task(acceptable=("gmail.read",)),),
+        (duplicate_a, duplicate_b),
+        (_health("gmail.read"),),
+        now="2026-08-19T18:30:00+00:00",
+    )
+    assert plan.runnable == ()
+    assert len(plan.blocked) == 1
+    assert "capability registry ambiguous: gmail.read" in plan.blocked[0].blockers
+
+
+def test_duplicate_registry_route_is_removed_so_unique_healthy_alternative_wins():
+    plan = plan_autonomy_with_health(
+        (_task(acceptable=("gmail.read", "notion.read")),),
+        (
+            _capability("gmail.read"),
+            _capability("gmail.read"),
+            _capability("notion.read"),
+        ),
+        (_health("gmail.read"), _health("notion.read")),
+        now="2026-08-19T18:30:00+00:00",
+    )
+    assert len(plan.runnable) == 1
+    assert plan.runnable[0].selected_capability_ids == ("notion.read",)
+    assert plan.blocked == ()
+
+
 def test_unhealthy_route_is_removed_before_selection_so_healthy_alternative_wins():
     plan = plan_autonomy_with_health(
         (_task(acceptable=("gmail.read", "notion.read")),),

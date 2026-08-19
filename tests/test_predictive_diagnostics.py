@@ -1,5 +1,6 @@
+from nexus_core.capability_health import CapabilityHealth
 from nexus_core.goal_portfolio import GoalTrack
-from nexus_core.predictive_diagnostics import diagnose_goal_portfolio
+from nexus_core.predictive_diagnostics import diagnose_capability_routes, diagnose_goal_portfolio
 
 
 def test_blocked_goal_emits_high_risk_finding():
@@ -43,3 +44,42 @@ def test_timezone_is_required_for_diagnostic_clock():
         assert False
     except ValueError as exc:
         assert "timezone" in str(exc)
+
+
+def test_stale_capability_route_becomes_predictive_finding():
+    health = CapabilityHealth(
+        capability_id="gmail.read",
+        state="verified_read",
+        checked_at="2026-08-19T10:00:00+00:00",
+        route_ref="connector:gmail:list_labels",
+        evidence_ref="probe:gmail:old",
+        proven_access=("read",),
+    )
+    findings = diagnose_capability_routes((health,), now="2026-08-19T21:00:00+03:30")
+    assert any(f.finding_id == "capability:stale_health_check:gmail.read" and f.risk == "medium" for f in findings)
+
+
+def test_blocked_connector_becomes_high_risk_route_finding():
+    health = CapabilityHealth(
+        capability_id="openai.platform",
+        state="blocked",
+        checked_at="2026-08-19T18:20:00+00:00",
+        route_ref="openai-platform:list-key-targets",
+        evidence_ref="probe:openai-platform:provider-rejected",
+        proven_access=(),
+    )
+    findings = diagnose_capability_routes((health,), now="2026-08-19T21:50:00+03:30")
+    assert any(f.subject_ref == "openai.platform" and f.risk == "high" for f in findings)
+
+
+def test_unverified_external_route_never_becomes_runtime_capability():
+    health = CapabilityHealth(
+        capability_id="zotero.local",
+        state="not_available_here",
+        checked_at="2026-08-19T18:20:00+00:00",
+        route_ref="codex:zotero-local-api",
+        evidence_ref="plugin-manager:not-installed-here",
+        proven_access=(),
+    )
+    findings = diagnose_capability_routes((health,), now="2026-08-19T21:50:00+03:30")
+    assert any(f.finding_id == "capability:route_unverified:zotero.local" for f in findings)

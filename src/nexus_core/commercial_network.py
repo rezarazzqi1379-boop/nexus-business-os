@@ -62,15 +62,13 @@ def qualify_commercial_network(candidates: Iterable[CommercialCandidate]) -> tup
     for item in candidates:
         errors = validate_commercial_candidate(item)
         if errors:
-            results.append(QualifiedCandidate(item, 0, "reject", errors))
-            continue
+            results.append(QualifiedCandidate(item, 0, "reject", errors)); continue
         if item.candidate_id in seen_ids:
-            results.append(QualifiedCandidate(item, 0, "reject", ("duplicate_candidate_id",)))
-            continue
+            results.append(QualifiedCandidate(item, 0, "reject", ("duplicate_candidate_id",))); continue
         seen_ids.add(item.candidate_id)
         if item.duplicate_of:
-            results.append(QualifiedCandidate(item, 0, "reject", ("duplicate_candidate",)))
-            continue
+            results.append(QualifiedCandidate(item, 0, "reject", ("duplicate_candidate",))); continue
+
         score = 0
         reasons: list[str] = []
         if item.product_fit:
@@ -93,7 +91,7 @@ def qualify_commercial_network(candidates: Iterable[CommercialCandidate]) -> tup
         hard_qualified = bool(item.product_fit and item.need_signals and item.role_signals and item.contact_paths)
         if hard_qualified and score >= 60 and item.evidence_strength in {"strong", "partial"}:
             state = "qualified"
-        elif score >= 25:
+        elif item.product_fit or item.need_signals or item.role_signals or item.contact_paths:
             state = "research_more"
         else:
             state = "reject"

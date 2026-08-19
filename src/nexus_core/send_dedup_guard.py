@@ -20,6 +20,10 @@ class SendGuardDecision:
     blocking_message_id: str | None = None
 
 
+def _valid_aware_datetime(value: object) -> bool:
+    return isinstance(value, datetime) and value.tzinfo is not None and value.utcoffset() is not None
+
+
 def evaluate_send_against_thread(
     *,
     draft_created_at: datetime,
@@ -28,27 +32,39 @@ def evaluate_send_against_thread(
 ) -> SendGuardDecision:
     """Block a send when the same thread already contains a newer SENT message.
 
-    The guard is intentionally chronology-based and fail-closed on malformed
-    state. It does not authorize a send; it only prevents stale-draft replay.
+    This is a prevention guard only: an allow result is never authorization to send.
+    Runtime inputs are validated fail-closed because type hints are not enforcement.
     """
-    if not thread_id.strip():
+    if not isinstance(thread_id, str) or not thread_id.strip() or thread_id != thread_id.strip():
         return SendGuardDecision(False, "invalid_thread_id")
-    if draft_created_at.tzinfo is None or draft_created_at.utcoffset() is None:
-        return SendGuardDecision(False, "naive_draft_timestamp")
+    if not _valid_aware_datetime(draft_created_at):
+        return SendGuardDecision(False, "invalid_draft_timestamp")
+
+    try:
+        iterator = iter(messages)
+    except TypeError:
+        return SendGuardDecision(False, "invalid_messages")
 
     newest_blocker: ThreadMessageState | None = None
     seen_ids: set[str] = set()
-    for msg in messages:
+    for msg in iterator:
         if not isinstance(msg, ThreadMessageState):
             return SendGuardDecision(False, "invalid_message_state")
-        if not msg.message_id.strip() or not msg.thread_id.strip():
+        if (
+            not isinstance(msg.message_id, str)
+            or not msg.message_id.strip()
+            or msg.message_id != msg.message_id.strip()
+            or not isinstance(msg.thread_id, str)
+            or not msg.thread_id.strip()
+            or msg.thread_id != msg.thread_id.strip()
+            or not isinstance(msg.is_sent, bool)
+            or not _valid_aware_datetime(msg.sent_at)
+        ):
             return SendGuardDecision(False, "invalid_message_state")
         if msg.message_id in seen_ids:
             return SendGuardDecision(False, "duplicate_message_id")
         seen_ids.add(msg.message_id)
-        if msg.sent_at.tzinfo is None or msg.sent_at.utcoffset() is None:
-            return SendGuardDecision(False, "naive_message_timestamp")
-        if msg.thread_id != thread_id or not msg.is_sent:
+        if msg.thread_id != thread_id or msg.is_sent is not True:
             continue
         if msg.sent_at <= draft_created_at:
             continue

@@ -95,9 +95,8 @@ def validate_eval_run(run: EvalRun) -> list[str]:
                 errors.append(f"{name} is required")
 
     for result in run.results:
-        for name, value in (("result.case_id", result.case_id),):
-            if not value.strip():
-                errors.append(f"{name} is required")
+        if not result.case_id.strip():
+            errors.append("result.case_id is required")
 
         if result.unsupported_claims < 0:
             errors.append("result.unsupported_claims cannot be negative")
@@ -105,10 +104,17 @@ def validate_eval_run(run: EvalRun) -> list[str]:
             errors.append("result.policy_violations cannot be negative")
         if result.human_overrides < 0:
             errors.append("result.human_overrides cannot be negative")
-        if any(not ref.strip() for ref in result.evidence_refs):
+
+        if not result.evidence_refs:
+            errors.append("result.evidence_refs must contain at least one retrievable reference")
+        elif any(not ref.strip() for ref in result.evidence_refs):
             errors.append("result.evidence_refs cannot contain blank references")
+
         if any(not tag.strip() for tag in result.failure_tags):
             errors.append("result.failure_tags cannot contain blank tags")
+
+        if not result.passed and not result.failure_tags:
+            errors.append("failed result must contain at least one failure tag")
 
         if result.passed and (result.policy_violations > 0 or result.failure_tags):
             errors.append("passed result cannot contain policy violations or failure tags")

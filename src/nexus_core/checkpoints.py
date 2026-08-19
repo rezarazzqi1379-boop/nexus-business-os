@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Literal, Sequence
+from typing import Literal
 from unicodedata import category
 
 
@@ -43,6 +43,23 @@ class CheckpointManifest:
     entries: tuple[SnapshotEntry, ...]
 
 
+@dataclass(frozen=True)
+class BackupReceipt:
+    """Evidence that one checkpoint artifact was written to a storage backend.
+
+    The receipt is intentionally metadata-only. It proves the destination reference and
+    the source-content digest that was claimed at write time; it does not make the
+    backend canonical NEXUS state and it does not authorize restore or deletion.
+    """
+
+    checkpoint_id: str
+    artifact_ref: str
+    backend: str
+    stored_artifact_ref: str
+    stored_at: str
+    source_content_sha256: str
+
+
 def _meta_error(name: str, value: object) -> str | None:
     if not isinstance(value, str):
         return f"{name} must be a string"
@@ -65,6 +82,20 @@ def _sha256_error(value: object) -> str | None:
     return None
 
 
+def _timezone_error(name: str, value: object) -> str | None:
+    meta_error = _meta_error(name, value)
+    if meta_error:
+        return meta_error
+    assert isinstance(value, str)
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return f"{name} must be ISO-8601"
+    if parsed.tzinfo is None:
+        return f"{name} must include a timezone offset"
+    return None
+
+
 def validate_checkpoint(manifest: CheckpointManifest) -> list[str]:
     """Validate backup metadata without assuming any storage backend."""
     if not isinstance(manifest, CheckpointManifest):
@@ -80,17 +111,9 @@ def validate_checkpoint(manifest: CheckpointManifest) -> list[str]:
         if error:
             errors.append(error)
 
-    captured_error = _meta_error("captured_at", manifest.captured_at)
+    captured_error = _timezone_error("captured_at", manifest.captured_at)
     if captured_error:
         errors.append(captured_error)
-    elif isinstance(manifest.captured_at, str):
-        try:
-            parsed = datetime.fromisoformat(manifest.captured_at.replace("Z", "+00:00"))
-        except ValueError:
-            errors.append("captured_at must be ISO-8601")
-        else:
-            if parsed.tzinfo is None:
-                errors.append("captured_at must include a timezone offset")
 
     if not isinstance(manifest.entries, tuple):
         return errors + ["entries must be a tuple"]
@@ -121,6 +144,47 @@ def validate_checkpoint(manifest: CheckpointManifest) -> list[str]:
             seen_artifacts.add(entry.artifact_ref)
 
     return errors
+
+
+def validate_backup_receipt(receipt: BackupReceipt) -> list[str]:
+    """Fail closed on ambiguous or malformed storage-write evidence."""
+    if not isinstance(receipt, BackupReceipt):
+        return ["receipt must be a BackupReceipt"]
+
+    errors: list[str] = []
+    for name, value in (
+        ("checkpoint_id", receipt.checkpoint_id),
+        ("artifact_ref", receipt.artifact_ref),
+        ("backend", receipt.backend),
+        ("stored_artifact_ref", receipt.stored_artifact_ref),
+    ):
+        error = _meta_error(name, value)
+        if error:
+            errors.append(error)
+
+    stored_at_error = _timezone_error("stored_at", receipt.stored_at)
+    if stored_at_error:
+        errors.append(stored_at_error)
+
+    digest_error = _sha256_error(receipt.source_content_sha256)
+    if digest_error:
+        errors.append(digest_error.replace("content_sha256", "source_content_sha256"))
+    return errors
+
+
+def receipt_covers_manifest_entry(
+    receipt: BackupReceipt,
+    manifest: CheckpointManifest,
+) -> bool:
+    """True only when storage evidence matches an exact manifest entry digest."""
+    if validate_backup_receipt(receipt) or validate_checkpoint(manifest):
+        return False
+    if receipt.checkpoint_id != manifest.checkpoint_id:
+        return False
+    matching = [entry for entry in manifest.entries if entry.artifact_ref == receipt.artifact_ref]
+    if len(matching) != 1:
+        return False
+    return matching[0].content_sha256 == receipt.source_content_sha256
 
 
 def checkpoint_matches(

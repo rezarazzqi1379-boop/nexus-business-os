@@ -1,8 +1,11 @@
 from nexus_core.checkpoints import (
+    BackupReceipt,
     CheckpointManifest,
     SnapshotEntry,
     changed_artifact_refs,
     checkpoint_matches,
+    receipt_covers_manifest_entry,
+    validate_backup_receipt,
     validate_checkpoint,
 )
 
@@ -25,6 +28,17 @@ def manifest(*, digest: str = HASH_A, captured_at: str = "2026-08-19T16:00:00+00
                 content_sha256=digest,
             ),
         ),
+    )
+
+
+def receipt(*, digest: str = HASH_A, stored_at: str = "2026-08-19T19:44:00+03:30"):
+    return BackupReceipt(
+        checkpoint_id="checkpoint:nexus:command-center",
+        artifact_ref="notion:command-center",
+        backend="google_drive",
+        stored_artifact_ref="drive:file:example-backup-doc",
+        stored_at=stored_at,
+        source_content_sha256=digest,
     )
 
 
@@ -67,3 +81,29 @@ def test_duplicate_artifact_refs_are_rejected():
         ),
     )
     assert "checkpoint cannot contain duplicate artifact_ref values" in validate_checkpoint(duplicate)
+
+
+def test_valid_backup_receipt_matches_exact_manifest_entry_digest():
+    assert validate_backup_receipt(receipt()) == []
+    assert receipt_covers_manifest_entry(receipt(), manifest()) is True
+
+
+def test_receipt_digest_mismatch_does_not_prove_backup():
+    assert receipt_covers_manifest_entry(receipt(digest=HASH_B), manifest(digest=HASH_A)) is False
+
+
+def test_receipt_requires_timezone_aware_storage_time():
+    errors = validate_backup_receipt(receipt(stored_at="2026-08-19T19:44:00"))
+    assert "stored_at must include a timezone offset" in errors
+
+
+def test_receipt_rejects_ambiguous_backend_metadata():
+    malformed = BackupReceipt(
+        checkpoint_id="checkpoint:nexus:command-center",
+        artifact_ref="notion:command-center",
+        backend=" google_drive ",
+        stored_artifact_ref="drive:file:example-backup-doc",
+        stored_at="2026-08-19T19:44:00+03:30",
+        source_content_sha256=HASH_A,
+    )
+    assert "backend cannot have leading or trailing whitespace" in validate_backup_receipt(malformed)

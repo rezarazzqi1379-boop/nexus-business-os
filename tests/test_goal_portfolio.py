@@ -1,3 +1,5 @@
+from hypothesis import given, strategies as st
+
 from nexus_core.goal_portfolio import GoalTrack, route_goal_portfolio, validate_goal_track
 
 
@@ -70,7 +72,38 @@ def test_duplicate_goal_ref_is_invalid_in_same_cycle():
     assert "goal_ref must be unique within a portfolio cycle" in portfolio.invalid[0][1]
 
 
+def test_invalid_goal_cannot_poison_later_valid_duplicate_ref():
+    malformed = goal(goal_ref="goal:shared", blocker_ref="blocker:illegal-routing")
+    valid = goal(goal_ref="goal:shared")
+    portfolio = route_goal_portfolio((malformed, valid))
+    assert [item.goal_ref for item in portfolio.ready] == ["goal:shared"]
+    assert len(portfolio.invalid) == 1
+    assert "next_action state cannot carry blocker/review/pause routing" in portfolio.invalid[0][1]
+    assert "goal_ref must be unique within a portfolio cycle" not in portfolio.invalid[0][1]
+
+
 def test_goal_metadata_rejects_unicode_format_controls():
     malformed = goal(goal_ref="goal:\u202eai")
     errors = validate_goal_track(malformed)
     assert "goal_ref cannot contain control or formatting characters" in errors
+
+
+@given(st.one_of(st.none(), st.integers(), st.lists(st.integers()), st.dictionaries(st.text(max_size=5), st.integers(), max_size=3)))
+def test_goal_validator_never_crashes_on_malformed_state(value):
+    malformed = goal(state=value)  # type: ignore[arg-type]
+    errors = validate_goal_track(malformed)
+    assert errors
+    assert "state must be supported" in errors
+
+
+@given(st.text(min_size=1, max_size=32).filter(lambda text: text == text.strip() and "\x00" not in text))
+def test_valid_goal_ref_survives_preceding_invalid_goal_with_same_ref(goal_ref):
+    malformed = goal(goal_ref=goal_ref, blocker_ref="blocker:illegal-routing")
+    valid = goal(goal_ref=goal_ref)
+    portfolio = route_goal_portfolio((malformed, valid))
+    if validate_goal_track(valid):
+        # Property input itself can contain a disallowed Unicode category; in that case
+        # both records must fail closed and there is no valid record to preserve.
+        assert not portfolio.ready
+    else:
+        assert [item.goal_ref for item in portfolio.ready] == [goal_ref]

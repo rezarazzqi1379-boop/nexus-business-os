@@ -10,7 +10,7 @@ This is an audit metadata envelope, not another agent, workflow engine, database
 
 ## Design
 
-Each `AuditEvent` records only stable metadata:
+Each `AuditEvent` records only compact stable metadata:
 
 - `event_id` — stable event identity;
 - `trace_id` — groups one end-to-end control flow;
@@ -27,6 +27,8 @@ Each `AuditEvent` records only stable metadata:
 
 v0.1 deliberately has **no free-form payload field**. Email bodies, prompts, LLM/tool inputs and outputs, prices, contracts, credentials and other sensitive content stay in their authoritative source systems and are referenced rather than copied.
 
+All string metadata is intentionally bounded: leading/trailing whitespace, control characters (including CR/LF) and values over 256 characters fail validation. This prevents reference/tag fields from becoming a covert payload or log-injection channel.
+
 ## Validation / fail-closed rules
 
 `validate_audit_trace(...)` rejects:
@@ -37,6 +39,7 @@ v0.1 deliberately has **no free-form payload field**. Email bodies, prompts, LLM
 - unsupported event/actor/result/privacy values;
 - duplicate event IDs;
 - duplicate/blank evidence, correlation or tag values;
+- oversized, control-character or whitespace-padded metadata values;
 - human-gate/action-attempt events without an exact `action_ref`;
 - missing parent events;
 - parent links that cross trace IDs;
@@ -50,20 +53,30 @@ The regression fixture models the current Hydrotester control path:
 
 The event metadata links to the existing Gmail evidence and GitHub eval work while keeping commercial message content out of the audit envelope.
 
-## External standards / portability
+## External standards / security research
 
-Primary-source research checked 2026-08-19:
+Primary-source/security guidance checked 2026-08-19:
 
-- OpenAI Agents SDK tracing models an end-to-end workflow as a trace with unique trace IDs and child spans with parent IDs, timestamps and metadata. It also exposes controls for sensitive trace data.
-- OpenTelemetry traces model spans with identity, parentage, attributes, events and links. Semantic conventions provide common naming, but convention areas can have different stability levels; GenAI conventions are still evolving/moving.
+- OWASP logging guidance says sensitive information such as access tokens, passwords, connection strings, commercially sensitive information and higher-classification data should normally not be recorded directly. It also recommends sanitizing event data to prevent log injection, explicitly including carriage return and line feed characters.
+- W3C Trace Context privacy guidance states trace correlation fields must not carry personally identifiable or otherwise sensitive information. Its security guidance recommends checking trace-header length and content and avoiding proprietary/confidential information in propagated trace state.
+- OpenTelemetry Baggage warns that propagated context can unintentionally reach third-party resources and has no built-in integrity guarantee. NEXUS therefore does not treat external trace/baggage metadata as trusted authorization or evidence.
+- OpenAI Agents SDK tracing and OpenTelemetry provide useful exporter targets, but they are not canonical NEXUS state.
 
-NEXUS therefore keeps this internal envelope canonical and may later add exporters/adapters. Export mapping must not change the internal meaning of event identity, evidence references, action scope or privacy mode.
+Security consequence for future exporters: export only an explicit allowlist of fields, never use trace/correlation metadata as an authorization signal, and remove or transform sensitive references before crossing a trust boundary.
 
 References:
+- https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html
+- https://www.w3.org/TR/trace-context/
+- https://github.com/w3c/trace-context/blob/main/spec/50-privacy.md
+- https://github.com/w3c/trace-context/blob/main/spec/51-security.md
+- https://opentelemetry.io/docs/concepts/signals/baggage/
+- https://www.w3.org/TR/baggage/
 - https://openai.github.io/openai-agents-python/tracing/
-- https://openai.github.io/openai-agents-python/running_agents/
 - https://opentelemetry.io/docs/specs/otel/trace/api/
-- https://opentelemetry.io/docs/specs/semconv/
+
+## Trust-boundary rule
+
+Audit metadata may correlate an internal source-of-record, but it does **not** grant permission to read that source, does not prove the source is trustworthy, and must not be propagated automatically outside the current trust boundary. External exporters/adapters must independently enforce destination policy, field allowlists and access controls.
 
 ## Non-goals
 
@@ -78,4 +91,4 @@ References:
 
 ## Promotion gate
 
-Keep this branch Draft. Before integration, use it in shadow mode on the existing PR #9 control chain and verify that audit metadata can reconstruct control decisions without sensitive payload duplication. Independent review remains required before merge.
+Keep this branch Draft. Unit hardening and CI are required, then refresh the existing PR #9 shadow integration against the exact hardened contract. Independent security/architecture review remains required before merge.

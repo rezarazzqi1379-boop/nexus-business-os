@@ -49,12 +49,13 @@ def plan_autonomy_with_health(
     Fail-closed invariants
     ----------------------
     1. Missing, malformed, duplicate, future-dated or stale health cannot satisfy work.
-    2. Read work requires explicit fresh read proof.
-    3. Write work requires explicit fresh ``verified_write`` proof; registry ``can_write``
+    2. Duplicate capability IDs are ambiguous registry state and cannot satisfy work.
+    3. Read work requires explicit fresh read proof.
+    4. Write work requires explicit fresh ``verified_write`` proof; registry ``can_write``
        alone is insufficient.
-    4. Unhealthy candidate routes are removed *before* canonical capability selection so a
+    5. Unhealthy candidate routes are removed *before* canonical capability selection so a
        healthy alternative can win deterministically.
-    5. Action-specific Human Gates remain owned by ``plan_autonomy`` / canonical policy.
+    6. Action-specific Human Gates remain owned by ``plan_autonomy`` / canonical policy.
 
     The output is still the normal ``AutonomyPlan`` contract, so downstream code does not
     need a parallel planner model.
@@ -65,7 +66,19 @@ def plan_autonomy_with_health(
 
     # Registry membership and runtime health are deliberately separate. A route may exist
     # in configuration while its authentication, permission, or provider state has drifted.
-    capability_ids = {capability.capability_id for capability in capabilities}
+    # Duplicate registry IDs are also ambiguous: the planner must not let dictionary/order
+    # behavior silently decide which definition owns the route.
+    capability_counts = Counter(
+        capability.capability_id
+        for capability in capabilities
+        if isinstance(capability, Capability) and isinstance(capability.capability_id, str)
+    )
+    capability_ids = {
+        capability_id for capability_id, count in capability_counts.items() if count == 1
+    }
+    duplicate_capability_ids = {
+        capability_id for capability_id, count in capability_counts.items() if count > 1
+    }
 
     # Duplicate health evidence is ambiguous: we do not guess which record is authoritative.
     # Only capability IDs with exactly one record are eligible for runtime proof.
@@ -100,9 +113,14 @@ def plan_autonomy_with_health(
 
         required_access = "write" if task.write_required else "read"
         unhealthy_ids: list[str] = []
+        ambiguous_registry_ids: list[str] = []
         eligible_ids: set[str] = set()
 
         for capability_id in task.acceptable_capability_ids:
+            if capability_id in duplicate_capability_ids:
+                ambiguous_registry_ids.append(capability_id)
+                continue
+
             # Unknown registry IDs are handled by the canonical planner as unresolved needs.
             if capability_id not in capability_ids:
                 continue
@@ -118,9 +136,12 @@ def plan_autonomy_with_health(
             else:
                 eligible_ids.add(capability_id)
 
-        # Feed only health-proven routes back into the canonical capability planner.
+        # Feed only uniquely-defined, health-proven routes back into the canonical planner.
         eligible_capabilities = tuple(
-            capability for capability in capabilities if capability.capability_id in eligible_ids
+            capability
+            for capability in capabilities
+            if capability.capability_id in eligible_ids
+            and capability_counts.get(capability.capability_id) == 1
         )
         result = plan_autonomy((task,), eligible_capabilities)
 
@@ -131,8 +152,18 @@ def plan_autonomy_with_health(
         else:
             planned = result.blocked[0]
             health_blockers = tuple(
-                f"capability health unavailable: {capability_id}" for capability_id in sorted(unhealthy_ids)
+                f"capability health unavailable: {capability_id}"
+                for capability_id in sorted(set(unhealthy_ids))
             )
-            blocked.append(replace(planned, blockers=planned.blockers + health_blockers))
+            registry_blockers = tuple(
+                f"capability registry ambiguous: {capability_id}"
+                for capability_id in sorted(set(ambiguous_registry_ids))
+            )
+            blocked.append(
+                replace(
+                    planned,
+                    blockers=planned.blockers + registry_blockers + health_blockers,
+                )
+            )
 
     return AutonomyPlan(tuple(runnable), tuple(human_gated), tuple(blocked))

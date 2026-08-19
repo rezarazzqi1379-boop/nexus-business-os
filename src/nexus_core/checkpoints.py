@@ -30,6 +30,7 @@ _DISALLOWED_UNICODE_CATEGORIES = {"Cc", "Cf", "Zl", "Zp"}
 class SnapshotEntry:
     artifact_ref: str
     source_ref: str
+    source_version_ref: str
     category: SnapshotCategory
     content_sha256: str
 
@@ -45,11 +46,12 @@ class CheckpointManifest:
 
 @dataclass(frozen=True)
 class BackupReceipt:
-    """Evidence that one checkpoint artifact was written to a storage backend.
+    """Evidence that one exact source version was written to a storage backend.
 
-    The receipt is intentionally metadata-only. It proves the destination reference and
-    the source-content digest that was claimed at write time; it does not make the
-    backend canonical NEXUS state and it does not authorize restore or deletion.
+    The receipt is intentionally metadata-only. A digest match alone is not freshness
+    proof: the receipt must bind to the exact source_version_ref captured in the
+    manifest. This does not make the backend canonical NEXUS state and it does not
+    authorize restore or deletion.
     """
 
     checkpoint_id: str
@@ -57,6 +59,7 @@ class BackupReceipt:
     backend: str
     stored_artifact_ref: str
     stored_at: str
+    source_version_ref: str
     source_content_sha256: str
 
 
@@ -129,6 +132,7 @@ def validate_checkpoint(manifest: CheckpointManifest) -> list[str]:
         for name, value in (
             ("artifact_ref", entry.artifact_ref),
             ("source_ref", entry.source_ref),
+            ("source_version_ref", entry.source_version_ref),
         ):
             error = _meta_error(name, value)
             if error:
@@ -147,7 +151,7 @@ def validate_checkpoint(manifest: CheckpointManifest) -> list[str]:
 
 
 def validate_backup_receipt(receipt: BackupReceipt) -> list[str]:
-    """Fail closed on ambiguous or malformed storage-write evidence."""
+    """Fail closed on ambiguous or stale storage-write evidence."""
     if not isinstance(receipt, BackupReceipt):
         return ["receipt must be a BackupReceipt"]
 
@@ -157,6 +161,7 @@ def validate_backup_receipt(receipt: BackupReceipt) -> list[str]:
         ("artifact_ref", receipt.artifact_ref),
         ("backend", receipt.backend),
         ("stored_artifact_ref", receipt.stored_artifact_ref),
+        ("source_version_ref", receipt.source_version_ref),
     ):
         error = _meta_error(name, value)
         if error:
@@ -176,7 +181,7 @@ def receipt_covers_manifest_entry(
     receipt: BackupReceipt,
     manifest: CheckpointManifest,
 ) -> bool:
-    """True only when storage evidence matches an exact manifest entry digest."""
+    """True only when storage evidence matches one exact manifest source version."""
     if validate_backup_receipt(receipt) or validate_checkpoint(manifest):
         return False
     if receipt.checkpoint_id != manifest.checkpoint_id:
@@ -184,14 +189,18 @@ def receipt_covers_manifest_entry(
     matching = [entry for entry in manifest.entries if entry.artifact_ref == receipt.artifact_ref]
     if len(matching) != 1:
         return False
-    return matching[0].content_sha256 == receipt.source_content_sha256
+    entry = matching[0]
+    return (
+        entry.source_version_ref == receipt.source_version_ref
+        and entry.content_sha256 == receipt.source_content_sha256
+    )
 
 
 def checkpoint_matches(
     manifest: CheckpointManifest,
     previous: CheckpointManifest | None,
 ) -> bool:
-    """Return True only when the same idempotency key represents identical snapshot content."""
+    """Return True only when the same idempotency key represents identical source versions and content."""
     if previous is None:
         return False
     if validate_checkpoint(manifest) or validate_checkpoint(previous):
@@ -199,11 +208,11 @@ def checkpoint_matches(
     if manifest.idempotency_key != previous.idempotency_key:
         return False
     current = tuple(
-        (entry.artifact_ref, entry.source_ref, entry.category, entry.content_sha256)
+        (entry.artifact_ref, entry.source_ref, entry.source_version_ref, entry.category, entry.content_sha256)
         for entry in manifest.entries
     )
     prior = tuple(
-        (entry.artifact_ref, entry.source_ref, entry.category, entry.content_sha256)
+        (entry.artifact_ref, entry.source_ref, entry.source_version_ref, entry.category, entry.content_sha256)
         for entry in previous.entries
     )
     return current == prior
@@ -213,15 +222,19 @@ def changed_artifact_refs(
     manifest: CheckpointManifest,
     previous: CheckpointManifest | None,
 ) -> tuple[str, ...]:
-    """Identify changed/new artifacts for incremental backup without deleting old snapshots."""
+    """Identify changed/new source versions for incremental backup without deleting old snapshots."""
     if validate_checkpoint(manifest):
         return ()
     previous_by_ref = {}
     if previous is not None and not validate_checkpoint(previous):
-        previous_by_ref = {entry.artifact_ref: entry.content_sha256 for entry in previous.entries}
+        previous_by_ref = {
+            entry.artifact_ref: (entry.source_version_ref, entry.content_sha256)
+            for entry in previous.entries
+        }
     changed = [
         entry.artifact_ref
         for entry in manifest.entries
-        if previous_by_ref.get(entry.artifact_ref) != entry.content_sha256
+        if previous_by_ref.get(entry.artifact_ref)
+        != (entry.source_version_ref, entry.content_sha256)
     ]
     return tuple(changed)

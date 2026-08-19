@@ -51,6 +51,17 @@ def _message_action(kind: str = "send_intro", ordinal: int = 1) -> CommercialAct
     )
 
 
+def _internal_action(kind: str) -> CommercialAction:
+    return replace(
+        _message_action(),
+        action_id=f"action:{kind}",
+        kind=kind,  # type: ignore[arg-type]
+        channel=None,
+        message_ordinal=0,
+        content_digest=None,
+    )
+
+
 def _packet(*, recommendation: str = "deal", open_issues: tuple[str, ...] = ()) -> DealDecisionPacket:
     return DealDecisionPacket(
         packet_id="deal-packet-001",
@@ -66,16 +77,26 @@ def _packet(*, recommendation: str = "deal", open_issues: tuple[str, ...] = ()) 
     )
 
 
-def test_exact_mandate_allows_routine_external_outreach_without_per_message_approval() -> None:
+def test_exact_mandate_allows_internal_preparation_only() -> None:
     mandate = _mandate()
-    decision = evaluate_commercial_action(
-        mandate,
-        _approval(mandate),
-        _message_action("send_intro", 1),
-        now=datetime(2026, 8, 20, 12, 0, tzinfo=timezone.utc),
-    )
-    assert decision.allowed_now
-    assert not decision.requires_final_deal_gate
+    for kind in ("discover", "qualify", "draft", "prepare_deal_packet"):
+        decision = evaluate_commercial_action(
+            mandate,
+            _approval(mandate),
+            _internal_action(kind),
+            now=datetime(2026, 8, 20, 12, 0, tzinfo=timezone.utc),
+        )
+        assert decision.allowed_now
+        assert not decision.requires_final_deal_gate
+
+
+def test_all_external_commercial_actions_require_action_specific_human_gate() -> None:
+    mandate = _mandate()
+    approval = _approval(mandate)
+    for kind in ("send_intro", "send_followup", "ask_clarification", "request_meeting", "request_quote", "nonbinding_negotiate"):
+        decision = evaluate_commercial_action(mandate, approval, _message_action(kind, 1))
+        assert not decision.allowed_now
+        assert "Human Gate" in decision.reason
 
 
 def test_mandate_mutation_invalidates_previous_approval() -> None:
@@ -86,19 +107,19 @@ def test_mandate_mutation_invalidates_previous_approval() -> None:
     decision = evaluate_commercial_action(
         changed,
         approval,
-        _message_action(),
+        _internal_action("draft"),
         now=datetime(2026, 8, 20, 12, 0, tzinfo=timezone.utc),
     )
     assert not decision.allowed_now
     assert "exact mandate digest" in decision.reason
 
 
-def test_expired_mandate_blocks_routine_send() -> None:
+def test_expired_mandate_blocks_internal_preparation() -> None:
     mandate = _mandate()
     decision = evaluate_commercial_action(
         mandate,
         _approval(mandate),
-        _message_action(),
+        _internal_action("draft"),
         now=datetime(2026, 9, 1, 0, 0, tzinfo=timezone.utc),
     )
     assert not decision.allowed_now
@@ -108,31 +129,10 @@ def test_expired_mandate_blocks_routine_send() -> None:
 def test_project_and_campaign_scope_cannot_bleed() -> None:
     mandate = _mandate()
     approval = _approval(mandate)
-    outside_project = replace(_message_action(), project_ref="project:other")
-    outside_campaign = replace(_message_action(), campaign_ref="campaign:other")
+    outside_project = replace(_internal_action("draft"), project_ref="project:other")
+    outside_campaign = replace(_internal_action("draft"), campaign_ref="campaign:other")
     assert not evaluate_commercial_action(mandate, approval, outside_project).allowed_now
     assert not evaluate_commercial_action(mandate, approval, outside_campaign).allowed_now
-
-
-def test_message_count_and_channel_are_bounded_by_mandate() -> None:
-    mandate = _mandate()
-    approval = _approval(mandate)
-    too_many = _message_action("send_followup", 5)
-    wrong_channel = replace(_message_action(), channel="whatsapp")
-    assert not evaluate_commercial_action(mandate, approval, too_many).allowed_now
-    assert not evaluate_commercial_action(mandate, approval, wrong_channel).allowed_now
-
-
-def test_nonbinding_negotiation_is_autonomous_only_when_enabled() -> None:
-    mandate = _mandate()
-    action = _message_action("nonbinding_negotiate", 2)
-    assert evaluate_commercial_action(mandate, _approval(mandate), action).allowed_now
-
-    disabled = replace(mandate, allow_nonbinding_negotiation=False)
-    disabled_approval = _approval(disabled)
-    decision = evaluate_commercial_action(disabled, disabled_approval, action)
-    assert not decision.allowed_now
-    assert "disabled" in decision.reason
 
 
 def test_binding_actions_always_stop_at_final_deal_gate() -> None:
@@ -164,11 +164,11 @@ def test_final_deal_approval_is_packet_and_decision_specific() -> None:
     assert blocked.gate.requires_human_approval
 
 
-def test_commercial_queue_prioritizes_evidence_before_outreach_and_negotiation() -> None:
+def test_commercial_queue_prioritizes_internal_evidence_work_before_external_actions() -> None:
     actions = (
         _message_action("nonbinding_negotiate", 2),
-        replace(_message_action(), action_id="action:qualify", kind="qualify", channel=None, message_ordinal=0, content_digest=None),
-        replace(_message_action(), action_id="action:draft", kind="draft", channel=None, message_ordinal=0, content_digest=None),
+        _internal_action("qualify"),
+        _internal_action("draft"),
     )
     chosen = choose_next_commercial_action(actions)
     assert chosen is not None

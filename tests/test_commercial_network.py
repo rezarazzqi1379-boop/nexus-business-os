@@ -24,6 +24,10 @@ def test_unverified_name_does_not_become_opportunity():
     assert qualify_commercial_network((candidate(evidence_strength="unverified"),))[0].state != "qualified"
 
 
+def test_weak_evidence_never_qualifies_even_with_complete_shape():
+    assert qualify_commercial_network((candidate(evidence_strength="weak"),))[0].state == "research_more"
+
+
 def test_duplicate_is_rejected():
     result = qualify_commercial_network((candidate(duplicate_of="existing:1"),))[0]
     assert result.state == "reject" and "duplicate_candidate" in result.reasons

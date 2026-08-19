@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from math import ceil
 from typing import Iterable
 
@@ -10,6 +11,17 @@ class RouteSample:
     route_id: str
     latency_ms: int
     success: bool
+    cache_hit: bool = False
+    context_tokens: int = 0
+
+
+@dataclass(frozen=True)
+class ConnectorObservation:
+    route_id: str
+    started_at: datetime
+    finished_at: datetime
+    success: bool
+    source_ref: str
     cache_hit: bool = False
     context_tokens: int = 0
 
@@ -31,6 +43,51 @@ def _percentile(values: list[int], q: float) -> int:
     values = sorted(values)
     idx = max(0, min(len(values) - 1, ceil(q * len(values)) - 1))
     return values[idx]
+
+
+def _aware_utc(value: datetime) -> datetime:
+    if value.tzinfo is None or value.utcoffset() is None:
+        raise ValueError("naive_timestamp")
+    return value.astimezone(timezone.utc)
+
+
+def ingest_connector_observations(
+    observations: Iterable[ConnectorObservation],
+) -> tuple[RouteSample, ...]:
+    """Convert measured connector observations into telemetry samples.
+
+    The ingestion boundary intentionally requires an evidence source_ref and
+    timezone-aware timestamps so synthetic/untraceable latency claims cannot be
+    silently mixed with measured runtime evidence.
+    """
+    items = tuple(observations)
+    seen_refs: set[str] = set()
+    samples: list[RouteSample] = []
+    for item in items:
+        if not item.route_id.strip():
+            raise ValueError("invalid_route_id")
+        if not item.source_ref.strip():
+            raise ValueError("missing_source_ref")
+        if item.source_ref in seen_refs:
+            raise ValueError("duplicate_source_ref")
+        seen_refs.add(item.source_ref)
+        if item.context_tokens < 0:
+            raise ValueError("invalid_context_tokens")
+        started = _aware_utc(item.started_at)
+        finished = _aware_utc(item.finished_at)
+        if finished < started:
+            raise ValueError("negative_observed_duration")
+        latency_ms = int((finished - started).total_seconds() * 1000)
+        samples.append(
+            RouteSample(
+                route_id=item.route_id,
+                latency_ms=latency_ms,
+                success=item.success,
+                cache_hit=item.cache_hit,
+                context_tokens=item.context_tokens,
+            )
+        )
+    return tuple(samples)
 
 
 def summarize_route(samples: Iterable[RouteSample]) -> RouteTelemetry:

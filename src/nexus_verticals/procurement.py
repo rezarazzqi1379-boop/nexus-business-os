@@ -67,8 +67,27 @@ class ProcurementVerticalRecord:
     def validate(self) -> list[str]:
         errors: list[str] = []
 
-        if not self.case_id.strip():
-            errors.append("case_id is required")
+        required_values = (
+            ("case_id", self.case_id),
+            ("evidence.evidence_id", self.evidence.evidence_id),
+            ("evidence.source", self.evidence.source),
+            ("evidence.source_ref", self.evidence.source_ref),
+            ("evidence.summary", self.evidence.summary),
+            ("evidence.observed_at", self.evidence.observed_at),
+            ("relationship.relationship_id", self.relationship.relationship_id),
+            ("relationship.from_entity", self.relationship.from_entity),
+            ("relationship.to_entity", self.relationship.to_entity),
+            ("signal.signal_id", self.signal.signal_id),
+            ("signal.entity", self.signal.entity),
+            ("opportunity.opportunity_id", self.opportunity.opportunity_id),
+            ("opportunity.entity", self.opportunity.entity),
+            ("opportunity.next_action", self.opportunity.next_action),
+            ("outcome.outcome_id", self.outcome.outcome_id),
+            ("outcome.opportunity_id", self.outcome.opportunity_id),
+        )
+        for name, value in required_values:
+            if not value.strip():
+                errors.append(f"{name} is required")
 
         for name, value in (
             ("evidence.confidence", self.evidence.confidence),

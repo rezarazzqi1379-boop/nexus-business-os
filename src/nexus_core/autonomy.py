@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Literal, Sequence
+from typing import Literal, Sequence, get_args
 from unicodedata import category
 
 from nexus_core.capabilities import Capability, CapabilityNeed, plan_capabilities
-from nexus_core.policy import ActionIntent, GateDecision, evaluate_action
+from nexus_core.policy import ActionIntent, ActionKind, GateDecision, evaluate_action
 
 
 WorkDomain = Literal[
@@ -21,6 +21,7 @@ _ALLOWED_DOMAINS = {
     "coding_learning", "backup", "knowledge_management", "innovation", "security",
     "news_monitoring",
 }
+_ALLOWED_ACTION_KINDS = frozenset(get_args(ActionKind))
 _ALLOWED_PRIORITY = {"critical", "high", "medium", "low"}
 _ALLOWED_EVIDENCE = {"strong", "partial", "weak", "unverified"}
 _ALLOWED_COST = {"low", "medium", "high"}
@@ -112,6 +113,10 @@ def validate_work_item(task: WorkItem) -> list[str]:
     errors.extend(_text_errors("task_id", task.task_id, _MAX_META_LENGTH))
     errors.extend(_text_errors("objective", task.objective, _MAX_OBJECTIVE_LENGTH))
     if not isinstance(task.domain, str) or task.domain not in _ALLOWED_DOMAINS: errors.append("domain must be supported")
+    if not isinstance(task.action_kind, str):
+        errors.append("action_kind must be a string")
+    elif task.action_kind not in _ALLOWED_ACTION_KINDS:
+        errors.append("action_kind must be supported")
     if not isinstance(task.value, str) or task.value not in _ALLOWED_PRIORITY: errors.append("value must be supported")
     if not isinstance(task.urgency, str) or task.urgency not in _ALLOWED_PRIORITY: errors.append("urgency must be supported")
     if not isinstance(task.evidence, str) or task.evidence not in _ALLOWED_EVIDENCE: errors.append("evidence must be supported")

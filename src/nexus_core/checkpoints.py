@@ -105,13 +105,17 @@ def _sha256_error(value: object) -> str | None:
     return None
 
 
+def _parse_timestamp(value: str) -> datetime:
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
 def _timezone_error(name: str, value: object) -> str | None:
     meta_error = _meta_error(name, value)
     if meta_error:
         return meta_error
     assert isinstance(value, str)
     try:
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        parsed = _parse_timestamp(value)
     except ValueError:
         return f"{name} must be ISO-8601"
     if parsed.tzinfo is None:
@@ -238,6 +242,8 @@ def receipt_covers_manifest_entry(
         return False
     if receipt.checkpoint_id != manifest.checkpoint_id:
         return False
+    if _parse_timestamp(receipt.stored_at) < _parse_timestamp(manifest.captured_at):
+        return False
     matching = [entry for entry in manifest.entries if entry.artifact_ref == receipt.artifact_ref]
     if len(matching) != 1:
         return False
@@ -257,6 +263,8 @@ def restore_proves_reconstruction(
     if validate_restore_proof(proof):
         return False
     if not receipt_covers_manifest_entry(receipt, manifest):
+        return False
+    if _parse_timestamp(proof.restored_at) < _parse_timestamp(receipt.stored_at):
         return False
     if (
         proof.checkpoint_id != receipt.checkpoint_id

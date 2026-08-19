@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 from nexus_evals import Assertion, EvaluationCase, evaluate_suite
 from nexus_evals.promotion import (
     CaseOutcomeMetrics,
@@ -140,3 +142,31 @@ def test_invalid_policy_fails_closed_instead_of_raising_or_allowing():
     assert decision.allowed is False
     assert decision.blockers == ("invalid_promotion_input",)
     assert "max_failed_cases cannot be negative" in decision.validation_errors
+
+
+def test_tampered_suite_aggregates_cannot_hide_a_concrete_failure():
+    run = make_run(human_gate_allowed=True)
+    tampered_suite = replace(
+        run.suite,
+        passed_cases=run.suite.total_cases,
+        failed_cases=0,
+    )
+    tampered_run = PromotionRun(
+        run_id=run.run_id,
+        system_version=run.system_version,
+        harness_version=run.harness_version,
+        config_ref=run.config_ref,
+        suite=tampered_suite,
+        metrics=run.metrics,
+        critical_case_ids=run.critical_case_ids,
+    )
+
+    decision = promotion_decision(
+        tampered_run,
+        PromotionPolicy(max_failed_cases=0, require_zero_critical_failures=False),
+    )
+
+    assert decision.allowed is False
+    assert decision.blockers == ("invalid_promotion_input",)
+    assert "suite.passed_cases must match concrete suite results" in decision.validation_errors
+    assert "suite.failed_cases must match concrete suite results" in decision.validation_errors

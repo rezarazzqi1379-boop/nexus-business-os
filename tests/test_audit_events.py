@@ -140,7 +140,7 @@ def test_multiline_reference_is_rejected_as_covert_payload_channel():
         evidence_refs=("gmail:message:test\nFULL EMAIL BODY SHOULD NOT FIT HERE",),
     )
     errors = event.validate()
-    assert "evidence_refs cannot contain control characters" in errors
+    assert "evidence_refs cannot contain control or formatting characters" in errors
 
 
 def test_oversized_reference_is_rejected_as_free_form_payload():
@@ -170,4 +170,58 @@ def test_action_reference_cannot_hide_multiline_payload():
         action_ref="send:rfq\nsecret body",
     )
     errors = event.validate()
-    assert "action_ref cannot contain control characters" in errors
+    assert "action_ref cannot contain control or formatting characters" in errors
+
+
+def test_unicode_line_separator_and_bidi_formatting_are_rejected():
+    event = AuditEvent(
+        event_id="event:unicode-injection",
+        trace_id="trace:test",
+        event_type="evidence_observed",
+        occurred_at="2026-08-19T14:30:00+00:00",
+        actor_type="external_source",
+        subject_ref="gmail:message:test",
+        result_class="observed",
+        evidence_refs=("gmail:message:test\u2028hidden-line", "ref:\u202esecret"),
+    )
+    errors = event.validate()
+    assert errors.count("evidence_refs cannot contain control or formatting characters") == 2
+
+
+def test_malformed_runtime_metadata_fails_closed_without_exception():
+    event = AuditEvent(
+        event_id=123,  # type: ignore[arg-type]
+        trace_id="trace:test",
+        event_type="evidence_observed",
+        occurred_at="2026-08-19T14:30:00+00:00",
+        actor_type="external_source",
+        subject_ref="gmail:message:test",
+        result_class="observed",
+        evidence_refs=(42,),  # type: ignore[arg-type]
+    )
+    result = validate_audit_trace((event,))
+    assert result.valid is False
+    assert any("event_id must be a string" in error for error in result.errors)
+    assert any("evidence_refs must be a string" in error for error in result.errors)
+
+
+def test_malformed_reference_collection_fails_closed_without_exception():
+    event = AuditEvent(
+        event_id="event:bad-refs",
+        trace_id="trace:test",
+        event_type="evidence_observed",
+        occurred_at="2026-08-19T14:30:00+00:00",
+        actor_type="external_source",
+        subject_ref="gmail:message:test",
+        result_class="observed",
+        evidence_refs=["gmail:message:test"],  # type: ignore[arg-type]
+    )
+    result = validate_audit_trace((event,))
+    assert result.valid is False
+    assert any("evidence_refs must be a tuple" in error for error in result.errors)
+
+
+def test_non_event_input_fails_closed_without_exception():
+    result = validate_audit_trace(("not-an-event",))  # type: ignore[arg-type]
+    assert result.valid is False
+    assert "event[0]: must be an AuditEvent" in result.errors

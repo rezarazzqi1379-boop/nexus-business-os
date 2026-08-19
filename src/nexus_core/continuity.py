@@ -74,12 +74,24 @@ def validate_continuity_packet(packet: ContinuityPacket) -> list[str]:
 
 
 def build_resume_instruction(packet: ContinuityPacket) -> str:
+    """Build a recovery-first bootstrap instruction for a new NEXUS session.
+
+    The packet is continuity input, never authority. Mutable live systems must win over
+    remembered or static state. Conflict is surfaced explicitly rather than silently
+    reconciled, because a convenient merge can turn stale context into false truth.
+    """
     errors = validate_continuity_packet(packet)
     if errors:
         raise ValueError("invalid continuity packet: " + "; ".join(errors))
     return (
-        "Resume NEXUS from this packet as canonical continuity input. Verify source/version refs before acting; "
-        "recover the current Goal Portfolio, active work, blockers, evidence and human gates; do not invent missing state; "
-        "continue only reversible internal work automatically; preserve human approval for consequential external actions. "
+        "Resume NEXUS from this packet as canonical continuity input, not authorization. "
+        "Recover the operating contract, Goal Portfolio, active work, blockers, evidence, experiments and Human Gates. "
+        "Then live-verify every mutable dependency that can change the next decision, prioritizing GitHub/CI, Gmail, Notion, Supabase, Vercel, Drive and Capability Health when referenced or available. "
+        "If live evidence conflicts with this packet or remembered chat context, preserve both refs, mark the old state stale, and let current verified evidence win; never silently merge contradictory state. "
+        "Do not create a replacement registry, checkpoint, database, agent or source merely to reconcile drift. "
+        "Classify each active goal as next_action, waiting_blocked, scheduled_review or explicit_pause; require measurable success/failure signals for meaningful work. "
+        "Continue the highest-value reversible internal work automatically, favoring current commercial blockers, qualified network paths, tested code/security hardening and restore-readiness over architecture accumulation. "
+        "Before any consequential action, preserve explicit human approval for external send, protected/main merge, production deploy, permission/access change, publication, payment, contract/signature, destructive action or material Supabase write. "
+        "At the end of the recovery pass, record only net-new verified state: current refs, changed blockers, measurable outcomes, failed assumptions and the next smallest high-value action. "
         + packet.next_resume_instruction
     )

@@ -1,3 +1,7 @@
+from datetime import datetime, timedelta, timezone
+
+from hypothesis import given, strategies as st
+
 from nexus_core.checkpoints import (
     BackupReceipt,
     CheckpointManifest,
@@ -19,39 +23,15 @@ VERSION_B = "notion:page:command-center:version:2"
 
 
 def manifest(*, digest: str = HASH_A, captured_at: str = "2026-08-19T16:00:00+00:00", source_version_ref: str = VERSION_A):
-    return CheckpointManifest(
-        checkpoint_id="checkpoint:nexus:command-center",
-        scope="nexus-command-center",
-        captured_at=captured_at,
-        idempotency_key="backup:nexus-command-center:v1",
-        entries=(SnapshotEntry("notion:command-center", "notion:page:command-center", source_version_ref, "documentation", digest),),
-    )
+    return CheckpointManifest("checkpoint:nexus:command-center", "nexus-command-center", captured_at, "backup:nexus-command-center:v1", (SnapshotEntry("notion:command-center", "notion:page:command-center", source_version_ref, "documentation", digest),))
 
 
 def receipt(*, digest: str = HASH_A, stored_at: str = "2026-08-19T19:44:00+03:30", source_version_ref: str = VERSION_A):
-    return BackupReceipt(
-        checkpoint_id="checkpoint:nexus:command-center",
-        artifact_ref="notion:command-center",
-        backend="google_drive",
-        stored_artifact_ref="drive:file:example-backup-doc",
-        stored_at=stored_at,
-        source_version_ref=source_version_ref,
-        source_content_sha256=digest,
-    )
+    return BackupReceipt("checkpoint:nexus:command-center", "notion:command-center", "google_drive", "drive:file:example-backup-doc", stored_at, source_version_ref, digest)
 
 
 def restore_proof(*, expected_digest: str = HASH_A, restored_digest: str = HASH_A, restored_at: str = "2026-08-19T20:00:00+03:30", source_version_ref: str = VERSION_A, backend: str = "google_drive", stored_artifact_ref: str = "drive:file:example-backup-doc"):
-    return RestoreProof(
-        checkpoint_id="checkpoint:nexus:command-center",
-        artifact_ref="notion:command-center",
-        backend=backend,
-        stored_artifact_ref=stored_artifact_ref,
-        restored_artifact_ref="restore:test:command-center",
-        restored_at=restored_at,
-        source_version_ref=source_version_ref,
-        expected_content_sha256=expected_digest,
-        restored_content_sha256=restored_digest,
-    )
+    return RestoreProof("checkpoint:nexus:command-center", "notion:command-center", backend, stored_artifact_ref, "restore:test:command-center", restored_at, source_version_ref, expected_digest, restored_digest)
 
 
 def test_valid_checkpoint_manifest_passes(): assert validate_checkpoint(manifest()) == []
@@ -95,6 +75,9 @@ def test_receipt_rejects_ambiguous_backend_metadata():
     malformed = BackupReceipt("checkpoint:nexus:command-center", "notion:command-center", " google_drive ", "drive:file:example-backup-doc", "2026-08-19T19:44:00+03:30", VERSION_A, HASH_A)
     assert "backend cannot have leading or trailing whitespace" in validate_backup_receipt(malformed)
 
+def test_receipt_cannot_precede_checkpoint_capture():
+    assert receipt_covers_manifest_entry(receipt(stored_at="2026-08-19T15:59:59+00:00"), manifest(captured_at="2026-08-19T16:00:00+00:00")) is False
+
 def test_valid_restore_proof_reconstructs_exact_manifest_entry():
     proof = restore_proof()
     assert validate_restore_proof(proof) == []
@@ -115,3 +98,20 @@ def test_restore_backend_and_stored_ref_are_bound_to_receipt():
 
 def test_restore_requires_timezone_aware_timestamp():
     assert "restored_at must include a timezone offset" in validate_restore_proof(restore_proof(restored_at="2026-08-19T20:00:00"))
+
+def test_restore_cannot_precede_storage_write():
+    assert restore_proves_reconstruction(restore_proof(restored_at="2026-08-19T19:43:59+03:30"), receipt(stored_at="2026-08-19T19:44:00+03:30"), manifest()) is False
+
+
+@given(st.integers(min_value=1, max_value=86_400))
+def test_any_receipt_timestamp_before_capture_fails_closed(seconds_before):
+    captured = datetime(2026, 8, 19, 16, 0, tzinfo=timezone.utc)
+    stored = captured - timedelta(seconds=seconds_before)
+    assert receipt_covers_manifest_entry(receipt(stored_at=stored.isoformat()), manifest(captured_at=captured.isoformat())) is False
+
+
+@given(st.integers(min_value=1, max_value=86_400))
+def test_any_restore_timestamp_before_storage_fails_closed(seconds_before):
+    stored = datetime(2026, 8, 19, 16, 14, tzinfo=timezone.utc)
+    restored = stored - timedelta(seconds=seconds_before)
+    assert restore_proves_reconstruction(restore_proof(restored_at=restored.isoformat()), receipt(stored_at=stored.isoformat()), manifest(captured_at="2026-08-19T16:00:00+00:00")) is False

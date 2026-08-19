@@ -48,13 +48,36 @@ def test_code_blind_cross_ai_review_is_explicitly_unverified():
     assert "not authorization" in task.objective
 
 
-def test_code_read_cross_ai_review_is_still_only_partial_evidence():
-    task = cross_ai_review_work_item(source_ref="public-mirror:review:1", review_key="security-review", code_change_relevant=True, reviewer_read_code=True)
-    assert task.evidence == "partial" and task.action_kind == "research" and task.write_required is False
+def test_cross_ai_review_requires_retrievable_code_proof_for_partial_evidence():
+    task = cross_ai_review_work_item(
+        source_ref="notion:claude-review:1",
+        review_key="security-review",
+        code_change_relevant=True,
+        code_review_proof_ref="github:commit:abc123",
+    )
+    assert task.evidence == "partial"
+    assert task.evidence_refs == ("notion:claude-review:1", "github:commit:abc123")
+    assert task.action_kind == "research" and task.write_required is False
+
+
+def test_arbitrary_claim_of_code_review_does_not_upgrade_evidence():
+    task = cross_ai_review_work_item(
+        source_ref="notion:claude-review:1",
+        review_key="security-review",
+        code_change_relevant=True,
+        code_review_proof_ref="reviewer-says-i-read-it",
+    )
+    assert task.evidence == "unverified"
+    assert task.evidence_refs == ("notion:claude-review:1",)
 
 
 def test_cross_ai_review_cannot_request_write_or_send_capability():
-    task = cross_ai_review_work_item(source_ref="notion:claude-review:1", review_key="boundary", code_change_relevant=True, reviewer_read_code=True)
+    task = cross_ai_review_work_item(
+        source_ref="notion:claude-review:1",
+        review_key="boundary",
+        code_change_relevant=True,
+        code_review_proof_ref="sha256:123456",
+    )
     assert task.acceptable_capability_ids == ("github.read",) and task.action_kind == "research" and task.write_required is False
 
 

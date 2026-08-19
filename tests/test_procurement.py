@@ -116,3 +116,43 @@ def test_entity_drift_is_rejected():
         outcome=record.outcome,
     )
     assert "opportunity.entity must match signal.entity" in broken.validate()
+
+
+def test_missing_evidence_source_ref_is_rejected():
+    record = make_suppliertr_record()
+    broken = ProcurementVerticalRecord(
+        case_id=record.case_id,
+        evidence=Evidence(
+            evidence_id=record.evidence.evidence_id,
+            source=record.evidence.source,
+            source_ref="",
+            summary=record.evidence.summary,
+            observed_at=record.evidence.observed_at,
+            confidence=record.evidence.confidence,
+        ),
+        relationship=record.relationship,
+        signal=record.signal,
+        opportunity=record.opportunity,
+        outcome=record.outcome,
+    )
+    assert "evidence.source_ref is required" in broken.validate()
+
+
+def test_missing_stable_identifier_is_rejected():
+    record = make_suppliertr_record()
+    broken = ProcurementVerticalRecord(
+        case_id=record.case_id,
+        evidence=record.evidence,
+        relationship=record.relationship,
+        signal=Signal(
+            signal_id="",
+            entity=record.signal.entity,
+            signal_type=record.signal.signal_type,
+            description=record.signal.description,
+            evidence_id=record.signal.evidence_id,
+            confidence=record.signal.confidence,
+        ),
+        opportunity=record.opportunity,
+        outcome=record.outcome,
+    )
+    assert "signal.signal_id is required" in broken.validate()

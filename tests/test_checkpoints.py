@@ -1,3 +1,7 @@
+from datetime import datetime, timedelta, timezone
+
+from hypothesis import given, strategies as st
+
 from nexus_core.checkpoints import (
     BackupReceipt,
     CheckpointManifest,
@@ -167,6 +171,13 @@ def test_receipt_rejects_ambiguous_backend_metadata():
     assert "backend cannot have leading or trailing whitespace" in validate_backup_receipt(malformed)
 
 
+def test_receipt_cannot_precede_checkpoint_capture():
+    assert receipt_covers_manifest_entry(
+        receipt(stored_at="2026-08-19T15:59:59+00:00"),
+        manifest(captured_at="2026-08-19T16:00:00+00:00"),
+    ) is False
+
+
 def test_valid_restore_proof_reconstructs_exact_manifest_entry():
     proof = restore_proof()
     assert validate_restore_proof(proof) == []
@@ -215,3 +226,32 @@ def test_restore_rejects_ambiguous_restored_artifact_ref():
         restored_content_sha256=HASH_A,
     )
     assert "restored_artifact_ref cannot have leading or trailing whitespace" in validate_restore_proof(malformed)
+
+
+def test_restore_cannot_precede_storage_write():
+    assert restore_proves_reconstruction(
+        restore_proof(restored_at="2026-08-19T19:43:59+03:30"),
+        receipt(stored_at="2026-08-19T19:44:00+03:30"),
+        manifest(),
+    ) is False
+
+
+@given(st.integers(min_value=1, max_value=86_400))
+def test_any_receipt_timestamp_before_capture_fails_closed(seconds_before):
+    captured = datetime(2026, 8, 19, 16, 0, tzinfo=timezone.utc)
+    stored = captured - timedelta(seconds=seconds_before)
+    assert receipt_covers_manifest_entry(
+        receipt(stored_at=stored.isoformat()),
+        manifest(captured_at=captured.isoformat()),
+    ) is False
+
+
+@given(st.integers(min_value=1, max_value=86_400))
+def test_any_restore_timestamp_before_storage_fails_closed(seconds_before):
+    stored = datetime(2026, 8, 19, 16, 14, tzinfo=timezone.utc)
+    restored = stored - timedelta(seconds=seconds_before)
+    assert restore_proves_reconstruction(
+        restore_proof(restored_at=restored.isoformat()),
+        receipt(stored_at=stored.isoformat()),
+        manifest(captured_at="2026-08-19T16:00:00+00:00"),
+    ) is False

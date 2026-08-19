@@ -126,3 +126,48 @@ def test_duplicate_evidence_refs_are_rejected():
         evidence_refs=("gmail:message:test", "gmail:message:test"),
     )
     assert "evidence_refs cannot contain duplicates" in event.validate()
+
+
+def test_multiline_reference_is_rejected_as_covert_payload_channel():
+    event = AuditEvent(
+        event_id="event:covert-payload",
+        trace_id="trace:test",
+        event_type="evidence_observed",
+        occurred_at="2026-08-19T14:30:00+00:00",
+        actor_type="external_source",
+        subject_ref="gmail:message:test",
+        result_class="observed",
+        evidence_refs=("gmail:message:test\nFULL EMAIL BODY SHOULD NOT FIT HERE",),
+    )
+    errors = event.validate()
+    assert "evidence_refs cannot contain control characters" in errors
+
+
+def test_oversized_reference_is_rejected_as_free_form_payload():
+    event = AuditEvent(
+        event_id="event:oversized-ref",
+        trace_id="trace:test",
+        event_type="evidence_observed",
+        occurred_at="2026-08-19T14:30:00+00:00",
+        actor_type="external_source",
+        subject_ref="gmail:message:test",
+        result_class="observed",
+        evidence_refs=("x" * 257,),
+    )
+    errors = event.validate()
+    assert "evidence_refs must be at most 256 characters" in errors
+
+
+def test_action_reference_cannot_hide_multiline_payload():
+    event = AuditEvent(
+        event_id="event:action-payload",
+        trace_id="trace:test",
+        event_type="human_gate_evaluated",
+        occurred_at="2026-08-19T14:30:00+00:00",
+        actor_type="human",
+        subject_ref="project:hydrotester",
+        result_class="blocked",
+        action_ref="send:rfq\nsecret body",
+    )
+    errors = event.validate()
+    assert "action_ref cannot contain control characters" in errors

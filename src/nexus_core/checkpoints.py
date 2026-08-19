@@ -46,14 +46,6 @@ class CheckpointManifest:
 
 @dataclass(frozen=True)
 class BackupReceipt:
-    """Evidence that one exact source version was written to a storage backend.
-
-    The receipt is intentionally metadata-only. A digest match alone is not freshness
-    proof: the receipt must bind to the exact source_version_ref captured in the
-    manifest. This does not make the backend canonical NEXUS state and it does not
-    authorize restore or deletion.
-    """
-
     checkpoint_id: str
     artifact_ref: str
     backend: str
@@ -61,6 +53,19 @@ class BackupReceipt:
     stored_at: str
     source_version_ref: str
     source_content_sha256: str
+
+
+@dataclass(frozen=True)
+class RestoreProof:
+    checkpoint_id: str
+    artifact_ref: str
+    backend: str
+    stored_artifact_ref: str
+    restored_artifact_ref: str
+    restored_at: str
+    source_version_ref: str
+    expected_content_sha256: str
+    restored_content_sha256: str
 
 
 def _meta_error(name: str, value: object) -> str | None:
@@ -153,6 +158,24 @@ def validate_backup_receipt(receipt: BackupReceipt) -> list[str]:
     return errors
 
 
+def validate_restore_proof(proof: RestoreProof) -> list[str]:
+    if not isinstance(proof, RestoreProof):
+        return ["proof must be a RestoreProof"]
+    errors: list[str] = []
+    for name, value in (("checkpoint_id", proof.checkpoint_id), ("artifact_ref", proof.artifact_ref), ("backend", proof.backend), ("stored_artifact_ref", proof.stored_artifact_ref), ("restored_artifact_ref", proof.restored_artifact_ref), ("source_version_ref", proof.source_version_ref)):
+        error = _meta_error(name, value)
+        if error:
+            errors.append(error)
+    restored_at_error = _timezone_error("restored_at", proof.restored_at)
+    if restored_at_error:
+        errors.append(restored_at_error)
+    for name, value in (("expected_content_sha256", proof.expected_content_sha256), ("restored_content_sha256", proof.restored_content_sha256)):
+        digest_error = _sha256_error(value)
+        if digest_error:
+            errors.append(digest_error.replace("content_sha256", name))
+    return errors
+
+
 def receipt_covers_manifest_entry(receipt: BackupReceipt, manifest: CheckpointManifest) -> bool:
     if validate_backup_receipt(receipt) or validate_checkpoint(manifest):
         return False
@@ -163,6 +186,16 @@ def receipt_covers_manifest_entry(receipt: BackupReceipt, manifest: CheckpointMa
         return False
     entry = matching[0]
     return entry.source_version_ref == receipt.source_version_ref and entry.content_sha256 == receipt.source_content_sha256
+
+
+def restore_proves_reconstruction(proof: RestoreProof, receipt: BackupReceipt, manifest: CheckpointManifest) -> bool:
+    if validate_restore_proof(proof):
+        return False
+    if not receipt_covers_manifest_entry(receipt, manifest):
+        return False
+    if proof.checkpoint_id != receipt.checkpoint_id or proof.artifact_ref != receipt.artifact_ref or proof.backend != receipt.backend or proof.stored_artifact_ref != receipt.stored_artifact_ref or proof.source_version_ref != receipt.source_version_ref or proof.expected_content_sha256 != receipt.source_content_sha256:
+        return False
+    return proof.restored_content_sha256 == proof.expected_content_sha256
 
 
 def checkpoint_matches(manifest: CheckpointManifest, previous: CheckpointManifest | None) -> bool:

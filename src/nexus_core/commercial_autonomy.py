@@ -27,18 +27,22 @@ CommercialActionKind = Literal[
     "change_bank_details",
 ]
 
-_ROUTINE_AUTONOMOUS_ACTIONS = frozenset(
+_INTERNAL_ROUTINE_ACTIONS = frozenset(
     {
         "discover",
         "qualify",
         "draft",
+        "prepare_deal_packet",
+    }
+)
+_EXTERNAL_COMMERCIAL_ACTIONS = frozenset(
+    {
         "send_intro",
         "send_followup",
         "ask_clarification",
         "request_meeting",
         "request_quote",
         "nonbinding_negotiate",
-        "prepare_deal_packet",
     }
 )
 _BINDING_ACTIONS = frozenset(
@@ -60,11 +64,12 @@ _MAX_MANDATE_HOURS = 24 * 31
 
 @dataclass(frozen=True)
 class CommercialMandate:
-    """Human-approved boundary for autonomous, non-binding commercial work.
+    """Bound internal commercial planning without authorizing external execution.
 
-    The mandate is intentionally narrow: it authorizes routine outreach and negotiation
-    only inside an exact project/campaign envelope. It never authorizes a binding deal,
-    PO, contract, payment, signature, or bank-detail change.
+    A mandate can scope research, qualification, drafting and deal-packet preparation.
+    It is deliberately *not* authorization for an email, message, meeting request,
+    quote request, negotiation, PO, contract, payment, signature or bank-detail change.
+    Those actions stay behind the canonical exact-action Human Gate.
     """
 
     mandate_id: str
@@ -232,7 +237,7 @@ def validate_mandate_approval(mandate: CommercialMandate, approval: ActionApprov
         return MandateDecision(False, False, "commercial mandate is not approved")
     if approval.action_id != mandate_action_id(mandate):
         return MandateDecision(False, False, "approval does not match exact mandate digest")
-    return MandateDecision(True, False, "exact bounded commercial mandate approved")
+    return MandateDecision(True, False, "exact bounded commercial mandate approved for internal planning only")
 
 
 def evaluate_commercial_action(
@@ -242,12 +247,7 @@ def evaluate_commercial_action(
     *,
     now: datetime | None = None,
 ) -> MandateDecision:
-    """Authorize routine work inside an approved mandate while blocking binding acts.
-
-    This is the core 'autopilot until Deal/No-Deal' rule. External messages may proceed
-    without per-message approval only when the exact mandate was approved and the action
-    remains within project, campaign, channel, message-count and non-binding boundaries.
-    """
+    """Allow bounded internal preparation while keeping every external act human-gated."""
 
     mandate_gate = validate_mandate_approval(mandate, approval)
     if not mandate_gate.allowed_now:
@@ -272,21 +272,12 @@ def evaluate_commercial_action(
 
     if action.kind in _BINDING_ACTIONS:
         return MandateDecision(False, True, f"{action.kind} requires final Deal/No-Deal gate")
-    if action.kind not in _ROUTINE_AUTONOMOUS_ACTIONS:
+    if action.kind in _EXTERNAL_COMMERCIAL_ACTIONS:
+        return MandateDecision(False, False, f"{action.kind} is an external commercial action and requires an exact action-specific Human Gate")
+    if action.kind not in _INTERNAL_ROUTINE_ACTIONS:
         return MandateDecision(False, False, "unsupported commercial action")
 
-    if action.kind in {"send_intro", "send_followup", "ask_clarification", "request_meeting", "request_quote", "nonbinding_negotiate"}:
-        if action.channel not in mandate.allowed_channels:
-            return MandateDecision(False, False, "channel is outside mandate")
-        if action.message_ordinal < 1 or action.message_ordinal > mandate.max_messages_per_target:
-            return MandateDecision(False, False, "message ordinal exceeds mandate")
-        if not _valid_text(action.content_digest, _MAX_REF):
-            return MandateDecision(False, False, "message action requires content_digest")
-
-    if action.kind == "nonbinding_negotiate" and not mandate.allow_nonbinding_negotiation:
-        return MandateDecision(False, False, "non-binding negotiation is disabled by mandate")
-
-    return MandateDecision(True, False, "routine commercial action allowed by exact mandate")
+    return MandateDecision(True, False, "bounded internal commercial preparation allowed")
 
 
 def validate_deal_packet(packet: DealDecisionPacket) -> tuple[str, ...]:
@@ -363,24 +354,19 @@ def ready_for_final_decision(packet: DealDecisionPacket) -> bool:
 
 
 def choose_next_commercial_action(actions: Sequence[CommercialAction]) -> CommercialAction | None:
-    """Deterministically pick the next non-binding action from a prepared queue.
-
-    The queue is intentionally not a business-score engine. It only gives priority to
-    evidence/qualification work before outbound, then clarification/quote collection,
-    then non-binding negotiation and final-packet preparation.
-    """
+    """Pick internal preparation first; external actions remain queued behind Human Gates."""
 
     rank = {
         "discover": 0,
         "qualify": 1,
         "draft": 2,
-        "send_intro": 3,
-        "ask_clarification": 4,
-        "request_quote": 5,
-        "request_meeting": 6,
-        "send_followup": 7,
-        "nonbinding_negotiate": 8,
-        "prepare_deal_packet": 9,
+        "prepare_deal_packet": 3,
+        "send_intro": 10,
+        "ask_clarification": 11,
+        "request_quote": 12,
+        "request_meeting": 13,
+        "send_followup": 14,
+        "nonbinding_negotiate": 15,
     }
     candidates = [action for action in actions if isinstance(action, CommercialAction) and action.kind in rank]
     if not candidates:

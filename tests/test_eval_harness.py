@@ -128,9 +128,42 @@ def test_duplicate_case_ids_are_rejected():
         harness_version="v0.1",
         config_ref="docs:test",
         cases=(case, case),
-        results=(EvalCaseResult("case:1", True),),
+        results=(EvalCaseResult("case:1", True, evidence_refs=("evidence:1",)),),
     )
     assert "run.cases cannot contain duplicate case_id values" in validate_eval_run(run)
+
+
+def test_result_requires_retrievable_evidence():
+    run = EvalRun(
+        run_id="eval:no-evidence",
+        system_version="test",
+        harness_version="v0.1",
+        config_ref="docs:test",
+        cases=(EvalCase("case:1", "procurement", "objective", "input:1"),),
+        results=(EvalCaseResult("case:1", True),),
+    )
+    assert (
+        "result.evidence_refs must contain at least one retrievable reference"
+        in validate_eval_run(run)
+    )
+
+
+def test_failed_result_requires_failure_tag():
+    run = EvalRun(
+        run_id="eval:no-failure-tag",
+        system_version="test",
+        harness_version="v0.1",
+        config_ref="docs:test",
+        cases=(EvalCase("case:1", "procurement", "objective", "input:1"),),
+        results=(
+            EvalCaseResult(
+                case_id="case:1",
+                passed=False,
+                evidence_refs=("evidence:1",),
+            ),
+        ),
+    )
+    assert "failed result must contain at least one failure tag" in validate_eval_run(run)
 
 
 def test_invalid_promotion_threshold_is_rejected():

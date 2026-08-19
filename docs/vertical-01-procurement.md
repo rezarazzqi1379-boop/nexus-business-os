@@ -16,6 +16,8 @@ Every Evidence record must explicitly classify its epistemic status as one of:
 
 A direct supplier email is evidence that the supplier made a statement; the statement's technical/commercial content remains a **claim** until independently verified. Observable events such as receiving a catalog can be recorded as **fact**. Classification never upgrades confidence by itself.
 
+`unknown` is a valid state, not a validation failure. Use it when the source exists but the decision-critical value is not yet established; do not replace it with a guessed estimate merely to complete the chain.
+
 ## First live cases
 
 1. SupplierTR — supplier **claim** that engineering evaluation started

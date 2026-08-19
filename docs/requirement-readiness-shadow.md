@@ -11,7 +11,7 @@ This is a shadow-mode experiment, not an autonomous sending gate and not a produ
 Each decision-critical buyer requirement is classified as exactly one of:
 
 - `approved` — value is approved for final quotation/compliance use and has a retrievable source reference.
-- `provisional` — a value exists, but it is historical, working, or otherwise not final authority. It may support discovery, but it blocks readiness for a final quotation/compliance request.
+- `provisional` — a value exists, but it is historical, communicated, working, or otherwise not final authority. It may support discovery, but it blocks readiness for a final quotation/compliance request.
 - `unknown_blocking` — the decision-critical value is not established. It may support discovery as an explicit unknown, but it blocks readiness for a final quotation/compliance request.
 
 ## Outputs
@@ -25,17 +25,19 @@ No external action is performed by the evaluator.
 
 ## Current Hydrotester shadow case
 
-Known approved basis currently represented in the test fixture:
+The current supplier-facing basis includes:
 
 - Pipe OD: `89–180 mm`
 - Maximum machine rating: `120 MPa`
 
-Current blockers:
+In shadow mode these are deliberately classified as `provisional` until the approved engineering/source-of-authority record is re-linked. The Gmail thread proves that these values were communicated; it does not by itself prove final engineering approval.
+
+Current explicit blockers:
 
 - Pipe-length range: `unknown_blocking`
 - Wall-thickness or ID range: `unknown_blocking`
 
-The historically communicated `12 m` value is modeled as `provisional`, not engineering authority, until an approved source replaces it.
+The historically communicated `12 m` value is also `provisional`, not engineering authority, until an approved source replaces it.
 
 ## Why these fields matter
 
@@ -45,7 +47,7 @@ Current primary manufacturer evidence supports the readiness model:
 - YAXING describes its hydrotesters as non-standard customized equipment designed from user parameters including pipe diameter, length and maximum test pressure; it also exposes selectable pressure-hold time, sealing methods and testing-station quantity.
 - Marley independently requested pipe-length and wall-thickness ranges before producing a detailed technical solution and quotation.
 
-These sources support the inference that geometry and operating/test parameters should be explicitly classified before final technical comparison. They do not by themselves define the buyer's approved values.
+These sources support the inference that geometry and operating/test parameters should be explicitly classified before final technical comparison. They do not define the buyer's approved values.
 
 ## Experiment
 

@@ -12,7 +12,7 @@ The fabric converts candidate work into three explicit queues:
 
 It does **not** execute tools itself. Existing connector runtimes remain the execution surface.
 
-## Loops this fabric is intended to coordinate
+## Loops this fabric coordinates
 
 - research and literature monitoring;
 - market intelligence and news monitoring;
@@ -38,31 +38,57 @@ v0.1 does not assign fake business-value percentages. It ranks by explicit ordin
 
 `value -> urgency -> evidence strength -> cost -> stable task_id`
 
+Evidence order is explicit: `strong -> partial -> weak -> unverified`.
+
+Malformed priority/evidence/cost fields are ranked last so they can reach validation and fail closed. Invalid WorkItems do not reach capability selection or an action gate built from malformed values.
+
 These tiers are reviewable and can later be calibrated against real outcomes using PR #7 Decision Learning.
+
+## Cross-AI evidence boundary
+
+- AI review without underlying code/data access is `unverified`.
+- Code-read review is at most `partial` until claim-level verification against the current code/data/tests.
+- Review evidence is research input, not authorization.
+- A research/review WorkItem cannot silently acquire write/send/access capability; consequential escalation must become a new explicit human-gated WorkItem.
 
 ## Security boundaries
 
-- External send, merge, production deploy, access changes, destructive actions, contracts/POs, payments and signatures remain human-gated by the canonical PR #4 policy.
+- External send, merge, production deploy, access changes, public publication/visibility changes, destructive actions, contracts/POs, payments and signatures remain human-gated by the canonical PR #4 policy.
 - Plugin or connector installation/permission changes are `change_access` actions and are not self-authorized.
 - Missing capabilities remain blocked; the fabric must not invent integrations.
 - Work metadata is bounded and rejects Unicode control/formatting characters to avoid ambiguous control-plane IDs.
 - Evidence refs are required so autonomous planning cannot manufacture unsupported tasks.
 - This is not a self-modifying model. Proposed upgrades are ordinary work items that must pass the same gates, tests and review process as other code.
 
+## Backup and reconstruction contract
+
+A backup is not considered proven merely because a destination file exists.
+
+`SnapshotEntry` binds an artifact to:
+- `source_ref`;
+- exact `source_version_ref`;
+- content SHA-256.
+
+`BackupReceipt` proves that the exact source version/digest was written to a backend. Matching digest alone does not prove freshness.
+
+`RestoreProof` then binds a read-back/reconstruction attempt to the same checkpoint, artifact, backend, stored artifact, exact source version and expected digest. Reconstruction proof succeeds only when the restored content digest exactly matches the expected stored digest.
+
+This proves byte/content reconstruction for that artifact only. It does **not** prove application-level semantic recovery, production readiness or permission to overwrite canonical state.
+
 ## Current technical research alignment
 
-The design intentionally stays small. OpenAI Agents SDK currently recommends a small set of primitives (agents, tools/handoffs, guardrails) and provides sessions, human-in-the-loop and tracing; NEXUS should adopt that runtime only when the deterministic fabric has a measured need for model-managed multi-step execution. MCP's host/client/server architecture is relevant for future connector portability and capability isolation. OpenAI tracing can capture sensitive model/tool inputs by default, so a future Agents SDK adapter must explicitly disable sensitive trace payload capture for NEXUS commercial workflows and preserve PR #10's metadata-only canonical audit state.
+The design intentionally stays small. OpenAI Agents SDK provides a compact set of agent/tool/handoff/guardrail primitives plus sessions, human-in-the-loop and tracing; NEXUS should adopt a model-managed worker only after the deterministic fabric demonstrates a measured need. MCP's host/client/server architecture remains relevant for future connector portability and capability isolation. Any future model/tool tracing must preserve NEXUS data minimization and must not turn sensitive commercial payloads into an observability exfiltration surface.
 
 ## Planned increments
 
 ### v0.1 — current
-Deterministic planning, capability routing, human-gate classification, blocked-state preservation, adversarial metadata tests.
+Deterministic planning, source adapters, capability routing, human-gate classification, blocked-state preservation, Cross-AI evidence tiers, backup manifests/receipts, exact source-version freshness and reconstruction proof, plus adversarial metadata tests.
 
-### v0.2 — after integration proof
-Adapters that translate current Automations/Gmail/GitHub/Notion research outputs into `WorkItem` objects. Read-only or reversible internal work only.
+### v0.2 — measured pilot
+Run real safe source cycles from Gmail/GitHub/Notion/research and record useful-vs-noise outcomes. Add no new scheduler until the pilot produces enough outcomes to justify calibration.
 
 ### v0.3 — after measured need
-A worker runner for selected safe task classes with idempotency keys, retry budgets, checkpointing and backup manifests. No autonomous consequential actions.
+A worker runner for selected safe task classes with idempotency keys, retry budgets and checkpointing. No autonomous consequential actions.
 
 ### v0.4 — only if justified
 Optional Agents SDK worker for research/synthesis tasks. Tool guardrails, limited concurrency, explicit budgets, sensitive tracing disabled and deterministic eval replay required before promotion.

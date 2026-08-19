@@ -88,7 +88,7 @@ def test_supplier_claim_preserves_epistemic_class_through_decision_learning():
     observation = OutcomeObservation(
         observation_id="observation:supplier-120mpa-claim",
         decision_id=decision.decision_id,
-        observed_at="2026-08-22",
+        observed_at="2026-08-22T10:00:00+00:00",
         result=evidence.summary,
         source_refs=(evidence.source_ref,),
         kind="claim",

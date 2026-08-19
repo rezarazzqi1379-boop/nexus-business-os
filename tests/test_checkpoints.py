@@ -1,12 +1,15 @@
 from nexus_core.checkpoints import (
     BackupReceipt,
     CheckpointManifest,
+    RestoreProof,
     SnapshotEntry,
     changed_artifact_refs,
     checkpoint_matches,
     receipt_covers_manifest_entry,
+    restore_proves_reconstruction,
     validate_backup_receipt,
     validate_checkpoint,
+    validate_restore_proof,
 )
 
 HASH_A = "a" * 64
@@ -34,6 +37,20 @@ def receipt(*, digest: str = HASH_A, stored_at: str = "2026-08-19T19:44:00+03:30
         stored_at=stored_at,
         source_version_ref=source_version_ref,
         source_content_sha256=digest,
+    )
+
+
+def restore_proof(*, expected_digest: str = HASH_A, restored_digest: str = HASH_A, restored_at: str = "2026-08-19T20:00:00+03:30", source_version_ref: str = VERSION_A, backend: str = "google_drive", stored_artifact_ref: str = "drive:file:example-backup-doc"):
+    return RestoreProof(
+        checkpoint_id="checkpoint:nexus:command-center",
+        artifact_ref="notion:command-center",
+        backend=backend,
+        stored_artifact_ref=stored_artifact_ref,
+        restored_artifact_ref="restore:test:command-center",
+        restored_at=restored_at,
+        source_version_ref=source_version_ref,
+        expected_content_sha256=expected_digest,
+        restored_content_sha256=restored_digest,
     )
 
 
@@ -77,3 +94,24 @@ def test_receipt_requires_timezone_aware_storage_time():
 def test_receipt_rejects_ambiguous_backend_metadata():
     malformed = BackupReceipt("checkpoint:nexus:command-center", "notion:command-center", " google_drive ", "drive:file:example-backup-doc", "2026-08-19T19:44:00+03:30", VERSION_A, HASH_A)
     assert "backend cannot have leading or trailing whitespace" in validate_backup_receipt(malformed)
+
+def test_valid_restore_proof_reconstructs_exact_manifest_entry():
+    proof = restore_proof()
+    assert validate_restore_proof(proof) == []
+    assert restore_proves_reconstruction(proof, receipt(), manifest()) is True
+
+def test_restore_digest_mismatch_fails_closed():
+    assert restore_proves_reconstruction(restore_proof(restored_digest=HASH_B), receipt(), manifest()) is False
+
+def test_restore_expected_digest_cannot_drift_from_receipt():
+    assert restore_proves_reconstruction(restore_proof(expected_digest=HASH_B, restored_digest=HASH_B), receipt(), manifest()) is False
+
+def test_restore_source_version_must_match_exact_receipt_version():
+    assert restore_proves_reconstruction(restore_proof(source_version_ref=VERSION_B), receipt(source_version_ref=VERSION_A), manifest(source_version_ref=VERSION_A)) is False
+
+def test_restore_backend_and_stored_ref_are_bound_to_receipt():
+    assert restore_proves_reconstruction(restore_proof(backend="other_backend"), receipt(), manifest()) is False
+    assert restore_proves_reconstruction(restore_proof(stored_artifact_ref="drive:file:different"), receipt(), manifest()) is False
+
+def test_restore_requires_timezone_aware_timestamp():
+    assert "restored_at must include a timezone offset" in validate_restore_proof(restore_proof(restored_at="2026-08-19T20:00:00"))

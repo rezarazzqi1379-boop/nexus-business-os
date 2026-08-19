@@ -31,6 +31,11 @@ PR #13 has become a monolithic integration branch. Presence of a module and pass
 | `commercial_learning.py` | Verified-code-read | Stage is already bounded by `Literal`; small-sample scores must not be sold as calibrated probabilities. |
 | `goal_portfolio.py` | Verified-code-read | State/horizon are already Literal-bounded and fail-closed validated. |
 | `entity_resolution.py` | Verified-code-read; incomplete identity contract | Exact normalized duplicate detection exists, but canonical Notion Entity Registry binding does not. Stable cross-system identity is therefore not yet verified. |
+| `send_dedup_guard.py` | Verified-code-read; regression hardened | Prevention-only guard now rejects malformed runtime types, invalid/naive timestamps, non-boolean sent state, duplicate message IDs and malformed thread/message IDs. An allow result is explicitly not authorization to send. |
+| `retry_budget.py` | Verified-code-read; regression hardened | Retry policy/runtime inputs fail closed; auth/permission/validation failures do not retry; half-open probe requires a real boolean. Retry never authorizes replay of an external side effect. |
+| `plugin_expertise.py` | Verified-code-read; regression hardened | Runtime inputs are bounded/typed and verified maturity now requires a nonblank evidence reference; unverified specialists cannot be routed as verified. Evidence-reference retrievability remains a broader trust-boundary requirement. |
+| `connector_broker.py` | Verified-code-read; regression hardened | Runtime type confusion, unsupported health/capabilities and malformed scores/priority fail closed; consequential-write semantics are validated before route selection. Route selection still does not authorize an external action. |
+| `capability_health.py` | Verified-code-read | Freshness-aware and fail-closed for malformed health records; verified read/write semantics require explicit proven access. Evidence-ref retrievability is still governed by the broader evidence contract. |
 
 ## Code-present-unreviewed — freeze expansion until reviewed or justified by outcome
 
@@ -40,16 +45,16 @@ These modules exist in the branch, but this inventory does **not** promote them 
 `asset_analysis.py`, `asset_chat_link.py`, `asset_contradictions.py`, `asset_manifest.py`, `asset_reanalysis.py`, `continuity.py`, `contradictions.py`, `cross_asset_retrieval.py`, `memory_consolidation.py`, `semantic_asset.py`, `semantic_memory.py`, `temporal_knowledge.py`.
 
 ### Autonomy / planning / scheduling
-`auto_bootstrap.py`, `autonomy.py`, `autonomy_adapters.py`, `autonomy_health.py`, `capacity_guard.py`, `critical_path_scheduler.py`, `durable_workflow.py`, `execution_planner.py`, `goal_coordination.py`, `portfolio_scheduler.py`, `retry_budget.py`, `provider_failover.py`, `network_resilience.py`, `predictive_diagnostics.py`, `uncertainty_router.py`.
+`auto_bootstrap.py`, `autonomy.py`, `autonomy_adapters.py`, `autonomy_health.py`, `capacity_guard.py`, `critical_path_scheduler.py`, `durable_workflow.py`, `execution_planner.py`, `goal_coordination.py`, `portfolio_scheduler.py`, `provider_failover.py`, `network_resilience.py`, `predictive_diagnostics.py`, `uncertainty_router.py`.
 
 ### Commercial / network / CRM
-`adaptive_portfolio.py`, `commercial_intelligence.py`, `commercial_network.py`, `crm_hygiene.py`, `outreach_controller.py`, `send_dedup_guard.py`.
+`adaptive_portfolio.py`, `commercial_intelligence.py`, `commercial_network.py`, `crm_hygiene.py`, `outreach_controller.py`.
 
 ### Graph / entity / knowledge
-`knowledge_graph.py`, `graph_store.py` is reviewed separately above; future infrastructure around graph persistence remains unpromoted.
+`knowledge_graph.py`; `graph_store.py` is reviewed separately above; future infrastructure around graph persistence remains unpromoted.
 
 ### Capability / connector / plugin
-`capability_health.py`, `connector_broker.py`, `latency_telemetry.py`, `plugin_expertise.py`, `sla_registry.py`.
+`latency_telemetry.py`, `sla_registry.py`.
 
 ### Causal / experimentation / science / ideation
 `causal_claims.py`, `causal_trace.py`, `experimentation.py`, `idea_generator.py`, `science_network.py`.
@@ -78,14 +83,19 @@ Do not claim any of the following from current evidence:
 - Stable entity IDs are reconciled with canonical Notion Entity Registry.
 - Apollo is healthy merely because a past document says `verified_read`; current runtime 401 evidence overrides stale documentation until a new successful probe.
 - A broad commercial mandate authorizes external sends; external commercial actions remain exact-action Human-Gated.
+- A syntactically plausible evidence/proof reference is proof of review or connector health unless the referenced immutable artifact can actually be retrieved and matched.
 
 ## Self-attestation audit rule
 
-Any future field/flag whose truth alone promotes evidence/review/health/readiness (for example a hypothetical `reviewed=True`, `verified=True`, or `code_read=True`) must be treated as untrusted unless bound to independently retrievable proof such as an exact artifact/version reference, content hash, test/run reference, reviewer evidence reference, or live connector probe. The repository-wide search performed on 2026-08-20 did not find the exact `reviewer_read_code` token; therefore that specific example remains a claim-to-verify, not a confirmed bug.
+A real self-attestation gap was subsequently found in the Cross-AI review path: `reviewer_read_code=True` could promote review evidence without independently retrievable proof. That boolean promotion path was removed and regression coverage added. The replacement proof-reference path is safer but **prefix/shape validation alone is still not sufficient proof**; promotion must ultimately bind the claimed review to an immutable retrievable artifact/version/hash and successful verification. Any future `reviewed=True`, `verified=True`, `code_read=True`, health/readiness flag or similar self-assertion must remain untrusted until independently evidenced.
 
 ## Persistence boundary rule
 
 Validation is mandatory at every real persistence boundary. Current reviewed in-memory graph and asset repositories already enforce validators. Any future Supabase/Postgres/Notion/CRM adapter must enforce the corresponding validator before write and must fail closed on malformed/unsupported domain state. A validator that callers may bypass is not sufficient.
+
+## Component disposition vocabulary
+
+During the remaining inventory, every major component must also receive one lifecycle disposition: **CORE / SPLIT-CANDIDATE / EXPERIMENTAL / SUPERSEDED / DUPLICATE / DEAD / FROZEN**. Presence in the branch is not a reason to keep it. Removal/merge proposals require dependency and regression evidence; destructive deletion is not authorized by this document.
 
 ## Decomposition target
 
@@ -122,7 +132,7 @@ Prefer warm/referral paths, official CAPEX/tender/plant expansion evidence, and 
 
 - Apollo: **Parked / blocked** after a current HTTP 401 credential failure. A later successful authenticated probe is required before promotion.
 - Quartr/Semrush and new connectors: no investment/promotion without a concrete use case and measurable benefit.
-- No new plugin/connector expansion while unresolved Handoff work and current integration debt remain material.
+- Do not maximize visible/executable tools. Route only the smallest evidence-backed specialist set required by the current lane; additional connectors remain discovered/candidate until a live probe and use-case justify promotion.
 
 ## Security / compliance gate
 

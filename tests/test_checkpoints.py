@@ -117,6 +117,19 @@ def test_changed_content_is_detected_for_incremental_backup():
     assert changed_artifact_refs(second, first) == ("notion:command-center",)
 
 
+def test_valid_no_change_is_distinct_from_invalid_current_manifest():
+    current = manifest()
+    previous = manifest(captured_at="2026-08-19T15:00:00+00:00")
+    assert changed_artifact_refs(current, previous) == ()
+    assert changed_artifact_refs(manifest(digest="invalid"), previous) is None
+
+
+def test_invalid_previous_manifest_forces_conservative_rebackup():
+    current = manifest()
+    invalid_previous = manifest(digest="invalid")
+    assert changed_artifact_refs(current, invalid_previous) == ("notion:command-center",)
+
+
 def test_new_source_version_is_changed_even_when_digest_is_identical():
     first = manifest(digest=HASH_A, source_version_ref=VERSION_A)
     second = manifest(digest=HASH_A, source_version_ref=VERSION_B)

@@ -8,11 +8,11 @@ This file is the code-repository current-state manifest. It does not replace the
 
 - **ChatGPT / NEXUS HQ** — control plane, orchestration, analysis, execution when a connected tool supports the action. Not the sole memory store.
 - **GitHub** — canonical source of truth for NEXUS code, tests, CI configuration, and version history.
-- **Notion** — human-readable operational coordination, canonical-object map, decisions, relationship signals, outcome learning, research/experiments, and Cross-AI Handoff Log.
-- **Gmail** — primary evidence for live commercial communications and supplier replies.
-- **Supabase/PostgreSQL** — structured runtime/state store already implemented, but currently connector-degraded: a 2026-08-19 retry of `select current_user, current_schema(), now()` still returned a permission error. Do not infer live schema while access is degraded.
-- **Vercel** — deployment layer. A production project is READY, but the existing deployment must not be assumed to contain the latest GitHub Vertical 01 code until a new deployment is explicitly verified.
-- **Claude** — independent auditor/second opinion through the shared handoff layer; not a second source of truth. Current PR #1 review remains pending.
+- **Notion** — operational coordination, canonical-object map, decisions, relationship signals, outcome learning, research/experiments, and Cross-AI Handoff Log.
+- **Gmail** — primary evidence for live commercial communications and supplier replies/drafts.
+- **Supabase/PostgreSQL** — structured runtime/state store already implemented, but connector access remains degraded; a current `select current_user, current_schema(), now()` still returns a permission error. Do not infer schema or rewrite RLS while blocked.
+- **Vercel** — deployment layer. Production is READY, but direct fetch verifies the current deployment serves only `NEXUS Business OS — Runtime bootstrap checkpoint`; current Python Vertical 01 / draft-PR code is not deployed there.
+- **Claude** — independent auditor through the shared handoff layer; not a second source of truth. PR #1 review remains Open with no response/comments.
 
 ## Vertical 01 maturity
 
@@ -20,93 +20,122 @@ Current main chain:
 
 `Evidence -> Relationship -> Signal -> Opportunity -> Outcome`
 
-Implemented in GitHub with stable IDs, provenance checks, entity consistency, outcome-state invariants, and real evidence-linked fixtures for SupplierTR, GH Petro, and YAXING.
+Main contains stable IDs, provenance checks, entity consistency, outcome-state invariants, real Gmail-linked cases, verified GitHub Actions, and live Notion relationship/outcome proof. It is not yet synchronized to the verified Supabase runtime and is not production.
 
-Current maturity:
+Draft PR #1 (`feature/evidence-classification`, head `9596b15e`) adds explicit epistemic classes:
 
-`Implemented in GitHub -> structural validation + GitHub Actions verified -> live Notion relationship/outcome proof exists -> Supabase adapter pending verified schema access -> not deployed as current Vercel runtime -> not production`
+`fact | claim | estimate | inference | hypothesis | assumption | unknown`
 
-Draft PR #1 (`feature/evidence-classification`) is **not merged**. It adds explicit epistemic evidence classes (`fact | claim | estimate | inference | hypothesis | assumption | unknown`) so supplier statements cannot silently become verified facts. Latest corrected PR head previously passed GitHub Actions; Claude KEEP/CHANGE/STOP review remains pending.
-
-## First measured loop proof
-
-Notion contains evidence-backed Relationship Signals for SupplierTR, GH Petro and YAXING, each linked to canonical Entity Registry entries and Gmail evidence.
-
-A YAXING micro-outcome is recorded in the canonical Outcome Ledger: technical engagement/catalog receipt progressed the route, but buyer-side engineering data (final Hydrotester pipe-length and wall-thickness/ID range) is now the explicit next blocker. The record is **Inconclusive / Retest**, not supplier qualification.
-
-Older GH Petro, SupplierTR and K+S Outcome Ledger records were re-audited. Supplier capability/progression statements were rewritten to preserve claim semantics, and uncalibrated numeric scores were removed where they created pseudo-precision.
+It also preserves claim semantics downstream so supplier statements are not silently promoted to facts. Corrected head passed GitHub Actions run `32244193115`. PR remains draft/unmerged pending independent review.
 
 ## Requirement Readiness Gate — shadow mode
 
-Repeated field evidence from Marley and YAXING produced a Research Registry inference and Experiment Lab design: missing buyer-side decision-critical requirements may be an upstream bottleneck before final quotation/compliance comparison.
+Repeated field evidence from Marley and YAXING produced a Research Registry inference and a Designed/Pending Experiment Lab test.
 
-Draft PR #2 (`feature/requirement-readiness-shadow`) implements the smallest testable shadow-mode evaluator:
+Draft PR #2 (`feature/requirement-readiness-shadow`, head `1dbe2546`) implements:
 
 - `approved`
 - `provisional`
 - `unknown_blocking`
 - separate `ready_for_discovery` and `ready_for_final_request`
+- retrievable source refs for approved/provisional values
 - no external action or autonomous blocking
+- source-separated Hydrotester Requirement Input Map
 
-Self-audit correction: the first fixture treated communicated Hydrotester OD/pressure values as approved. This was too strong because Gmail proves communication, not current engineering authority. Latest PR #2 therefore keeps OD `89–180 mm` and max machine rating `120 MPa` as **provisional** until an approved source-of-authority record is linked; pipe length and wall-thickness/ID remain `unknown_blocking`. GitHub Actions run `32245181605` completed with conclusion `success` on latest PR #2 head `1c2694ec`.
+Current Hydrotester shadow state:
 
-The Experiment Lab remains **Designed / Pending** despite passing code tests. It needs 3–5 real equipment RFQs before any claim that the gate improves supplier clarification rounds or time-to-comparable-quote.
+- OD `89–180 mm` — **provisional** until engineering authority is linked
+- max machine rating target `120 MPa` — **provisional** until engineering authority is linked
+- final pipe-length range — **unknown_blocking**
+- final wall-thickness / ID range — **unknown_blocking**
+- historical communicated `12 m` — provisional, not authority
+
+Latest PR #2 GitHub Actions run `32245386558` completed successfully. Passing tests prove implementation integrity, not field value. The gate must be observed across 3–5 real comparable equipment RFQs before promotion or workflow-value claims.
+
+## Live procurement evidence and qualification state
+
+### OCTG / Hydrotester / Heat Treatment
+
+Canonical Entity Registry and Relationship Signals now include Marley, ANZ Global and Yedi Mavi in addition to SupplierTR, GH Petro and YAXING.
+
+- **Marley** — responsive and asked for Hydrotester pipe-length and wall-thickness ranges before detailed quotation. Official-site review verifies Wuxi Marley Technology identity and the Eli contact, but the public portfolio currently emphasizes evaporation, heat-exchange and process equipment; no pipe/OCTG hydrotester product was found in focused review. Correct status: role/capability **unverified**, not rejected. Ask direct-manufacturer vs integrator vs third-party OEM identity and references.
+- **ANZ Global** — responsive UAE sourcing/integration route. Keep ANZ capability separate from OEM technical capability. Require named manufacturer, location, scope/exclusions, deviations, commercial terms, fee/markup and executable Iran route.
+- **Yedi Mavi** — responsive Turkish sourcing route, RFQ `YM-2026-0819-OCTG`. Require structured OEM shortlist, references, deviations, fee transparency and executable Iran route.
+- **SupplierTR** — supplier reports engineering evaluation active; OEM shortlist and compliance remain unverified.
+- **GH Petro** — substantive reply and capability claim; technical qualification remains open.
+- **YAXING** — catalog/technical engagement is fact; final Hydrotester geometry remains unresolved.
+
+Gmail drafts for Marley, ANZ and Yedi Mavi were updated to preserve provisional/unknown semantics, keep Heat Treatment dimensions separate from Hydrotester requirements, and ask for actual OEM/manufacturing scope. They remain drafts and were not sent.
+
+### KCl / Belaruskali / OMS
+
+BPC factually referred ASAK to Overseas Material Supply (OMS) for Iranian-market distribution. OMS then provided concrete commercial terms:
+
+- CFR basis
+- AED payment
+- 50% advance upon booking
+- balance against copies of shipping documents
+- usual shipment lot around 3,000 MT
+- possible combined shipment for ASAK's approximately 1,200 MT requirement
+
+OMS also states it is an exclusive Belaruskali agent, has supplied Iran for a long time, and that a specific Ministry of Agriculture permit is required. Those statements are not all independently verified for this transaction.
+
+The previous Outcome Ledger label `qualified with compliance conditions` was corrected to **commercial route — compliance/import facts pending**, with `Inconclusive / Retest` semantics and uncalibrated numeric scores removed. A canonical OMS Relationship Signal was added.
+
+Current research status for the permit issue: current web verification did not surface an authoritative Iranian government source establishing OMS's exact blanket permit requirement for industrial KCl feedstock used in SOP production. KCl has both agricultural and industrial uses, so exact HS/use classification and permit applicability remain **Unknown / Needs Check**. Verify via ASAK customs/import-registration expertise or authoritative trade-registration evidence before representing the route as compliant.
+
+A reply draft to OMS was created, not sent. It states import history and permit status are under internal verification, asks OMS for the exact HS code and regulatory reference required for industrial SOP-feedstock KCl, and requests COA/TDS, packaging, CFR destination/price basis, lead time and SGS/inspection options.
+
+K+S remains a direct compliance-rejected route for current Iran-related procurement unless new official evidence changes that status.
+
+### Can machinery
+
+The correct Golden Eagle contact thread uses `xugan@zjjyspjx.com`. The old draft addressed to `xugan@zijyspjx.com` is stale and must not be sent. Latest correct-thread outbound requested two commercial scopes: standalone Necking and combined Necking + Flanging + Beading + Seaming. No new supplier reply has been observed since that message; do not duplicate outreach without timing/evidence justification.
+
+## First measured-loop proof
+
+Notion contains evidence-backed Relationship Signals for SupplierTR, GH Petro, YAXING, Marley, ANZ, Yedi Mavi and OMS, each tied to retrievable evidence and canonical entities where resolved.
+
+Outcome Ledger records for YAXING, GH Petro, SupplierTR, K+S and OMS were re-audited so claims, facts, unknowns and uncalibrated scores do not masquerade as qualification.
+
+This is the current proof direction:
+
+`Evidence -> Resolved Entity -> Relationship Signal -> Next Action -> Outcome -> Learning`
+
+The remaining goal is repeated closed-loop performance, not more infrastructure.
 
 ## Current hard gates
 
 1. No new agent/registry/framework/integration merely to create activity.
 2. No Supabase adapter based on remembered or guessed schema.
-3. No supplier is commercially qualified merely because a structural test fixture validates.
+3. No supplier is qualified merely because a fixture validates or a supplier is responsive.
 4. No final Hydrotester length/wall-thickness assumption until engineering confirms it.
-5. Communicated or historical buyer values are not engineering authority unless an approved source is linked.
-6. No external consequential action without human approval.
-7. No claim that current GitHub code is deployed on Vercel until deployment parity is verified.
-8. No production AI-agent runtime before the procurement loop is measurable and repeatable.
-9. Draft PRs must not be merged merely because CI passed; evidence correctness and review still matter.
+5. Communicated/historical buyer values are not engineering authority without an approved source.
+6. Keep Heat Treatment dimensions separate from Hydrotester requirements.
+7. No external consequential action without human approval.
+8. No claim that current code is deployed on Vercel; bootstrap-only parity has been directly verified.
+9. Draft PRs must not be merged merely because CI passed.
+10. No production AI-agent runtime before procurement loops are measurable and repeatable.
+11. Do not present uncalibrated heuristic scores as probabilities or precise confidence.
 
 ## Drift rules
 
-- Stable project context can be older than runtime. Runtime facts must be re-verified before action.
-- A newer verified GitHub/Notion/Gmail/Supabase artifact supersedes older narrative state only for the fields it actually proves.
+- Runtime facts must be reverified before action.
+- Newer verified artifacts supersede older narratives only for fields they actually prove.
 - Backup pages are lineage snapshots, not live operating objects.
-- Code maturity must always be stated as Designed / Implemented / Tested / Deployed / Production separately.
-- Unit-test fixture source refs may be synthetic only when the fixture is explicitly synthetic; real-case fixtures must never invent authority references.
-
-## Verified research decisions — 2026-08-19
-
-### GitHub Actions
-
-The NEXUS test workflow has `workflow_dispatch`, `pull_request`, main-push execution and explicit least-privilege `contents: read`. CI is operational and has passed on multiple draft-PR heads, including PR #2 run `32245181605`.
-
-### Supabase security/access
-
-Connector access is still permission-blocked even for a minimal identity/schema query. Treat this as an integration/role-access problem before touching application RLS/schema. When access returns, inspect role, grants and RLS separately and use least privilege. Do not expose service-role/bypass credentials to a client.
-
-### Hydrotester readiness research
-
-Primary manufacturer material supports the readiness model, not buyer values: Fives Taylor-Wilson describes variation by pipe length, end conditions, pressure settings and sealing arrangements; YAXING describes non-standard customized hydrotesters designed from customer parameters such as pipe diameter, length and maximum pressure, with hold-time/station/sealing choices. Marley independently requested pipe-length and wall-thickness ranges before a detailed proposal. Therefore geometry and test parameters should be explicitly classified before final comparison, while buyer-approved values must come from the buyer/engineering authority.
-
-### Future Signal Registry canonicalization
-
-`NEXUS Future Signal Registry` at `5f728db4-2dfb-4ece-9c80-29707a118383` / `collection://ae665f6a-e726-4936-8e31-2b67e45b7ba9` remains the canonical write target. A unique source-less regional logistics Watch item from sibling `65efe565...` was re-researched against current IMO evidence, corrected at source, and merged into the canonical registry. The sibling remains lineage/recovery and should receive no new writes.
-
-### Page duplicate canonicalization
-
-Canonical Object Registry now explicitly records these live-under-Command-Center pages as Canonical Write, with matching siblings under the AGENT-FLEET backup Command Center preserved as read-only recovery/lineage:
-
-- `NEXUS Parallel Execution Control — LIVE`
-- `NEXUS Work Transfer Manifest — LIVE`
-- `NEXUS Software Build Log — Qualification Engine v0.1`
-
-No archive/delete/move was performed.
+- Designed / Implemented / Tested / Deployed / Production are separate maturity states.
+- Unit-test fixture authority refs may be synthetic only when explicitly synthetic; real-case fixtures must never invent authority.
+- A supplier statement is evidence that the supplier made the statement; it is not automatically evidence that the underlying capability/compliance fact is true.
 
 ## Near-term proof targets
 
-1. Receive Claude KEEP/CHANGE/STOP review of draft PR #1.
-2. Keep PR #2 in shadow mode; collect 3–5 real RFQ observations before promotion or merge decision tied to workflow value.
-3. Restore Supabase read access; inspect integration role/grants/RLS before changing policies or code.
-4. Obtain Hydrotester pipe-length and wall-thickness/ID range from engineering and advance Marley / Yedi Mavi / ANZ without specification drift.
-5. Record the next supplier reply/quote/referral as a measured outcome and compare expected vs actual Next Best Action.
-6. Verify Vercel deployment parity only when a deliberate deployment is justified; do not deploy merely to show activity.
-7. Only after repeated loop proof, begin Proposal Ingestion / deviation extraction v0.2.
-8. Produce one final Work-migration parity checkpoint before changing orchestration surface.
+1. Receive Claude KEEP/CHANGE/STOP review of PR #1; no response exists yet.
+2. Keep PR #2 in shadow mode and collect 3–5 real RFQ observations.
+3. Restore Supabase read access; inspect role/grants/RLS/schema before adapter work.
+4. Obtain engineering-approved Hydrotester length and wall-thickness/ID values plus hold-time/cycle and other decision-critical fields as needed.
+5. Resolve Marley exact manufacturing/OEM role before qualification.
+6. Resolve OMS industrial KCl HS/use/permit applicability and ASAK import-history/payment feasibility before commercial qualification.
+7. Record next supplier reply/quote/referral against expected Next Best Action and outcome.
+8. Begin Proposal Ingestion / deviation extraction only after repeated loop proof.
+9. Keep Vercel undeployed until there is a deliberate runtime artifact worth deploying.
+10. Produce one final Work-migration parity checkpoint only when the orchestration surface actually changes.

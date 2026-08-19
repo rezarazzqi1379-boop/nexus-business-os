@@ -81,11 +81,11 @@ def test_suppliertr_real_case_closes_the_structural_loop():
         evidence_summary="SupplierTR stated that its engineering team had started evaluating both projects.",
         evidence_kind="claim",
         signal_type="engineering_evaluation_started",
-        signal_description="Engineering evaluation started for the OCTG equipment packages.",
+        signal_description="SupplierTR reports engineering evaluation started for the OCTG equipment packages.",
         opportunity_title="Turkey sourcing route for OCTG equipment",
         next_action="Wait for supplier shortlist and engineering feedback.",
         outcome_type="qualified_reply",
-        outcome_result="Engineering evaluation started.",
+        outcome_result="SupplierTR reported engineering evaluation started; no OEM shortlist or technical compliance verified yet.",
     )
     assert record.validate() == []
 
@@ -102,7 +102,7 @@ def test_gh_petro_real_case_closes_the_structural_loop():
         opportunity_title="Direct technical supplier route via GH Petro",
         next_action="Qualify technical scope, references, deviations, lead time and commercial terms.",
         outcome_type="qualified_reply",
-        outcome_result="Relevant-capability reply received; qualification remains open.",
+        outcome_result="Relevant-capability claim received; qualification remains open pending verification.",
     )
     assert record.validate() == []
 

@@ -12,6 +12,8 @@ from nexus_core.policy import ActionApproval, ActionIntent, GateDecision, evalua
 OutreachChannel = Literal["email", "linkedin", "whatsapp", "other"]
 _MAX_TEXT = 2048
 _MAX_BODY = 20_000
+_MAX_FOLLOWUPS_PER_TARGET = 4
+_MAX_FOLLOWUP_DELAY_HOURS = 24 * 30
 
 
 @dataclass(frozen=True)
@@ -34,7 +36,7 @@ class OutreachTarget:
 
 @dataclass(frozen=True)
 class PreparedMessage:
-    """Exact external message proposed for one qualified target."""
+    """Exact first external message proposed for one qualified target."""
 
     target_id: str
     subject: str
@@ -43,11 +45,30 @@ class PreparedMessage:
 
 
 @dataclass(frozen=True)
+class PreparedFollowUp:
+    """Pre-reviewed bounded follow-up step included in the same approval envelope.
+
+    stop_on_reply is intentionally required to remain true by validation. A live reply is
+    new evidence and must stop blind scheduled outreach rather than letting a sequence
+    continue against an already-engaged counterparty.
+    """
+
+    target_id: str
+    step: int
+    wait_after_hours: int
+    subject: str
+    body: str
+    stop_on_reply: bool = True
+
+
+@dataclass(frozen=True)
 class OutreachBatch:
     """Immutable, source-versioned unit that can be released with one approval.
 
     One-click approval is deliberately batch-scoped rather than blanket authorization.
     Any material mutation changes the digest and therefore invalidates prior approval.
+    Optional follow-ups are exact, bounded and stop-on-reply; they are part of the same
+    digest so one button may approve a finite pre-reviewed communication sequence.
     """
 
     batch_id: str
@@ -57,6 +78,7 @@ class OutreachBatch:
     source_version_refs: tuple[str, ...]
     targets: tuple[OutreachTarget, ...]
     messages: tuple[PreparedMessage, ...]
+    followups: tuple[PreparedFollowUp, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -115,6 +137,8 @@ def validate_outreach_batch(batch: OutreachBatch) -> tuple[str, ...]:
         errors.append("targets requires at least one target")
     if not isinstance(batch.messages, tuple) or not batch.messages:
         errors.append("messages requires at least one prepared message")
+    if not isinstance(batch.followups, tuple):
+        errors.append("followups must be a tuple")
 
     target_ids: set[str] = set()
     recipients: set[tuple[str, str]] = set()
@@ -153,6 +177,46 @@ def validate_outreach_batch(batch: OutreachBatch) -> tuple[str, ...]:
     if target_ids and message_target_ids and target_ids != message_target_ids:
         errors.append("every target must have exactly one prepared message")
 
+    followup_keys: set[tuple[str, int]] = set()
+    followup_counts: dict[str, int] = {}
+    last_step_by_target: dict[str, int] = {}
+    last_delay_by_target: dict[str, int] = {}
+    for followup in batch.followups if isinstance(batch.followups, tuple) else ():
+        if not isinstance(followup, PreparedFollowUp):
+            errors.append("followups must contain PreparedFollowUp values")
+            continue
+        if followup.target_id not in target_ids:
+            errors.append("followup target_id must reference a batch target")
+        if not isinstance(followup.step, int) or isinstance(followup.step, bool) or followup.step < 1:
+            errors.append("followup step must be a positive integer")
+        if (
+            not isinstance(followup.wait_after_hours, int)
+            or isinstance(followup.wait_after_hours, bool)
+            or not 1 <= followup.wait_after_hours <= _MAX_FOLLOWUP_DELAY_HOURS
+        ):
+            errors.append("followup wait_after_hours is invalid")
+        if followup.stop_on_reply is not True:
+            errors.append("followups must stop_on_reply")
+        if not _valid_text(followup.subject): errors.append("followup subject is invalid")
+        if not _valid_text(followup.body, max_length=_MAX_BODY): errors.append("followup body is invalid")
+        if isinstance(followup.step, int) and not isinstance(followup.step, bool):
+            key = (followup.target_id, followup.step)
+            if key in followup_keys: errors.append("duplicate followup target/step")
+            followup_keys.add(key)
+            followup_counts[followup.target_id] = followup_counts.get(followup.target_id, 0) + 1
+            previous_step = last_step_by_target.get(followup.target_id, 0)
+            if followup.step != previous_step + 1:
+                errors.append("followup steps must be contiguous per target")
+            last_step_by_target[followup.target_id] = followup.step
+            if isinstance(followup.wait_after_hours, int) and not isinstance(followup.wait_after_hours, bool):
+                previous_delay = last_delay_by_target.get(followup.target_id, 0)
+                if followup.wait_after_hours <= previous_delay:
+                    errors.append("followup delays must increase per target")
+                last_delay_by_target[followup.target_id] = followup.wait_after_hours
+
+    if any(count > _MAX_FOLLOWUPS_PER_TARGET for count in followup_counts.values()):
+        errors.append("too many followups for one target")
+
     return tuple(errors)
 
 
@@ -186,6 +250,17 @@ def outreach_batch_digest(batch: OutreachBatch) -> str:
                 "thread_ref": m.thread_ref,
             }
             for m in batch.messages
+        ],
+        "followups": [
+            {
+                "target_id": f.target_id,
+                "step": f.step,
+                "wait_after_hours": f.wait_after_hours,
+                "subject": f.subject,
+                "body": f.body,
+                "stop_on_reply": f.stop_on_reply,
+            }
+            for f in batch.followups
         ],
     }
     encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
@@ -223,11 +298,12 @@ def authorize_outreach_release(
     approval: ActionApproval,
     now: datetime | None = None,
 ) -> OutreachRelease:
-    """Authorize only an exact, unexpired, immutable prepared batch.
+    """Authorize only an exact, unexpired, immutable prepared batch/sequence.
 
     This is the enforcement point behind the proposed UI button. The approval must match
-    the digest-derived action id. Editing a target/message/source version after review
-    changes the digest, so stale or blanket approval cannot bleed into a new send.
+    the digest-derived action id. Editing a target, first message, follow-up, schedule or
+    source version after review changes the digest, so stale or blanket approval cannot
+    bleed into a new send sequence.
     """
 
     errors = validate_outreach_batch(batch)
@@ -251,8 +327,12 @@ def authorize_outreach_release(
         ),
         approval=approval,
     )
-    approved = tuple(message.target_id for message in batch.messages) if gate.allowed_now else ()
-    return OutreachRelease(batch.batch_id, digest, action_id, gate, approved)
+    if not gate.allowed_now:
+        return OutreachRelease(batch.batch_id, digest, action_id, gate, ())
+
+    approved = [f"{message.target_id}:initial" for message in batch.messages]
+    approved.extend(f"{followup.target_id}:followup:{followup.step}" for followup in batch.followups)
+    return OutreachRelease(batch.batch_id, digest, action_id, gate, tuple(approved))
 
 
 def qualified_targets(targets: Sequence[OutreachTarget]) -> tuple[OutreachTarget, ...]:

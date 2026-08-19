@@ -43,16 +43,35 @@ _ALLOWED_RESULT_CLASSES = {
 }
 _ALLOWED_PRIVACY_MODES = {"metadata_only", "sensitive_omitted"}
 _ACTION_BOUND_EVENT_TYPES = {"human_gate_evaluated", "action_attempted"}
+_MAX_METADATA_LENGTH = 256
+
+
+def _metadata_errors(field_name: str, value: str, *, required: bool = False) -> list[str]:
+    """Reject metadata that can become a covert free-form payload channel."""
+
+    errors: list[str] = []
+    if required and not value.strip():
+        errors.append(f"{field_name} is required")
+        return errors
+    if not value:
+        return errors
+    if value != value.strip():
+        errors.append(f"{field_name} cannot have leading or trailing whitespace")
+    if len(value) > _MAX_METADATA_LENGTH:
+        errors.append(f"{field_name} must be at most {_MAX_METADATA_LENGTH} characters")
+    if any(ord(character) < 32 or ord(character) == 127 for character in value):
+        errors.append(f"{field_name} cannot contain control characters")
+    return errors
 
 
 @dataclass(frozen=True)
 class AuditEvent:
     """Stable, provider-neutral audit metadata for one NEXUS control-plane event.
 
-    v0.1 deliberately stores references and classifications only. It does not carry
-    email bodies, prompts, model/tool payloads, contracts, pricing, credentials or
-    other free-form sensitive content. Exporters may map this envelope to OpenAI
-    tracing or OpenTelemetry later without making either vendor schema canonical.
+    v0.1 deliberately stores compact references and classifications only. It does
+    not carry email bodies, prompts, model/tool payloads, contracts, pricing,
+    credentials or other free-form sensitive content. Exporters may map this
+    envelope to vendor tracing later without making that vendor schema canonical.
     """
 
     event_id: str
@@ -78,8 +97,7 @@ class AuditEvent:
             ("occurred_at", self.occurred_at),
             ("subject_ref", self.subject_ref),
         ):
-            if not value.strip():
-                errors.append(f"{name} is required")
+            errors.extend(_metadata_errors(name, value, required=True))
 
         if self.event_type not in _ALLOWED_EVENT_TYPES:
             errors.append("event_type is unsupported")
@@ -98,6 +116,12 @@ class AuditEvent:
             except ValueError:
                 errors.append("occurred_at must be ISO-8601")
 
+        for name, value in (
+            ("parent_event_id", self.parent_event_id),
+            ("action_ref", self.action_ref),
+        ):
+            errors.extend(_metadata_errors(name, value))
+
         if self.parent_event_id and self.parent_event_id == self.event_id:
             errors.append("parent_event_id cannot reference the same event")
 
@@ -109,10 +133,10 @@ class AuditEvent:
             ("correlation_refs", self.correlation_refs),
             ("tags", self.tags),
         ):
-            if any(not ref.strip() for ref in refs):
-                errors.append(f"{field_name} cannot contain blank values")
             if len(refs) != len(set(refs)):
                 errors.append(f"{field_name} cannot contain duplicates")
+            for value in refs:
+                errors.extend(_metadata_errors(field_name, value, required=True))
 
         return errors
 

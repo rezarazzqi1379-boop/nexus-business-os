@@ -1,3 +1,17 @@
-from .events import EventPrivacy, EventResult, EventType, TraceEvent
+from .events import (
+    EventPrivacy,
+    EventResult,
+    EventType,
+    TraceEvent,
+    TraceValidationResult,
+    validate_trace,
+)
 
-__all__ = ["EventPrivacy", "EventResult", "EventType", "TraceEvent"]
+__all__ = [
+    "EventPrivacy",
+    "EventResult",
+    "EventType",
+    "TraceEvent",
+    "TraceValidationResult",
+    "validate_trace",
+]

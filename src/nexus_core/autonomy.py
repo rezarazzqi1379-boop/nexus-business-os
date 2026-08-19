@@ -7,15 +7,8 @@ from nexus_core.policy import ActionIntent, GateDecision, evaluate_action
 
 
 WorkDomain = Literal[
-    "research",
-    "market_intelligence",
-    "customer_network",
-    "inbox_monitoring",
-    "coding_learning",
-    "backup",
-    "knowledge_management",
-    "innovation",
-    "security",
+    "research", "market_intelligence", "customer_network", "inbox_monitoring",
+    "coding_learning", "backup", "knowledge_management", "innovation", "security",
     "news_monitoring",
 ]
 PriorityTier = Literal["critical", "high", "medium", "low"]
@@ -37,6 +30,7 @@ _COST_RANK = {"low": 0, "medium": 1, "high": 2}
 _INVALID_RANK = 999
 _MAX_META_LENGTH = 256
 _MAX_OBJECTIVE_LENGTH = 2048
+_MAX_SIGNAL_LENGTH = 512
 _DISALLOWED_UNICODE_CATEGORIES = {"Cc", "Cf", "Zl", "Zp"}
 
 
@@ -54,6 +48,9 @@ class WorkItem:
     cost: CostTier = "medium"
     write_required: bool = False
     reversible: bool = True
+    goal_ref: str | None = None
+    success_signal: str | None = None
+    failure_signal: str | None = None
 
 
 @dataclass(frozen=True)
@@ -96,6 +93,19 @@ def _ref_errors(name: str, refs: object) -> list[str]:
     return errors
 
 
+def _outcome_errors(task: WorkItem) -> list[str]:
+    values = (task.goal_ref, task.success_signal, task.failure_signal)
+    if all(value is None for value in values):
+        return []
+    if any(value is None for value in values):
+        return ["outcome contract requires goal_ref, success_signal and failure_signal together"]
+    errors: list[str] = []
+    errors.extend(_text_errors("goal_ref", task.goal_ref, _MAX_META_LENGTH))
+    errors.extend(_text_errors("success_signal", task.success_signal, _MAX_SIGNAL_LENGTH))
+    errors.extend(_text_errors("failure_signal", task.failure_signal, _MAX_SIGNAL_LENGTH))
+    return errors
+
+
 def validate_work_item(task: WorkItem) -> list[str]:
     if not isinstance(task, WorkItem): return ["task must be a WorkItem"]
     errors: list[str] = []
@@ -109,6 +119,7 @@ def validate_work_item(task: WorkItem) -> list[str]:
     if not isinstance(task.write_required, bool): errors.append("write_required must be a boolean")
     if not isinstance(task.reversible, bool): errors.append("reversible must be a boolean")
     errors.extend(_ref_errors("evidence_refs", task.evidence_refs))
+    errors.extend(_outcome_errors(task))
     if not isinstance(task.acceptable_capability_ids, tuple):
         errors.append("acceptable_capability_ids must be a tuple")
     elif not task.acceptable_capability_ids:
@@ -124,13 +135,11 @@ def validate_work_item(task: WorkItem) -> list[str]:
 
 
 def _safe_rank(mapping: dict[str, int], value: object) -> int:
-    if not isinstance(value, str):
-        return _INVALID_RANK
+    if not isinstance(value, str): return _INVALID_RANK
     return mapping.get(value, _INVALID_RANK)
 
 
 def _priority_key(task: WorkItem) -> tuple[object, ...]:
-    """Rank malformed tasks last so validation can block them instead of sorting crashing."""
     if not isinstance(task, WorkItem):
         return (_INVALID_RANK, _INVALID_RANK, _INVALID_RANK, _INVALID_RANK, "~invalid-work-item")
     task_id = task.task_id if isinstance(task.task_id, str) else "~invalid-task-id"
@@ -144,60 +153,30 @@ def _priority_key(task: WorkItem) -> tuple[object, ...]:
 
 
 def _invalid_gate() -> GateDecision:
-    return evaluate_action(
-        ActionIntent(
-            action_id="autonomy:invalid-work-item",
-            kind="read",
-            description="Invalid autonomy work item; do not execute.",
-            reversible=True,
-        )
-    )
+    return evaluate_action(ActionIntent(action_id="autonomy:invalid-work-item", kind="read", description="Invalid autonomy work item; do not execute.", reversible=True))
 
 
 def plan_autonomy(tasks: Sequence[WorkItem], capabilities: Sequence[Capability]) -> AutonomyPlan:
-    """Plan safe NEXUS work without executing external actions."""
     planned: list[PlannedWork] = []
     for task in sorted(tasks, key=_priority_key):
         validation_errors = validate_work_item(task)
         if validation_errors:
             planned.append(PlannedWork(task, "blocked", (), tuple(validation_errors), _invalid_gate()))
             continue
-        gate = evaluate_action(
-            ActionIntent(
-                action_id=f"autonomy:{task.task_id}",
-                kind=task.action_kind,
-                description=task.objective,
-                reversible=task.reversible,
-            )
-        )  # type: ignore[arg-type]
-        capability_plan = plan_capabilities(
-            (
-                CapabilityNeed(
-                    need_id=task.task_id,
-                    purpose=task.objective,
-                    acceptable_capability_ids=task.acceptable_capability_ids,
-                    write_required=task.write_required,
-                ),
-            ),
-            capabilities,
-        )
+        gate = evaluate_action(ActionIntent(action_id=f"autonomy:{task.task_id}", kind=task.action_kind, description=task.objective, reversible=task.reversible))  # type: ignore[arg-type]
+        capability_plan = plan_capabilities((CapabilityNeed(need_id=task.task_id, purpose=task.objective, acceptable_capability_ids=task.acceptable_capability_ids, write_required=task.write_required),), capabilities)
         selected_ids = tuple(cap.capability_id for cap in capability_plan.selected)
         blockers = list(capability_plan.unresolved_need_ids)
         if blockers:
             status: PlanStatus = "blocked"
         elif gate.requires_human_approval or capability_plan.approval_required_capability_ids:
             status = "human_gate"
-            blockers.extend(
-                f"capability approval required: {capability_id}"
-                for capability_id in capability_plan.approval_required_capability_ids
-            )
-            if gate.requires_human_approval:
-                blockers.append(gate.reason)
+            blockers.extend(f"capability approval required: {capability_id}" for capability_id in capability_plan.approval_required_capability_ids)
+            if gate.requires_human_approval: blockers.append(gate.reason)
         elif gate.allowed_now:
             status = "runnable"
         else:
-            status = "blocked"
-            blockers.append(gate.reason)
+            status = "blocked"; blockers.append(gate.reason)
         planned.append(PlannedWork(task, status, selected_ids, tuple(blockers), gate))
     return AutonomyPlan(
         tuple(i for i in planned if i.status == "runnable"),

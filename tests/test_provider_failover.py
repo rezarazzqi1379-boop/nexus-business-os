@@ -39,9 +39,21 @@ def test_no_route_fails_closed() -> None:
     assert "no verified healthy route" in decision.reason
 
 
-def test_duplicate_provider_ids_do_not_create_ambiguous_success() -> None:
+def test_duplicate_provider_ids_fail_closed() -> None:
     decision = choose_provider_route((
         _route("exa", priority=1),
         _route("exa", priority=2),
     ), capability="prospecting")
+    assert decision.selected_provider_id is None
+    assert decision.blocked_provider_ids == ("exa",)
+    assert "ambiguous duplicate" in decision.reason
+
+
+def test_duplicate_primary_does_not_block_unique_secondary() -> None:
+    decision = choose_provider_route((
+        _route("apollo", priority=1),
+        _route("apollo", priority=2),
+        _route("exa", priority=3),
+    ), capability="prospecting")
     assert decision.selected_provider_id == "exa"
+    assert decision.blocked_provider_ids == ("apollo",)

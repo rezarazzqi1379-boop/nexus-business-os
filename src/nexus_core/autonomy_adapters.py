@@ -1,84 +1,22 @@
 from nexus_core.autonomy import WorkItem
 
 
-def inbox_reply_work_item(
-    *,
-    message_ref: str,
-    thread_key: str,
-    decision_relevant: bool,
-    external_reply_needed: bool,
-) -> WorkItem:
-    """Translate a normalized inbox signal without copying message content."""
+def inbox_reply_work_item(*, message_ref: str, thread_key: str, decision_relevant: bool, external_reply_needed: bool) -> WorkItem:
     if external_reply_needed:
-        return WorkItem(
-            task_id=f"reply-review:{thread_key}",
-            domain="inbox_monitoring",
-            objective="Review a decision-relevant inbox reply and prepare the next external response.",
-            action_kind="draft",
-            acceptable_capability_ids=("gmail.read", "notion.write"),
-            evidence_refs=(message_ref,),
-            value="high" if decision_relevant else "medium",
-            urgency="high" if decision_relevant else "medium",
-            evidence="strong",
-            cost="low",
-        )
-    return WorkItem(
-        task_id=f"inbox-monitor:{thread_key}",
-        domain="inbox_monitoring",
-        objective="Review the inbox signal and update internal project state if it changes a decision.",
-        action_kind="read",
-        acceptable_capability_ids=("gmail.read",),
-        evidence_refs=(message_ref,),
-        value="high" if decision_relevant else "low",
-        urgency="high" if decision_relevant else "low",
-        evidence="strong",
-        cost="low",
-    )
+        return WorkItem(f"reply-review:{thread_key}", "inbox_monitoring", "Review a decision-relevant inbox reply and prepare the next external response.", "draft", ("gmail.read", "notion.write"), (message_ref,), "high" if decision_relevant else "medium", "high" if decision_relevant else "medium", "strong", "low")
+    return WorkItem(f"inbox-monitor:{thread_key}", "inbox_monitoring", "Review the inbox signal and update internal project state if it changes a decision.", "read", ("gmail.read",), (message_ref,), "high" if decision_relevant else "low", "high" if decision_relevant else "low", "strong", "low")
 
 
 def ci_failure_work_item(*, run_ref: str, branch_key: str) -> WorkItem:
-    return WorkItem(
-        task_id=f"ci-failure:{branch_key}",
-        domain="security",
-        objective="Inspect the failed CI run, identify the failing contract, and prepare a reversible fix with regression coverage.",
-        action_kind="branch_commit",
-        acceptable_capability_ids=("github.write",),
-        evidence_refs=(run_ref,),
-        value="high",
-        urgency="high",
-        evidence="strong",
-        cost="medium",
-        write_required=True,
-    )
+    return WorkItem(f"ci-failure:{branch_key}", "security", "Inspect the failed CI run, identify the failing contract, and prepare a reversible fix with regression coverage.", "branch_commit", ("github.write",), (run_ref,), "high", "high", "strong", "medium", True)
 
 
-def research_signal_work_item(
-    *,
-    source_ref: str,
-    topic_key: str,
-    decision_relevant: bool,
-) -> WorkItem:
-    return WorkItem(
-        task_id=f"research:{topic_key}",
-        domain="research",
-        objective="Verify the research signal against primary or authoritative sources and record only decision-relevant findings.",
-        action_kind="research",
-        acceptable_capability_ids=("web.search", "exa.search"),
-        evidence_refs=(source_ref,),
-        value="high" if decision_relevant else "medium",
-        urgency="medium",
-        evidence="partial",
-        cost="medium",
-    )
+def research_signal_work_item(*, source_ref: str, topic_key: str, decision_relevant: bool) -> WorkItem:
+    return WorkItem(f"research:{topic_key}", "research", "Verify the research signal against primary or authoritative sources and record only decision-relevant findings.", "research", ("web.search", "exa.search"), (source_ref,), "high" if decision_relevant else "medium", "medium", "partial", "medium")
 
 
-def cross_ai_review_work_item(
-    *,
-    source_ref: str,
-    review_key: str,
-    code_change_relevant: bool,
-) -> WorkItem:
-    """Treat another model's review as untrusted input that must be verified."""
+def cross_ai_review_work_item(*, source_ref: str, review_key: str, code_change_relevant: bool, reviewer_read_code: bool = False) -> WorkItem:
+    """External AI review is input, never authorization; code-blind review is unverified."""
     return WorkItem(
         task_id=f"cross-ai-review:{review_key}",
         domain="security" if code_change_relevant else "research",
@@ -88,117 +26,30 @@ def cross_ai_review_work_item(
         evidence_refs=(source_ref,),
         value="high" if code_change_relevant else "medium",
         urgency="high" if code_change_relevant else "medium",
-        evidence="partial",
+        evidence="partial" if reviewer_read_code else "unverified",
         cost="low",
     )
 
 
-def customer_network_research_work_item(
-    *,
-    source_ref: str,
-    market_key: str,
-    commercially_relevant: bool,
-) -> WorkItem:
-    """Research prospects and buyer networks without authorizing outreach."""
-    return WorkItem(
-        task_id=f"customer-network:{market_key}",
-        domain="customer_network",
-        objective="Map and qualify potential customers, buyers, integrators and decision-maker paths using retrievable evidence; prepare candidates for human-reviewed outreach only.",
-        action_kind="research",
-        acceptable_capability_ids=("web.search", "exa.search", "linkedin.read"),
-        evidence_refs=(source_ref,),
-        value="high" if commercially_relevant else "medium",
-        urgency="medium",
-        evidence="partial",
-        cost="medium",
-    )
+def customer_network_research_work_item(*, source_ref: str, market_key: str, commercially_relevant: bool) -> WorkItem:
+    return WorkItem(f"customer-network:{market_key}", "customer_network", "Map and qualify potential customers, buyers, integrators and decision-maker paths using retrievable evidence; prepare candidates for human-reviewed outreach only.", "research", ("web.search", "exa.search", "linkedin.read"), (source_ref,), "high" if commercially_relevant else "medium", "medium", "partial", "medium")
 
 
-def learning_signal_work_item(
-    *,
-    source_ref: str,
-    topic_key: str,
-    implementation_relevant: bool,
-) -> WorkItem:
-    """Turn new technical knowledge into a testable proposal, not passive notes."""
-    return WorkItem(
-        task_id=f"learning:{topic_key}",
-        domain="coding_learning",
-        objective="Study the authoritative technical source, extract only implementation-relevant techniques, compare them with the current NEXUS architecture, and propose a testable code or review change if justified.",
-        action_kind="research",
-        acceptable_capability_ids=("web.search", "exa.search", "github.read"),
-        evidence_refs=(source_ref,),
-        value="high" if implementation_relevant else "medium",
-        urgency="medium" if implementation_relevant else "low",
-        evidence="partial",
-        cost="medium",
-    )
+def learning_signal_work_item(*, source_ref: str, topic_key: str, implementation_relevant: bool) -> WorkItem:
+    return WorkItem(f"learning:{topic_key}", "coding_learning", "Study the authoritative technical source, extract only implementation-relevant techniques, compare them with the current NEXUS architecture, and propose a testable code or review change if justified.", "research", ("web.search", "exa.search", "github.read"), (source_ref,), "high" if implementation_relevant else "medium", "medium" if implementation_relevant else "low", "partial", "medium")
 
 
-def news_signal_work_item(
-    *,
-    source_ref: str,
-    topic_key: str,
-    business_impact: bool,
-) -> WorkItem:
-    """Verify volatile news before it changes procurement or strategy state."""
-    return WorkItem(
-        task_id=f"news:{topic_key}",
-        domain="news_monitoring",
-        objective="Verify the news signal against authoritative or primary sources, identify concrete business impact, and record only changes that alter a decision, risk, route, supplier, buyer or market assumption.",
-        action_kind="research",
-        acceptable_capability_ids=("web.search", "exa.search"),
-        evidence_refs=(source_ref,),
-        value="high" if business_impact else "low",
-        urgency="high" if business_impact else "low",
-        evidence="partial",
-        cost="low",
-    )
+def news_signal_work_item(*, source_ref: str, topic_key: str, business_impact: bool) -> WorkItem:
+    return WorkItem(f"news:{topic_key}", "news_monitoring", "Verify the news signal against authoritative or primary sources, identify concrete business impact, and record only changes that alter a decision, risk, route, supplier, buyer or market assumption.", "research", ("web.search", "exa.search"), (source_ref,), "high" if business_impact else "low", "high" if business_impact else "low", "partial", "low")
 
 
 def backup_due_work_item(*, source_ref: str, scope_key: str) -> WorkItem:
-    return WorkItem(
-        task_id=f"backup:{scope_key}",
-        domain="backup",
-        objective="Create a categorized internal backup manifest for the selected NEXUS scope without deleting or moving source data.",
-        action_kind="internal_record_write",
-        acceptable_capability_ids=("notion.write", "drive.write"),
-        evidence_refs=(source_ref,),
-        value="high",
-        urgency="medium",
-        evidence="strong",
-        cost="low",
-        write_required=True,
-    )
+    return WorkItem(f"backup:{scope_key}", "backup", "Create a categorized internal backup manifest for the selected NEXUS scope without deleting or moving source data.", "internal_record_write", ("notion.write", "drive.write"), (source_ref,), "high", "medium", "strong", "low", True)
 
 
 def plugin_candidate_work_item(*, source_ref: str, plugin_key: str) -> WorkItem:
-    return WorkItem(
-        task_id=f"plugin-review:{plugin_key}",
-        domain="innovation",
-        objective="Evaluate a candidate plugin or connector for unique value, overlap, permissions, security risk and measurable benefit before any installation or access change.",
-        action_kind="research",
-        acceptable_capability_ids=("plugin.catalog", "web.search"),
-        evidence_refs=(source_ref,),
-        value="medium",
-        urgency="low",
-        evidence="partial",
-        cost="low",
-    )
+    return WorkItem(f"plugin-review:{plugin_key}", "innovation", "Evaluate a candidate plugin or connector for unique value, overlap, permissions, security risk and measurable benefit before any installation or access change.", "research", ("plugin.catalog", "web.search"), (source_ref,), "medium", "low", "partial", "low")
 
 
 def plugin_connect_work_item(*, source_ref: str, plugin_key: str) -> WorkItem:
-    """Connection/permission change is deliberately a separate human-gated item."""
-    return WorkItem(
-        task_id=f"plugin-connect:{plugin_key}",
-        domain="innovation",
-        objective="Connect the reviewed plugin or connector using the minimum required permissions.",
-        action_kind="change_access",
-        acceptable_capability_ids=("plugin.manage",),
-        evidence_refs=(source_ref,),
-        value="medium",
-        urgency="low",
-        evidence="strong",
-        cost="low",
-        write_required=True,
-    )
+    return WorkItem(f"plugin-connect:{plugin_key}", "innovation", "Connect the reviewed plugin or connector using the minimum required permissions.", "change_access", ("plugin.manage",), (source_ref,), "medium", "low", "strong", "low", True)

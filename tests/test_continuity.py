@@ -23,8 +23,25 @@ def packet(**overrides):
 def test_valid_packet_builds_portable_resume_instruction():
     text = build_resume_instruction(packet())
     assert "canonical continuity input" in text
-    assert "do not invent missing state" in text
+    assert "not authorization" in text
+    assert "live-verify" in text
+    assert "current verified evidence win" in text
+    assert "do not create a replacement registry" in text.lower()
+    assert "highest-value reversible internal work" in text
     assert "human approval" in text
+
+
+def test_bootstrap_requires_conflict_preservation_instead_of_silent_reconciliation():
+    text = build_resume_instruction(packet())
+    assert "preserve both refs" in text
+    assert "mark the old state stale" in text
+    assert "never silently merge contradictory state" in text
+
+
+def test_bootstrap_routes_every_goal_and_demands_measurable_outcomes():
+    text = build_resume_instruction(packet())
+    assert "next_action, waiting_blocked, scheduled_review or explicit_pause" in text
+    assert "measurable success/failure signals" in text
 
 
 def test_missing_evidence_fails_closed():

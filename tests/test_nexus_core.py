@@ -91,6 +91,23 @@ def test_all_available_plan_is_preferred_over_smaller_degraded_plan():
     assert {item.capability_id for item in plan.selected} == {"gmail.read", "notion.read"}
 
 
+def test_large_registry_uses_bounded_deterministic_planner():
+    hub = _capability("control.all", can_write=False)
+    individual = [_capability(f"tool.{index}", can_write=False) for index in range(20)]
+    needs = [
+        CapabilityNeed(
+            need_id=f"need-{index}",
+            purpose=f"Need {index}",
+            acceptable_capability_ids=("control.all", f"tool.{index}"),
+        )
+        for index in range(20)
+    ]
+
+    plan = plan_capabilities(needs, [hub, *individual])
+    assert [item.capability_id for item in plan.selected] == ["control.all"]
+    assert plan.unresolved_need_ids == ()
+
+
 def test_blocked_capability_does_not_resolve_need():
     plan = plan_capabilities(
         [

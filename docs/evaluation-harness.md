@@ -2,7 +2,7 @@
 
 ## Objective
 
-Create a deterministic, side-effect-free regression layer for structured NEXUS decisions before introducing more autonomous agent/tool behavior.
+Create one deterministic, side-effect-free regression layer for structured NEXUS decisions before introducing more autonomous agent/tool behavior.
 
 The harness evaluates **observations** against explicit **assertions**. It does not call models, tools, email, databases or external APIs.
 
@@ -15,6 +15,7 @@ The harness evaluates **observations** against explicit **assertions**. It does 
 - Assertion IDs must be stable and unique within a case.
 - Suite results report pass/fail counts; they are not calibrated business-confidence scores.
 - The harness is independent of any single LLM or agent framework.
+- There is one canonical evaluation core. Promotion policy consumes its results rather than defining a second case/result engine.
 
 ## Supported assertions
 
@@ -45,6 +46,25 @@ Hydrotester requirement readiness can be represented as structured observations 
 
 The evaluation then asserts that discovery remains open while final quotation is blocked and unknown buyer-side engineering inputs remain explicit.
 
+## Regression core vs promotion policy
+
+`nexus_evals.harness` owns deterministic evaluation semantics: cases, assertions, validation and suite results.
+
+`nexus_evals.promotion` is a separate policy layer over those already-evaluated results. It records exact run/config versions, case-level observed counters, critical case IDs and explicit blockers. It does **not** re-evaluate observations or define a parallel `EvalCase` / `EvalCaseResult` model.
+
+Promotion can be blocked by explicit limits on:
+
+- failed cases;
+- unsupported claims;
+- policy violations;
+- any failed critical case when zero critical failures are required.
+
+The policy uses counts rather than an opaque aggregate intelligence score or a pseudo-calibrated business score. Invalid run/policy inputs fail closed with `invalid_promotion_input`.
+
+## Consolidation decision for draft PR #8
+
+Draft PR #8 explored useful run metadata, critical cases and explicit promotion blockers, but it also introduced a second evaluation case/result model. The useful promotion concepts are consolidated here as a consumer of the canonical regression core. Until this consolidation is independently reviewed and CI-tested, PR #8 remains historical/draft evidence and should not be merged in parallel.
+
 ## Intended future adapters
 
 Only after the relevant features are independently accepted:
@@ -66,4 +86,4 @@ Only after the relevant features are independently accepted:
 
 ## Promotion gate
 
-Do not merge merely because unit tests pass. Review whether the harness catches a real regression in at least one active NEXUS feature branch before promoting it to the main runtime.
+A passing CI run proves implementation/test integrity only. Promotion additionally requires a real regression replay, independent review, and a deliberate merge decision. No merge, deployment, send or other consequential external action is authorized by this harness.

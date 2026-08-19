@@ -66,6 +66,19 @@ class PromotionRun:
         if len(result_ids) != len(result_id_set):
             errors.append("suite results cannot contain duplicate case_id values")
 
+        # Fail closed if a caller manually constructs or tampers with the suite
+        # summary instead of using evaluate_suite(). Promotion policy must derive
+        # from the concrete per-case results, never from trusted aggregate fields.
+        derived_total = len(self.suite.results)
+        derived_passed = sum(1 for result in self.suite.results if result.passed)
+        derived_failed = derived_total - derived_passed
+        if self.suite.total_cases != derived_total:
+            errors.append("suite.total_cases must match concrete suite results")
+        if self.suite.passed_cases != derived_passed:
+            errors.append("suite.passed_cases must match concrete suite results")
+        if self.suite.failed_cases != derived_failed:
+            errors.append("suite.failed_cases must match concrete suite results")
+
         metric_ids = [metric.case_id for metric in self.metrics]
         metric_id_set = set(metric_ids)
         if len(metric_ids) != len(metric_id_set):

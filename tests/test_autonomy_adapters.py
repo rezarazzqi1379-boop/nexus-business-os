@@ -1,4 +1,4 @@
-from nexus_core.autonomy import plan_autonomy
+from nexus_core.autonomy import WorkItem, plan_autonomy, validate_work_item
 from nexus_core.autonomy_adapters import (
     backup_due_work_item, ci_failure_work_item, cross_ai_review_work_item,
     customer_network_research_work_item, inbox_reply_work_item,
@@ -43,49 +43,54 @@ def test_real_source_adapters_route_safe_work_without_external_side_effects():
 
 def test_code_blind_cross_ai_review_is_explicitly_unverified():
     task = cross_ai_review_work_item(source_ref="notion:claude-review:1", review_key="security-review", code_change_relevant=True)
-    assert task.action_kind == "research"
-    assert task.write_required is False
-    assert task.evidence == "unverified"
-    assert task.acceptable_capability_ids == ("github.read",)
+    assert task.action_kind == "research" and task.write_required is False
+    assert task.evidence == "unverified" and task.acceptable_capability_ids == ("github.read",)
     assert "not authorization" in task.objective
 
 
 def test_code_read_cross_ai_review_is_still_only_partial_evidence():
     task = cross_ai_review_work_item(source_ref="public-mirror:review:1", review_key="security-review", code_change_relevant=True, reviewer_read_code=True)
-    assert task.evidence == "partial"
-    assert task.action_kind == "research"
-    assert task.write_required is False
+    assert task.evidence == "partial" and task.action_kind == "research" and task.write_required is False
 
 
 def test_cross_ai_review_cannot_request_write_or_send_capability():
     task = cross_ai_review_work_item(source_ref="notion:claude-review:1", review_key="boundary", code_change_relevant=True, reviewer_read_code=True)
-    assert task.acceptable_capability_ids == ("github.read",)
-    assert task.action_kind == "research"
-    assert task.write_required is False
+    assert task.acceptable_capability_ids == ("github.read",) and task.action_kind == "research" and task.write_required is False
 
 
-def test_customer_network_research_never_implies_outreach_authorization():
+def test_customer_network_research_is_outcome_bound_but_never_outreach_authorized():
     task = customer_network_research_work_item(source_ref="market:buyer-map", market_key="buyer-map", commercially_relevant=True)
     assert task.action_kind == "research" and task.write_required is False and task.domain == "customer_network"
+    assert task.goal_ref == "goal:customer-network:buyer-map"
+    assert "verified company fit" in task.success_signal
+    assert "kill or narrow" in task.failure_signal
 
 
-def test_learning_adapter_demands_implementation_relevance_before_high_urgency():
-    high = learning_signal_work_item(source_ref="docs:primary", topic_key="high", implementation_relevant=True)
-    low = learning_signal_work_item(source_ref="docs:background", topic_key="low", implementation_relevant=False)
-    assert high.value == "high" and high.urgency == "medium" and low.urgency == "low"
+def test_inbox_reply_is_bound_to_blocker_resolution_not_activity():
+    task = inbox_reply_work_item(message_ref="gmail:message:abc", thread_key="supplier-thread", decision_relevant=True, external_reply_needed=True)
+    assert task.action_kind == "draft" and task.write_required is False
+    assert task.goal_ref == "goal:commercial-thread:supplier-thread"
+    assert "blocker is resolved" in task.success_signal
+    assert "required engineering/commercial evidence is still missing" in task.failure_signal
 
 
-def test_news_adapter_stays_research_only_even_when_business_impact_is_high():
-    task = news_signal_work_item(source_ref="news:critical", topic_key="critical", business_impact=True)
-    assert task.action_kind == "research" and task.urgency == "high"
+def test_learning_adapter_requires_testable_result_or_explicit_no_action():
+    task = learning_signal_work_item(source_ref="docs:primary", topic_key="agent-runtime", implementation_relevant=True)
+    assert task.goal_ref == "goal:technical-learning:agent-runtime"
+    assert "testable implementation" in task.success_signal
+    assert "passive summary" in task.failure_signal
+
+
+def test_partial_outcome_contract_fails_closed():
+    task = WorkItem(
+        "bad-outcome", "research", "Research safely.", "research", ("web.search",), ("source:test",),
+        goal_ref="goal:test",
+    )
+    errors = validate_work_item(task)
+    assert "outcome contract requires goal_ref, success_signal and failure_signal together" in errors
 
 
 def test_plugin_review_and_plugin_connection_are_separate_gates():
     plan = plan_autonomy((plugin_candidate_work_item(source_ref="plugin:catalog:example", plugin_key="security-tool"), plugin_connect_work_item(source_ref="review:security-tool:approved-candidate", plugin_key="security-tool")), capabilities())
     assert [i.task.task_id for i in plan.runnable] == ["plugin-review:security-tool"]
     assert [i.task.task_id for i in plan.human_gated] == ["plugin-connect:security-tool"]
-
-
-def test_inbox_adapter_never_turns_reply_needed_into_auto_send():
-    task = inbox_reply_work_item(message_ref="gmail:message:abc", thread_key="supplier-thread", decision_relevant=True, external_reply_needed=True)
-    assert task.action_kind == "draft" and task.write_required is False

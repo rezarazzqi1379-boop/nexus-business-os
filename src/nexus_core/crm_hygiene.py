@@ -28,6 +28,21 @@ class CRMClassification:
     reason: str
 
 
+@dataclass(frozen=True)
+class LiveCommercialSignal:
+    signal_key: str
+    counterparty_key: str
+    project_ref: str
+    evidence_ref: str
+
+
+@dataclass(frozen=True)
+class PersistenceDrift:
+    missing_signal_keys: tuple[str, ...]
+    stale_persisted_signal_keys: tuple[str, ...]
+    duplicate_live_signal_keys: tuple[str, ...]
+
+
 def classify_crm_record(candidate: CRMRecordCandidate) -> CRMClassification:
     """Classify CRM records without promoting inbox noise into the deal pipeline.
 
@@ -78,3 +93,44 @@ def commercial_pipeline_candidates(candidates: Sequence[CRMRecordCandidate]) -> 
             seen_addresses.add(address)
         retained.append(candidate)
     return tuple(retained)
+
+
+def detect_persistence_drift(
+    live_signals: Sequence[LiveCommercialSignal],
+    persisted_signal_keys: Sequence[str],
+) -> PersistenceDrift:
+    """Compare verified live commercial evidence with persisted opportunity state.
+
+    This function is diagnostic only. It intentionally does not authorize CRM or
+    database writes; detected gaps must still pass the owning persistence/human gate.
+    """
+    counts: dict[str, int] = {}
+    live_keys: set[str] = set()
+    for signal in live_signals:
+        if not isinstance(signal, LiveCommercialSignal):
+            raise ValueError("invalid_live_signal")
+        if not all(
+            value.strip()
+            for value in (
+                signal.signal_key,
+                signal.counterparty_key,
+                signal.project_ref,
+                signal.evidence_ref,
+            )
+        ):
+            raise ValueError("invalid_live_signal")
+        counts[signal.signal_key] = counts.get(signal.signal_key, 0) + 1
+        live_keys.add(signal.signal_key)
+
+    persisted = tuple(persisted_signal_keys)
+    if any(not isinstance(key, str) or not key.strip() for key in persisted):
+        raise ValueError("invalid_persisted_signal_key")
+    if len(set(persisted)) != len(persisted):
+        raise ValueError("duplicate_persisted_signal_key")
+    persisted_set = set(persisted)
+
+    return PersistenceDrift(
+        missing_signal_keys=tuple(sorted(live_keys - persisted_set)),
+        stale_persisted_signal_keys=tuple(sorted(persisted_set - live_keys)),
+        duplicate_live_signal_keys=tuple(sorted(key for key, count in counts.items() if count > 1)),
+    )

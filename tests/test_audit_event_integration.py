@@ -195,4 +195,7 @@ def test_integration_rejects_covert_payload_in_metadata_reference():
     )
     validation = validate_audit_trace((event,))
     assert validation.valid is False
-    assert any("evidence_refs cannot contain control characters" in error for error in validation.errors)
+    assert any(
+        "evidence_refs cannot contain control or formatting characters" in error
+        for error in validation.errors
+    )

@@ -8,10 +8,11 @@ from nexus_verticals.procurement import (
 )
 
 
-def test_suppliertr_closed_loop_is_valid():
-    record = ProcurementVerticalRecord(
+def make_suppliertr_record() -> ProcurementVerticalRecord:
+    return ProcurementVerticalRecord(
         case_id="suppliertr-2026-08-19",
         evidence=Evidence(
+            evidence_id="ev-suppliertr-1",
             source="gmail",
             source_ref="gmail:thread:suppliertr",
             summary="SupplierTR confirmed engineering evaluation",
@@ -19,45 +20,99 @@ def test_suppliertr_closed_loop_is_valid():
             confidence=0.95,
         ),
         relationship=Relationship(
+            relationship_id="rel-atf-suppliertr",
             from_entity="ASAK TEJARAT FATER",
             to_entity="SupplierTR",
             relationship_type="buyer-sourcing-intermediary",
             status="responsive",
-            evidence_ref="gmail:thread:suppliertr",
+            evidence_id="ev-suppliertr-1",
         ),
         signal=Signal(
+            signal_id="sig-suppliertr-eval",
             entity="SupplierTR",
             signal_type="engineering_evaluation_started",
             description="SupplierTR started engineering evaluation",
-            evidence_ref="gmail:thread:suppliertr",
+            evidence_id="ev-suppliertr-1",
             confidence=0.95,
         ),
         opportunity=Opportunity(
+            opportunity_id="opp-turkey-octg",
             entity="SupplierTR",
             title="Turkey sourcing route for OCTG equipment",
             stage="qualification",
-            signal_ref="SupplierTR started engineering evaluation",
+            signal_id="sig-suppliertr-eval",
             next_action="await supplier shortlist",
         ),
         outcome=Outcome(
-            opportunity_ref="Turkey sourcing route for OCTG equipment",
+            outcome_id="out-suppliertr-1",
+            opportunity_id="opp-turkey-octg",
             outcome_type="qualified_reply",
             result="engineering evaluation started",
+            status="open",
             terminal=False,
         ),
     )
 
-    assert record.validate() == []
+
+def test_suppliertr_closed_loop_is_valid():
+    assert make_suppliertr_record().validate() == []
 
 
 def test_broken_evidence_link_is_rejected():
-    record = ProcurementVerticalRecord(
-        case_id="broken-case",
-        evidence=Evidence("gmail", "gmail:1", "reply", "2026-08-19", 0.9),
-        relationship=Relationship("ATF", "Supplier", "commercial", "responsive", "gmail:2"),
-        signal=Signal("Supplier", "reply", "supplier replied", "gmail:1", 0.9),
-        opportunity=Opportunity("Supplier", "Opportunity", "qualification", "supplier replied", "review"),
-        outcome=Outcome("Opportunity", "micro_outcome", "reply received"),
+    record = make_suppliertr_record()
+    broken = ProcurementVerticalRecord(
+        case_id=record.case_id,
+        evidence=record.evidence,
+        relationship=Relationship(
+            relationship_id=record.relationship.relationship_id,
+            from_entity=record.relationship.from_entity,
+            to_entity=record.relationship.to_entity,
+            relationship_type=record.relationship.relationship_type,
+            status=record.relationship.status,
+            evidence_id="ev-wrong",
+        ),
+        signal=record.signal,
+        opportunity=record.opportunity,
+        outcome=record.outcome,
     )
+    assert "relationship.evidence_id must match evidence.evidence_id" in broken.validate()
 
-    assert "relationship.evidence_ref must match evidence.source_ref" in record.validate()
+
+def test_terminal_open_outcome_is_rejected():
+    record = make_suppliertr_record()
+    broken = ProcurementVerticalRecord(
+        case_id=record.case_id,
+        evidence=record.evidence,
+        relationship=record.relationship,
+        signal=record.signal,
+        opportunity=record.opportunity,
+        outcome=Outcome(
+            outcome_id="out-terminal-bad",
+            opportunity_id=record.opportunity.opportunity_id,
+            outcome_type="final_result",
+            result="closed",
+            status="open",
+            terminal=True,
+        ),
+    )
+    assert "terminal outcome must have status won or lost" in broken.validate()
+
+
+def test_entity_drift_is_rejected():
+    record = make_suppliertr_record()
+    broken = ProcurementVerticalRecord(
+        case_id=record.case_id,
+        evidence=record.evidence,
+        relationship=record.relationship,
+        signal=record.signal,
+        opportunity=Opportunity(
+            opportunity_id=record.opportunity.opportunity_id,
+            entity="Different Supplier",
+            title=record.opportunity.title,
+            stage=record.opportunity.stage,
+            signal_id=record.opportunity.signal_id,
+            next_action=record.opportunity.next_action,
+        ),
+        outcome=record.outcome,
+    )
+    assert "opportunity.entity must match signal.entity" in broken.validate()

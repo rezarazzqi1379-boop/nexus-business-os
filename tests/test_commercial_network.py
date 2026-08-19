@@ -13,26 +13,37 @@ def candidate(**overrides):
 
 
 def test_complete_evidence_backed_path_qualifies():
-    result = qualify_commercial_network((candidate(),))
-    assert result[0].state == "qualified"
+    assert qualify_commercial_network((candidate(),))[0].state == "qualified"
 
 
 def test_contact_without_need_signal_is_not_qualified():
-    result = qualify_commercial_network((candidate(need_signals=()),))
-    assert result[0].state != "qualified"
+    assert qualify_commercial_network((candidate(need_signals=()),))[0].state != "qualified"
 
 
 def test_unverified_name_does_not_become_opportunity():
-    result = qualify_commercial_network((candidate(evidence_strength="unverified"),))
-    assert result[0].state != "qualified"
+    assert qualify_commercial_network((candidate(evidence_strength="unverified"),))[0].state != "qualified"
 
 
 def test_duplicate_is_rejected():
-    result = qualify_commercial_network((candidate(duplicate_of="existing:1"),))
-    assert result[0].state == "reject"
-    assert "duplicate_candidate" in result[0].reasons
+    result = qualify_commercial_network((candidate(duplicate_of="existing:1"),))[0]
+    assert result.state == "reject" and "duplicate_candidate" in result.reasons
 
 
 def test_missing_evidence_is_rejected():
-    result = qualify_commercial_network((candidate(evidence_refs=()),))
-    assert result[0].state == "reject"
+    result = qualify_commercial_network((candidate(evidence_refs=()),))[0]
+    assert result.state == "reject" and "missing_evidence_refs" in result.reasons
+
+
+def test_runtime_invalid_enum_is_rejected_fail_closed():
+    result = qualify_commercial_network((candidate(evidence_strength="invented"),))[0]
+    assert result.state == "reject" and "invalid_evidence_strength" in result.reasons
+
+
+def test_duplicate_candidate_id_is_rejected():
+    results = qualify_commercial_network((candidate(), candidate(company_name="Other Co")))
+    assert any(item.state == "reject" and "duplicate_candidate_id" in item.reasons for item in results)
+
+
+def test_duplicate_evidence_refs_are_rejected():
+    result = qualify_commercial_network((candidate(evidence_refs=("source:1", "source:1")),))[0]
+    assert result.state == "reject" and "invalid_evidence_refs" in result.reasons

@@ -17,6 +17,17 @@ NEXUS already records evidence, signals, opportunities and outcomes, but it also
 5. Planned or active decisions cannot be silently rewritten as already evaluated.
 6. v0.1 intentionally stores no numeric confidence score. NEXUS has not yet accumulated enough forecasts/outcomes to justify calibrated probability claims.
 7. When real numeric metrics exist, store the metric in the evidence/outcome layer; do not convert qualitative judgment into a made-up percentage.
+8. Runtime objects are untrusted despite Python type hints: malformed scalar/tuple/enum inputs must fail closed rather than crash validation.
+9. Decision, observation and evaluation IDs plus evidence/source refs are compact control-plane metadata; padded, oversized, duplicate or Unicode control/formatting values are invalid.
+10. Observation timestamps must be ISO-8601 and timezone-aware so later outcome ordering is not ambiguous. Review dates may remain date-only scheduling metadata.
+
+## Security / integrity boundary
+
+Decision Learning is a learning and evidence-integrity layer, not an authorization layer. A recorded learning, next action, outcome observation or evaluation classification must never authorize an external send, merge, deploy, payment, contract/signature or permission change. Those actions remain subject to the independent action-specific human gate.
+
+Supplier/model/tool statements remain epistemically classified observations; the existence of an observation is evidence that something was observed or stated, not automatic proof that the underlying claim is true.
+
+The validator therefore treats public dataclass constructors as an untrusted boundary and rejects malformed runtime types, ambiguous control-plane identifiers, duplicate references and naive observation timestamps before they can enter the learning chain.
 
 ## Evaluation classes
 

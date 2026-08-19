@@ -72,6 +72,69 @@ def research_signal_work_item(
     )
 
 
+def customer_network_research_work_item(
+    *,
+    source_ref: str,
+    market_key: str,
+    commercially_relevant: bool,
+) -> WorkItem:
+    """Research prospects and buyer networks without authorizing outreach."""
+    return WorkItem(
+        task_id=f"customer-network:{market_key}",
+        domain="customer_network",
+        objective="Map and qualify potential customers, buyers, integrators and decision-maker paths using retrievable evidence; prepare candidates for human-reviewed outreach only.",
+        action_kind="research",
+        acceptable_capability_ids=("web.search", "exa.search", "linkedin.read"),
+        evidence_refs=(source_ref,),
+        value="high" if commercially_relevant else "medium",
+        urgency="medium",
+        evidence="partial",
+        cost="medium",
+    )
+
+
+def learning_signal_work_item(
+    *,
+    source_ref: str,
+    topic_key: str,
+    implementation_relevant: bool,
+) -> WorkItem:
+    """Turn new technical knowledge into a testable proposal, not passive notes."""
+    return WorkItem(
+        task_id=f"learning:{topic_key}",
+        domain="coding_learning",
+        objective="Study the authoritative technical source, extract only implementation-relevant techniques, compare them with the current NEXUS architecture, and propose a testable code or review change if justified.",
+        action_kind="research",
+        acceptable_capability_ids=("web.search", "exa.search", "github.read"),
+        evidence_refs=(source_ref,),
+        value="high" if implementation_relevant else "medium",
+        urgency="medium" if implementation_relevant else "low",
+        evidence="partial",
+        cost="medium",
+    )
+
+
+def news_signal_work_item(
+    *,
+    source_ref: str,
+    topic_key: str,
+    business_impact: bool,
+) -> WorkItem:
+    """Verify volatile news before it changes procurement or strategy state."""
+    return WorkItem(
+        task_id=f"news:{topic_key}",
+        domain="news_monitoring",
+        objective="Verify the news signal against authoritative or primary sources, identify concrete business impact, and record only changes that alter a decision, risk, route, supplier, buyer or market assumption.",
+        action_kind="research",
+        acceptable_capability_ids=("web.search", "exa.search"),
+        evidence_refs=(source_ref,),
+        value="high" if business_impact else "low",
+        urgency="high" if business_impact else "low",
+        evidence="partial",
+        cost="low",
+    )
+
+
 def backup_due_work_item(*, source_ref: str, scope_key: str) -> WorkItem:
     return WorkItem(
         task_id=f"backup:{scope_key}",

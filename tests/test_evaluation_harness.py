@@ -149,6 +149,39 @@ def test_present_and_absent_semantics():
     assert evaluate_case(case).passed is True
 
 
+def test_unsupported_membership_type_fails_closed():
+    case = EvaluationCase(
+        case_id="membership-type",
+        name="Do not infer containment semantics for scalars",
+        input_ref="evidence:membership",
+        observations={"value": 42},
+        assertions=(
+            Assertion("scalar-not-contains", "value", "not_contains", "danger"),
+        ),
+        evidence_refs=("evidence:membership",),
+    )
+    result = evaluate_case(case)
+    assert result.passed is False
+    assert (
+        result.assertion_results[0].message
+        == "membership unsupported for observed value"
+    )
+
+
+def test_blank_dot_path_segment_is_rejected():
+    case = EvaluationCase(
+        case_id="bad-path",
+        name="Malformed paths fail validation",
+        input_ref="evidence:path",
+        observations={"a": {"b": 1}},
+        assertions=(Assertion("bad-path-assertion", "a..b", "equals", 1),),
+        evidence_refs=("evidence:path",),
+    )
+    result = evaluate_case(case)
+    assert result.passed is False
+    assert any("path segments must be nonblank" in error for error in result.validation_errors)
+
+
 def test_suite_summary_is_count_based_not_business_scoring():
     passing = make_case()
     failing = EvaluationCase(
@@ -166,6 +199,17 @@ def test_suite_summary_is_count_based_not_business_scoring():
     assert suite.passed_cases == 1
     assert suite.failed_cases == 1
     assert suite.passed is False
+
+
+def test_duplicate_case_ids_fail_suite_even_when_cases_pass():
+    case = make_case()
+    suite = evaluate_suite((case, case))
+    assert suite.passed_cases == 2
+    assert suite.failed_cases == 0
+    assert suite.passed is False
+    assert suite.validation_errors == (
+        "duplicate case_id: hydrotester-readiness-shadow",
+    )
 
 
 def test_empty_suite_does_not_pass():

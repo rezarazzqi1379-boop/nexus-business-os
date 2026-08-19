@@ -1,5 +1,6 @@
 from nexus_verticals.procurement import (
     Evidence,
+    EvidenceKind,
     Opportunity,
     Outcome,
     ProcurementVerticalRecord,
@@ -14,7 +15,7 @@ def _record(
     supplier: str,
     gmail_message_id: str,
     evidence_summary: str,
-    evidence_kind: str,
+    evidence_kind: EvidenceKind,
     signal_type: str,
     signal_description: str,
     opportunity_title: str,
@@ -35,7 +36,7 @@ def _record(
             summary=evidence_summary,
             observed_at="2026-08-19",
             confidence=0.95,
-            kind=evidence_kind,  # type: ignore[arg-type]
+            kind=evidence_kind,
         ),
         relationship=Relationship(
             relationship_id=f"relationship:{case_id}",

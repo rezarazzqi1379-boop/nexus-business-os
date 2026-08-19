@@ -1,4 +1,4 @@
-# NEXUS Tooling & Capability Matrix v0.1
+# NEXUS Tooling & Capability Matrix v0.2
 
 Verified: 2026-08-19
 
@@ -12,15 +12,16 @@ Prefer one reliable capability over multiple overlapping apps. A new plugin, age
 
 | Capability | Current system | Role | Status | Write policy | Current decision |
 |---|---|---|---|---|---|
-| Code/version/tests | GitHub | Canonical code, PRs, issues, CI | Available | Feature-branch writes may proceed; merge is human-gated | KEEP |
-| Commercial evidence | Gmail | Supplier/customer communication evidence and drafts | Available | Drafting may proceed; external send is human-gated | KEEP |
+| Code/version/tests | GitHub | Canonical code, PRs, issues, CI | Available | Feature-branch writes may proceed; merge is action-specifically human-gated | KEEP |
+| Commercial evidence | Gmail | Supplier/customer communication evidence and drafts | Available | Drafting may proceed; external send is action-specifically human-gated | KEEP |
 | Human-readable operating state | Notion | Decisions, canonical map, research, relationship signals, outcomes, AI handoffs | Available | Reversible internal writes allowed; destructive cleanup gated | KEEP |
 | Structured runtime/state | Supabase/PostgreSQL | Runtime rows and future deterministic sync | Blocked/degraded | No schema or adapter writes until read access and real schema are verified | REPAIR |
-| Deployment | Vercel | Production/preview deployment surface | Available but current-code parity false | Production deploy is human-gated | KEEP |
+| Deployment | Vercel | Production/preview deployment surface | Available but current-code parity false | Production deploy is action-specifically human-gated | KEEP |
 | Primary-source research | Web / Exa | Current external verification and research | Available | Read/research only | KEEP |
 | File/source workspace | Google Drive | Master documents, Sheets/Docs/Slides when needed | Available | Writes only when a specific workflow needs them | KEEP |
-| Scheduling/contacts | Google Calendar / Contacts | Meetings, free-busy, contact resolution | Available | External calendar/contact mutations require task-specific approval | ON DEMAND |
+| Scheduling/contacts | Google Calendar / Contacts | Meetings, free-busy, contact resolution | Available | External mutations require task-specific approval | ON DEMAND |
 | Professional relationship lookup | LinkedIn | Professional profile lookup where relevant | Available | Primarily read/lookup | ON DEMAND |
+| Scheduled condition checks | Native automations | Integrity, opportunity, research and access watches | Available | Read/notify; no automatic commercial sends | KEEP / CONSOLIDATE |
 
 ## Existing coded capabilities
 
@@ -32,20 +33,20 @@ Prefer one reliable capability over multiple overlapping apps. A new plugin, age
 6. Human-gated external action policy in the capability-runtime branch.
 7. Evidence-backed capability registry/planner in the capability-runtime branch.
 
-## New capability-runtime objective
+## Capability Runtime v0.2 objective
 
 The capability runtime is intentionally small. It does not execute arbitrary tools or create autonomous agents. It provides:
 
 - a registry of what NEXUS can actually read/write;
 - current status (`available`, `degraded`, `blocked`, `candidate`, `not_connected`);
 - proof references for capabilities claimed as live;
-- minimal routing from a declared need to an existing capability;
-- surfacing of unresolved needs instead of silently inventing integrations;
-- human-approval gates for external messages, merges, production deploys, access changes, deletion/archive, contracts/POs, payments and signatures.
+- reliability-first routing from declared needs to the smallest practical existing capability set;
+- exact surfacing of unresolved needs instead of silently inventing integrations;
+- action-specific human approval for consequential actions, so a generic approval cannot unlock an unrelated future payment/send/deploy/access change/signature.
 
 ## Plugin discovery — 2026-08-19
 
-Installable plugins surfaced by current plugin search included Slack, Linear, Airtable, HubSpot, Monday.com, Todoist/TickTick and others. No direct n8n, Make, Zapier, WhatsApp or Telegram integration surfaced in the targeted plugin search.
+Current installable-plugin search surfaced Slack, Linear, Airtable, HubSpot, Monday.com, Todoist/TickTick and others. No direct n8n, Make, Zapier, WhatsApp or Telegram integration surfaced in the targeted search.
 
 ### Current decisions
 
@@ -55,6 +56,29 @@ Installable plugins surfaced by current plugin search included Slack, Linear, Ai
 - **Slack — DEFER.** Useful only if the operating team actually adopts Slack as a live coordination channel.
 - **Monday.com — DO NOT INSTALL NOW.** Overlaps current coordination stack.
 - **Todoist/TickTick — DO NOT INSTALL NOW.** Current task state belongs in NEXUS/Notion/GitHub; reminders can use native automation when explicitly required.
+
+## Native automation consolidation
+
+NEXUS already had an Opportunity Radar that inspects Gmail and active commercial signals. A newly created dedicated Procurement Reply Watch duplicated that function, so it was disabled instead of consuming an additional active-task slot. The released slot is now used by **Supabase Access Watch**, which performs a harmless read-access check and only reports a meaningful access-state change. This is an example of consolidation before expansion.
+
+## Custom NEXUS app / MCP path
+
+Official OpenAI documentation now treats the Plugins Directory as the discovery surface, while apps provide underlying external data/actions. The recommended way to build a custom ChatGPT app is the Apps SDK on top of MCP.
+
+Primary sources:
+- `https://help.openai.com/en/articles/11487775-apps-in-chatgpt`
+- `https://help.openai.com/en/articles/12515353-build-with-the-apps-sdk`
+- `https://help.openai.com/en/articles/12584461-developer-mode-and-full-mcp-connectors-in-chatgpt-beta`
+
+Current constraint: full custom MCP write/modify support is documented for Business and Enterprise/Edu. OpenAI also documents read/fetch custom-MCP access for Pro; a verified custom Developer Mode/write path for the current personal Plus setup is not documented. Therefore NEXUS should **not** claim that a private custom write-enabled NEXUS app is connected to this account today.
+
+Decision:
+
+1. Keep NEXUS tool/action contracts MCP-compatible now.
+2. Do not duplicate current connectors behind a custom MCP server yet.
+3. When an eligible workspace/developer-mode surface is available, expose a minimal remote NEXUS app whose first tools are read/status/plan operations.
+4. Add write tools only after action-specific approvals, auth, audit logging and prompt-injection review are verified.
+5. Do not publish a public plugin solely to bypass plan/workspace controls.
 
 ## Capabilities that are justified next
 
@@ -80,7 +104,7 @@ Current state: manual/shadow experiment only. Do not code into a production rule
 
 Need: surface new supplier replies and due follow-ups without auto-sending messages.
 
-Implementation preference: native scheduled/conditional automation or Gmail-driven watch when available. External messages remain human-gated.
+Current implementation: consolidated into the existing Opportunity Radar rather than maintaining a redundant dedicated watch.
 
 ### 5. Engineering Requirement Authority Layer
 
@@ -102,4 +126,4 @@ Current state: Requirement Readiness Gate is implemented in shadow mode. Field v
 
 ## Approval boundary
 
-NEXUS may autonomously research, read, analyze, create drafts, create internal records, write reversible feature-branch code and run tests. Explicit human approval is required before external commercial sends, merges to production branches when consequential, production deploys, access/permission changes, destructive cleanup, contracts/POs, payments and signatures.
+NEXUS may autonomously research, read, analyze, create drafts, create internal records, write reversible feature-branch code and run tests. Consequential actions require **action-specific** human approval. A blanket statement must not be persisted as a permanent authorization for unrelated future sends, merges, deploys, access changes, destructive cleanup, contracts/POs, payments or signatures.

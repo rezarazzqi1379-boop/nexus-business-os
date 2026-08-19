@@ -7,6 +7,15 @@ from .harness import (
     evaluate_case,
     evaluate_suite,
 )
+from .promotion import (
+    CaseOutcomeMetrics,
+    PromotionDecision,
+    PromotionPolicy,
+    PromotionRun,
+    PromotionSummary,
+    promotion_decision,
+    summarize_promotion_run,
+)
 
 __all__ = [
     "Assertion",
@@ -16,4 +25,11 @@ __all__ = [
     "EvaluationSuiteResult",
     "evaluate_case",
     "evaluate_suite",
+    "CaseOutcomeMetrics",
+    "PromotionDecision",
+    "PromotionPolicy",
+    "PromotionRun",
+    "PromotionSummary",
+    "promotion_decision",
+    "summarize_promotion_run",
 ]

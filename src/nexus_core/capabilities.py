@@ -30,6 +30,7 @@ _ALLOWED_APPROVAL_MODES = {
 }
 _EXECUTABLE_STATUSES = {"available", "degraded"}
 _STATUS_RANK = {"available": 0, "degraded": 1}
+_MAX_EXACT_USABLE_CAPABILITIES = 16
 
 
 @dataclass(frozen=True)
@@ -140,49 +141,12 @@ def _can_satisfy(need: CapabilityNeed, capability: Capability) -> bool:
     return True
 
 
-def plan_capabilities(
-    needs: Sequence[CapabilityNeed],
-    capabilities: Sequence[Capability],
-) -> CapabilityPlan:
-    """Build a deterministic, reliability-first capability plan.
-
-    Planning policy:
-    - only available/degraded capabilities are executable;
-    - write needs cannot resolve to read-only capabilities;
-    - plans with fewer degraded capabilities are preferred;
-    - among equally reliable plans, fewer capabilities are preferred;
-    - among remaining ties, fewer approval-gated capabilities and lexical IDs win;
-    - unresolved needs are surfaced instead of inventing a connector.
-
-    The exact subset search is intentional: the live NEXUS registry is small, and a
-    deterministic minimal plan is more valuable here than adding a general optimizer.
-    """
-    by_id = {capability.capability_id: capability for capability in capabilities}
-    candidate_ids_by_need: dict[str, tuple[str, ...]] = {}
-    unresolved: list[str] = []
-
-    for need in needs:
-        candidate_ids = tuple(
-            capability_id
-            for capability_id in need.acceptable_capability_ids
-            if capability_id in by_id and _can_satisfy(need, by_id[capability_id])
-        )
-        if not candidate_ids:
-            unresolved.append(need.need_id)
-        else:
-            candidate_ids_by_need[need.need_id] = candidate_ids
-
-    resolvable_needs = [
-        need for need in needs if need.need_id in candidate_ids_by_need
-    ]
-    usable_ids = sorted(
-        {
-            capability_id
-            for candidate_ids in candidate_ids_by_need.values()
-            for capability_id in candidate_ids
-        }
-    )
-
+def _exact_select(
+    usable_ids: list[str],
+    candidate_ids_by_need: dict[str, tuple[str, ...]],
+    resolvable_needs: Sequence[CapabilityNeed],
+    by_id: dict[str, Capability],
+) -> tuple[str, ...]:
     best_combo: tuple[str, ...] = ()
     best_score: tuple[object, ...] | None = None
 
@@ -214,12 +178,111 @@ def plan_capabilities(
                 best_combo = combo
 
         if best_score is not None and best_score[0] == 0:
-            # Once an all-available plan exists at this size, larger all-available plans
-            # cannot improve the capability-count objective.
             break
 
-    selected = tuple(by_id[capability_id] for capability_id in best_combo)
-    selected_ids = set(best_combo)
+    return best_combo
+
+
+def _bounded_greedy_select(
+    usable_ids: list[str],
+    candidate_ids_by_need: dict[str, tuple[str, ...]],
+    resolvable_needs: Sequence[CapabilityNeed],
+    by_id: dict[str, Capability],
+) -> tuple[str, ...]:
+    """Deterministic reliability-first fallback for larger registries.
+
+    Exact set-cover search is exponential. Once the usable candidate set exceeds the
+    small-registry threshold, NEXUS preserves reliability and bounded execution rather
+    than pretending an exponential exact search will scale indefinitely.
+    """
+    uncovered = {need.need_id for need in resolvable_needs}
+    selected: list[str] = []
+    remaining = set(usable_ids)
+
+    while uncovered:
+        best_id: str | None = None
+        best_covered: set[str] = set()
+        best_score: tuple[object, ...] | None = None
+
+        for capability_id in sorted(remaining):
+            covered = {
+                need_id
+                for need_id in uncovered
+                if capability_id in candidate_ids_by_need[need_id]
+            }
+            if not covered:
+                continue
+
+            capability = by_id[capability_id]
+            score: tuple[object, ...] = (
+                _STATUS_RANK[capability.status],
+                -len(covered),
+                1 if capability.approval_mode != "none" else 0,
+                capability_id,
+            )
+            if best_score is None or score < best_score:
+                best_score = score
+                best_id = capability_id
+                best_covered = covered
+
+        if best_id is None:
+            break
+
+        selected.append(best_id)
+        remaining.remove(best_id)
+        uncovered.difference_update(best_covered)
+
+    return tuple(selected)
+
+
+def plan_capabilities(
+    needs: Sequence[CapabilityNeed],
+    capabilities: Sequence[Capability],
+) -> CapabilityPlan:
+    """Build a deterministic, reliability-first capability plan.
+
+    Small live registries use exact subset search. Larger registries use a bounded,
+    deterministic greedy fallback so future expansion cannot turn routing into an
+    exponential execution bottleneck. Unresolved needs are always surfaced rather
+    than inventing an integration.
+    """
+    by_id = {capability.capability_id: capability for capability in capabilities}
+    candidate_ids_by_need: dict[str, tuple[str, ...]] = {}
+    unresolved: list[str] = []
+
+    for need in needs:
+        candidate_ids = tuple(
+            capability_id
+            for capability_id in need.acceptable_capability_ids
+            if capability_id in by_id and _can_satisfy(need, by_id[capability_id])
+        )
+        if not candidate_ids:
+            unresolved.append(need.need_id)
+        else:
+            candidate_ids_by_need[need.need_id] = candidate_ids
+
+    resolvable_needs = [
+        need for need in needs if need.need_id in candidate_ids_by_need
+    ]
+    usable_ids = sorted(
+        {
+            capability_id
+            for candidate_ids in candidate_ids_by_need.values()
+            for capability_id in candidate_ids
+        }
+    )
+
+    if len(usable_ids) <= _MAX_EXACT_USABLE_CAPABILITIES:
+        selected_ids_tuple = _exact_select(
+            usable_ids, candidate_ids_by_need, resolvable_needs, by_id
+        )
+    else:
+        selected_ids_tuple = _bounded_greedy_select(
+            usable_ids, candidate_ids_by_need, resolvable_needs, by_id
+        )
+
+    selected = tuple(by_id[capability_id] for capability_id in selected_ids_tuple)
+    selected_ids = set(selected_ids_tuple)
 
     approval_required: set[str] = set()
     for need in resolvable_needs:

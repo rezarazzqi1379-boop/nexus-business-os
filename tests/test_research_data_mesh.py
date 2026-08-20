@@ -4,9 +4,12 @@ from nexus_core.research_data_mesh import (
     ResearchHit,
     ResearchQuery,
     ResearchSource,
+    ResearchOutcome,
     benchmark_retrieval,
     fuse_hits,
     plan_sources,
+    schedule_retrieval,
+    summarize_source_outcomes,
 )
 
 
@@ -97,3 +100,51 @@ def test_fusion_rejects_hits_from_different_queries():
     ]
     with pytest.raises(ValueError, match="fuse_requires_one_query"):
         fuse_hits(hits)
+
+
+def test_source_plan_prefers_distinct_publishers_before_correlated_fill():
+    query = ResearchQuery("q1", "supplier evidence", "commercial-intelligence", max_sources=3)
+    sources = [
+        ResearchSource("a1", "official", "same.example", "2026-08-20T00:00:00+00:00", "ref:a1", 10, 99),
+        ResearchSource("a2", "news", "same.example", "2026-08-20T00:00:00+00:00", "ref:a2", 10, 98),
+        ResearchSource("b1", "official", "independent.example", "2026-08-20T00:00:00+00:00", "ref:b1", 10, 90),
+    ]
+    plan = plan_sources(query, sources)
+    assert plan.selected_sources[:2] == ("a1", "b1")
+    assert plan.selected_sources[2] == "a2"
+
+
+def test_retrieval_schedule_enforces_bounded_parallel_waves():
+    query = ResearchQuery("q1", "wide search", "research", max_sources=5)
+    sources = [
+        ResearchSource(
+            f"s{i}",
+            "web",
+            f"d{i}.example",
+            "2026-08-20T00:00:00+00:00",
+            f"ref:{i}",
+            i,
+            90 - i,
+        )
+        for i in range(5)
+    ]
+    schedule = schedule_retrieval(plan_sources(query, sources), max_parallel=2)
+    assert tuple(map(len, schedule.waves)) == (2, 2, 1)
+    assert schedule.max_parallel == 2
+
+    with pytest.raises(ValueError, match="invalid_max_parallel"):
+        schedule_retrieval(plan_sources(query, sources), max_parallel=20)
+
+
+def test_source_learning_requires_evidence_and_never_mutates_trust_automatically():
+    learned = summarize_source_outcomes([
+        ResearchOutcome("exa", True, 100),
+        ResearchOutcome("exa", True, 120),
+        ResearchOutcome("exa", True, 80),
+        ResearchOutcome("slow", False, 900),
+        ResearchOutcome("slow", True, 1100),
+    ])
+    assert learned[0].source_id == "exa"
+    assert learned[0].recommendation == "prefer"
+    assert learned[0].average_latency_ms == 100
+    assert learned[1].recommendation == "insufficient_evidence"

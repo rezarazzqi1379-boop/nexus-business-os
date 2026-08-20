@@ -48,3 +48,11 @@ def test_consequential_write_request_is_validated_before_route_selection():
 def test_non_iterable_routes_fail_closed():
     with pytest.raises(ValueError):
         choose_route(None, "read")
+
+
+def test_consequential_send_never_returns_a_route_before_policy_gate():
+    routes = [ConnectorRoute("gmail", ("send",), "healthy", 10, 1, 100)]
+    decision = choose_route(routes, "send", consequential_write=True)
+    assert decision.selected is None
+    assert decision.fallbacks == ()
+    assert decision.blocked_reason == "consequential_write_requires_policy_gate"

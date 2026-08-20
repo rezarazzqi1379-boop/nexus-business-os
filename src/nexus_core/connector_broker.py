@@ -67,6 +67,8 @@ def choose_route(routes: Iterable[ConnectorRoute], required: Capability, *, cons
         raise ValueError("invalid_consequential_write")
     if consequential_write and required not in {"write", "send"}:
         raise ValueError("consequential_write_requires_write_capability")
+    if consequential_write:
+        return RouteDecision(None, (), "consequential_write_requires_policy_gate")
     try:
         items = tuple(routes)
     except TypeError as exc:

@@ -185,3 +185,37 @@ def test_qualified_targets_require_fit_need_and_contact_evidence() -> None:
     weak = replace(good, target_id="t2", recipient="weak@example.com", need_evidence_refs=())
     duplicate = replace(good, target_id="t3")
     assert qualified_targets((good, weak, duplicate)) == (good,)
+
+
+def test_malformed_batch_fails_closed_without_crashing() -> None:
+    release = preview_outreach_release(object())  # type: ignore[arg-type]
+    assert not release.gate.allowed_now
+    assert release.gate.reason == "batch must be an OutreachBatch"
+
+    authorized = authorize_outreach_release(  # type: ignore[arg-type]
+        object(),
+        approval=ActionApproval(action_id="irrelevant"),
+    )
+    assert not authorized.gate.allowed_now
+    assert authorized.gate.reason == "batch must be an OutreachBatch"
+
+
+def test_naive_or_malformed_now_fails_closed() -> None:
+    batch = _batch()
+    approval = ActionApproval(action_id=outreach_action_id(batch), approved=True)
+
+    naive = authorize_outreach_release(
+        batch,
+        approval=approval,
+        now=datetime(2026, 8, 19, 20, 30),
+    )
+    assert not naive.gate.allowed_now
+    assert naive.gate.reason == "now must be a timezone-aware datetime"
+
+    malformed = authorize_outreach_release(  # type: ignore[arg-type]
+        batch,
+        approval=approval,
+        now="2026-08-19T20:30:00Z",
+    )
+    assert not malformed.gate.allowed_now
+    assert malformed.gate.reason == "now must be a timezone-aware datetime"

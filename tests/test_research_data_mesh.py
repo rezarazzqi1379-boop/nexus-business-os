@@ -88,3 +88,12 @@ def test_invalid_stance_fails_closed():
     bad = ResearchHit("q1", "a", "claim", "Claim", "x", "strong", 90, "maybe")
     with pytest.raises(ValueError, match="invalid_stance"):
         fuse_hits([bad])
+
+
+def test_fusion_rejects_hits_from_different_queries():
+    hits = [
+        ResearchHit("q1", "a", "same-key", "Claim", "first query", "strong", 90),
+        ResearchHit("q2", "b", "same-key", "Claim", "second query", "strong", 90),
+    ]
+    with pytest.raises(ValueError, match="fuse_requires_one_query"):
+        fuse_hits(hits)

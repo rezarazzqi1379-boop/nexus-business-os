@@ -274,6 +274,9 @@ def outreach_action_id(batch: OutreachBatch) -> str:
 def preview_outreach_release(batch: OutreachBatch) -> OutreachRelease:
     """Create the exact one-click approval envelope without authorizing a send."""
 
+    if not isinstance(batch, OutreachBatch):
+        return OutreachRelease("", "", "", GateDecision(False, False, "batch must be an OutreachBatch"), ())
+
     errors = validate_outreach_batch(batch)
     digest = outreach_batch_digest(batch)
     action_id = f"outreach:{batch.batch_id}:{digest}"
@@ -306,11 +309,27 @@ def authorize_outreach_release(
     bleed into a new send sequence.
     """
 
+    if not isinstance(batch, OutreachBatch):
+        return OutreachRelease("", "", "", GateDecision(False, False, "batch must be an OutreachBatch"), ())
+
     errors = validate_outreach_batch(batch)
     digest = outreach_batch_digest(batch)
     action_id = f"outreach:{batch.batch_id}:{digest}"
     if errors:
         return OutreachRelease(batch.batch_id, digest, action_id, GateDecision(False, False, "; ".join(errors)), ())
+
+    if now is not None and (
+        not isinstance(now, datetime)
+        or now.tzinfo is None
+        or now.utcoffset() is None
+    ):
+        return OutreachRelease(
+            batch.batch_id,
+            digest,
+            action_id,
+            GateDecision(False, False, "now must be a timezone-aware datetime"),
+            (),
+        )
 
     current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     expires_at = _parse_time(batch.expires_at)

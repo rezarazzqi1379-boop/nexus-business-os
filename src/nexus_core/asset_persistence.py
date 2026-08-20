@@ -33,6 +33,8 @@ class InMemoryAssetPersistence:
         current = self._items.get(asset.asset_id)
         if current and current.source_version_ref != asset.source_version_ref:
             raise ValueError("asset_id_version_collision")
+        if current and current != asset:
+            raise ValueError("asset_identity_collision")
         self._items[asset.asset_id] = asset
         return PersistedAssetRef(
             asset_id=asset.asset_id,

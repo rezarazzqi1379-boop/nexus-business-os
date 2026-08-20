@@ -74,6 +74,29 @@ class RetrievalBenchmark:
     improved: bool
 
 
+@dataclass(frozen=True)
+class RetrievalSchedule:
+    query_id: str
+    waves: tuple[tuple[str, ...], ...]
+    max_parallel: int
+
+
+@dataclass(frozen=True)
+class ResearchOutcome:
+    source_id: str
+    useful: bool
+    latency_ms: int
+
+
+@dataclass(frozen=True)
+class SourceLearning:
+    source_id: str
+    observations: int
+    useful_count: int
+    average_latency_ms: int
+    recommendation: Literal["insufficient_evidence", "prefer", "hold", "review"]
+
+
 def _bounded_text(value: object) -> bool:
     return isinstance(value, str) and bool(value) and value == value.strip() and len(value) <= _MAX_TEXT
 
@@ -135,17 +158,33 @@ def plan_sources(query: ResearchQuery, sources: Iterable[ResearchSource]) -> Res
     ranked = sorted(pool, key=lambda s: (-s.confidence, s.latency_ms, s.source_id))
     selected: list[ResearchSource] = []
     used_kinds: set[str] = set()
+    used_domains: set[str] = set()
 
-    # First pass favors independent source classes to reduce correlated evidence.
+    # First pass favors different source classes and publishers.
     for source in ranked:
         if len(selected) >= query.max_sources:
             break
-        if source.kind in used_kinds:
+        domain_key = source.domain.casefold()
+        if source.kind in used_kinds or domain_key in used_domains:
             continue
         selected.append(source)
         used_kinds.add(source.kind)
+        used_domains.add(domain_key)
 
-    # Second pass fills remaining capacity using the original quality/latency ranking.
+    # Second pass favors additional publishers even when source classes repeat.
+    if len(selected) < query.max_sources:
+        selected_ids = {item.source_id for item in selected}
+        for source in ranked:
+            if len(selected) >= query.max_sources:
+                break
+            domain_key = source.domain.casefold()
+            if source.source_id in selected_ids or domain_key in used_domains:
+                continue
+            selected.append(source)
+            selected_ids.add(source.source_id)
+            used_domains.add(domain_key)
+
+    # Final pass fills the bounded budget; correlated sources remain explicit.
     if len(selected) < query.max_sources:
         selected_ids = {item.source_id for item in selected}
         for source in ranked:
@@ -248,3 +287,55 @@ def benchmark_retrieval(hits: Iterable[ResearchHit]) -> RetrievalBenchmark:
         contradiction_detected=fused.contradiction,
         improved=fused.score > single.relevance and not fused.contradiction,
     )
+
+
+def schedule_retrieval(plan: ResearchPlan, *, max_parallel: int = 4) -> RetrievalSchedule:
+    """Split a validated source plan into deterministic bounded parallel waves."""
+    if not isinstance(plan, ResearchPlan) or not _bounded_text(plan.query_id):
+        raise ValueError("invalid_research_plan")
+    if (
+        not isinstance(plan.selected_sources, tuple)
+        or any(not _bounded_text(source_id) for source_id in plan.selected_sources)
+        or len(set(plan.selected_sources)) != len(plan.selected_sources)
+    ):
+        raise ValueError("invalid_selected_sources")
+    if not isinstance(max_parallel, int) or isinstance(max_parallel, bool) or not 1 <= max_parallel <= 6:
+        raise ValueError("invalid_max_parallel")
+    waves = tuple(
+        tuple(plan.selected_sources[index:index + max_parallel])
+        for index in range(0, len(plan.selected_sources), max_parallel)
+    )
+    return RetrievalSchedule(plan.query_id, waves, max_parallel)
+
+
+def summarize_source_outcomes(outcomes: Iterable[ResearchOutcome]) -> tuple[SourceLearning, ...]:
+    """Create reviewable source-learning signals without auto-changing trust scores."""
+    try:
+        items = tuple(outcomes)
+    except TypeError as exc:
+        raise ValueError("outcomes_must_be_iterable") from exc
+    grouped: dict[str, list[ResearchOutcome]] = {}
+    for outcome in items:
+        if not isinstance(outcome, ResearchOutcome) or not _bounded_text(outcome.source_id):
+            raise ValueError("invalid_outcome")
+        if not isinstance(outcome.useful, bool):
+            raise ValueError("invalid_outcome_useful")
+        if not isinstance(outcome.latency_ms, int) or isinstance(outcome.latency_ms, bool) or outcome.latency_ms < 0:
+            raise ValueError("invalid_outcome_latency")
+        grouped.setdefault(outcome.source_id, []).append(outcome)
+
+    learned: list[SourceLearning] = []
+    for source_id, group in grouped.items():
+        count = len(group)
+        useful_count = sum(item.useful for item in group)
+        average_latency = sum(item.latency_ms for item in group) // count
+        if count < 3:
+            recommendation = "insufficient_evidence"
+        elif useful_count * 4 >= count * 3:
+            recommendation = "prefer"
+        elif useful_count * 2 >= count:
+            recommendation = "hold"
+        else:
+            recommendation = "review"
+        learned.append(SourceLearning(source_id, count, useful_count, average_latency, recommendation))
+    return tuple(sorted(learned, key=lambda item: item.source_id))

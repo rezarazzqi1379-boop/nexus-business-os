@@ -6,9 +6,11 @@ from typing import Iterable, Literal
 
 SourceKind = Literal["official", "regulatory", "academic", "company", "news", "web", "crm", "email"]
 EvidenceTier = Literal["strong", "partial", "weak", "unverified"]
+ClaimStance = Literal["support", "refute", "uncertain"]
 
 _ALLOWED_SOURCE_KINDS = {"official", "regulatory", "academic", "company", "news", "web", "crm", "email"}
 _TIER_WEIGHT = {"strong": 4, "partial": 3, "weak": 2, "unverified": 1}
+_ALLOWED_STANCES = {"support", "refute", "uncertain"}
 _MAX_TEXT = 512
 
 
@@ -40,6 +42,7 @@ class ResearchHit:
     raw_observation: str
     evidence_tier: EvidenceTier
     relevance: int
+    stance: ClaimStance = "support"
 
 
 @dataclass(frozen=True)
@@ -56,7 +59,19 @@ class FusedFinding:
     best_observation: str
     evidence_tier: EvidenceTier
     supporting_sources: tuple[str, ...]
+    refuting_sources: tuple[str, ...]
+    uncertain_sources: tuple[str, ...]
+    contradiction: bool
     score: int
+
+
+@dataclass(frozen=True)
+class RetrievalBenchmark:
+    single_source_score: int
+    multi_source_score: int
+    source_count: int
+    contradiction_detected: bool
+    improved: bool
 
 
 def _bounded_text(value: object) -> bool:
@@ -104,6 +119,7 @@ def validate_source(source: object) -> None:
 
 
 def plan_sources(query: ResearchQuery, sources: Iterable[ResearchSource]) -> ResearchPlan:
+    """Select a bounded, confidence-led but source-diverse retrieval set."""
     validate_query(query)
     try:
         pool = tuple(sources)
@@ -115,47 +131,116 @@ def plan_sources(query: ResearchQuery, sources: Iterable[ResearchSource]) -> Res
         if source.source_id in seen:
             raise ValueError("duplicate_source")
         seen.add(source.source_id)
+
     ranked = sorted(pool, key=lambda s: (-s.confidence, s.latency_ms, s.source_id))
-    selected = tuple(s.source_id for s in ranked[: query.max_sources])
-    rejected = tuple(s.source_id for s in ranked[query.max_sources :])
-    return ResearchPlan(query.query_id, selected, rejected)
+    selected: list[ResearchSource] = []
+    used_kinds: set[str] = set()
+
+    # First pass favors independent source classes to reduce correlated evidence.
+    for source in ranked:
+        if len(selected) >= query.max_sources:
+            break
+        if source.kind in used_kinds:
+            continue
+        selected.append(source)
+        used_kinds.add(source.kind)
+
+    # Second pass fills remaining capacity using the original quality/latency ranking.
+    if len(selected) < query.max_sources:
+        selected_ids = {item.source_id for item in selected}
+        for source in ranked:
+            if len(selected) >= query.max_sources:
+                break
+            if source.source_id in selected_ids:
+                continue
+            selected.append(source)
+            selected_ids.add(source.source_id)
+
+    selected_ids = {item.source_id for item in selected}
+    rejected = tuple(source.source_id for source in ranked if source.source_id not in selected_ids)
+    return ResearchPlan(query.query_id, tuple(source.source_id for source in selected), rejected)
+
+
+def _validate_hit(hit: object) -> ResearchHit:
+    if not isinstance(hit, ResearchHit):
+        raise ValueError("invalid_hit")
+    if not all(_bounded_text(value) for value in (hit.query_id, hit.source_id, hit.canonical_key, hit.title, hit.raw_observation)):
+        raise ValueError("invalid_hit_text")
+    if hit.evidence_tier not in _TIER_WEIGHT:
+        raise ValueError("invalid_evidence_tier")
+    if not _valid_score(hit.relevance):
+        raise ValueError("invalid_relevance")
+    if hit.stance not in _ALLOWED_STANCES:
+        raise ValueError("invalid_stance")
+    return hit
 
 
 def fuse_hits(hits: Iterable[ResearchHit]) -> tuple[FusedFinding, ...]:
+    """Fuse evidence without collapsing contradictions into false consensus."""
     try:
         items = tuple(hits)
     except TypeError as exc:
         raise ValueError("hits_must_be_iterable") from exc
     grouped: dict[str, list[ResearchHit]] = {}
-    for hit in items:
-        if not isinstance(hit, ResearchHit):
-            raise ValueError("invalid_hit")
-        if not all(_bounded_text(value) for value in (hit.query_id, hit.source_id, hit.canonical_key, hit.title, hit.raw_observation)):
-            raise ValueError("invalid_hit_text")
-        if hit.evidence_tier not in _TIER_WEIGHT:
-            raise ValueError("invalid_evidence_tier")
-        if not _valid_score(hit.relevance):
-            raise ValueError("invalid_relevance")
+    for raw_hit in items:
+        hit = _validate_hit(raw_hit)
         grouped.setdefault(hit.canonical_key, []).append(hit)
 
     fused: list[FusedFinding] = []
     for key, group in grouped.items():
-        unique_sources = sorted({item.source_id for item in group})
+        supporting = sorted({item.source_id for item in group if item.stance == "support"})
+        refuting = sorted({item.source_id for item in group if item.stance == "refute"})
+        uncertain = sorted({item.source_id for item in group if item.stance == "uncertain"})
+        contradiction = bool(supporting and refuting)
+
         ranked = sorted(
             group,
             key=lambda h: (-_TIER_WEIGHT[h.evidence_tier], -h.relevance, h.source_id),
         )
         best = ranked[0]
-        corroboration_bonus = min(20, (len(unique_sources) - 1) * 5)
-        score = min(100, best.relevance + corroboration_bonus)
+        unique_sources = {item.source_id for item in group}
+        corroboration_bonus = min(20, max(0, len(unique_sources) - 1) * 5)
+        contradiction_penalty = 20 if contradiction else 0
+        uncertainty_penalty = min(10, len(uncertain) * 3)
+        score = max(0, min(100, best.relevance + corroboration_bonus - contradiction_penalty - uncertainty_penalty))
+
         fused.append(
             FusedFinding(
                 canonical_key=key,
                 title=best.title,
                 best_observation=best.raw_observation,
                 evidence_tier=best.evidence_tier,
-                supporting_sources=tuple(unique_sources),
+                supporting_sources=tuple(supporting),
+                refuting_sources=tuple(refuting),
+                uncertain_sources=tuple(uncertain),
+                contradiction=contradiction,
                 score=score,
             )
         )
     return tuple(sorted(fused, key=lambda item: (-item.score, item.canonical_key)))
+
+
+def benchmark_retrieval(hits: Iterable[ResearchHit]) -> RetrievalBenchmark:
+    """Compare a naive best-single-source baseline with contradiction-aware fusion.
+
+    This is a deterministic retrieval-quality proxy, not a claim about final LLM answer quality.
+    """
+    try:
+        items = tuple(hits)
+    except TypeError as exc:
+        raise ValueError("hits_must_be_iterable") from exc
+    if not items:
+        raise ValueError("benchmark_requires_hits")
+    validated = tuple(_validate_hit(item) for item in items)
+    if len({item.canonical_key for item in validated}) != 1:
+        raise ValueError("benchmark_requires_one_claim")
+
+    single = max(validated, key=lambda h: (_TIER_WEIGHT[h.evidence_tier], h.relevance, h.source_id))
+    fused = fuse_hits(validated)[0]
+    return RetrievalBenchmark(
+        single_source_score=single.relevance,
+        multi_source_score=fused.score,
+        source_count=len({item.source_id for item in validated}),
+        contradiction_detected=fused.contradiction,
+        improved=fused.score > single.relevance and not fused.contradiction,
+    )

@@ -182,9 +182,13 @@ def fuse_hits(hits: Iterable[ResearchHit]) -> tuple[FusedFinding, ...]:
     except TypeError as exc:
         raise ValueError("hits_must_be_iterable") from exc
     grouped: dict[str, list[ResearchHit]] = {}
+    query_ids: set[str] = set()
     for raw_hit in items:
         hit = _validate_hit(raw_hit)
+        query_ids.add(hit.query_id)
         grouped.setdefault(hit.canonical_key, []).append(hit)
+    if len(query_ids) > 1:
+        raise ValueError("fuse_requires_one_query")
 
     fused: list[FusedFinding] = []
     for key, group in grouped.items():

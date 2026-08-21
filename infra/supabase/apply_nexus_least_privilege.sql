@@ -56,15 +56,18 @@ revoke all privileges on table public.nexus_signals from anon, authenticated;
 -- Remove direct privileges on current NEXUS-named sequences if present.
 do $$
 declare
-  sequence_name text;
+  qualified_sequence text;
 begin
-  for sequence_name in
-    select quote_ident(sequence_schema) || '.' || quote_ident(sequence_name)
-    from information_schema.sequences
-    where sequence_schema = 'public'
-      and sequence_name like 'nexus_%'
+  for qualified_sequence in
+    select quote_ident(s.sequence_schema) || '.' || quote_ident(s.sequence_name)
+    from information_schema.sequences s
+    where s.sequence_schema = 'public'
+      and s.sequence_name like 'nexus_%'
   loop
-    execute format('revoke all privileges on sequence %s from anon, authenticated', sequence_name);
+    execute format(
+      'revoke all privileges on sequence %s from anon, authenticated',
+      qualified_sequence
+    );
   end loop;
 end $$;
 
@@ -77,8 +80,9 @@ alter default privileges for role postgres in schema public
   revoke usage, select, update on sequences from anon, authenticated;
 
 -- Supabase-managed object creation has also shown public default ACLs under supabase_admin.
--- This block may require the executing role to have authority over supabase_admin. If it
--- fails, ROLLBACK and apply the equivalent setting through the authorized platform owner.
+-- These statements require authority over supabase_admin. If that authority is absent,
+-- the transaction must fail/rollback and the equivalent change should be performed only
+-- through an authorized platform owner rather than silently skipping the default ACL.
 alter default privileges for role supabase_admin in schema public
   revoke select, insert, update, delete, truncate, references, trigger on tables from anon, authenticated;
 alter default privileges for role supabase_admin in schema public

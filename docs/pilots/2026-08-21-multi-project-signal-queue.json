@@ -1,0 +1,80 @@
+{
+  "queue_id": "multi-project-live-2026-08-21",
+  "mode": "read_research_only",
+  "ordered_signals": [
+    {
+      "rank": 1,
+      "project_id": "hydrotest-120mpa",
+      "kind": "supplier_reply",
+      "value": "critical",
+      "urgency": "critical",
+      "evidence": "strong",
+      "summary": "New 120 MPa hydrotester technical solution and EXW quotation received from Wuxi Marley.",
+      "facts": {
+        "exw_price_usd": 238461.55,
+        "installation_training_usd": 23077,
+        "payment": "50% deposit / 50% before shipment",
+        "manufacturing_cycle_days": 90,
+        "warranty_years": 2,
+        "pipe_od_mm": "89-180",
+        "wall_thickness_mm": "5-12",
+        "pipe_length_m": "6-12",
+        "test_pressure_mpa": "0-120",
+        "hold_time_s": "5-30 adjustable",
+        "equipment_tensile_load_t": 500,
+        "configuration": "single-workstation horizontal dual-force-beam"
+      },
+      "verification": {
+        "supplier_identity": "public website contact email and phone align with quotation contact",
+        "price_benchmark": "public marketplace prices are not directly comparable to this customized configuration"
+      },
+      "next_work": [
+        "normalize total landed/comparable scope including installation and excluded items",
+        "verify guaranteed throughput/cycle time at 5-10 second hold",
+        "verify pressure accuracy wording and acceptance criteria",
+        "confirm API 5CT testing requirements and data-record format",
+        "compare 500T reaction load and sealing architecture with competing offers",
+        "request reference installations only after internal review if needed"
+      ]
+    },
+    {
+      "rank": 2,
+      "project_id": "kcl-import",
+      "kind": "project_risk",
+      "value": "critical",
+      "urgency": "high",
+      "evidence": "strong",
+      "summary": "BPC-referred distributor states an importer permit from the Soil and Water Institute is required before commercial discussion can proceed.",
+      "facts": {
+        "channel": "Overseas Material Supply, referred by Belarusian Potash Company",
+        "commercial_status": "permit prerequisite raised before commercial progression"
+      },
+      "next_work": [
+        "verify exact Iranian permit/legal basis with authoritative sources",
+        "determine whether end-user or importer can hold the permit",
+        "map documents, lead time, validity and product/spec linkage",
+        "preserve Belarus/BPC channel while compliance prerequisite is resolved"
+      ]
+    },
+    {
+      "rank": 3,
+      "project_id": "can-body-line",
+      "kind": "technical_mismatch",
+      "value": "high",
+      "urgency": "medium",
+      "evidence": "strong",
+      "summary": "Golden Eagle quotations contain GT10C-500 specification differences versus current public manufacturer information and different D73/D99 forming architectures.",
+      "next_work": [
+        "verify quotation revision and guaranteed stable output",
+        "reconcile D73/D99 forming architecture",
+        "normalize utilities and scope"
+      ]
+    }
+  ],
+  "human_gates": [
+    "supplier_outreach",
+    "contract_or_po",
+    "payment",
+    "merge_or_deploy"
+  ]
+}

@@ -39,6 +39,35 @@ def test_same_legal_identity_is_duplicate_without_domain():
     )
 
     assert result.decision == OutreachDecision.HOLD_DUPLICATE_SOURCE
+    assert "same_legal_name" in result.reasons
+
+
+def test_same_factory_name_is_duplicate():
+    registry = SupplierRegistry()
+    registry.add_supplier(
+        supplier("oem-1", legal_name="Alpha Export Co", factory_name="Wuxi Alpha Machinery Works")
+    )
+
+    result = registry.find_identity_match(
+        supplier("lead-2", legal_name="Alpha International", factory_name="wuxi alpha machinery works")
+    )
+
+    assert result.decision == OutreachDecision.HOLD_DUPLICATE_SOURCE
+    assert "same_factory_name" in result.reasons
+
+
+def test_same_brand_alone_requires_review_not_auto_hold():
+    registry = SupplierRegistry()
+    registry.add_supplier(
+        supplier("oem-1", legal_name="Factory Alpha", brand="Karat", domain="alpha.example")
+    )
+
+    result = registry.find_identity_match(
+        supplier("lead-2", legal_name="Factory Beta", brand="karat", domain="beta.example")
+    )
+
+    assert result.decision == OutreachDecision.REVIEW_POSSIBLE_COLLISION
+    assert "same_brand" in result.reasons
 
 
 def test_same_city_and_model_requires_human_review_not_auto_hold():
@@ -64,6 +93,31 @@ def test_same_city_and_model_requires_human_review_not_auto_hold():
     )
 
     assert result.decision == OutreachDecision.REVIEW_POSSIBLE_COLLISION
+
+
+def test_same_model_in_different_city_does_not_create_false_collision():
+    registry = SupplierRegistry()
+    registry.add_supplier(
+        supplier(
+            "oem-1",
+            legal_name="Factory Alpha",
+            country="China",
+            city="Wuxi",
+            model_families=("GSY-180",),
+        )
+    )
+
+    result = registry.find_identity_match(
+        supplier(
+            "oem-2",
+            legal_name="Factory Beta",
+            country="China",
+            city="Huludao",
+            model_families=("GSY-180",),
+        )
+    )
+
+    assert result.decision == OutreachDecision.ALLOW
 
 
 def test_different_supplier_is_allowed():
@@ -100,6 +154,75 @@ def test_channel_cannot_reference_unknown_supplier():
         assert "existing supplier" in str(exc)
     else:
         raise AssertionError("expected ValueError")
+
+
+def test_duplicate_channel_id_is_rejected():
+    registry = SupplierRegistry()
+    registry.add_supplier(supplier("oem-1", legal_name="Factory Alpha"))
+    registry.add_channel(SupplierChannel("agent-a", "oem-1", "agent", "Agent A"))
+
+    try:
+        registry.add_channel(SupplierChannel("agent-a", "oem-1", "agent", "Agent B"))
+    except ValueError as exc:
+        assert "channel_id already exists" in str(exc)
+    else:
+        raise AssertionError("expected ValueError")
+
+
+def test_same_channel_organization_is_held_as_duplicate_route():
+    registry = SupplierRegistry()
+    registry.add_supplier(supplier("oem-1", legal_name="Factory Alpha"))
+    registry.add_channel(
+        SupplierChannel("agent-a", "oem-1", "agent", "Yedi Mavi", email="a@example.com")
+    )
+
+    result = registry.assess_channel_collision(
+        SupplierChannel("agent-a-2", "oem-1", "agent", "  yedi   mavi  ", email="b@example.com")
+    )
+
+    assert result.decision == OutreachDecision.HOLD_DUPLICATE_SOURCE
+    assert "same_channel_organization" in result.reasons
+
+
+def test_same_channel_email_is_held_as_duplicate_route():
+    registry = SupplierRegistry()
+    registry.add_supplier(supplier("oem-1", legal_name="Factory Alpha"))
+    registry.add_channel(
+        SupplierChannel("agent-a", "oem-1", "agent", "Agent A", email="Sales@Example.com")
+    )
+
+    result = registry.assess_channel_collision(
+        SupplierChannel("agent-b", "oem-1", "agent", "Agent B", email=" sales@example.com ")
+    )
+
+    assert result.decision == OutreachDecision.HOLD_DUPLICATE_SOURCE
+    assert "same_channel_email" in result.reasons
+
+
+def test_second_distinct_intermediary_for_same_oem_requires_review():
+    registry = SupplierRegistry()
+    registry.add_supplier(supplier("oem-1", legal_name="Factory Alpha"))
+    registry.add_channel(SupplierChannel("agent-a", "oem-1", "agent", "Agent A"))
+
+    result = registry.assess_channel_collision(
+        SupplierChannel("agent-b", "oem-1", "agent", "Agent B")
+    )
+
+    assert result.decision == OutreachDecision.REVIEW_POSSIBLE_COLLISION
+    assert result.matched_supplier_id == "oem-1"
+    assert result.reasons == ("parallel_intermediary_channels",)
+
+
+def test_direct_route_can_coexist_with_existing_intermediary():
+    registry = SupplierRegistry()
+    registry.add_supplier(supplier("oem-1", legal_name="Factory Alpha"))
+    registry.add_channel(SupplierChannel("agent-a", "oem-1", "agent", "Agent A"))
+
+    result = registry.assess_channel_collision(
+        SupplierChannel("direct", "oem-1", "direct", "Factory Alpha")
+    )
+
+    assert result.decision == OutreachDecision.ALLOW
 
 
 def test_deduplicate_candidates_adds_only_unique_oems():

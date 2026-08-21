@@ -1,0 +1,99 @@
+{
+  "registry_version": "0.1",
+  "project": "OCTG hydrostatic tester 89-180 mm / up to 120 MPa",
+  "as_of": "2026-08-21",
+  "suppliers": [
+    {
+      "supplier_id": "marley-wuxi",
+      "legal_name": "Wuxi Marley Machinery Technology Co., Ltd.",
+      "brand": "Marley",
+      "domain": "marleymachinery.com",
+      "country": "China",
+      "city": "Wuxi",
+      "factory_name": "Wuxi Marley Machinery Technology Co., Ltd.",
+      "model_families": ["custom hydro testing machine"],
+      "identity_status": "verified",
+      "project_capability_status": "proposal_received",
+      "evidence": ["received 11-page technical solution", "official manufacturer product/contact pages"]
+    },
+    {
+      "supplier_id": "yaxing-dezhou",
+      "legal_name": "Dezhou Yaxing Steel Tube Equipment Factory",
+      "brand": "Yaxing",
+      "domain": "yaxingmachines.com",
+      "country": "China",
+      "city": "Dezhou",
+      "factory_name": "Dezhou Yaxing Steel Tube Equipment Factory",
+      "model_families": ["custom hydrotester", "SYJ-I A-219"],
+      "identity_status": "verified",
+      "project_capability_status": "budgetary_quote_received",
+      "evidence": ["Alisa email quote", "official manufacturer hydrotester pages", "public manufacturer profile"]
+    },
+    {
+      "supplier_id": "gh-petro",
+      "legal_name": "GH-Petro",
+      "brand": "GH-Petro",
+      "domain": "gh-petro.com",
+      "country": "China",
+      "city": "",
+      "factory_name": "",
+      "model_families": ["60-168 mm 70 MPa hydrotester", "60-219 mm 80 MPa hydrotester", "114-219 mm 80 MPa hydrotester"],
+      "identity_status": "manufacturer_status_verified",
+      "project_capability_status": "120_mpa_not_verified",
+      "evidence": ["official manufacturer about page", "official hydrotester product pages", "received GH-Petro email"]
+    }
+  ],
+  "channels": [
+    {
+      "channel_id": "marley-eli-direct",
+      "supplier_id": "marley-wuxi",
+      "channel_type": "direct",
+      "organization": "Wuxi Marley Machinery Technology Co., Ltd.",
+      "contact_name": "Eli",
+      "email": "eli@marleytechs.com",
+      "status": "active"
+    },
+    {
+      "channel_id": "yaxing-alisa-direct",
+      "supplier_id": "yaxing-dezhou",
+      "channel_type": "direct",
+      "organization": "Dezhou Yaxing Steel Tube Equipment Factory",
+      "contact_name": "Alisa",
+      "email": "alisa@yxgd.com.cn",
+      "status": "active"
+    },
+    {
+      "channel_id": "gh-fiona-direct",
+      "supplier_id": "gh-petro",
+      "channel_type": "direct",
+      "organization": "GH-Petro",
+      "contact_name": "Fiona Wong",
+      "email": "fionawong@gh-petro.com",
+      "status": "active"
+    }
+  ],
+  "unresolved_channels": [
+    {
+      "channel_id": "yedi-mavi-ali",
+      "organization": "Yedi Mavi",
+      "channel_type": "agent",
+      "underlying_supplier_id": null,
+      "status": "hold_until_oem_identity_disclosed",
+      "collision_signal": "another party contacted same Turkish specialist"
+    },
+    {
+      "channel_id": "anz-global",
+      "organization": "ANZ Global Group",
+      "channel_type": "agent",
+      "underlying_supplier_id": null,
+      "status": "hold_until_oem_identity_disclosed"
+    },
+    {
+      "channel_id": "sinoqat",
+      "organization": "SinoQAT",
+      "channel_type": "agent",
+      "underlying_supplier_id": null,
+      "status": "hold_until_oem_identity_disclosed"
+    }
+  ]
+}

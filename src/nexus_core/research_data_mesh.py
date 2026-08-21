@@ -1,16 +1,19 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from typing import Iterable, Literal
 
 SourceKind = Literal["official", "regulatory", "academic", "company", "news", "web", "crm", "email"]
 EvidenceTier = Literal["strong", "partial", "weak", "unverified"]
 ClaimStance = Literal["support", "refute", "uncertain"]
+RetrievalStatus = Literal["success", "partial", "stale", "timeout", "error", "unavailable"]
 
 _ALLOWED_SOURCE_KINDS = {"official", "regulatory", "academic", "company", "news", "web", "crm", "email"}
 _TIER_WEIGHT = {"strong": 4, "partial": 3, "weak": 2, "unverified": 1}
 _ALLOWED_STANCES = {"support", "refute", "uncertain"}
+_ALLOWED_RETRIEVAL_STATUS = {"success", "partial", "stale", "timeout", "error", "unavailable"}
+_CONFIDENCE_CAP = {"success": 100, "partial": 70, "stale": 50, "timeout": 0, "error": 0, "unavailable": 0}
 _MAX_TEXT = 512
 
 
@@ -98,6 +101,22 @@ class SourceLearning:
     recommendation: Literal["insufficient_evidence", "prefer", "hold", "review"]
 
 
+@dataclass(frozen=True)
+class RetrievalAttempt:
+    source_id: str
+    status: RetrievalStatus
+    latency_ms: int
+    evidence_count: int
+    error_code: str | None = None
+
+
+@dataclass(frozen=True)
+class ConnectorConditioning:
+    usable_sources: tuple[ResearchSource, ...]
+    excluded_sources: tuple[str, ...]
+    degraded_sources: tuple[str, ...]
+
+
 def _bounded_text(value: object) -> bool:
     return isinstance(value, str) and bool(value) and value == value.strip() and len(value) <= _MAX_TEXT
 
@@ -143,7 +162,6 @@ def validate_source(source: object) -> None:
 
 
 def _source_rank_key(source: ResearchSource) -> tuple[float, float, int, str]:
-    """Rank confidence first, then prefer fresher evidence before latency."""
     retrieved_at = _aware_iso(source.retrieved_at)
     if retrieved_at is None:
         raise ValueError("invalid_retrieved_at")
@@ -151,7 +169,6 @@ def _source_rank_key(source: ResearchSource) -> tuple[float, float, int, str]:
 
 
 def plan_sources(query: ResearchQuery, sources: Iterable[ResearchSource]) -> ResearchPlan:
-    """Select a bounded, confidence-led, freshness-aware and source-diverse retrieval set."""
     validate_query(query)
     try:
         pool = tuple(sources)
@@ -206,6 +223,79 @@ def plan_sources(query: ResearchQuery, sources: Iterable[ResearchSource]) -> Res
     return ResearchPlan(query.query_id, tuple(source.source_id for source in selected), rejected)
 
 
+def _validate_attempt(attempt: object) -> RetrievalAttempt:
+    if not isinstance(attempt, RetrievalAttempt):
+        raise ValueError("invalid_retrieval_attempt")
+    if not _bounded_text(attempt.source_id):
+        raise ValueError("invalid_attempt_source")
+    if attempt.status not in _ALLOWED_RETRIEVAL_STATUS:
+        raise ValueError("invalid_attempt_status")
+    if not isinstance(attempt.latency_ms, int) or isinstance(attempt.latency_ms, bool) or attempt.latency_ms < 0:
+        raise ValueError("invalid_attempt_latency")
+    if not isinstance(attempt.evidence_count, int) or isinstance(attempt.evidence_count, bool) or attempt.evidence_count < 0:
+        raise ValueError("invalid_evidence_count")
+    if attempt.error_code is not None and not _bounded_text(attempt.error_code):
+        raise ValueError("invalid_error_code")
+    if attempt.status == "success" and attempt.evidence_count == 0:
+        raise ValueError("success_requires_evidence")
+    if attempt.status in {"timeout", "error", "unavailable"} and attempt.evidence_count != 0:
+        raise ValueError("failed_attempt_cannot_claim_evidence")
+    return attempt
+
+
+def condition_sources_on_connector_health(
+    sources: Iterable[ResearchSource], attempts: Iterable[RetrievalAttempt]
+) -> ConnectorConditioning:
+    """Exclude failed connectors and cap confidence for partial/stale retrievals.
+
+    Every source must have exactly one retrieval attempt. Missing health data fails closed.
+    """
+    try:
+        source_items = tuple(sources)
+        attempt_items = tuple(attempts)
+    except TypeError as exc:
+        raise ValueError("connector_conditioning_requires_iterables") from exc
+
+    source_map: dict[str, ResearchSource] = {}
+    for source in source_items:
+        validate_source(source)
+        if source.source_id in source_map:
+            raise ValueError("duplicate_source")
+        source_map[source.source_id] = source
+
+    attempt_map: dict[str, RetrievalAttempt] = {}
+    for raw_attempt in attempt_items:
+        attempt = _validate_attempt(raw_attempt)
+        if attempt.source_id in attempt_map:
+            raise ValueError("duplicate_retrieval_attempt")
+        if attempt.source_id not in source_map:
+            raise ValueError("attempt_for_unknown_source")
+        attempt_map[attempt.source_id] = attempt
+
+    if set(attempt_map) != set(source_map):
+        raise ValueError("missing_retrieval_attempt")
+
+    usable: list[ResearchSource] = []
+    excluded: list[str] = []
+    degraded: list[str] = []
+    for source_id, source in source_map.items():
+        attempt = attempt_map[source_id]
+        cap = _CONFIDENCE_CAP[attempt.status]
+        if cap == 0:
+            excluded.append(source_id)
+            continue
+        conditioned = replace(source, latency_ms=attempt.latency_ms, confidence=min(source.confidence, cap))
+        usable.append(conditioned)
+        if attempt.status != "success":
+            degraded.append(source_id)
+
+    return ConnectorConditioning(
+        usable_sources=tuple(sorted(usable, key=_source_rank_key)),
+        excluded_sources=tuple(sorted(excluded)),
+        degraded_sources=tuple(sorted(degraded)),
+    )
+
+
 def _validate_hit(hit: object) -> ResearchHit:
     if not isinstance(hit, ResearchHit):
         raise ValueError("invalid_hit")
@@ -227,7 +317,6 @@ def _independence_key(hit: ResearchHit) -> str:
 
 
 def fuse_hits(hits: Iterable[ResearchHit]) -> tuple[FusedFinding, ...]:
-    """Fuse evidence without collapsing contradictions or correlated evidence into false consensus."""
     try:
         items = tuple(hits)
     except TypeError as exc:
@@ -273,10 +362,6 @@ def fuse_hits(hits: Iterable[ResearchHit]) -> tuple[FusedFinding, ...]:
 
 
 def benchmark_retrieval(hits: Iterable[ResearchHit]) -> RetrievalBenchmark:
-    """Compare a naive best-single-source baseline with contradiction-aware fusion.
-
-    This is a deterministic retrieval-quality proxy, not a claim about final LLM answer quality.
-    """
     try:
         items = tuple(hits)
     except TypeError as exc:
@@ -299,7 +384,6 @@ def benchmark_retrieval(hits: Iterable[ResearchHit]) -> RetrievalBenchmark:
 
 
 def schedule_retrieval(plan: ResearchPlan, *, max_parallel: int = 4) -> RetrievalSchedule:
-    """Split a validated source plan into deterministic bounded parallel waves."""
     if not isinstance(plan, ResearchPlan) or not _bounded_text(plan.query_id):
         raise ValueError("invalid_research_plan")
     if (
@@ -315,7 +399,6 @@ def schedule_retrieval(plan: ResearchPlan, *, max_parallel: int = 4) -> Retrieva
 
 
 def summarize_source_outcomes(outcomes: Iterable[ResearchOutcome]) -> tuple[SourceLearning, ...]:
-    """Create reviewable source-learning signals without auto-changing trust scores."""
     try:
         items = tuple(outcomes)
     except TypeError as exc:

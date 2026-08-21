@@ -1,4 +1,5 @@
 import math
+from datetime import datetime, timezone
 
 import pytest
 
@@ -18,6 +19,7 @@ def observation(**overrides):
         failure_mode="poor source selection",
         evidence_refs=("trace://run/1",),
         severity=3,
+        observed_at=datetime(2026, 8, 21, 9, 0, tzinfo=timezone.utc),
     )
     data.update(overrides)
     return FailureObservation(**data)
@@ -41,6 +43,11 @@ def test_observation_requires_evidence():
 def test_observation_rejects_non_integer_severity():
     with pytest.raises(ValueError):
         observation(severity=2.5)
+
+
+def test_observation_requires_timezone_aware_timestamp():
+    with pytest.raises(ValueError):
+        observation(observed_at=datetime(2026, 8, 21, 9, 0))
 
 
 def test_proposal_is_traceable_to_failure():
@@ -125,6 +132,45 @@ def test_dedup_keeps_highest_severity():
     assert [item.observation_id for item in unique] == ["high"]
 
 
+def test_dedup_prefers_newer_observation_on_equal_severity():
+    old = observation(observation_id="old", observed_at=datetime(2026, 8, 20, 9, 0, tzinfo=timezone.utc))
+    new = observation(observation_id="new", observed_at=datetime(2026, 8, 21, 9, 0, tzinfo=timezone.utc))
+    unique = deduplicate_observations([new, old])
+    assert [item.observation_id for item in unique] == ["new"]
+
+
 def test_dedup_rejects_wrong_runtime_type():
     with pytest.raises(ValueError):
         deduplicate_observations([observation(), "not-an-observation"])
+
+
+def test_real_hydrotester_state_drift_becomes_traceable_experiment_not_auto_promotion():
+    drift = FailureObservation(
+        observation_id="hydrotester-state-drift-2026-08-21",
+        component="canonical-state-reconciliation",
+        failure_mode="repository manifest lagged newer buyer-confirmed hydrotester evidence",
+        evidence_refs=(
+            "gmail://message/1a024073bfa91b65",
+            "notion://page/3c0b8b40-ace2-81ad-a2e2-d2151d577672",
+            "github://docs/architecture/current-state.md@2026-08-19",
+        ),
+        severity=4,
+        observed_at=datetime(2026, 8, 21, 13, 45, tzinfo=timezone.utc),
+    )
+    candidate = propose_from_failure(
+        drift,
+        proposal_id="prop-hydrotester-state-freshness-gate-v1",
+        hypothesis="source-version and observed-at checks reduce stale canonical-state decisions",
+        change_summary="add freshness-aware reconciliation before a lower-authority manifest can drive action",
+        expected_metric="stale-state escape rate",
+    )
+    assert candidate.source_observations == (drift.observation_id,)
+    unevaluated = EvaluationResult(
+        candidate.proposal_id,
+        baseline_score=0.0,
+        candidate_score=0.0,
+        evidence_refs=("replay://hydrotester-state-drift/2026-08-21",),
+    )
+    decision = decide_evolution(candidate, unevaluated, minimum_gain=0.01)
+    assert decision.decision == "experiment"
+    assert not decision.requires_human_approval

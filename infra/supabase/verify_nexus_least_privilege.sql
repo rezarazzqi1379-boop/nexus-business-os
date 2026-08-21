@@ -1,22 +1,7 @@
 -- NEXUS least-privilege post-change verification (read-only)
 -- Expected result after an approved hardening change: zero rows from each violation query.
 
--- Any NEXUS table still directly accessible to anon/authenticated is a violation.
-with nexus_tables as (
-  select c.oid, c.relname
-  from pg_class c
-  join pg_namespace n on n.oid = c.relnamespace
-  where n.nspname = 'public'
-    and c.relkind = 'r'
-    and c.relname like 'nexus_%'
-)
-select relname as table_name
-from nexus_tables
-where has_table_privilege('anon', oid, 'SELECT, INSERT, UPDATE, DELETE')
-   or has_table_privilege('authenticated', oid, 'SELECT, INSERT, UPDATE, DELETE')
-order by relname;
-
--- More explicit per-operation verification so one remaining privilege cannot hide.
+-- Any remaining CRUD privilege on an internal NEXUS table is a violation.
 with nexus_tables as (
   select c.oid, c.relname
   from pg_class c
@@ -47,7 +32,11 @@ order by relname;
 
 -- Current NEXUS-named sequences should not remain API-role accessible.
 select sequence_schema,
-       sequence_name
+       sequence_name,
+       has_sequence_privilege('anon', format('%I.%I', sequence_schema, sequence_name), 'USAGE') as anon_usage,
+       has_sequence_privilege('anon', format('%I.%I', sequence_schema, sequence_name), 'SELECT') as anon_select,
+       has_sequence_privilege('authenticated', format('%I.%I', sequence_schema, sequence_name), 'USAGE') as authenticated_usage,
+       has_sequence_privilege('authenticated', format('%I.%I', sequence_schema, sequence_name), 'SELECT') as authenticated_select
 from information_schema.sequences
 where sequence_schema = 'public'
   and sequence_name like 'nexus_%'

@@ -39,6 +39,35 @@ def test_same_legal_identity_is_duplicate_without_domain():
     )
 
     assert result.decision == OutreachDecision.HOLD_DUPLICATE_SOURCE
+    assert "same_legal_name" in result.reasons
+
+
+def test_same_factory_name_is_duplicate():
+    registry = SupplierRegistry()
+    registry.add_supplier(
+        supplier("oem-1", legal_name="Alpha Export Co", factory_name="Wuxi Alpha Machinery Works")
+    )
+
+    result = registry.find_identity_match(
+        supplier("lead-2", legal_name="Alpha International", factory_name="wuxi alpha machinery works")
+    )
+
+    assert result.decision == OutreachDecision.HOLD_DUPLICATE_SOURCE
+    assert "same_factory_name" in result.reasons
+
+
+def test_same_brand_alone_requires_review_not_auto_hold():
+    registry = SupplierRegistry()
+    registry.add_supplier(
+        supplier("oem-1", legal_name="Factory Alpha", brand="Karat", domain="alpha.example")
+    )
+
+    result = registry.find_identity_match(
+        supplier("lead-2", legal_name="Factory Beta", brand="karat", domain="beta.example")
+    )
+
+    assert result.decision == OutreachDecision.REVIEW_POSSIBLE_COLLISION
+    assert "same_brand" in result.reasons
 
 
 def test_same_city_and_model_requires_human_review_not_auto_hold():
@@ -64,6 +93,31 @@ def test_same_city_and_model_requires_human_review_not_auto_hold():
     )
 
     assert result.decision == OutreachDecision.REVIEW_POSSIBLE_COLLISION
+
+
+def test_same_model_in_different_city_does_not_create_false_collision():
+    registry = SupplierRegistry()
+    registry.add_supplier(
+        supplier(
+            "oem-1",
+            legal_name="Factory Alpha",
+            country="China",
+            city="Wuxi",
+            model_families=("GSY-180",),
+        )
+    )
+
+    result = registry.find_identity_match(
+        supplier(
+            "oem-2",
+            legal_name="Factory Beta",
+            country="China",
+            city="Huludao",
+            model_families=("GSY-180",),
+        )
+    )
+
+    assert result.decision == OutreachDecision.ALLOW
 
 
 def test_different_supplier_is_allowed():

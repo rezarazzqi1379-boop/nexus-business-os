@@ -7,36 +7,56 @@ Status date: 2026-08-21
 - fail-closed same-project/same-entity/same-field supersession rule;
 - explicit maturity stages through MEASURED;
 - shared Hydrotester + Can Forming benchmark observation contract;
-- human-acceptance precision withheld until decisions exist;
-- seed records for known real failure modes;
-- regression coverage for lower-authority overwrite and cross-project contamination;
-- source-separated Can Forming replay contract;
-- real-project Can Forming evidence seed for D73/D99 quotations, buyer scope, stable/max CPM claim and duplicate-follow-up state;
-- regressions that reject full-production-line == machine-only scope equivalence;
-- regressions that preserve 400 CPM as an unverified supplier claim rather than accepted throughput;
-- D73/D99 contextual gaps of 200/250 CPM versus existing 600/650 CPM line ratings without converting those ratings into an invented acceptance requirement;
-- duplicate-follow-up protection when corrective clarification is already recorded as sent.
+- source-separated Can Forming replay for D73/D99;
+- fail-closed P0 measurement layer separating replay-tested, human-reviewed and operationally-measured states;
+- replay snapshot across Hydrotester + Can Forming;
+- regressions preventing replay/CI evidence from being promoted into human, timing or commercial ROI claims.
 
 ## Already present on main before this branch
 - Hydrotester qualification matrix v0.1 from merged PR #22;
 - supplier qualification guardrails for unresolved buyer requirements and unsupported 120 MPa verification claims.
 
-## Current evidence result
-The Can Forming replay now reaches RESEARCHED/TESTABLE maturity. It correctly produces a WAIT/CLARIFY posture rather than a supplier rejection or price comparison:
-1. D73 and D99 Golden Eagle quotations are full-production-line scopes and are not equivalent to the requested necking-only or machine-level full-forming scopes.
-2. Supplier-stated 400 CPM stable / 500 CPM max remains supplier evidence, not FAT-verified throughput.
-3. Existing 600/650 CPM line ratings create a 200/250 CPM context gap versus the stated stable speed, but required continuous throughput remains an unresolved buyer acceptance criterion.
-4. Because corrective clarification was already sent, equivalent duplicate follow-up should remain blocked until revised evidence arrives.
+## Current replay result
+### Hydrotester
+Three known control hazards are exercised by current replay/regression evidence:
+1. cross-project engineering parameter contamination;
+2. unsupported representation of 120 MPa as verified/compliant capability;
+3. premature supplier selection while buyer-side blockers remain unresolved.
+
+The qualification matrix preserves four buyer-side unknown blockers: required pressure envelope, required throughput, sealing/interface geometry, and governing acceptance/FAT protocol. No supplier is selected.
+
+### Can Forming
+Three known control hazards are exercised by current replay/regression evidence:
+1. full-production-line quotation treated as equivalent to requested retrofit/machine-only scope;
+2. supplier-stated CPM treated as verified throughput equivalence;
+3. duplicate corrective follow-up despite an already-sent clarification.
+
+D73/D99 Golden Eagle quotations remain WAITING_FOR_REVISED_EVIDENCE. Their USD 628,200 / USD 636,200 full-line prices are not normalized as comparable machine-only alternatives. Supplier-stated 400 CPM stable / 500 CPM max remains claim evidence. Existing-line 600/650 CPM is context, not silently promoted into an acceptance criterion.
+
+## Measurement snapshot
+At REPLAY_TESTED maturity only:
+- replay hazards tested: 6;
+- replay hazards detected: 6;
+- replay detection rate: 1.0 for this bounded fixture set;
+- operational metrics available: no;
+- commercial ROI available: no.
+
+The 1.0 detection rate is not a production accuracy claim. These six hazards were selected because they are known failure modes. This number must not be reported as general supplier-qualification precision, opportunity precision, or business effectiveness.
 
 ## Not yet proven
-- human review/acceptance of the replay result;
-- measured human correction rate;
-- measured time-to-decision improvement versus an uncontrolled baseline;
+- human review/correction counts for both benchmark cases;
+- measured elapsed time from evidence capture to comparable decision;
+- improvement versus an uncontrolled/historical baseline;
+- real commercial value, margin impact or conversion lift;
 - revised Golden Eagle machine-only quotation/configuration;
-- business outcome impact;
 - production deployment or persistent canonical database.
 
-## Current gate
-GitHub Actions must pass for the current branch head before code-level promotion consideration. After CI, the next evidence gate is human review of the Can Forming replay plus recording actual correction count/time. The benchmark pair must remain unpromoted until Hydrotester and Can Forming both have measured observations.
+## Promotion gate
+Do not promote this P0 contract to canonical core merely because CI is green or the known-hazard replay is 6/6. Promotion requires at minimum:
+1. human review of both project replays;
+2. actual correction counts recorded;
+3. actual elapsed-time measurements recorded;
+4. no authority/contamination regression;
+5. explicit acknowledgement that ROI remains unknown until downstream commercial outcomes exist.
 
 Do not expand infrastructure while these measurement gates remain open.

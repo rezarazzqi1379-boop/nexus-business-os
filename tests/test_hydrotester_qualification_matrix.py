@@ -84,17 +84,21 @@ def test_yaxing_one_pipe_per_minute_is_not_treated_as_high_pressure_verified():
     yaxing = next(item for item in data["candidates"] if item["supplier_id"] == "yaxing-dezhou")
     throughput = yaxing["fields"]["cycle_time_or_throughput"]
     assert throughput["value"] == "1 pc/min"
-    assert throughput["status"] == "supplier_stated_budgetary_matches_approximate_buyer_rate_not_high_pressure_verified"
+    assert throughput["status"] == "supplier_stated_budgetary"
+    assert "not yet verified" in throughput["qualification_note"]
 
 
-def test_gh_quote_is_commercial_evidence_not_technical_qualification():
+def test_gh_quote_is_commercial_evidence_not_technical_readiness():
     data = load(MATRIX_PATH)
     gh = next(item for item in data["candidates"] if item["supplier_id"] == "gh-petro")
-    assert gh["fields"]["od_range"]["value"] == "89-180 mm"
-    assert gh["fields"]["pressure_capability"]["value"] == "maximum 120 MPa"
-    assert gh["fields"]["price"]["value"] == "USD 542800"
-    assert gh["fields"]["incoterm"]["value"] == "FOB Dalian"
-    assert gh["fields"]["lead_time"]["value"] == "120 days"
+    quote = gh["commercial_quote"]
+    assert quote["model"] == "HPG-180"
+    assert quote["applicable_od_mm"] == "89-180"
+    assert quote["nominal_max_pressure_mpa"] == 120
+    assert quote["price_usd"] == 542800
+    assert quote["incoterm"] == "FOB Dalian"
+    assert quote["delivery_days"] == 120
+    assert gh["fields"]["price"]["value"] is None
     assert gh["qualification_state"] == "commercial_quote_received_technical_validation_required"
     assert gh["fields"]["pressure_envelope_vs_geometry"]["status"] == "missing_blocker"
 

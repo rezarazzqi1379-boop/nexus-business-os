@@ -22,11 +22,25 @@ def test_current_matrix_blocks_supplier_selection():
     assert all(result.selection_allowed is False for result in results)
 
 
-def test_marley_has_highest_current_evidence_completeness_without_being_selected():
+def test_marley_has_highest_current_usable_evidence_without_being_selected():
     matrix = load_matrix()
     top = highest_readiness_without_selection(matrix)
     assert top.supplier_id == "marley-wuxi"
+    assert top.readiness_percent == 60
     assert top.selection_allowed is False
+
+
+def test_current_readiness_percentages_are_evidence_conservative():
+    results = by_id(evaluate_matrix(load_matrix()))
+    assert results["marley-wuxi"].readiness_percent == 60
+    assert results["yaxing-dezhou"].readiness_percent == 15
+    assert results["gh-petro"].readiness_percent == 0
+
+
+def test_pending_or_buyer_request_values_do_not_inflate_readiness():
+    results = by_id(evaluate_matrix(load_matrix()))
+    assert results["gh-petro"].readiness_percent == 0
+    assert results["yaxing-dezhou"].readiness_percent < 20
 
 
 def test_marley_power_inconsistency_is_explicit_blocker():

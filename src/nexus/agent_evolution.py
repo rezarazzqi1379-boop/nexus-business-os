@@ -8,7 +8,8 @@ external approval-gated action.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from typing import Iterable, Literal
 
 
@@ -22,6 +23,7 @@ class FailureObservation:
     failure_mode: str
     evidence_refs: tuple[str, ...]
     severity: int = 1
+    observed_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def __post_init__(self) -> None:
         if not self.observation_id or not self.component or not self.failure_mode:
@@ -30,6 +32,8 @@ class FailureObservation:
             raise ValueError("retrievable evidence is required")
         if not isinstance(self.severity, int) or isinstance(self.severity, bool) or not 1 <= self.severity <= 5:
             raise ValueError("severity must be an integer between 1 and 5")
+        if not isinstance(self.observed_at, datetime) or self.observed_at.tzinfo is None or self.observed_at.utcoffset() is None:
+            raise ValueError("observed_at must be a timezone-aware datetime")
 
 
 @dataclass(frozen=True)
@@ -121,13 +125,18 @@ def decide_evolution(proposal: EvolutionProposal, evaluation: EvaluationResult, 
 
 
 def deduplicate_observations(observations: Iterable[FailureObservation]) -> list[FailureObservation]:
-    """Keep the highest-severity version of each semantic component/failure pair."""
+    """Keep the strongest observation; use recency to break equal-severity ties."""
     best: dict[tuple[str, str], FailureObservation] = {}
     for item in observations:
         if not isinstance(item, FailureObservation):
             raise ValueError("observations must contain FailureObservation objects")
         key = (item.component.strip().lower(), item.failure_mode.strip().lower())
         current = best.get(key)
-        if current is None or item.severity > current.severity:
+        if current is None or item.severity > current.severity or (
+            item.severity == current.severity and item.observed_at > current.observed_at
+        ):
             best[key] = item
-    return sorted(best.values(), key=lambda item: (-item.severity, item.component, item.failure_mode))
+    return sorted(
+        best.values(),
+        key=lambda item: (-item.severity, -item.observed_at.timestamp(), item.component, item.failure_mode),
+    )

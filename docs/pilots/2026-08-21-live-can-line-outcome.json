@@ -1,0 +1,53 @@
+{
+  "pilot_id": "live-can-line-research-2026-08-21",
+  "mode": "read_research_only",
+  "status": "succeeded",
+  "goal_ref": "commercial:can-body-line",
+  "source_signal": {
+    "type": "gmail_supplier_reply",
+    "subject": "Re: RFQ – Can Body Necking / Flanging / Beading Machine – Ø73 mm and Ø99 mm",
+    "supplier": "Zhejiang Golden Eagle Food Machinery Co., Ltd."
+  },
+  "findings": [
+    {
+      "kind": "cross_source_spec_mismatch",
+      "subject": "GT10C-500",
+      "quote_values": {
+        "diameter_mm": "52-153",
+        "power_kw": 35,
+        "weight_kg": 4000,
+        "welding_speed_m_per_min": "50-70"
+      },
+      "official_current_values": {
+        "diameter_mm": "52-180",
+        "power_kw": 50,
+        "weight_kg": 5000,
+        "welding_speed_m_per_min": "25-70"
+      },
+      "classification": "requires_supplier_verification"
+    },
+    {
+      "kind": "commercial_architecture_difference",
+      "d73_total_usd": 628200,
+      "d99_total_usd": 636200,
+      "difference_usd": 8000,
+      "d73_forming_usd": 122000,
+      "d99_forming_usd": 130000,
+      "classification": "decision_relevant"
+    }
+  ],
+  "next_work": [
+    "verify_gt10c500_revision_and_specs",
+    "verify_guaranteed_stable_line_output",
+    "identify_400cpm_bottleneck_machine",
+    "verify_d73_vs_d99_forming_architecture",
+    "reconcile_machine_level_utilities",
+    "confirm_material_thickness_and_blank_dimensions",
+    "normalize_scope_fat_sat_spares_commissioning"
+  ],
+  "human_gates": [
+    "supplier_outreach",
+    "contract_or_po",
+    "payment"
+  ]
+}

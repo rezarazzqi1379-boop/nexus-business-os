@@ -19,4 +19,6 @@ Core properties:
 - schedule evaluation is timezone-aware, deterministic, and cannot execute or authorize work
 - action budgets and stop-on-failure prevent unbounded cascading execution
 
-This is not yet a production daemon. Real source executors, event/scheduler hosting, Outcome Ledger integration, operational telemetry, and measured pilots remain separate layers and must preserve the same authorization boundary.
+## Execution boundary
+
+The current code provides a deterministic planning/execution/state/scheduling contract. It is not yet a production daemon and does not claim continuous operation by itself. Real source executors, hosted scheduling/event triggers, Outcome Ledger integration, operational telemetry, and measured pilots remain separate layers and must preserve the same authorization boundary.

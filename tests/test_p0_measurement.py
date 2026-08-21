@@ -10,7 +10,7 @@ def _hydro(**overrides):
         hazards_tested=3,
         hazards_detected=3,
         unsafe_equivalence_or_selection_blocked=2,
-        unresolved_blockers=4,
+        unresolved_blockers=3,
     )
     values.update(overrides)
     return ProjectMeasurement(**values)

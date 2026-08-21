@@ -23,6 +23,10 @@ def _norm_domain(value: str) -> str:
     return host.removeprefix("www.")
 
 
+def _norm_email(value: str) -> str:
+    return value.casefold().strip()
+
+
 @dataclass(frozen=True)
 class SupplierIdentity:
     supplier_id: str
@@ -68,6 +72,10 @@ class SupplierRegistry:
     def add_channel(self, channel: SupplierChannel) -> None:
         if channel.supplier_id not in self.suppliers:
             raise ValueError("channel must reference an existing supplier")
+        if not channel.channel_id.strip() or not channel.organization.strip():
+            raise ValueError("channel_id and organization are required")
+        if any(c.channel_id == channel.channel_id for c in self.channels):
+            raise ValueError(f"channel_id already exists: {channel.channel_id}")
         self.channels.append(channel)
 
     def find_identity_match(self, candidate: SupplierIdentity) -> CollisionResult:
@@ -125,6 +133,55 @@ class SupplierRegistry:
                 )
 
         return CollisionResult(OutreachDecision.ALLOW)
+
+    def assess_channel_collision(self, candidate: SupplierChannel) -> CollisionResult:
+        """Assess a proposed outreach route to a supplier already in the registry.
+
+        Exact route reuse is treated as a duplicate. A second distinct intermediary
+        for the same OEM is review-only: field evidence suggests parallel approaches
+        can create supplier confusion, but that is not strong enough to auto-block.
+        """
+        if candidate.supplier_id not in self.suppliers:
+            raise ValueError("channel must reference an existing supplier")
+
+        existing_channels = self.channels_for_supplier(candidate.supplier_id)
+        candidate_org = _norm(candidate.organization)
+        candidate_email = _norm_email(candidate.email)
+
+        for existing in existing_channels:
+            same_org = candidate_org and candidate_org == _norm(existing.organization)
+            same_email = (
+                candidate_email
+                and _norm_email(existing.email)
+                and candidate_email == _norm_email(existing.email)
+            )
+            if same_org or same_email:
+                reasons = []
+                if same_org:
+                    reasons.append("same_channel_organization")
+                if same_email:
+                    reasons.append("same_channel_email")
+                return CollisionResult(
+                    OutreachDecision.HOLD_DUPLICATE_SOURCE,
+                    candidate.supplier_id,
+                    tuple(reasons),
+                )
+
+        intermediary_types = {"agent", "referrer", "distributor", "marketplace"}
+        candidate_type = _norm(candidate.channel_type)
+        existing_intermediaries = [
+            channel
+            for channel in existing_channels
+            if _norm(channel.channel_type) in intermediary_types
+        ]
+        if candidate_type in intermediary_types and existing_intermediaries:
+            return CollisionResult(
+                OutreachDecision.REVIEW_POSSIBLE_COLLISION,
+                candidate.supplier_id,
+                ("parallel_intermediary_channels",),
+            )
+
+        return CollisionResult(OutreachDecision.ALLOW, candidate.supplier_id)
 
     def channels_for_supplier(self, supplier_id: str) -> tuple[SupplierChannel, ...]:
         return tuple(c for c in self.channels if c.supplier_id == supplier_id)

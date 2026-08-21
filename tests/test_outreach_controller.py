@@ -48,7 +48,7 @@ def test_preview_requires_human_gate_for_external_send() -> None:
     assert release.approved_message_ids == ()
 
 
-def test_exact_one_click_approval_releases_only_reviewed_batch() -> None:
+def test_exact_one_click_approval_releases_only_reviewed_initial_batch() -> None:
     batch = _batch()
     approval = ActionApproval(action_id=outreach_action_id(batch), approved=True)
     release = authorize_outreach_release(
@@ -60,7 +60,7 @@ def test_exact_one_click_approval_releases_only_reviewed_batch() -> None:
     assert release.approved_message_ids == ("t1:initial",)
 
 
-def test_one_click_can_release_finite_pre_reviewed_sequence() -> None:
+def test_batch_approval_does_not_preapprove_finite_followup_sequence() -> None:
     batch = replace(
         _batch(),
         followups=(
@@ -75,10 +75,10 @@ def test_one_click_can_release_finite_pre_reviewed_sequence() -> None:
         now=datetime(2026, 8, 19, 20, 30, tzinfo=timezone.utc),
     )
     assert release.gate.allowed_now
-    assert release.approved_message_ids == ("t1:initial", "t1:followup:1", "t1:followup:2")
+    assert release.approved_message_ids == ("t1:initial",)
 
 
-def test_followup_mutation_invalidates_previous_approval() -> None:
+def test_followup_mutation_invalidates_previous_batch_approval() -> None:
     batch = replace(
         _batch(),
         followups=(PreparedFollowUp("t1", 1, 72, "Re: OCTG equipment sourcing", "Original follow-up"),),

@@ -22,3 +22,11 @@ Core properties:
 ## Execution boundary
 
 The current code provides a deterministic planning/execution/state/scheduling contract. It is not yet a production daemon and does not claim continuous operation by itself. Real source executors, hosted scheduling/event triggers, Outcome Ledger integration, operational telemetry, and measured pilots remain separate layers and must preserve the same authorization boundary.
+
+## Next execution milestones
+
+1. Add read-only real-source executors for research and monitored sources.
+2. Add an Outcome Ledger adapter that links task goals, run evidence, success/failure signals and later re-evaluation.
+3. Add hosted scheduler/event-trigger integration without moving authorization into the scheduler.
+4. Add opportunity/customer discovery as research-only WorkItems; outreach remains independently gated.
+5. Run measured pilots, capture false-positive/duplicate/retry rates, and tighten policy from evidence.

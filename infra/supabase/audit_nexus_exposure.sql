@@ -29,6 +29,18 @@ select schema_name,
 from nexus_tables
 order by table_name;
 
+-- Current public sequences matching the NEXUS namespace.
+select sequence_schema,
+       sequence_name,
+       has_sequence_privilege('anon', format('%I.%I', sequence_schema, sequence_name), 'USAGE') as anon_usage,
+       has_sequence_privilege('anon', format('%I.%I', sequence_schema, sequence_name), 'SELECT') as anon_select,
+       has_sequence_privilege('authenticated', format('%I.%I', sequence_schema, sequence_name), 'USAGE') as authenticated_usage,
+       has_sequence_privilege('authenticated', format('%I.%I', sequence_schema, sequence_name), 'SELECT') as authenticated_select
+from information_schema.sequences
+where sequence_schema = 'public'
+  and sequence_name like 'nexus_%'
+order by sequence_name;
+
 -- Public-schema functions/RPCs and EXECUTE exposure.
 select n.nspname as schema_name,
        p.proname as function_name,
@@ -52,3 +64,15 @@ join pg_roles r on r.oid = d.defaclrole
 left join pg_namespace n on n.oid = d.defaclnamespace
 where n.nspname = 'public'
 order by owner_role, defaclobjtype;
+
+-- Raw ACL snapshot for rollback planning. Save this output before any mutation.
+select n.nspname as schema_name,
+       c.relname as object_name,
+       c.relkind,
+       pg_get_userbyid(c.relowner) as owner_role,
+       c.relacl
+from pg_class c
+join pg_namespace n on n.oid = c.relnamespace
+where n.nspname = 'public'
+  and c.relname like 'nexus_%'
+order by c.relkind, c.relname;

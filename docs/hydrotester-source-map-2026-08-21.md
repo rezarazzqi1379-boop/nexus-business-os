@@ -21,12 +21,12 @@ Before any new outreach:
 
 | Channel | Role | Underlying OEM / factory | Evidence currently known | Collision status | Next action |
 |---|---|---|---|---|---|
-| Wuxi Marley Technology / Eli | Direct-looking manufacturer/seller channel | WUXI MARLEY TECHNOLOGY CO., LTD (as stated in technical solution) | 11-page technical solution; OD 89–180; 6–12 m; 5–12 mm; 0–120 MPa; 5–30 s adjustable; EXW USD 238,461.55; 90-day manufacture; 2-year warranty | No proven collision yet | Technical clarification: throughput/cycle, 260 kVA vs 30 kW, pressure envelope vs pipe ID/OD, axial restraint basis, references/FAT |
-| Yaxing/Karat / Alisa (yxgd.com.cn) | Direct manufacturer/seller channel claimed through catalogue/site | Yaxing/Karat identity needs legal-name confirmation | Budgetary price CNY 3,400,000 FOB Tianjin; stated efficiency 1 pc/min; customized machine | No proven collision yet | Obtain legal manufacturer name, factory address, guaranteed pressure envelope, 6–12 m confirmation, axial force, lead time, payment, Iran support |
-| Yedi Mavi / Ali Mahdian | Sourcing agent | Turkish specialist/OEM identity not disclosed | Reports no Turkish manufacturer capable of complete 120 MPa pipe hydrotester; says Turkish practical complete-machine ceiling around 500 bar; reports another party contacted same specialist | POSSIBLE CHANNEL COLLISION | Do not broaden outreach yet. Ask for identity of contacted specialist/OEMs before authorizing further sourcing; compare identities to registry |
+| Wuxi Marley Technology / Eli | Direct manufacturer/seller channel | Wuxi Marley Machinery Technology Co., Ltd., Wuxi, Jiangsu | Received 11-page technical solution: OD 89–180; 6–12 m; 5–12 mm; 0–120 MPa; 5–30 s adjustable; EXW USD 238,461.55; 90-day manufacture; 2-year warranty. Official Marley machinery site independently lists the same Eli email/phone, Wuxi address and hydro-testing-machine product category, and states the company integrates R&D, production and sales. | IDENTITY VERIFIED; no proven collision | Technical clarification only: throughput/cycle, 260 kVA vs 30 kW, pressure envelope vs pipe ID/OD, axial restraint basis, references/FAT |
+| Yaxing / Alisa (yxgd.com.cn; yaxingmachines.com) | Direct manufacturer/seller channel | Dezhou Yaxing Steel Tube Equipment Factory, Dezhou, Shandong | Alisa quoted CNY 3,400,000 FOB Tianjin and 1 pc/min. Official Yaxing site uses Alisa's yxgd.com.cn email and Dezhou factory address, describes Yaxing as a hydrotester manufacturer with its own R&D team, states up to 150 MPa and about 50–60 s/cycle for customized hydrotesters. A third-party supplier profile also names Dezhou Yaxing Steel Tube Equipment Factory as manufacturer established in 1996. | IDENTITY VERIFIED; no proven collision | Request project-specific guarantee: 120 MPa envelope for OD/ID/wall, 6–12 m range, axial-force/end-restraint capacity, exact cycle at our parameters, lead time, payment, FAT, Iran support |
+| Yedi Mavi / Ali Mahdian | Sourcing agent | Turkish specialist/OEM identity not disclosed | Reports no Turkish manufacturer capable of complete 120 MPa pipe hydrotester; says Turkish practical complete-machine ceiling around 500 bar; reports another party contacted same specialist | POSSIBLE CHANNEL COLLISION | Do not broaden outreach yet. Require identity of contacted specialist/OEMs before authorization; compare against registry |
 | ANZ Global | Sourcing/integration channel | Not yet disclosed | Evaluating prospective OEMs; requested confirmed technical inputs | UNRESOLVED | Require OEM/manufacturer disclosure before further parallel RFQ distribution |
 | SinoQAT | Sourcing/QC channel | Not yet disclosed | States it has a channel to handle Iran; commercial model benefits from closed order | UNRESOLVED | Require proposed OEM identity before supplier contact; run dedup check first |
-| GH Petro | Supplier/integration channel | Not yet resolved in this snapshot | Existing hydrotester correspondence | UNRESOLVED | Resolve legal OEM/factory and domain before next outreach |
+| GH Petro | Direct manufacturer / turnkey OCTG-equipment channel | GH-Petro (official site states founded 2004; China) | Official site describes GH-Petro as a steel pipe/tube mill manufacturer and explicitly lists hydro-testers within full OCTG production-line supply. Product pages show multiple hydrotester configurations, including 60–168 mm / 70 MPa, 60–219 mm / 80 MPa, 114–219 mm / 80 MPa and other customized configurations. | MANUFACTURER STATUS VERIFIED; 120 MPa capability for our exact range NOT VERIFIED | Treat as direct OEM candidate. Request exact 89–180 mm / 6–12 m / 5–12 mm / 120 MPa capability envelope and commercial proposal; do not treat generic 70–80 MPa catalogue models as proof of 120 MPa |
 
 ## Evidence classification
 
@@ -37,11 +37,18 @@ Before any new outreach:
 - Alisa/Yaxing stated a budgetary price around CNY 3,400,000 FOB Tianjin and test efficiency of 1 pc/min.
 - Yedi Mavi reported that another party had already contacted the same Turkish specialist about the same requirement.
 
-### Claims requiring independent verification
+### Facts independently verified from public manufacturer sources
+
+- Marley maintains hydro-testing-machine product pages and lists the same Eli contact details and Wuxi address as the received quotation channel.
+- Yaxing publicly identifies itself as a hydrotester manufacturer in Dezhou, uses Alisa's yxgd.com.cn email, and states customized hydrotester capability up to 150 MPa with about 50–60 seconds per cycle as a general product claim.
+- GH-Petro publicly identifies itself as a steel pipe/OCTG equipment manufacturer and lists hydrotesters among its manufactured line equipment; public product pages show several 70–80 MPa catalogue configurations.
+
+### Claims requiring independent/project-specific verification
 
 - Yedi Mavi's statement that no Turkish manufacturer can build a complete 120 MPa pipe hydrotester and that the practical Turkish ceiling is around 500 bar.
 - Any supplier claim of continuous 120 MPa capability across the entire OD range without a pressure/ID/axial-force envelope.
-- Manufacturer status of any channel until legal entity/factory evidence is confirmed.
+- Yaxing's general public statement of maximum 150 MPa does not prove 120 MPa at every pipe size in our project.
+- GH-Petro manufacturer status is verified, but 120 MPa capability for the required 89–180 mm range is not yet verified.
 
 ### Unknowns blocking clean comparison
 
@@ -49,10 +56,14 @@ Before any new outreach:
 - Required production throughput/cycle time. The earlier 40–60 pipes/min figure is not accepted as a hydrotester requirement until engineering reconfirms it.
 - Pipe-end geometry and sealing interface.
 - Required governing standard/API acceptance criteria and pressure-recording/FAT protocol.
-- Underlying OEM identities for intermediary channels.
+- Underlying OEM identities for intermediary channels (Yedi Mavi, ANZ Global, SinoQAT).
 
 ## Procurement gate
 
 No new intermediary may distribute this RFQ to an undisclosed supplier without first returning at least the proposed OEM legal name and domain/factory identity for collision checking.
 
 This gate does not block direct technical clarification with already identified candidate manufacturers.
+
+## Next verification target
+
+Resolve the remaining intermediary-backed OEM identities before any new broad RFQ distribution. Direct technical clarification may continue with Marley, Yaxing and GH-Petro because their manufacturer status is now independently supported; project-specific pressure capability remains separately gated.

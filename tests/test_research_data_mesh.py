@@ -50,6 +50,24 @@ def test_fuses_duplicate_claims_with_corroboration_without_hiding_raw_evidence()
     assert fused[0].contradiction is False
 
 
+def test_correlated_aliases_do_not_create_false_corroboration_bonus():
+    hits = [
+        ResearchHit("q1", "vendor-site", "claim", "Pressure", "120 MPa", "strong", 90, independence_key="vendor-a"),
+        ResearchHit("q1", "vendor-marketplace", "claim", "Pressure", "120 MPa repost", "partial", 80, independence_key="vendor-a"),
+    ]
+    result = benchmark_retrieval(hits)
+    assert result.source_count == 1
+    assert result.single_source_score == 90
+    assert result.multi_source_score == 90
+    assert result.improved is False
+
+
+def test_invalid_independence_key_fails_closed():
+    bad = ResearchHit("q1", "a", "claim", "Claim", "x", "strong", 90, independence_key=" ")
+    with pytest.raises(ValueError, match="invalid_independence_key"):
+        fuse_hits([bad])
+
+
 def test_contradiction_is_preserved_and_penalized_not_silently_merged():
     hits = [
         ResearchHit("q1", "official", "claim", "Capacity", "capacity approved", "strong", 90, "support"),

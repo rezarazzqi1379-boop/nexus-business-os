@@ -34,15 +34,6 @@ class SupplierIdentity:
     factory_name: str = ""
     model_families: tuple[str, ...] = ()
 
-    def fingerprint_tokens(self) -> set[str]:
-        tokens = {
-            _norm(self.legal_name),
-            _norm(self.brand),
-            _norm(self.factory_name),
-            _norm_domain(self.domain),
-        }
-        return {token for token in tokens if token}
-
 
 @dataclass(frozen=True)
 class SupplierChannel:
@@ -81,7 +72,9 @@ class SupplierRegistry:
 
     def find_identity_match(self, candidate: SupplierIdentity) -> CollisionResult:
         candidate_domain = _norm_domain(candidate.domain)
-        candidate_names = candidate.fingerprint_tokens()
+        candidate_legal = _norm(candidate.legal_name)
+        candidate_factory = _norm(candidate.factory_name)
+        candidate_brand = _norm(candidate.brand)
 
         for existing in self.suppliers.values():
             existing_domain = _norm_domain(existing.domain)
@@ -92,12 +85,25 @@ class SupplierRegistry:
                     ("same_domain",),
                 )
 
-            overlap = candidate_names & existing.fingerprint_tokens()
-            if overlap:
+            if candidate_legal and candidate_legal == _norm(existing.legal_name):
                 return CollisionResult(
                     OutreachDecision.HOLD_DUPLICATE_SOURCE,
                     existing.supplier_id,
-                    ("identity_token_match",),
+                    ("same_legal_name",),
+                )
+
+            if candidate_factory and candidate_factory == _norm(existing.factory_name):
+                return CollisionResult(
+                    OutreachDecision.HOLD_DUPLICATE_SOURCE,
+                    existing.supplier_id,
+                    ("same_factory_name",),
+                )
+
+            if candidate_brand and candidate_brand == _norm(existing.brand):
+                return CollisionResult(
+                    OutreachDecision.REVIEW_POSSIBLE_COLLISION,
+                    existing.supplier_id,
+                    ("same_brand",),
                 )
 
             same_location = (

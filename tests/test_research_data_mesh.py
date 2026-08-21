@@ -5,7 +5,9 @@ from nexus_core.research_data_mesh import (
     ResearchQuery,
     ResearchSource,
     ResearchOutcome,
+    RetrievalAttempt,
     benchmark_retrieval,
+    condition_sources_on_connector_health,
     fuse_hits,
     plan_sources,
     schedule_retrieval,
@@ -66,6 +68,42 @@ def test_invalid_independence_key_fails_closed():
     bad = ResearchHit("q1", "a", "claim", "Claim", "x", "strong", 90, independence_key=" ")
     with pytest.raises(ValueError, match="invalid_independence_key"):
         fuse_hits([bad])
+
+
+def test_connector_failures_are_excluded_and_degraded_results_are_capped():
+    sources = [
+        ResearchSource("ok", "official", "ok.example", "2026-08-21T00:00:00+00:00", "ref:ok", 10, 95),
+        ResearchSource("partial", "web", "partial.example", "2026-08-21T00:00:00+00:00", "ref:partial", 10, 95),
+        ResearchSource("stale", "crm", "stale.example", "2026-08-20T00:00:00+00:00", "ref:stale", 10, 95),
+        ResearchSource("down", "email", "down.example", "2026-08-21T00:00:00+00:00", "ref:down", 10, 95),
+    ]
+    attempts = [
+        RetrievalAttempt("ok", "success", 25, 3),
+        RetrievalAttempt("partial", "partial", 400, 1),
+        RetrievalAttempt("stale", "stale", 100, 2),
+        RetrievalAttempt("down", "timeout", 2000, 0, "timeout"),
+    ]
+    conditioned = condition_sources_on_connector_health(sources, attempts)
+    by_id = {source.source_id: source for source in conditioned.usable_sources}
+    assert set(by_id) == {"ok", "partial", "stale"}
+    assert by_id["ok"].confidence == 95
+    assert by_id["partial"].confidence == 70
+    assert by_id["stale"].confidence == 50
+    assert conditioned.excluded_sources == ("down",)
+    assert conditioned.degraded_sources == ("partial", "stale")
+
+
+def test_connector_health_missing_attempt_fails_closed():
+    source = ResearchSource("a", "official", "a.example", "2026-08-21T00:00:00+00:00", "ref:a", 10, 90)
+    with pytest.raises(ValueError, match="missing_retrieval_attempt"):
+        condition_sources_on_connector_health([source], [])
+
+
+def test_failed_attempt_cannot_claim_evidence():
+    source = ResearchSource("a", "official", "a.example", "2026-08-21T00:00:00+00:00", "ref:a", 10, 90)
+    bad = RetrievalAttempt("a", "timeout", 1000, 1, "timeout")
+    with pytest.raises(ValueError, match="failed_attempt_cannot_claim_evidence"):
+        condition_sources_on_connector_health([source], [bad])
 
 
 def test_contradiction_is_preserved_and_penalized_not_silently_merged():

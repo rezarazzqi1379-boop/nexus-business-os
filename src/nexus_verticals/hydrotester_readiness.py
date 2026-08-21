@@ -11,7 +11,7 @@ BLOCKING_FIELD_STATUSES = {
     "supplier_stated_not_fat_verified",
 }
 
-POSITIVE_FIELD_STATUSES = {
+USABLE_FIELD_STATUSES = {
     "supplier_stated_match",
     "supplier_stated",
     "quoted",
@@ -61,7 +61,7 @@ def evaluate_candidate(candidate: dict[str, Any], buyer_baseline: dict[str, Any]
             blocking.append(name)
         if value is None or status.startswith("missing") or status.endswith("_missing") or status == "pending":
             missing.append(name)
-        if value is not None and status not in BLOCKING_FIELD_STATUSES and "inconsistency" not in status:
+        if value is not None and status in USABLE_FIELD_STATUSES:
             usable += 1
 
     readiness = round((usable / total) * 100)

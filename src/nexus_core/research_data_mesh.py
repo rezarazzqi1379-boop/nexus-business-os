@@ -141,8 +141,16 @@ def validate_source(source: object) -> None:
         raise ValueError("invalid_confidence")
 
 
+def _source_rank_key(source: ResearchSource) -> tuple[float, float, int, str]:
+    """Rank confidence first, then prefer fresher evidence before latency."""
+    retrieved_at = _aware_iso(source.retrieved_at)
+    if retrieved_at is None:
+        raise ValueError("invalid_retrieved_at")
+    return (-source.confidence, -retrieved_at.timestamp(), source.latency_ms, source.source_id)
+
+
 def plan_sources(query: ResearchQuery, sources: Iterable[ResearchSource]) -> ResearchPlan:
-    """Select a bounded, confidence-led but source-diverse retrieval set."""
+    """Select a bounded, confidence-led, freshness-aware and source-diverse retrieval set."""
     validate_query(query)
     try:
         pool = tuple(sources)
@@ -155,7 +163,7 @@ def plan_sources(query: ResearchQuery, sources: Iterable[ResearchSource]) -> Res
             raise ValueError("duplicate_source")
         seen.add(source.source_id)
 
-    ranked = sorted(pool, key=lambda s: (-s.confidence, s.latency_ms, s.source_id))
+    ranked = sorted(pool, key=_source_rank_key)
     selected: list[ResearchSource] = []
     used_kinds: set[str] = set()
     used_domains: set[str] = set()

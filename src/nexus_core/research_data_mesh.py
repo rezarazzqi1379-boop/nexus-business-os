@@ -43,6 +43,7 @@ class ResearchHit:
     evidence_tier: EvidenceTier
     relevance: int
     stance: ClaimStance = "support"
+    independence_key: str | None = None
 
 
 @dataclass(frozen=True)
@@ -168,7 +169,6 @@ def plan_sources(query: ResearchQuery, sources: Iterable[ResearchSource]) -> Res
     used_kinds: set[str] = set()
     used_domains: set[str] = set()
 
-    # First pass favors different source classes and publishers.
     for source in ranked:
         if len(selected) >= query.max_sources:
             break
@@ -179,7 +179,6 @@ def plan_sources(query: ResearchQuery, sources: Iterable[ResearchSource]) -> Res
         used_kinds.add(source.kind)
         used_domains.add(domain_key)
 
-    # Second pass favors additional publishers even when source classes repeat.
     if len(selected) < query.max_sources:
         selected_ids = {item.source_id for item in selected}
         for source in ranked:
@@ -192,7 +191,6 @@ def plan_sources(query: ResearchQuery, sources: Iterable[ResearchSource]) -> Res
             selected_ids.add(source.source_id)
             used_domains.add(domain_key)
 
-    # Final pass fills the bounded budget; correlated sources remain explicit.
     if len(selected) < query.max_sources:
         selected_ids = {item.source_id for item in selected}
         for source in ranked:
@@ -213,6 +211,8 @@ def _validate_hit(hit: object) -> ResearchHit:
         raise ValueError("invalid_hit")
     if not all(_bounded_text(value) for value in (hit.query_id, hit.source_id, hit.canonical_key, hit.title, hit.raw_observation)):
         raise ValueError("invalid_hit_text")
+    if hit.independence_key is not None and not _bounded_text(hit.independence_key):
+        raise ValueError("invalid_independence_key")
     if hit.evidence_tier not in _TIER_WEIGHT:
         raise ValueError("invalid_evidence_tier")
     if not _valid_score(hit.relevance):
@@ -222,8 +222,12 @@ def _validate_hit(hit: object) -> ResearchHit:
     return hit
 
 
+def _independence_key(hit: ResearchHit) -> str:
+    return hit.independence_key or hit.source_id
+
+
 def fuse_hits(hits: Iterable[ResearchHit]) -> tuple[FusedFinding, ...]:
-    """Fuse evidence without collapsing contradictions into false consensus."""
+    """Fuse evidence without collapsing contradictions or correlated evidence into false consensus."""
     try:
         items = tuple(hits)
     except TypeError as exc:
@@ -244,13 +248,10 @@ def fuse_hits(hits: Iterable[ResearchHit]) -> tuple[FusedFinding, ...]:
         uncertain = sorted({item.source_id for item in group if item.stance == "uncertain"})
         contradiction = bool(supporting and refuting)
 
-        ranked = sorted(
-            group,
-            key=lambda h: (-_TIER_WEIGHT[h.evidence_tier], -h.relevance, h.source_id),
-        )
+        ranked = sorted(group, key=lambda h: (-_TIER_WEIGHT[h.evidence_tier], -h.relevance, h.source_id))
         best = ranked[0]
-        unique_sources = {item.source_id for item in group}
-        corroboration_bonus = min(20, max(0, len(unique_sources) - 1) * 5)
+        independent_origins = {_independence_key(item) for item in group}
+        corroboration_bonus = min(20, max(0, len(independent_origins) - 1) * 5)
         contradiction_penalty = 20 if contradiction else 0
         uncertainty_penalty = min(10, len(uncertain) * 3)
         score = max(0, min(100, best.relevance + corroboration_bonus - contradiction_penalty - uncertainty_penalty))
@@ -291,7 +292,7 @@ def benchmark_retrieval(hits: Iterable[ResearchHit]) -> RetrievalBenchmark:
     return RetrievalBenchmark(
         single_source_score=single.relevance,
         multi_source_score=fused.score,
-        source_count=len({item.source_id for item in validated}),
+        source_count=len({_independence_key(item) for item in validated}),
         contradiction_detected=fused.contradiction,
         improved=fused.score > single.relevance and not fused.contradiction,
     )
@@ -309,10 +310,7 @@ def schedule_retrieval(plan: ResearchPlan, *, max_parallel: int = 4) -> Retrieva
         raise ValueError("invalid_selected_sources")
     if not isinstance(max_parallel, int) or isinstance(max_parallel, bool) or not 1 <= max_parallel <= 6:
         raise ValueError("invalid_max_parallel")
-    waves = tuple(
-        tuple(plan.selected_sources[index:index + max_parallel])
-        for index in range(0, len(plan.selected_sources), max_parallel)
-    )
+    waves = tuple(tuple(plan.selected_sources[index:index + max_parallel]) for index in range(0, len(plan.selected_sources), max_parallel))
     return RetrievalSchedule(plan.query_id, waves, max_parallel)
 
 

@@ -25,6 +25,17 @@ def test_plans_bounded_diverse_high_confidence_sources():
     assert plan.rejected_sources == ("official-b",)
 
 
+def test_equal_confidence_prefers_fresher_evidence_before_latency():
+    query = ResearchQuery("q1", "latest supplier state", "commercial-intelligence", max_sources=1)
+    sources = [
+        ResearchSource("stale-fast", "official", "old.example", "2026-08-19T00:00:00+00:00", "ref:old", 10, 90),
+        ResearchSource("fresh-slow", "official", "new.example", "2026-08-21T00:00:00+00:00", "ref:new", 1000, 90),
+    ]
+    plan = plan_sources(query, sources)
+    assert plan.selected_sources == ("fresh-slow",)
+    assert plan.rejected_sources == ("stale-fast",)
+
+
 def test_fuses_duplicate_claims_with_corroboration_without_hiding_raw_evidence():
     hits = [
         ResearchHit("q1", "official", "uss-qandt-2026", "U.S. Steel Q&T", "$475m Q&T line approved", "strong", 92),

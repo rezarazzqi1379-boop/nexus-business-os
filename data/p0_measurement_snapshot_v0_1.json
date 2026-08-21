@@ -15,7 +15,12 @@
       "premature supplier selection while buyer blockers remain unresolved"
     ],
     "unsafe_equivalence_or_selection_blocked": 2,
-    "buyer_unknown_blockers_preserved": 4,
+    "buyer_unknown_blockers_preserved": 3,
+    "buyer_engineering_updates_applied": [
+      "approximately 60 pipes/hour throughput",
+      "pressure varies by pipe size/configuration under API 5CT",
+      "up to 120 MPa is an upper required capability for relevant duty points rather than a blanket all-size requirement"
+    ],
     "selected_supplier": null,
     "human_corrections": null,
     "elapsed_minutes_to_decision": null,

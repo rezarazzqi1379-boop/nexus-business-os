@@ -110,6 +110,15 @@
       "underlying_supplier_id": null,
       "status": "hold_until_oem_identity_disclosed",
       "evidence_ref": "1a01ffb633f08224"
+    },
+    {
+      "channel_id": "suppliertr-yakup",
+      "organization": "SupplierTR / AKPAYA Teknoloji Ltd.",
+      "channel_type": "turnkey_supplier_manager",
+      "underlying_supplier_id": null,
+      "status": "hold_until_oem_identity_disclosed",
+      "evidence_ref": "1a01e12668971ef3",
+      "notes": "Evaluating standard configuration up to 500 bar and a special-engineered route up to 1200 bar, but underlying Turkish manufacturer identity has not been disclosed."
     }
   ]
 }

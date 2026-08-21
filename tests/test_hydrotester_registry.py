@@ -96,7 +96,8 @@ def test_all_direct_channels_reference_known_supplier():
 def test_unresolved_intermediaries_cannot_be_counted_as_unique_oems():
     data = load_data()
     registry = build_registry(data)
-    assert len(data["unresolved_channels"]) == 3
+    unresolved_ids = {item["channel_id"] for item in data["unresolved_channels"]}
+    assert {"yedi-mavi-ali", "anz-global", "sinoqat", "suppliertr-yakup"} <= unresolved_ids
     assert all(item["underlying_supplier_id"] is None for item in data["unresolved_channels"])
     assert registry.unique_oem_count() == 3
 

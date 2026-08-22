@@ -45,13 +45,15 @@ def evaluate_candidate(candidate: dict[str, Any], buyer_baseline: dict[str, Any]
         raise ValueError("candidate must contain qualification fields")
 
     buyer_blockers = tuple(
-        key for key, value in buyer_baseline.items()
+        key
+        for key, value in buyer_baseline.items()
         if isinstance(value, dict) and value.get("blocking") is True
     )
 
-    blocking = []
-    missing = []
-    inconsistent = []
+    blocking: list[str] = []
+    missing: list[str] = []
+    inconsistent: list[str] = []
+    unresolved: list[str] = []
     usable = 0
 
     for name, field in fields.items():
@@ -64,19 +66,34 @@ def evaluate_candidate(candidate: dict[str, Any], buyer_baseline: dict[str, Any]
             blocking.append(name)
         if value is None or status.startswith("missing") or status.endswith("_missing") or status == "pending":
             missing.append(name)
+
         if value is not None and status in USABLE_FIELD_STATUSES:
             usable += 1
+        else:
+            # Final supplier selection must fail closed on every qualification
+            # field that is absent, stale, provisional, unrecognized, or not in
+            # the explicit usable-evidence allowlist. Readiness may still be
+            # reported, but incomplete evidence can never silently authorize
+            # selection.
+            unresolved.append(name)
 
     readiness = round((usable / total) * 100)
-    selection_allowed = not buyer_blockers and not blocking and not inconsistent
+    selection_allowed = (
+        not buyer_blockers
+        and not blocking
+        and not inconsistent
+        and not unresolved
+    )
 
-    rationale = []
+    rationale: list[str] = []
     if buyer_blockers:
         rationale.append("buyer_baseline_has_unresolved_blockers")
     if blocking:
         rationale.append("candidate_has_blocking_technical_gaps")
     if inconsistent:
         rationale.append("candidate_has_internal_document_inconsistencies")
+    if unresolved:
+        rationale.append("candidate_has_unresolved_qualification_fields")
     if not rationale:
         rationale.append("no_current_selection_blocker_detected")
 

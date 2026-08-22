@@ -1,3 +1,4 @@
+import copy
 import json
 from pathlib import Path
 
@@ -76,6 +77,41 @@ def test_gh_price_is_non_final_and_does_not_create_technical_readiness():
     assert gh["fields"]["price"]["status"] == "quoted_non_final_subject_to_final_specification"
     result = by_id(evaluate_matrix(matrix))["gh-petro"]
     assert result.selection_allowed is False
+
+
+def test_unrecognized_status_fails_closed_even_when_buyer_blockers_are_cleared():
+    matrix = copy.deepcopy(load_matrix())
+    for value in matrix["buyer_baseline"].values():
+        if isinstance(value, dict):
+            value["blocking"] = False
+
+    candidate = matrix["candidates"][0]
+    for field in candidate["fields"].values():
+        field["value"] = field.get("value") or "provided"
+        field["status"] = "supplier_stated"
+    candidate["fields"]["automation"]["status"] = "mystery_status"
+
+    result = by_id(evaluate_matrix(matrix))[candidate["supplier_id"]]
+    assert result.selection_allowed is False
+    assert "candidate_has_unresolved_qualification_fields" in result.rationale
+
+
+def test_missing_non_blocker_field_cannot_silently_allow_final_selection():
+    matrix = copy.deepcopy(load_matrix())
+    for value in matrix["buyer_baseline"].values():
+        if isinstance(value, dict):
+            value["blocking"] = False
+
+    candidate = matrix["candidates"][0]
+    for field in candidate["fields"].values():
+        field["value"] = "provided"
+        field["status"] = "supplier_stated"
+    candidate["fields"]["warranty"] = {"value": None, "status": "pending"}
+
+    result = by_id(evaluate_matrix(matrix))[candidate["supplier_id"]]
+    assert result.selection_allowed is False
+    assert "warranty" in result.missing_fields
+    assert "candidate_has_unresolved_qualification_fields" in result.rationale
 
 
 def test_no_supplier_is_shortlisted_before_rev1_2_reconfirmation():

@@ -13,6 +13,7 @@ def obs(
     recommendation: Decision,
     human: Decision | None = None,
     outcome: bool | None = None,
+    stage: str | None = None,
     safety: bool = False,
 ):
     return ShadowDecisionObservation(
@@ -22,6 +23,7 @@ def obs(
         recommendation=recommendation,
         human_decision=human,
         outcome_success=outcome,
+        outcome_stage=stage,
         safety_violation=safety,
         source_ref=f"source:{oid}",
     )
@@ -33,13 +35,25 @@ def test_metrics_stay_undefined_without_labels():
     assert report.pursue_outcome_precision is None
     assert report.human_labeled == 0
     assert report.outcome_labeled == 0
+    assert report.final_outcome_labeled == 0
 
 
-def test_report_uses_only_observed_denominators():
+def test_stage_success_does_not_masquerade_as_order_precision():
+    rows = [
+        obs("1", "kcl", Decision.PURSUE, Decision.PURSUE, True, "reply"),
+        obs("2", "kcl", Decision.PURSUE, Decision.PURSUE),
+    ]
+    report = evaluate_shadow(rows)
+    assert report.stage_successes == 1
+    assert report.final_outcome_labeled == 0
+    assert report.pursue_outcome_precision is None
+
+
+def test_report_uses_only_final_outcomes_for_pursue_precision():
     rows = [
         obs("1", "hydrotester", Decision.RESEARCH, Decision.RESEARCH),
-        obs("2", "can-forming", Decision.PURSUE, Decision.PURSUE, True),
-        obs("3", "can-forming", Decision.PURSUE, Decision.RESEARCH, False),
+        obs("2", "can-forming", Decision.PURSUE, Decision.PURSUE, True, "order"),
+        obs("3", "can-forming", Decision.PURSUE, Decision.RESEARCH, False, "contract"),
     ]
     report = evaluate_shadow(rows)
     assert report.recommendation_human_agreement == 2 / 3
@@ -60,24 +74,33 @@ def test_invalid_observation_is_excluded_fail_closed():
     assert report.total_observations == 0
 
 
-def test_promotion_policy_reports_gaps_instead_of_auto_promoting():
+def test_outcome_requires_stage():
+    bad = obs("bad", "kcl", Decision.PURSUE, Decision.PURSUE, True)
+    report = evaluate_shadow([bad])
+    assert report.total_observations == 0
+
+
+def test_promotion_policy_requires_final_business_outcomes():
     report = evaluate_shadow([
         obs("1", "hydrotester", Decision.RESEARCH, Decision.RESEARCH),
         obs("2", "can-forming", Decision.RESEARCH, Decision.RESEARCH),
+        obs("3", "kcl", Decision.PURSUE, Decision.PURSUE, True, "reply"),
+        obs("4", "supplier", Decision.RESEARCH, Decision.RESEARCH),
+        obs("5", "kcl", Decision.PURSUE, Decision.PURSUE),
     ])
     gaps = promotion_evidence_gaps(report)
-    assert "insufficient_observations" in gaps
-    assert "insufficient_human_decisions" in gaps
-    assert "insufficient_real_outcomes" in gaps
+    assert "insufficient_observations" not in gaps
+    assert "insufficient_human_decisions" not in gaps
+    assert "insufficient_final_business_outcomes" in gaps
 
 
 def test_safety_violation_is_always_a_promotion_gap():
     rows = [
-        obs("1", "hydrotester", Decision.RESEARCH, Decision.RESEARCH, True),
-        obs("2", "can-forming", Decision.PURSUE, Decision.PURSUE, True),
-        obs("3", "hydrotester", Decision.RESEARCH, Decision.RESEARCH, False),
-        obs("4", "can-forming", Decision.PURSUE, Decision.PURSUE, True),
-        obs("5", "hydrotester", Decision.RESEARCH, Decision.RESEARCH, False, safety=True),
+        obs("1", "hydrotester", Decision.RESEARCH, Decision.RESEARCH, True, "order"),
+        obs("2", "can-forming", Decision.PURSUE, Decision.PURSUE, True, "order"),
+        obs("3", "hydrotester", Decision.RESEARCH, Decision.RESEARCH, False, "contract"),
+        obs("4", "can-forming", Decision.PURSUE, Decision.PURSUE, True, "order"),
+        obs("5", "hydrotester", Decision.RESEARCH, Decision.RESEARCH, False, "contract", safety=True),
     ]
     report = evaluate_shadow(rows)
     gaps = promotion_evidence_gaps(
@@ -86,7 +109,7 @@ def test_safety_violation_is_always_a_promotion_gap():
             min_observations=5,
             min_case_types=2,
             min_human_labeled=3,
-            min_outcome_labeled=3,
+            min_final_outcome_labeled=3,
         ),
     )
     assert "safety_violation_present" in gaps

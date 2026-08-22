@@ -1,4 +1,4 @@
-from nexus.business_genome import (
+from nexus_verticals.business_genome import (
     BusinessGenomeRecord,
     Decision,
     Epistemic,
@@ -33,18 +33,31 @@ def test_high_value_evidence_backed_opportunity_is_pursue():
     assert candidate.decide(problem) == Decision.PURSUE
 
 
-def test_weak_evidence_forces_research_even_if_story_is_attractive():
+def test_hypothesis_only_support_forces_research_even_with_high_score():
     problem = ProblemRecord("p1", "future need", ("acme",), 5, 5, 5, 5, (ev(Epistemic.HYPOTHESIS),))
     candidate = OpportunityCandidate(
-        "o1", "p1", 5, 5, 5, 5, 1, 0, 0, 0, 0, 0,
+        "o1", "p1", 5, 5, 5, 5, 5, 0, 0, 0, 0, 0,
         evidence=(ev(Epistemic.HYPOTHESIS),)
     )
     assert candidate.decide(problem) == Decision.RESEARCH
 
 
+def test_out_of_range_scores_fail_closed():
+    problem = ProblemRecord("p1", "manual qualification", ("acme",), 5, 5, 5, 5, (ev(),))
+    candidate = OpportunityCandidate("o1", "p1", 99, 5, 5, 5, 5, 0, 0, 0, 0, 0, evidence=(ev(),))
+    assert candidate.validate()
+    assert candidate.decide(problem) == Decision.RESEARCH
+    assert rank_opportunities([problem], [candidate]) == []
+
+
 def test_missing_problem_is_not_ranked():
     candidate = OpportunityCandidate("o1", "missing", 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, evidence=(ev(),))
     assert rank_opportunities([], [candidate]) == []
+
+
+def test_invalid_genome_does_not_enter_store():
+    invalid = BusinessGenomeRecord("", "procurement", "slow", "need", evidence=(ev(),))
+    assert dedupe_genomes([invalid]) == []
 
 
 def test_negative_knowledge_is_first_class_state():

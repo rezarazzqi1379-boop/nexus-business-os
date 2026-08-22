@@ -45,8 +45,8 @@ def test_hydrotester_rev1_2_stays_research_while_buyer_blockers_remain():
             evidence("github:pr:29", "new authority lineage exists"),
             evidence("github:pr:29", "decision-critical blockers remain", Epistemic.UNKNOWN),
         ),
+        blocking_unknowns=("test-pressure envelope", "pipe-end condition"),
     )
-    # High operational value does not authorize an unsafe final-selection workflow.
     assert candidate.decide(problem) == Decision.RESEARCH
 
 
@@ -78,8 +78,18 @@ def test_can_forming_scope_mismatch_is_research_not_price_selection():
         risk=4,
         evidence=(evidence("github:pr:24", "scope-equivalence failure is observed in a real procurement replay"),),
     )
-    # The capability is promising, but one replay is not enough to claim production value.
+    # One replay can justify continued research, not a production-effectiveness claim.
     assert candidate.decide(problem) in {Decision.RESEARCH, Decision.PURSUE}
+
+
+def test_explicit_blocker_overrides_attractive_score():
+    problem = ProblemRecord("p", "missing decision input", ("project:x",), 5, 5, 5, 5, (evidence("source:x", "known blocker"),))
+    candidate = OpportunityCandidate(
+        "o", "p", 5, 5, 5, 5, 5, 0, 0, 0, 0, 0,
+        evidence=(evidence("source:x", "strong evidence"),),
+        blocking_unknowns=("engineering authority",),
+    )
+    assert candidate.decide(problem) == Decision.RESEARCH
 
 
 def test_can_forming_duplicate_followup_enters_negative_knowledge():

@@ -1,7 +1,7 @@
 from nexus.agent_evolution import EvaluationResult, EvolutionProposal, decide_evolution
 from nexus_verticals.business_genome_learning import NegativeKnowledgeEvent
 from nexus_verticals.pattern_miner import mine_failure_patterns
-from nexus_verticals.pattern_to_improvement import proposal_from_pattern
+from nexus_verticals.pattern_proposal_adapter import proposal_from_pattern
 
 
 def _eligible_pattern():
@@ -33,6 +33,7 @@ def _pr19_proposal():
     pattern = _eligible_pattern()
     adapter = proposal_from_pattern(
         pattern,
+        proposal_id="proposal:failure:pursue-false-positive:v1",
         component="opportunity_engine",
         hypothesis="Repeated false-positive PURSUE outcomes indicate the decision boundary is too permissive for this failure mode.",
         change_summary="Evaluate a stricter candidate decision boundary against the frozen baseline; do not deploy automatically.",

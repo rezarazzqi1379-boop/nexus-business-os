@@ -9,6 +9,9 @@ BLOCKING_FIELD_STATUSES = {
     "not_verified_for_requirement",
     "budgetary_not_engineering_verified",
     "supplier_stated_not_fat_verified",
+    "quoted_not_engineering_verified",
+    "superseded_by_buyer_revision",
+    "buyer_request_pending_supplier_reconfirmation",
 }
 
 USABLE_FIELD_STATUSES = {

@@ -115,6 +115,7 @@ class OpportunityCandidate:
     time_to_revenue: int
     risk: int
     evidence: tuple[EvidenceRef, ...] = ()
+    blocking_unknowns: tuple[str, ...] = ()
 
     def validate(self) -> list[str]:
         errors = _required("opportunity_id", self.opportunity_id) + _required("problem_id", self.problem_id)
@@ -122,6 +123,8 @@ class OpportunityCandidate:
             errors += _ordinal(name, getattr(self, name))
         for item in self.evidence:
             errors += item.validate()
+        if any(not isinstance(item, str) or not item.strip() for item in self.blocking_unknowns):
+            errors.append("blocking_unknowns must contain non-empty strings")
         return errors
 
     def score(self, problem: ProblemRecord) -> int:
@@ -138,9 +141,10 @@ class OpportunityCandidate:
     def decide(self, problem: ProblemRecord) -> Decision:
         if self.validate() or problem.validate():
             return Decision.RESEARCH
+        if self.blocking_unknowns:
+            return Decision.RESEARCH
         if not self.evidence or self.evidence_strength <= 1:
             return Decision.RESEARCH
-        # Hypothesis/assumption-only support may guide research but cannot justify pursuit.
         supported_classes = {item.epistemic for item in self.evidence}
         if supported_classes <= {Epistemic.HYPOTHESIS, Epistemic.ASSUMPTION, Epistemic.UNKNOWN}:
             return Decision.RESEARCH

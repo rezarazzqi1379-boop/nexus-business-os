@@ -4,7 +4,7 @@ from pathlib import Path
 from nexus_verticals.hydrotester_readiness import evaluate_matrix, highest_readiness_without_selection
 
 
-MATRIX_PATH = Path("data/procurement/hydrotester_qualification_matrix_v0_1.json")
+MATRIX_PATH = Path("data/procurement/hydrotester_qualification_matrix_v0_2.json")
 
 
 def load_matrix():
@@ -22,25 +22,35 @@ def test_current_matrix_blocks_supplier_selection():
     assert all(result.selection_allowed is False for result in results)
 
 
-def test_marley_has_highest_current_usable_evidence_without_being_selected():
+def test_current_authority_is_rev1_2_and_supersedes_stale_dimensions():
     matrix = load_matrix()
-    top = highest_readiness_without_selection(matrix)
-    assert top.supplier_id == "marley-wuxi"
-    assert top.readiness_percent == 60
-    assert top.selection_allowed is False
+    assert matrix["matrix_version"] == "0.2"
+    assert matrix["authority_revision"] == "buyer_engineer_rev1.2"
+    baseline = matrix["buyer_baseline"]
+    assert baseline["wall_thickness_mm"] == {"min": 6, "max": 20, "status": "confirmed"}
+    assert baseline["pipe_length_m"] == {"min": 9, "max": 12, "status": "confirmed"}
+    assert baseline["required_throughput"]["value"] == 60
 
 
-def test_current_readiness_percentages_are_evidence_conservative():
-    results = by_id(evaluate_matrix(load_matrix()))
-    assert results["marley-wuxi"].readiness_percent == 60
-    assert results["yaxing-dezhou"].readiness_percent == 15
-    assert results["gh-petro"].readiness_percent == 0
+def test_superseded_supplier_dimensions_do_not_count_as_usable_readiness():
+    matrix = load_matrix()
+    results = by_id(evaluate_matrix(matrix))
+    marley = next(item for item in matrix["candidates"] if item["supplier_id"] == "marley-wuxi")
+    assert marley["fields"]["wall_thickness_range"]["status"] == "superseded_by_buyer_revision"
+    assert marley["fields"]["length_range"]["status"] == "superseded_by_buyer_revision"
+    assert results["marley-wuxi"].selection_allowed is False
 
 
-def test_pending_or_buyer_request_values_do_not_inflate_readiness():
-    results = by_id(evaluate_matrix(load_matrix()))
-    assert results["gh-petro"].readiness_percent == 0
-    assert results["yaxing-dezhou"].readiness_percent < 20
+def test_all_candidates_block_on_geometry_pressure_envelope():
+    results = evaluate_matrix(load_matrix())
+    assert all("pressure_envelope_vs_geometry" in item.blocking_fields for item in results)
+
+
+def test_buyer_open_end_condition_prevents_selection():
+    matrix = load_matrix()
+    assert matrix["buyer_baseline"]["pipe_end_geometry_and_sealing_interface"]["blocking"] is True
+    results = evaluate_matrix(matrix)
+    assert all("buyer_baseline_has_unresolved_blockers" in item.rationale for item in results)
 
 
 def test_marley_power_inconsistency_is_explicit_blocker():
@@ -50,25 +60,33 @@ def test_marley_power_inconsistency_is_explicit_blocker():
     assert "candidate_has_internal_document_inconsistencies" in marley.rationale
 
 
-def test_all_candidates_block_on_pressure_envelope():
-    results = evaluate_matrix(load_matrix())
-    assert all("pressure_envelope_vs_geometry" in item.blocking_fields for item in results)
-
-
-def test_buyer_unknowns_prevent_selection_even_if_candidate_fields_are_filled():
+def test_yaxing_budgetary_throughput_is_not_selection_evidence():
     matrix = load_matrix()
-    candidate = matrix["candidates"][0]
-    for field in candidate["fields"].values():
-        field["value"] = field.get("value") or "provided"
-        field["status"] = "supplier_stated"
-    result = by_id(evaluate_matrix(matrix))[candidate["supplier_id"]]
+    yaxing = next(item for item in matrix["candidates"] if item["supplier_id"] == "yaxing-dezhou")
+    assert yaxing["fields"]["cycle_time_or_throughput"]["value"] == "1 pc/min"
+    assert yaxing["fields"]["cycle_time_or_throughput"]["status"] == "supplier_stated_budgetary"
+    result = by_id(evaluate_matrix(matrix))["yaxing-dezhou"]
     assert result.selection_allowed is False
-    assert "buyer_baseline_has_unresolved_blockers" in result.rationale
+
+
+def test_gh_price_is_non_final_and_does_not_create_technical_readiness():
+    matrix = load_matrix()
+    gh = next(item for item in matrix["candidates"] if item["supplier_id"] == "gh-petro")
+    assert gh["fields"]["price"]["value"] == "USD 542800"
+    assert gh["fields"]["price"]["status"] == "quoted_non_final_subject_to_final_specification"
+    result = by_id(evaluate_matrix(matrix))["gh-petro"]
+    assert result.selection_allowed is False
+
+
+def test_no_supplier_is_shortlisted_before_rev1_2_reconfirmation():
+    matrix = load_matrix()
+    decision = matrix["current_decision"]
+    assert decision["shortlist"] == []
+    assert set(decision["conditional"]) == {"marley-wuxi", "yaxing-dezhou", "gh-petro"}
+    assert decision["selected_supplier"] is None
 
 
 def test_no_currency_conversion_or_price_ranking_is_performed():
     matrix = load_matrix()
-    results = by_id(evaluate_matrix(matrix))
-    assert results["marley-wuxi"].readiness_percent > results["yaxing-dezhou"].readiness_percent
-    assert results["marley-wuxi"].selection_allowed is False
-    assert results["yaxing-dezhou"].selection_allowed is False
+    top = highest_readiness_without_selection(matrix)
+    assert top.selection_allowed is False

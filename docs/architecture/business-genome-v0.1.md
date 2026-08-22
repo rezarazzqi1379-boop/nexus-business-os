@@ -14,6 +14,8 @@ NEXUS needs to learn from businesses, agents, non-agent automation, failures and
 2. **Problem Graph** — problems linked to affected entities, evidence, pain, frequency, urgency and ability-to-pay ordinals.
 3. **Negative Knowledge** — rejected suppliers, failed strategies, invalid hypotheses, duplicate actions, unreliable sources and deprecated requirements.
 4. **Opportunity Portfolio** — evidence-backed candidates classified PURSUE / RESEARCH / WATCH / REJECT.
+5. **Outcome Ledger** — append-only shadow outcome events separated by alignment, stage success, final success, false positive, safety failure and open state.
+6. **Pattern Miner** — cross-project repeated failure/success detection; single anecdotes cannot create improvement proposals.
 
 ## Evidence contract
 
@@ -40,16 +42,26 @@ Default implementation should be one orchestrator invoking bounded role contract
 
 v0.1 deliberately uses an explainable ordinal score, not a probability. Positive factors include pain, frequency, ability to pay, urgency, market, access, strategic fit, differentiation and evidence strength. Penalties include capital, complexity, competition, time-to-revenue and risk.
 
-Weak evidence forces RESEARCH even when the commercial story is attractive.
+Weak evidence or decision-critical unknowns force RESEARCH even when the commercial story is attractive.
 
-## Activation path
+## Learning loop
 
-1. Run in shadow mode against real procurement observations.
-2. Capture denominators: signals -> problems -> opportunities -> approved actions -> replies -> RFQs -> quotes -> orders.
-3. Compare recommendations with human decisions and actual outcomes.
-4. Store false positives and failed hypotheses in Negative Knowledge.
-5. Adjust scoring only from observed outcomes; do not tune to anecdotes.
-6. Promote to a connector-backed service only after repeated loop proof.
+1. Run shadow recommendations against real procurement observations.
+2. Capture human decisions only when supported by executed actions or explicit positions.
+3. Separate stage outcomes (reply/RFQ/quote) from final outcomes (contract/order).
+4. Convert validated observations into Outcome Ledger entries.
+5. Generate Negative Knowledge only for observed unsuccessful PURSUE outcomes or safety failures; open cases are not failures.
+6. Mine repeated patterns only after minimum occurrence and cross-project-diversity gates are met.
+7. Pattern eligibility is evidence for an improvement proposal, not authorization to change production.
+8. Any eventual agent/tool change remains governed by the separate bounded evolution mechanism and human approval.
+
+## Pattern Miner gates
+
+- `min_occurrences >= 2`; a single anecdote is never generalizable.
+- default `min_distinct_projects = 2`; repetition inside one project does not establish a reusable cross-project pattern.
+- conflicting duplicate event or ledger IDs fail closed.
+- success patterns are mined only from observed stage/final successes; alignment/open states are excluded.
+- no pattern miner output can tune scoring weights or alter an agent directly.
 
 ## Initial benchmark vertical
 
@@ -62,4 +74,6 @@ Industrial procurement remains the first benchmark because NEXUS already has rea
 - No web/email/document instruction may grant itself permissions.
 - No cross-project requirement contamination.
 - No uncalibrated score may be represented as a probability.
+- No missing outcome may be interpreted as failure.
+- No single case may become a reusable failure/success pattern.
 - No new registry/database merely to increase activity.

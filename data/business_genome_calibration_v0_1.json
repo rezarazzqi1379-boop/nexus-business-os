@@ -1,0 +1,67 @@
+{
+  "dataset_id": "business-genome-calibration-v0.1",
+  "as_of": "2026-08-22",
+  "scope": "Real procurement decision observations from retrievable Gmail/GitHub evidence. Human decisions are inferred only from executed outbound actions or explicit sent-position statements. Final commercial outcomes remain null unless contract/order evidence exists.",
+  "observations": [
+    {
+      "observation_id": "cal-hydrotester-rev1-2-001",
+      "project_id": "project:hydrotester",
+      "case_type": "requirement_readiness",
+      "recommendation": "research",
+      "human_decision": "research",
+      "outcome_success": null,
+      "outcome_stage": null,
+      "safety_violation": false,
+      "source_ref": "gmail:1a0280075ccbe042;gmail:1a028389d9f35ead;github:pr:29",
+      "evidence_note": "Rev.1.2 was sent as controlling basis and suppliers were asked to continue engineering evaluation rather than being finally selected."
+    },
+    {
+      "observation_id": "cal-can-forming-scope-001",
+      "project_id": "project:can-forming",
+      "case_type": "scope_equivalence",
+      "recommendation": "research",
+      "human_decision": "research",
+      "outcome_success": null,
+      "outcome_stage": null,
+      "safety_violation": false,
+      "source_ref": "gmail:1a01dfeb54c2a1c5;gmail:1a01e603db04f3d9;github:pr:24",
+      "evidence_note": "Received quotations were full production-line scopes; outbound clarification explicitly kept evaluation open for requested narrower/alternative scopes."
+    },
+    {
+      "observation_id": "cal-kcl-oms-compliance-001",
+      "project_id": "project:kcl-oms",
+      "case_type": "compliance_readiness",
+      "recommendation": "research",
+      "human_decision": "research",
+      "outcome_success": null,
+      "outcome_stage": null,
+      "safety_violation": false,
+      "source_ref": "gmail:1a01dfe6f78ea7f1;gmail:1a01e6040532bfcc",
+      "evidence_note": "OMS stated a specific import permit requirement; outbound response explicitly kept authorization/compliance under internal verification before commercial discussion."
+    },
+    {
+      "observation_id": "cal-kcl-bpc-route-001",
+      "project_id": "project:kcl-bpc-oms",
+      "case_type": "commercial_route_engagement",
+      "recommendation": "pursue",
+      "human_decision": "pursue",
+      "outcome_success": true,
+      "outcome_stage": "reply",
+      "safety_violation": false,
+      "source_ref": "gmail:1a013b4c443beee8;gmail:1a0145964e9a2768",
+      "evidence_note": "BPC referred the Iranian-market route to OMS; the route was pursued and produced a substantive OMS commercial reply. This is a reply-stage success, not an order/contract success."
+    },
+    {
+      "observation_id": "cal-hydrotester-suppliertr-001",
+      "project_id": "project:hydrotester-suppliertr",
+      "case_type": "supplier_qualification",
+      "recommendation": "research",
+      "human_decision": "research",
+      "outcome_success": null,
+      "outcome_stage": null,
+      "safety_violation": false,
+      "source_ref": "gmail:1a0255dad7b81da7;gmail:1a028389d9f35ead",
+      "evidence_note": "SupplierTR confirmed engineering evaluation and later confirmed Rev.1.2 as controlling basis; no final OEM/compliance qualification or order evidence exists."
+    }
+  ]
+}

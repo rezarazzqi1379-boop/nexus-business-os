@@ -2,7 +2,8 @@
 
 This module does not tune scoring weights or authorize promotion. It records
 what NEXUS recommended, what a human decided, and what eventually happened.
-Metrics remain undefined until their required observations exist.
+Stage outcomes (reply/RFQ/quote) are kept separate from final commercial
+outcomes (contract/order) so early engagement cannot masquerade as business ROI.
 """
 from __future__ import annotations
 
@@ -10,6 +11,9 @@ from dataclasses import dataclass
 from typing import Iterable
 
 from .business_genome import Decision
+
+
+FINAL_OUTCOME_STAGES = {"contract", "order"}
 
 
 @dataclass(frozen=True)
@@ -20,6 +24,7 @@ class ShadowDecisionObservation:
     recommendation: Decision
     human_decision: Decision | None = None
     outcome_success: bool | None = None
+    outcome_stage: str | None = None
     safety_violation: bool = False
     source_ref: str = ""
 
@@ -39,9 +44,18 @@ class ShadowDecisionObservation:
             errors.append("human_decision must be Decision or None")
         if self.outcome_success not in {True, False, None}:
             errors.append("outcome_success must be bool or None")
+        if self.outcome_success is not None:
+            if not isinstance(self.outcome_stage, str) or not self.outcome_stage.strip():
+                errors.append("outcome_stage is required when outcome_success is observed")
+        elif self.outcome_stage is not None:
+            errors.append("outcome_stage requires an observed outcome_success")
         if not isinstance(self.safety_violation, bool):
             errors.append("safety_violation must be bool")
         return errors
+
+    @property
+    def is_final_outcome(self) -> bool:
+        return self.outcome_success is not None and self.outcome_stage in FINAL_OUTCOME_STAGES
 
 
 @dataclass(frozen=True)
@@ -50,9 +64,11 @@ class CalibrationReport:
     distinct_case_types: int
     human_labeled: int
     outcome_labeled: int
+    final_outcome_labeled: int
     recommendation_human_agreement: float | None
     pursue_outcome_precision: float | None
     pursue_false_positives: int
+    stage_successes: int
     safety_violations: int
 
 
@@ -60,8 +76,9 @@ def evaluate_shadow(observations: Iterable[ShadowDecisionObservation]) -> Calibr
     rows = [row for row in observations if not row.validate()]
     human_rows = [row for row in rows if row.human_decision is not None]
     outcome_rows = [row for row in rows if row.outcome_success is not None]
-    pursue_outcomes = [
-        row for row in outcome_rows if row.recommendation == Decision.PURSUE
+    final_outcome_rows = [row for row in outcome_rows if row.is_final_outcome]
+    pursue_final_outcomes = [
+        row for row in final_outcome_rows if row.recommendation == Decision.PURSUE
     ]
 
     agreement = None
@@ -71,20 +88,25 @@ def evaluate_shadow(observations: Iterable[ShadowDecisionObservation]) -> Calibr
         ) / len(human_rows)
 
     pursue_precision = None
-    if pursue_outcomes:
-        pursue_precision = sum(1 for row in pursue_outcomes if row.outcome_success) / len(pursue_outcomes)
+    if pursue_final_outcomes:
+        pursue_precision = sum(
+            1 for row in pursue_final_outcomes if row.outcome_success
+        ) / len(pursue_final_outcomes)
 
     return CalibrationReport(
         total_observations=len(rows),
         distinct_case_types=len({row.case_type for row in rows}),
         human_labeled=len(human_rows),
         outcome_labeled=len(outcome_rows),
+        final_outcome_labeled=len(final_outcome_rows),
         recommendation_human_agreement=agreement,
         pursue_outcome_precision=pursue_precision,
         pursue_false_positives=sum(
-            1
-            for row in pursue_outcomes
-            if row.outcome_success is False
+            1 for row in pursue_final_outcomes if row.outcome_success is False
+        ),
+        stage_successes=sum(
+            1 for row in outcome_rows
+            if row.outcome_success is True and not row.is_final_outcome
         ),
         safety_violations=sum(1 for row in rows if row.safety_violation),
     )
@@ -95,7 +117,7 @@ class PromotionEvidencePolicy:
     min_observations: int = 5
     min_case_types: int = 2
     min_human_labeled: int = 3
-    min_outcome_labeled: int = 3
+    min_final_outcome_labeled: int = 3
 
 
 def promotion_evidence_gaps(
@@ -109,8 +131,8 @@ def promotion_evidence_gaps(
         gaps.append("insufficient_case_diversity")
     if report.human_labeled < policy.min_human_labeled:
         gaps.append("insufficient_human_decisions")
-    if report.outcome_labeled < policy.min_outcome_labeled:
-        gaps.append("insufficient_real_outcomes")
+    if report.final_outcome_labeled < policy.min_final_outcome_labeled:
+        gaps.append("insufficient_final_business_outcomes")
     if report.safety_violations:
         gaps.append("safety_violation_present")
     return tuple(gaps)

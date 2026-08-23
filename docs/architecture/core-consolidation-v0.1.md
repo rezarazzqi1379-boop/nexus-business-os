@@ -1,171 +1,154 @@
-# NEXUS Core Consolidation Plan v0.1
+# NEXUS Core Consolidation Plan v0.2
 
-Status: REVIEW / CONSOLIDATION CHECKPOINT
-Date: 2026-08-22
+Status: REVIEW / PROJECT-WIDE FORGE CONSOLIDATION CHECKPOINT
+Date: 2026-08-23
 
 ## Why this exists
-NEXUS has accumulated multiple useful but overlapping draft branches. The current bottleneck is no longer lack of capability; it is integration cost, authority drift, review complexity, and the risk of promoting large experimental stacks before measured business loops exist.
+NEXUS no longer has a capability shortage. It has an overlap, lineage, review, and promotion problem: many useful draft branches exist, several are intentionally superseded or integration-only, and multiple branches touch evidence, evaluation, learning, runtime, autonomy, and promotion semantics.
 
-This plan defines the smallest canonical Core and a disposition for the major open PRs reviewed on 2026-08-22.
+The project-wide rule is now the NEXUS Forge lifecycle:
 
-## Canonical Core boundary
+`OBSERVE -> REVERSE ENGINEER -> RECONSTRUCT -> BENCHMARK -> BREAK -> DIAGNOSE -> IMPROVE -> INTEGRATE -> SANDBOX -> PROMOTE -> EXECUTE -> MEASURE -> LEARN -> EVOLVE`
+
+Forge is a control policy, not a new agent framework. Existing canonical mechanisms must be reused before a new mechanism is created.
+
+## Canonical ownership rule
+Every cross-project concern must have one canonical owner. Other branches may consume, adapt, or experimentally replay the owner but must not create a competing source of truth.
+
+Current ownership candidates:
+- evidence semantics: PR #1
+- requirement readiness: PR #2 plus newer authority semantics in PR #29 for Hydrotester
+- capability/action routing and exact action-scoped approval: PR #4, with PR #18 security hardening to extract
+- deterministic regression and promotion evidence: PR #6
+- decision/outcome learning: PR #7
+- privacy-first audit metadata: PR #10
+- security policy/threat model: PR #12
+- autonomy planning/runtime primitives: PR #13/#17 as incubators only
+- evidence-driven evolution proposal/evaluation: PR #19
+- authority/benchmark patterns: useful parts of PR #24, with Hydrotester authority superseded by PR #29
+- capability adoption governor: PR #28
+- Business Genome / opportunity / negative knowledge: PR #33
+- public-pattern reconstruction/workforce experiment: PR #35
+- Forge reconstruction-to-controlled-evolution contract: PR #36
+
+## Core boundary
 
 `Evidence -> Authority/Entity Resolution -> Decision -> Exact Action Approval -> Execution -> Outcome -> Learning`
 
 Core owns only cross-domain invariants:
-- provenance and epistemic class preservation
-- authority/supersession rules
+- provenance and epistemic-class preservation
+- authority/supersession and immutable history
 - project/entity isolation
 - deterministic validation and fail-closed behavior
 - exact-action human approval for consequential actions
-- idempotency / duplicate-action controls
-- compact privacy-first audit metadata
-- outcome measurement contracts
+- idempotency, duplicate-action, and no-op-write controls
+- privacy-first compact audit metadata
+- outcome-stage separation and measurement contracts
+- versioned learning proposals that cannot self-promote
 
-Domain-specific qualification logic remains in vertical modules such as Hydrotester and Can Forming.
+Domain-specific qualification remains in vertical modules.
 
-Agent runtimes, research meshes, self-improvement kernels, hosted schedulers, and additional frameworks remain experimental until measured NEXUS outcomes justify promotion.
+## Project-wide Forge policy
+Before any material new agent, workflow, project mechanism, connector wrapper, business engine, evaluator, or learning component:
+1. OBSERVE the existing NEXUS capability and evidence.
+2. REVERSE ENGINEER the mechanism and its owner.
+3. RECONSTRUCT only missing behavior; do not copy hidden/private implementation claims.
+4. BENCHMARK against the current baseline using explicit metrics and evidence refs.
+5. BREAK with adversarial cases: stale authority, cross-project contamination, duplicate/no-op writes, malformed runtime values, approval drift, prompt injection, safety regression, partial failure, and missing outcomes.
+6. DIAGNOSE root cause; do not weaken tests to make a branch pass.
+7. IMPROVE the smallest responsible component.
+8. INTEGRATE through existing canonical contracts.
+9. SANDBOX / shadow replay before consequential execution.
+10. PROMOTE only if required metrics improve and no safety regression exists; promotion eligibility is not deployment authorization.
+11. EXECUTE only within the current authority boundary.
+12. MEASURE actual outcome stage, not proxy success alone.
+13. LEARN from observed success/failure with evidence.
+14. EVOLVE through versioned proposals and regression protection.
+
+## Failure policy
+Recoverable isolated failures do not halt unrelated safe work. They become evidence-backed learning records and regression tests.
+
+`isolated + recoverable -> continue unrelated safe work`
+
+`consequential risk OR non-isolated failure -> contain affected action`
+
+A failure record should capture component, failure mode, evidence refs, severity, root cause, correction, regression, and version fixed. Learning records are never authorization.
+
+Observed Forge failure already converted into protection: PR #36 generated duplicate/no-op README writes during an update attempt. The project now treats byte-identical content writes as a preventable failure class and tests a no-op-write guard.
+
+## Evidence / promotion anti-self-deception rule
+Alignment with a human decision, CI success, responsiveness, a reply, an RFQ, or a quote is not a final business outcome.
+
+PR #33 currently records 5/5 recommendation-human agreement across five real procurement observations, one reply-stage success, and zero final contract/order outcomes. Forge therefore must keep such evidence in EXPERIMENT/SHADOW rather than treating alignment alone as proof of commercial superiority or production readiness.
 
 ## PR disposition map
 
-### PR #29 — Align hydrotester authority with buyer Rev.1.2
-Disposition: KEEP / DOMAIN-CANONICAL CANDIDATE
+### KEEP / canonical candidate
+- PR #1: explicit evidence classification.
+- PR #2: requirement readiness shadow semantics; Hydrotester authority must use newer PR #29 lineage where applicable.
+- PR #4: capability runtime and exact action-scoped gates.
+- PR #6: deterministic evaluation + promotion evidence core.
+- PR #7: bounded decision/outcome learning.
+- PR #10: canonical privacy-first audit envelope; do not revive PR #11 as a second trace framework.
+- PR #12: security policy/threat model candidate.
+- PR #28: small deterministic capability governor; never an automatic production oracle.
+- PR #29: current Hydrotester authority candidate preserving historical lineage.
+- PR #33: Business Genome / opportunity / pattern-learning shadow engine; final-outcome evidence remains insufficient for promotion.
+- PR #35: public-pattern reconstruction/workforce experiment; public behavior only, no claim of private implementation access.
+- PR #36: Forge lifecycle/integration contract; remains stacked on PR #35 and must not duplicate PR #19.
 
-Why:
-- preserves historical v0.1 instead of rewriting it in place
-- records Rev.1.2 as a new authority revision
-- latest basis currently recorded: WT 6-20 mm, length 9-12 m, 60 pipes/hour
-- keeps test-pressure envelope and end/sealing condition as buyer blockers
-- downgrades stale supplier matches
-- current head includes fail-closed readiness hardening for unknown/pending statuses
-- current CI is green
+### EXTRACT / keep only the useful invariant
+- PR #18: exact per-send approval hardening -> extract to Core security.
+- PR #24: extract A0-A8 authority, fail-closed supersession, maturity/benchmark, Can Forming scope-equivalence, and no-fake-precision rules; do not merge stale Hydrotester history mutation.
+- PR #14: provenance-first research-mesh ideas only if a measured source-recall/quality bottleneck justifies them.
+- PR #16: least-privilege Supabase audit/hardening proposal only after live state is reverified.
 
-Do not merge solely because CI is green. Review authority evidence and domain semantics first.
+### INCUBATOR / do not expand as Core merge units
+- PR #13: Autonomy Fabric. Preserve useful adapters/planner/checkpoint ideas; stop adding unrelated Core responsibility.
+- PR #17: Autonomy Runner. Preserve bounded execution/idempotency/scheduler primitives; benchmark a real read/research loop before promotion.
+- PR #19: evolution kernel. It is the canonical proposal/evaluation target for Forge learning, but remains non-production and human-gated.
 
-### PR #28 — Deterministic Capability Governor
-Disposition: KEEP / SMALL STANDALONE CONTROL MODULE
+### INTEGRATION-ONLY / DO NOT MERGE
+- PR #9: compatibility shadow only.
 
-Why:
-- small and bounded
-- no network/model/external action authority
-- hard gates prevent score-based automatic production adoption
-- CI green at reviewed head
+### SUPERSEDED / HISTORICAL EVIDENCE
+- PR #8: superseded evaluation experiment; PR #6 is canonical.
+- PR #11: superseded trace experiment; PR #10 is canonical.
 
-Constraint: the score remains heuristic. Capability promotion still requires measured NEXUS outcomes.
-
-### PR #24 — P0 Benchmark Pair / Authority + Outcome Proof
-Disposition: EXTRACT, DO NOT MERGE AS-IS
-
-Keep/extract:
-- A0-A8 authority model
-- fail-closed supersession contract
-- maturity stages
-- benchmark observation contract
-- Can Forming replay and scope-equivalence controls
-- no-fake-precision measurement rules
-
-Supersede/remove before promotion:
-- Hydrotester edits that mutate `hydrotester_qualification_matrix_v0_1.json` in place
-- Hydrotester dimensions/authority that predate Rev.1.2
-
-PR #29 is the newer Hydrotester authority path. A consolidated benchmark branch should consume the new matrix rather than rewriting history.
-
-### PR #18 — Per-send outreach approval hardening
-Disposition: P0 EXTRACT TO CORE SECURITY
-
-Invariant to preserve:
-- approval of an initial external message must not pre-authorize a future follow-up
-- planned follow-ups are data/plans only until an exact action-specific approval exists at execution time
-
-This security property should not remain hostage to the full PR #13 autonomy stack.
-
-### PR #12 — Security Policy + Threat Model
-Disposition: KEEP / CORE GOVERNANCE CANDIDATE
-
-Why:
-- small, documentation-only, independent
-- defines external/model/tool content as untrusted data rather than authorization
-- codifies fail-closed behavior and exact-action human approval
-- creates a stable security review context
-
-### PR #10 — Privacy-first Audit Event Envelope
-Disposition: KEEP IDEAS / EXTRACT AFTER EVALUATION DEPENDENCY REVIEW
-
-Preserve:
-- compact metadata-only audit events
-- timezone-aware timestamps
-- stable IDs and parent checks
-- exact action refs for approval/action events
-- no free-form sensitive payload
-- Unicode/control-character hardening
-
-Do not duplicate this with a second trace/observability framework.
-
-### PR #13 — Autonomy Fabric
-Disposition: INCUBATOR / SUPERSEDE AS MERGE UNIT
-
-Reason:
-- valuable source adapters, planning rules, checkpoint semantics and research-only boundaries exist
-- but the PR has grown into a very large stacked merge unit
-- security-critical pieces should be extracted independently
-- measured business loop evidence is still insufficient to justify merging the entire fabric as Core
-
-Do not add more unrelated capabilities to this PR.
-
-### PR #17 — Autonomy Runner
-Disposition: INCUBATOR / EXTRACT LATER
-
-Potentially valuable primitives:
-- bounded action budget
-- stop-on-failure
-- fail-closed missing executors
-- durable versioned state
-- idempotency semantics
-- scheduler without action authority
-- append-only outcome projection
-
-Promotion gate:
-- first stabilize Core security/authority contracts
-- then benchmark one real read/research loop against a simpler deterministic implementation
-- do not treat CI as proof of hosted 24/7 autonomy or business value
-
-### PR #19 — Agent Evolution Kernel
-Disposition: WATCH / DEFER
-
-Self-improvement machinery is premature until NEXUS has repeated measured loops and a stable baseline. Keep as experiment evidence, not Core dependency.
-
-## Immediate consolidation order
-
-1. Finish independent review of PR #29; keep historical authority immutable.
-2. Extract PR #18 exact-send approval invariant into a small Core-oriented branch.
-3. Rebuild the useful portions of PR #24 on top of current main + PR #29 semantics without modifying historical Hydrotester files.
-4. Keep PR #28 standalone; no automatic adoption authority.
-5. Adopt one security policy/threat-model source rather than parallel security documents.
-6. Treat PR #13/#17/#19 as incubators and stop adding new Core responsibilities to them.
-7. Measure two real procurement loops before promoting a hosted agent runtime.
+## Contradiction / drift findings
+1. PR #31 states Supabase runtime is active/healthy and the cross-project graph is implemented, while the main current-state document previously recorded connector permission degradation. This runtime claim must be reverified live before PR #31 is treated as authoritative; documentation cannot resolve the contradiction by repetition.
+2. PR #13 and PR #17 contain valuable autonomy behavior but are too large/stacked to become Core merely because CI passes.
+3. PR #24 contains useful benchmark/authority ideas but mutates stale Hydrotester lineage; PR #29 is newer for that domain.
+4. PR #35/#36 are stacked experiments. Forge must not become a third capability/eval/learning registry.
+5. Open-PR count itself is now a maintenance signal. Superseded/integration-only branches should not receive new features.
 
 ## Merge discipline
+A candidate may be considered for Core only when all are true:
+- one clear responsibility and one canonical owner
+- source/authority semantics are explicit
+- malformed input fails closed
+- relevant adversarial tests exist
+- no cross-project leakage
+- no new implicit authorization path
+- no-op/duplicate mutation is guarded where applicable
+- exact CI evidence exists at the reviewed head
+- no unresolved overlap with a smaller/newer canonical implementation
+- outcome metric is appropriate to the claimed maturity
+- runtime-sensitive claims are live-reverified
+- rollback/reversibility is understood
 
-A candidate change may be considered Core only when all are true:
-- one clear responsibility
-- explicit source/authority semantics
-- fail-closed malformed input behavior
-- adversarial tests for the relevant failure mode
-- no cross-project state leakage
-- no new authorization path
-- exact CI evidence at the reviewed head
-- no unresolved overlap with a newer or smaller canonical implementation
-- maturity claim limited to what the evidence proves
+## Immediate execution order
+1. Use PR #30 as the project-wide disposition checkpoint and stop framework multiplication.
+2. Keep PR #36 Draft and use it as the Forge contract; continue real shadow replays only.
+3. Extract PR #18 exact-send approval into the eventual minimal Core.
+4. Preserve PR #29 Hydrotester authority lineage; do not import stale PR #24 history mutation.
+5. Treat PR #33 as outcome-learning shadow evidence, not ROI proof.
+6. Reverify PR #31 Supabase/runtime claims before adopting its state wording.
+7. Keep PR #28 as a bounded governor and PR #19 as the existing evolution target; do not duplicate either.
+8. Run future changes through Forge gates before adding new agents, registries, evaluators, or learning engines.
+9. Promote hosted autonomy only after repeated real loops provide final-stage outcome evidence and safe-runtime proof.
 
 ## Non-goals
+This consolidation does not authorize merge, deploy, external messages, permissions/access broadening, production database mutation, contracts/payments, or self-promotion.
 
-This consolidation does not:
-- merge any PR automatically
-- deploy production code
-- send external messages
-- change permissions
-- modify Supabase production state
-- claim business ROI from unit tests
-- add another agent framework
-
-The purpose is to reduce the project to a reviewable, measurable Core while preserving useful experimental work for later extraction.
+The objective is fewer canonical mechanisms, stronger evidence, smaller review units, explicit lineage, and a system that turns observed failures into bounded improvements rather than either ignoring them or halting the entire platform.

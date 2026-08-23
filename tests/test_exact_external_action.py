@@ -89,3 +89,12 @@ def test_malformed_or_control_character_metadata_fails_closed():
     assert release.action_id == ""
     assert release.gate.allowed_now is False
     assert release.gate.requires_human_approval is False
+
+
+def test_unhashable_reference_value_fails_closed_instead_of_crashing():
+    malformed = _message(source_version_refs=("gmail:thread-42:v3", ["not", "a", "string"]))
+    release = authorize_exact_external_message(malformed)
+    assert release.action_id == ""
+    assert release.gate.allowed_now is False
+    assert release.gate.requires_human_approval is False
+    assert "source_version_refs must be a string" in release.gate.reason

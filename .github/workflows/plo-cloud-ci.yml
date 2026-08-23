@@ -1,0 +1,25 @@
+name: PLO Cloud Runtime CI
+on:
+  push:
+    paths: ['runtime/plo_cloud/**','.github/workflows/plo-cloud-ci.yml']
+  pull_request:
+    paths: ['runtime/plo_cloud/**','.github/workflows/plo-cloud-ci.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Tests
+        working-directory: runtime/plo_cloud
+        run: python tests/test_cloud.py
+      - name: One-shot worker
+        working-directory: runtime/plo_cloud
+        run: python worker.py --db /tmp/nexus-plo-ci.db
+      - name: Container build
+        working-directory: runtime/plo_cloud
+        run: docker build -t nexus-plo-cloud:ci .

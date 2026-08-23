@@ -23,12 +23,22 @@ def _records():
     ]
 
 
-def test_registered_shadow_snapshot_has_25_unique_evidence_backed_records():
+def test_registered_shadow_snapshot_matches_inventory_count_and_is_valid():
     payload, records = _records()
     assert payload["status"] == "shadow_observation_not_merge_authority"
-    assert len(records) == 25
-    assert len({r.pr_number for r in records}) == 25
+    assert payload["inventory_count"] == 27
+    assert len(records) == payload["inventory_count"]
+    assert len({r.pr_number for r in records}) == payload["inventory_count"]
     assert validate_shadow_audit(records) == ()
+
+
+def test_snapshot_covers_all_registered_canonical_owners_present_in_open_inventory():
+    _, records = _records()
+    canonical_claims = {(r.concern, r.owner) for r in records if r.concern and r.owner}
+    assert ("evidence_semantics", "PR1") in canonical_claims
+    assert ("requirement_readiness", "PR2") in canonical_claims
+    assert ("forge_lifecycle", "PR36") in canonical_claims
+    assert ("exact_external_approval", "PR37") in canonical_claims
 
 
 def test_snapshot_records_multiple_non_promotional_dispositions():

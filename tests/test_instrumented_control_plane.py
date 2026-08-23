@@ -1,5 +1,6 @@
 from nexus_control_plane.control_plane import AgentSpec, Authority, ControlPlane, Goal, Maturity, WorkItem, WorkState
 from nexus_control_plane.instrumented_control_plane import InstrumentedControlPlane
+from nexus_control_plane.telemetry_store import JsonlTelemetryStore
 
 
 def _clock(values):
@@ -19,6 +20,17 @@ def _setup():
         project_scopes={"KCL"},
     ))
     return cp
+
+
+def _item(item_id="w1", capability="research"):
+    return WorkItem(
+        id=item_id,
+        project_id="KCL",
+        goal_id="g1",
+        kind="research",
+        required_capabilities={capability},
+        required_authorities={Authority.READ},
+    )
 
 
 def test_instrumented_control_plane_records_submit_route_complete_and_preserves_behavior():
@@ -53,14 +65,7 @@ def test_instrumented_control_plane_records_submit_route_complete_and_preserves_
 def test_instrumented_control_plane_records_blocked_route_without_fabricating_decision():
     cp = _setup()
     observed = InstrumentedControlPlane(cp, clock_ms=_clock([0, 1, 2, 3]))
-    item = WorkItem(
-        id="w2",
-        project_id="KCL",
-        goal_id="g1",
-        kind="research",
-        required_capabilities={"missing-capability"},
-        required_authorities={Authority.READ},
-    )
+    item = _item("w2", capability="missing-capability")
 
     observed.submit(item)
     selected = observed.route("w2")
@@ -76,14 +81,7 @@ def test_instrumented_control_plane_records_blocked_route_without_fabricating_de
 def test_human_correction_is_observed_as_override_not_hidden():
     cp = _setup()
     observed = InstrumentedControlPlane(cp, clock_ms=_clock([0, 1, 2, 3, 4, 5]))
-    item = WorkItem(
-        id="w3",
-        project_id="KCL",
-        goal_id="g1",
-        kind="research",
-        required_capabilities={"research"},
-        required_authorities={Authority.READ},
-    )
+    item = _item("w3")
 
     observed.submit(item)
     observed.route("w3")
@@ -92,3 +90,39 @@ def test_human_correction_is_observed_as_override_not_hidden():
     snapshot = observed.snapshot()
     assert snapshot.human_overrides == 1
     assert observed.events[-1].human_override is True
+
+
+def test_instrumented_control_plane_persists_events_to_durable_sink(tmp_path):
+    cp = _setup()
+    store = JsonlTelemetryStore(tmp_path / "runtime.jsonl")
+    observed = InstrumentedControlPlane(cp, clock_ms=_clock([0, 1, 2, 3, 4, 5]), sink=store)
+    item = _item("w4")
+
+    observed.submit(item)
+    observed.route("w4")
+    observed.complete("w4", success=True, quality=0.9)
+
+    persisted = store.read_all()
+    assert len(persisted) == 3
+    assert [event.event_id for event in persisted] == ["cp:1:submit", "cp:2:route", "cp:3:complete"]
+    assert observed.telemetry_errors == []
+
+
+def test_telemetry_sink_failure_does_not_undo_or_duplicate_business_action():
+    class BrokenSink:
+        def append(self, event):
+            raise OSError("sink unavailable")
+
+    cp = _setup()
+    observed = InstrumentedControlPlane(cp, clock_ms=_clock([0, 1, 2, 3, 4, 5]), sink=BrokenSink())
+    item = _item("w5")
+
+    observed.submit(item)
+    selected = observed.route("w5")
+    observed.complete("w5", success=True, quality=0.9)
+
+    assert selected == "a1"
+    assert cp.work["w5"].state is WorkState.DONE
+    assert len(cp.evaluations) == 1
+    assert len(observed.events) == 3
+    assert len(observed.telemetry_errors) == 3

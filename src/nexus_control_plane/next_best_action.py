@@ -20,6 +20,7 @@ class ActionCandidate:
     unresolved_contradictions: int
     prior_failures_consulted: bool
     human_gate_required: bool = False
+    epistemic_resolution: bool = False
 
 
 @dataclass(frozen=True)
@@ -43,7 +44,10 @@ def rank_next_best_actions(candidates: tuple[ActionCandidate, ...]) -> tuple[Ran
     """Rank bounded candidate actions without creating execution authority.
 
     Scores are transparent heuristics, not calibrated probabilities or ROI forecasts.
-    Hard evidence/authority/contradiction failures block the candidate regardless of score.
+    Material actions fail closed on unresolved authority/contradictions. A candidate
+    explicitly marked ``epistemic_resolution=True`` may remain rankable when its sole
+    purpose is to resolve those unknowns; that exception does not authorize external or
+    consequential execution and does not bypass dependency/failure-memory checks.
     """
     if not isinstance(candidates, tuple):
         raise TypeError("candidates must be a tuple")
@@ -61,7 +65,13 @@ def rank_next_best_actions(candidates: tuple[ActionCandidate, ...]) -> tuple[Ran
         for field in ("evidence_readiness", "expected_value", "information_gain", "urgency", "reversibility", "risk", "cost"):
             if not _unit(getattr(candidate, field)):
                 raise ValueError(f"{field} must be within [0, 1]")
-        for field in ("dependency_ready", "source_authority_ok", "prior_failures_consulted", "human_gate_required"):
+        for field in (
+            "dependency_ready",
+            "source_authority_ok",
+            "prior_failures_consulted",
+            "human_gate_required",
+            "epistemic_resolution",
+        ):
             if not isinstance(getattr(candidate, field), bool):
                 raise ValueError(f"{field} must be boolean")
         if not isinstance(candidate.unresolved_contradictions, int) or isinstance(candidate.unresolved_contradictions, bool) or candidate.unresolved_contradictions < 0:
@@ -70,11 +80,17 @@ def rank_next_best_actions(candidates: tuple[ActionCandidate, ...]) -> tuple[Ran
         reasons: list[str] = []
         blocked = False
         if not candidate.source_authority_ok:
-            reasons.append("canonical source authority is unresolved")
-            blocked = True
+            if candidate.epistemic_resolution:
+                reasons.append("source authority unresolved; candidate is limited to resolving that authority")
+            else:
+                reasons.append("canonical source authority is unresolved")
+                blocked = True
         if candidate.unresolved_contradictions > 0:
-            reasons.append("unresolved contradictions block material action")
-            blocked = True
+            if candidate.epistemic_resolution:
+                reasons.append("open contradictions exist; candidate is limited to verification/research that resolves them")
+            else:
+                reasons.append("unresolved contradictions block material action")
+                blocked = True
         if not candidate.dependency_ready:
             reasons.append("dependency is not ready")
             blocked = True
@@ -82,8 +98,6 @@ def rank_next_best_actions(candidates: tuple[ActionCandidate, ...]) -> tuple[Ran
             reasons.append("relevant prior failures have not been consulted")
             blocked = True
 
-        # Heuristic prioritization only. Positive terms reward evidence, value, learning,
-        # urgency and reversibility; risk/cost are explicit penalties.
         score = (
             0.25 * candidate.evidence_readiness
             + 0.20 * candidate.expected_value
@@ -95,6 +109,8 @@ def rank_next_best_actions(candidates: tuple[ActionCandidate, ...]) -> tuple[Ran
         )
         if candidate.human_gate_required:
             reasons.append("human gate is required before execution")
+        if candidate.epistemic_resolution:
+            reasons.append("epistemic exception permits ranking only; it does not establish the missing fact")
         if not reasons:
             reasons.append("advisory ranking only; no execution authority")
         ranked.append(RankedAction(candidate, round(score, 6), blocked, tuple(reasons)))

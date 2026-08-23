@@ -213,7 +213,9 @@ class ControlPlane:
 
     def route(self, item_id: str) -> Optional[str]:
         item = self.work[item_id]
-        if item.state in {WorkState.BLOCKED, WorkState.REVIEW}:
+        if item.state is WorkState.REVIEW:
+            return None
+        if item.state is WorkState.BLOCKED and any(blocker.startswith("forge_") for blocker in item.blockers):
             return None
         if item.state in {WorkState.DONE, WorkState.REJECTED, WorkState.RUNNING}:
             return item.assigned_agent

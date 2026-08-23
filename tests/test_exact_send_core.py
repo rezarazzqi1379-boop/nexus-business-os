@@ -56,8 +56,27 @@ def test_provenance_change_changes_action_id():
     assert first != second
 
 
-def test_control_characters_fail_closed():
+def test_multiline_email_body_is_supported_and_still_content_bound():
+    multiline = _action("supplier:initial", body="Dear Supplier,\n\nPlease confirm the revised specification.\nRegards,\nReza")
+    changed = _action("supplier:initial", body="Dear Supplier,\n\nPlease confirm the revised specification.\nRegards,\nReza R.")
+    assert multiline
+    assert multiline != changed
+
+
+def test_normal_tabs_and_crlf_in_body_are_supported():
+    action = _action("supplier:initial", body="Line 1\r\nLine 2\tValue")
+    assert action.startswith("external-send:")
+
+
+def test_dangerous_formatting_characters_fail_closed():
     with pytest.raises(ValueError):
         exact_send_action_id(
             batch_id="batch-1", message_id="m1", target="a@example.com", subject="S", body="bad\u202econtent"
+        )
+
+
+def test_subject_newline_fails_closed():
+    with pytest.raises(ValueError):
+        exact_send_action_id(
+            batch_id="batch-1", message_id="m1", target="a@example.com", subject="bad\nsubject", body="safe body"
         )

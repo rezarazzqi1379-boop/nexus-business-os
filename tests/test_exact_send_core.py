@@ -1,0 +1,63 @@
+import pytest
+
+from nexus_control_plane.exact_send import ExactSendApproval, authorize_exact_send, exact_send_action_id
+
+
+def _action(message_id: str, body: str = "Hello") -> str:
+    return exact_send_action_id(
+        batch_id="batch-1",
+        message_id=message_id,
+        target="supplier@example.com",
+        subject="RFQ follow-up",
+        body=body,
+        source_version_refs=("rfq-v1",),
+        thread_ref="thread-1",
+    )
+
+
+def test_matching_approval_allows_only_exact_send():
+    action = _action("supplier:initial")
+    decision = authorize_exact_send(action_id=action, approval=ExactSendApproval(action))
+    assert decision.allowed is True
+    assert decision.requires_human_approval is False
+
+
+def test_initial_approval_does_not_authorize_future_followup():
+    initial = _action("supplier:initial")
+    followup = _action("supplier:followup:1")
+    decision = authorize_exact_send(action_id=followup, approval=ExactSendApproval(initial))
+    assert decision.allowed is False
+    assert decision.requires_human_approval is True
+
+
+def test_editing_message_invalidates_prior_approval():
+    original = _action("supplier:initial", body="Hello")
+    edited = _action("supplier:initial", body="Hello — revised")
+    assert original != edited
+    decision = authorize_exact_send(action_id=edited, approval=ExactSendApproval(original))
+    assert decision.allowed is False
+
+
+def test_missing_or_denied_approval_fails_closed():
+    action = _action("supplier:initial")
+    assert authorize_exact_send(action_id=action, approval=None).allowed is False
+    assert authorize_exact_send(action_id=action, approval=ExactSendApproval(action, approved=False)).allowed is False
+
+
+def test_provenance_change_changes_action_id():
+    first = exact_send_action_id(
+        batch_id="batch-1", message_id="m1", target="a@example.com", subject="S", body="B",
+        source_version_refs=("rfq-v1",),
+    )
+    second = exact_send_action_id(
+        batch_id="batch-1", message_id="m1", target="a@example.com", subject="S", body="B",
+        source_version_refs=("rfq-v2",),
+    )
+    assert first != second
+
+
+def test_control_characters_fail_closed():
+    with pytest.raises(ValueError):
+        exact_send_action_id(
+            batch_id="batch-1", message_id="m1", target="a@example.com", subject="S", body="bad\u202econtent"
+        )

@@ -119,3 +119,29 @@ def test_failure_learning_replay_contains_risk_and_emits_existing_pr19_contract(
         "expected_metric",
         "max_regression",
     }
+
+
+def test_real_procurement_calibration_does_not_self_promote_on_alignment_alone():
+    """Use the current PR #33 calibration result as a promotion anti-self-deception check.
+
+    PR #33 currently records 5/5 recommendation-human agreement, one reply-stage
+    success, zero final contract/order outcomes, and zero safety violations. Those
+    observations are useful field evidence but do not prove that a candidate is
+    better than baseline on final business outcomes.
+    """
+    benchmark = BenchmarkResult(
+        benchmark_id="forge-pr33-field-calibration-v0-1",
+        reconstruction_id="nexus-workforce-public-pattern-reconstruction-v0-1",
+        metrics={
+            "human_decision_agreement": MetricPair(1.0, 1.0),
+            "final_contract_order_outcome_coverage": MetricPair(0.0, 0.0),
+        },
+        evidence_refs=(
+            "github:PR33:data/business_genome_calibration_v0_1.json",
+            "github:PR33:tests/test_business_genome_real_calibration.py",
+        ),
+        safety_regressions=(),
+    )
+    decision = evaluate_promotion(benchmark, minimum_gain=0.01)
+    assert decision.decision is PromotionDecision.EXPERIMENT
+    assert decision.requires_human_approval is False

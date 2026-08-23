@@ -189,6 +189,13 @@ def classify_failure(*, isolated: bool, consequential_risk: bool) -> FailureDisp
     return FailureDisposition.CONTINUE_ISOLATED
 
 
+def content_write_needed(current_content: str, proposed_content: str) -> bool:
+    """Block byte-identical/no-op content writes before they create duplicate history."""
+    if not isinstance(current_content, str) or not isinstance(proposed_content, str):
+        raise ValueError("content values must be strings")
+    return current_content != proposed_content
+
+
 def build_pr19_evolution_payload(
     *,
     proposal_id: str,

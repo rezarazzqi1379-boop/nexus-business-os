@@ -1,0 +1,101 @@
+{
+  "effective_date": "2026-08-24",
+  "projects": {
+    "PRJ-HYD-01": {
+      "canonical_source_id": "PRJ-HYD-01-ENG",
+      "status": "CANONICAL",
+      "confirmed": {
+        "application": "API 5CT hydrostatic testing",
+        "equipment_reference": "GSY180/120 or technically equivalent",
+        "outside_diameter_mm": "89-180",
+        "wall_thickness_mm": "6-20",
+        "pipe_length_m": "9-12",
+        "maximum_capability_mpa": 120,
+        "pressure_logic": "actual operating pressure varies by geometry/duty; supplier must provide signed pressure-versus-OD/ID/WT/length/end-condition capability matrix",
+        "typical_hold_time_s": "5-10",
+        "buyer_capacity_basis": "60 pipes/hour"
+      },
+      "supplier_evidence_not_authority": [
+        "known supplier reference at OD 168.3 mm: 50 pipes/hour at 120 MPa and 60 pipes/hour at 70 MPa",
+        "Boyu public standard GSY180 data around 70 MPa does not prove required 120 MPa duty",
+        "GH Petro / HPG-180 and Marley remain evidence until signed capability and throughput hold points are closed",
+        "KARAT / Yaxing SYJ-I A-219 brochure may cover nominal geometry/pressure but does not prove cycle time or 60 pipes/hour"
+      ],
+      "hold_points": [
+        "final OD x WT/ID x length x pressure x hold-time x guaranteed sustained output matrix",
+        "contractual achievability of 60 pipes/hour at critical 120 MPa duty points",
+        "one unambiguous pressure accuracy/deviation/stability pass-fail rule with calibration traceability",
+        "end-condition exclusions and tooling/cycle penalties",
+        "seal-life contractual basis and approved seal/packing vendor",
+        "utilities, layout/interface, spares, training, installation, SAT and warranty terms",
+        "signed structural calculations/FEA for worst contractual pressure and pipe-ID load envelope",
+        "FAT/TPI/ITP, welding/NDE, data recording/export, safety interlocks and no-substitution BOM controls"
+      ]
+    },
+    "PRJ-HTL-01": {
+      "canonical_source_id": "PRJ-HTL-01-ENG",
+      "status": "CANONICAL_WITH_REVALIDATION_HOLD",
+      "confirmed": {
+        "application": "API 5CT steel pipe/OCTG",
+        "outside_diameter_mm": "63.5-177.8",
+        "wall_thickness_mm": "2-20",
+        "length_m": "6-12",
+        "process": "Quench + Normalize + Temper",
+        "quench_normalize_furnace": "hydraulic walking beam, natural gas, max 960C; pipe 850-950C; soak >5 min; uniformity +/-10C; inside/outside delta-T target +/-5C",
+        "tempering_furnace": "hydraulic walking beam, max 800C; pipe 500-750C; uniformity +/-10C",
+        "quench": "water quench/internal cooling with pumps, heat exchanger and water treatment"
+      },
+      "controlled_working_state": {
+        "throughput": "approximately 40 pipes/hour",
+        "authority_status": "REVALIDATION_HOLD",
+        "reason": "older engineer-side message recorded 40-60 pipes/minute, materially conflicting with later 40 pipes/hour correction"
+      },
+      "hold_points": [
+        "revalidate throughput directly with buyer engineering before new RFQ, final technical commitment or contract",
+        "current project activation / management go-ahead",
+        "engineering amendments after 21 Aug 2026",
+        "final utilities, layout, interface, quality/FAT and commissioning requirements"
+      ]
+    },
+    "PRJ-KCL-01": {
+      "canonical_source_id": "PRJ-KCL-01-ACC",
+      "status": "CANONICAL",
+      "confirmed": {
+        "material": "white potassium chloride / MOP used as SOP unit feed",
+        "moisture_max_percent": 0.5,
+        "water_soluble_K2O_min_percent": 61,
+        "NaCl_max_percent": 2,
+        "MgCl2_max_percent": 1,
+        "granulometry": "75% at 0.1-0.4 mm; 1 mm max 0.5%; below 0.1 mm max 23.5%",
+        "black_impurities": "none visible to naked eye",
+        "solubility_min_percent": 99.5
+      },
+      "dynamic_refresh_required": [
+        "purchase quantity / forecast and buying authority",
+        "permit/legal requirements and permit owner",
+        "destination, Incoterm, price target, payment route and sanctions/logistics feasibility",
+        "supplier availability and export terms"
+      ]
+    },
+    "PRJ-CAN-01": {
+      "canonical_source_id": "PRJ-CAN-01-ENG",
+      "status": "CANONICAL",
+      "confirmed": {
+        "application": "cylindrical metal can/tube approximately diameter 52-99 mm",
+        "operations": ["necking", "flanging", "beading"],
+        "comparison_scope": "where relevant compare necking-only and full-set configurations",
+        "rfq_minimum_fields": ["model/range", "CPM", "power", "dimensions/weight", "utilities", "photos/video", "price", "delivery", "warranty", "spares", "installation", "export references", "long-term support"]
+      },
+      "unknown_requires_fresh_verification": [
+        "final buyer-selected production rate and exact product geometry for each SKU",
+        "mandatory operations in the next purchase stage",
+        "final acceptance test, tooling/changeover and support requirements"
+      ]
+    }
+  },
+  "cross_project_invariants": [
+    "Hydrotester buyer capacity basis is 60 pipes/hour",
+    "Heat Treatment throughput is only a controlled working state of approximately 40 pipes/hour pending revalidation",
+    "Hydrotester values must not migrate into Heat Treatment and Heat Treatment values must not migrate into Hydrotester"
+  ]
+}

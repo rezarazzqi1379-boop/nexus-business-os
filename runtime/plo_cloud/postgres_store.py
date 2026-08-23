@@ -191,12 +191,14 @@ class PostgresPLOStore:
         with self.connect() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT status,lease_token,lease_owner,task_version,approval_required FROM plo_tasks WHERE run_id=%s::uuid FOR UPDATE",
+                    "SELECT status,lease_token,lease_owner,lock_expires_at,task_version,approval_required FROM plo_tasks WHERE run_id=%s::uuid FOR UPDATE",
                     (run_id,),
                 )
                 task = cur.fetchone()
-                if not task or task["status"] != "RUNNING" or str(task["lease_token"]) != lease_token or task["lease_owner"] != worker:
-                    raise PostgresOwnershipError("not current owner")
+                if (not task or task["status"] != "RUNNING" or str(task["lease_token"]) != lease_token
+                        or task["lease_owner"] != worker or task["lock_expires_at"] is None
+                        or task["lock_expires_at"] <= utcnow()):
+                    raise PostgresOwnershipError("lease invalid, expired, or not current owner")
                 if not task["approval_required"]:
                     raise PostgresApprovalError("approval path misuse")
                 cur.execute("SELECT run_id,scope FROM plo_operations WHERE operation_key=%s", (operation_key,))
@@ -221,9 +223,19 @@ class PostgresPLOStore:
                 cur.execute("INSERT INTO plo_audit(action,run_id,result) VALUES('operation_authorized',%s::uuid,%s)", (run_id, operation_key))
         return str(auth)
 
-    def record_intent(self, run_id: str, operation_key: str, auth_token: str):
+    def record_intent(self, run_id: str, operation_key: str, auth_token: str, lease_token: str, worker: str):
         with self.connect() as conn:
             with conn.cursor() as cur:
+                cur.execute(
+                    """SELECT status,lease_token,lease_owner,lock_expires_at FROM plo_tasks
+                       WHERE run_id=%s::uuid FOR UPDATE""",
+                    (run_id,),
+                )
+                task = cur.fetchone()
+                if (not task or task["status"] != "RUNNING" or str(task["lease_token"]) != lease_token
+                        or task["lease_owner"] != worker or task["lock_expires_at"] is None
+                        or task["lock_expires_at"] <= utcnow()):
+                    raise PostgresOwnershipError("lease invalid, expired, or not current owner")
                 cur.execute(
                     """UPDATE plo_operations SET state='intended'
                        WHERE operation_key=%s AND run_id=%s::uuid AND auth_token=%s::uuid AND state='authorized'
@@ -236,10 +248,12 @@ class PostgresPLOStore:
     def mark_executed(self, operation_key: str):
         with self.connect() as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT run_id FROM plo_operations WHERE operation_key=%s FOR UPDATE", (operation_key,))
+                cur.execute("SELECT run_id,state FROM plo_operations WHERE operation_key=%s FOR UPDATE", (operation_key,))
                 row = cur.fetchone()
                 if not row:
                     raise PostgresApprovalError("unknown operation")
+                if row["state"] not in ("intended", "executed"):
+                    raise PostgresApprovalError("operation was not intended")
                 cur.execute("UPDATE plo_operations SET state='executed', executed_at=now() WHERE operation_key=%s", (operation_key,))
                 cur.execute("INSERT INTO plo_execution_log(operation_key,run_id) VALUES(%s,%s)", (operation_key, row["run_id"]))
 

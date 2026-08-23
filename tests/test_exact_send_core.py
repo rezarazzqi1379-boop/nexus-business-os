@@ -80,3 +80,15 @@ def test_subject_newline_fails_closed():
         exact_send_action_id(
             batch_id="batch-1", message_id="m1", target="a@example.com", subject="bad\nsubject", body="safe body"
         )
+
+
+def test_source_version_refs_reject_plain_string_instead_of_hashing_characters():
+    with pytest.raises(ValueError, match="sequence of strings"):
+        exact_send_action_id(
+            batch_id="batch-1",
+            message_id="m1",
+            target="a@example.com",
+            subject="S",
+            body="B",
+            source_version_refs="rfq-v1",
+        )

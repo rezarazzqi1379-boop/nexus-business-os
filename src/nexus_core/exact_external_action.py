@@ -63,12 +63,16 @@ def _refs_error(name: str, refs: object, *, required: bool) -> str | None:
         return f"{name} must be a tuple"
     if required and not refs:
         return f"{name} requires at least one reference"
-    if len(set(refs)) != len(refs):
-        return f"{name} cannot contain duplicates"
+
+    normalized: list[str] = []
     for ref in refs:
         error = _text_error(name, ref, max_length=_MAX_REF)
         if error:
             return error
+        normalized.append(ref)
+
+    if len(set(normalized)) != len(normalized):
+        return f"{name} cannot contain duplicates"
     return None
 
 

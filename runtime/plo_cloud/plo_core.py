@@ -85,19 +85,21 @@ class PLOStore:
             db.execute("UPDATE approvals SET decision=? WHERE approval_id=?",(decision,aid))
     def authorize_operation(self,rid,op_key,scope,lease_token,worker):
         with self.tx() as db:
-            t=db.execute("SELECT status,lease_token,lease_owner,task_version,approval_required FROM tasks WHERE run_id=?",(rid,)).fetchone()
-            if not t or t[0]!="RUNNING" or t[1]!=lease_token or t[2]!=worker: raise OwnershipError("not owner")
-            if not t[4]: raise ApprovalError("approval path misuse")
+            t=db.execute("SELECT status,lease_token,lease_owner,lock_expires_at,task_version,approval_required FROM tasks WHERE run_id=?",(rid,)).fetchone()
+            if not t or t[0]!="RUNNING" or t[1]!=lease_token or t[2]!=worker or not t[3] or t[3]<=now(): raise OwnershipError("lease invalid, expired, or not owned")
+            if not t[5]: raise ApprovalError("approval path misuse")
             existing=db.execute("SELECT run_id,scope FROM operations WHERE operation_key=?",(op_key,)).fetchone()
             if existing and existing!=(rid,scope): raise ApprovalError("operation key rebound")
-            a=db.execute("SELECT approval_id FROM approvals WHERE run_id=? AND task_version=? AND scope=? AND decision='approved' AND consumed_at IS NULL AND expires_at>?",(rid,t[3],scope,now())).fetchone()
+            a=db.execute("SELECT approval_id FROM approvals WHERE run_id=? AND task_version=? AND scope=? AND decision='approved' AND consumed_at IS NULL AND expires_at>?",(rid,t[4],scope,now())).fetchone()
             if not a: raise ApprovalError("no valid approval")
             db.execute("UPDATE approvals SET consumed_at=? WHERE approval_id=?",(now(),a[0]))
             token=str(uuid.uuid4())
             db.execute("INSERT INTO operations(operation_key,run_id,scope,auth_token,state,created_at) VALUES(?,?,?,?,?,?)",(op_key,rid,scope,token,"authorized",now()))
             self.audit(db,"operation_authorized",rid,op_key); return token
-    def record_intent(self,rid,op_key,auth_token):
+    def record_intent(self,rid,op_key,auth_token,lease_token,worker):
         with self.tx() as db:
+            task=db.execute("SELECT status,lease_token,lease_owner,lock_expires_at FROM tasks WHERE run_id=?",(rid,)).fetchone()
+            if not task or task[0]!="RUNNING" or task[1]!=lease_token or task[2]!=worker or not task[3] or task[3]<=now(): raise OwnershipError("lease invalid, expired, or not owned")
             row=db.execute("SELECT run_id,auth_token,state FROM operations WHERE operation_key=?",(op_key,)).fetchone()
             if not row or row!=(rid,auth_token,"authorized"): raise ApprovalError("missing authorization")
             db.execute("UPDATE operations SET state='intended' WHERE operation_key=?",(op_key,))
@@ -105,6 +107,7 @@ class PLOStore:
         with self.tx() as db:
             row=db.execute("SELECT state FROM operations WHERE operation_key=?",(op_key,)).fetchone()
             if not row: raise ApprovalError("unknown operation")
+            if row[0] not in ("intended","executed"): raise ApprovalError("operation was not intended")
             db.execute("UPDATE operations SET state='executed' WHERE operation_key=?",(op_key,))
             db.execute("INSERT INTO execution_log(operation_key,ts) VALUES(?,?)",(op_key,now()))
     def recover_orphans(self):

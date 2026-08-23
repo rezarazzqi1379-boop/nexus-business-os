@@ -51,6 +51,15 @@ def _clean_message_body(value: object) -> str:
     return value
 
 
+def _clean_source_version_refs(value: object) -> list[str]:
+    if isinstance(value, (str, bytes)) or not isinstance(value, Sequence):
+        raise ValueError("source_version_refs must be a sequence of strings")
+    refs: list[str] = []
+    for ref in value:
+        refs.append(_clean_control_text("source_version_ref", ref, _MAX_ID))
+    return refs
+
+
 def exact_send_action_id(
     *,
     batch_id: str,
@@ -74,9 +83,7 @@ def exact_send_action_id(
     if thread_ref is not None:
         thread_ref = _clean_control_text("thread_ref", thread_ref, _MAX_ID)
 
-    refs = []
-    for ref in source_version_refs:
-        refs.append(_clean_control_text("source_version_ref", ref, _MAX_ID))
+    refs = _clean_source_version_refs(source_version_refs)
 
     payload: Mapping[str, object] = {
         "batch_id": batch_id,

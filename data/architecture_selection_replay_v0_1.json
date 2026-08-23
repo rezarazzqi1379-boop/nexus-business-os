@@ -1,0 +1,58 @@
+{
+  "version": "0.1",
+  "purpose": "matched shadow replay for selecting the smallest effective agent architecture on representative NEXUS work types",
+  "cases": [
+    {
+      "id": "hydro-contract-review-sequential",
+      "description": "Hydrotester contractual qualification where pressure, throughput, sealing, FAT and structural checks depend on one integrated requirement state",
+      "parallelizable_fraction": 0.35,
+      "sequential_dependency": 0.85,
+      "tool_count": 7,
+      "context_degradation": 0.35,
+      "independent_verification_available": true,
+      "expected_architecture": "single_agent"
+    },
+    {
+      "id": "supplier-landscape-parallel-research",
+      "description": "Independent supplier discovery across countries/sources with one canonical evidence synthesis and duplicate check",
+      "parallelizable_fraction": 0.92,
+      "sequential_dependency": 0.12,
+      "tool_count": 6,
+      "context_degradation": 0.65,
+      "independent_verification_available": true,
+      "latency_priority": 0.9,
+      "cost_priority": 0.3,
+      "expected_architecture": "parallel_research"
+    },
+    {
+      "id": "commercial-thread-reply-tool-heavy",
+      "description": "Read current thread, resolve identity, verify attachments, canonical requirements and exact-action approval before drafting/sending",
+      "parallelizable_fraction": 0.55,
+      "sequential_dependency": 0.72,
+      "tool_count": 14,
+      "context_degradation": 0.45,
+      "independent_verification_available": true,
+      "expected_architecture": "single_agent"
+    },
+    {
+      "id": "portfolio-research-degraded-context",
+      "description": "Large cross-market opportunity investigation with independent evidence branches and one centralized verifier-backed synthesis",
+      "parallelizable_fraction": 0.72,
+      "sequential_dependency": 0.28,
+      "tool_count": 8,
+      "context_degradation": 0.82,
+      "independent_verification_available": true,
+      "expected_architecture": "centralized_multi_agent"
+    },
+    {
+      "id": "unverified-parallel-idea",
+      "description": "Highly decomposable exploration with no independent verification available",
+      "parallelizable_fraction": 0.9,
+      "sequential_dependency": 0.1,
+      "tool_count": 4,
+      "context_degradation": 0.7,
+      "independent_verification_available": false,
+      "expected_architecture": "single_agent"
+    }
+  ]
+}

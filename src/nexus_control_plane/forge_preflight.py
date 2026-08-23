@@ -39,6 +39,19 @@ def _non_empty_text(value: object) -> bool:
     return isinstance(value, str) and bool(value.strip()) and value == value.strip()
 
 
+def _valid_unique_refs(refs: object, *, required: bool) -> bool:
+    if not isinstance(refs, tuple):
+        return False
+    if required and not refs:
+        return False
+    normalized: list[str] = []
+    for ref in refs:
+        if not _non_empty_text(ref):
+            return False
+        normalized.append(ref)
+    return len(set(normalized)) == len(normalized)
+
+
 def evaluate_forge_preflight(
     request: ForgePreflightRequest,
     *,
@@ -59,6 +72,7 @@ def evaluate_forge_preflight(
     blockers: list[str] = []
     warnings: list[str] = []
 
+    valid_concern = _non_empty_text(request.concern)
     for name, value in (
         ("change_id", request.change_id),
         ("concern", request.concern),
@@ -67,34 +81,28 @@ def evaluate_forge_preflight(
         if not _non_empty_text(value):
             blockers.append(f"{name} is invalid")
 
-    if (
-        not isinstance(request.evidence_refs, tuple)
-        or not request.evidence_refs
-        or any(not _non_empty_text(ref) for ref in request.evidence_refs)
-        or len(set(request.evidence_refs)) != len(request.evidence_refs)
-    ):
+    if not _valid_unique_refs(request.evidence_refs, required=True):
         blockers.append("evidence_refs must be unique non-empty strings")
 
-    existing_owner = canonical_owners.get(request.concern)
-    if existing_owner is not None:
-        if not _non_empty_text(existing_owner):
-            blockers.append("canonical owner registry contains invalid owner metadata")
-        elif existing_owner != request.proposed_owner:
-            blockers.append(
-                f"canonical owner conflict: {request.concern} is owned by {existing_owner}, not {request.proposed_owner}"
-            )
-    else:
-        warnings.append("concern has no canonical owner yet; consolidation review required before promotion")
+    if valid_concern:
+        existing_owner = canonical_owners.get(request.concern)
+        if existing_owner is not None:
+            if not _non_empty_text(existing_owner):
+                blockers.append("canonical owner registry contains invalid owner metadata")
+            elif existing_owner != request.proposed_owner:
+                blockers.append(
+                    f"canonical owner conflict: {request.concern} is owned by {existing_owner}, not {request.proposed_owner}"
+                )
+        else:
+            warnings.append("concern has no canonical owner yet; consolidation review required before promotion")
 
     if not isinstance(request.runtime_sensitive, bool) or not isinstance(request.live_verified, bool):
         blockers.append("runtime verification flags must be boolean")
     elif request.runtime_sensitive and not request.live_verified:
         warnings.append("runtime-sensitive claim is not live-verified")
 
-    if not isinstance(request.prior_failure_refs, tuple) or any(
-        not _non_empty_text(ref) for ref in request.prior_failure_refs
-    ):
-        blockers.append("prior_failure_refs must contain non-empty strings")
+    if not _valid_unique_refs(request.prior_failure_refs, required=False):
+        blockers.append("prior_failure_refs must be unique non-empty strings")
     elif request.prior_failure_refs and request.prior_failures_consulted is not True:
         warnings.append("relevant prior failures exist but have not been consulted")
 

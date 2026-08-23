@@ -8,6 +8,7 @@ from nexus_control_plane.forge import (
     TargetKind,
     build_pr19_evolution_payload,
     classify_failure,
+    content_write_needed,
     evaluate_promotion,
 )
 from nexus_control_plane.workforce import EvidenceClass, catalog
@@ -145,3 +146,24 @@ def test_real_procurement_calibration_does_not_self_promote_on_alignment_alone()
     decision = evaluate_promotion(benchmark, minimum_gain=0.01)
     assert decision.decision is PromotionDecision.EXPERIMENT
     assert decision.requires_human_approval is False
+
+
+def test_observed_noop_write_failure_becomes_a_regression_guard():
+    """Regression for the observed PR #36 duplicate/no-op README write failure."""
+    current = "canonical content\n"
+    assert content_write_needed(current, current) is False
+    assert content_write_needed(current, "canonical content changed\n") is True
+
+    disposition = classify_failure(isolated=True, consequential_risk=False)
+    assert disposition is FailureDisposition.CONTINUE_ISOLATED
+
+    payload = build_pr19_evolution_payload(
+        proposal_id="forge-noop-write-guard-v0-1",
+        component="nexus_control_plane.forge",
+        hypothesis="pre-write content equality checks reduce duplicate commit noise",
+        change_summary="skip byte-identical content writes before connector mutation",
+        source_observations=("github:PR36:observed-noop-readme-write-failure",),
+        expected_metric="noop_write_rate",
+        max_regression=0.0,
+    )
+    assert payload["expected_metric"] == "noop_write_rate"

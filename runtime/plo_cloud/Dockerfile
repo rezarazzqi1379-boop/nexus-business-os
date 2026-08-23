@@ -6,4 +6,4 @@ RUN python -m pip install --no-cache-dir 'psycopg[binary]>=3.2,<4' \
  && python -m compileall -q . \
  && python tests/test_cloud.py
 VOLUME ["/data"]
-CMD ["python","worker.py","--db","/data/nexus_plo.db"]
+CMD ["python","worker.py","--backend","auto"]

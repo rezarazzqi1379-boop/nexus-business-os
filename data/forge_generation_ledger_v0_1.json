@@ -1,0 +1,33 @@
+{
+  "schema_version": "forge_generation_ledger_v0_1",
+  "authority": "shadow_observation_not_merge_or_production_authority",
+  "entries": [
+    {
+      "generation_id": "forge-gen-2026-08-23-evidence-loop-01",
+      "parent_generation_id": null,
+      "baseline_version": "6a3bfab51f164ce6d665d4648d50e9d59d90c1e2",
+      "candidate_version": "99fa77e29572876ff0214d614ea03759eb301402",
+      "decision": "self_stop_audit",
+      "stop_reason": "evidence_checkpoint",
+      "technical_verification": {
+        "github_actions_run": 32664601714,
+        "run_number": 573,
+        "pytest_passed": 184,
+        "pytest_failed": 0,
+        "pytest_seconds": 0.40
+      },
+      "evidence_refs": [
+        "github:pr36@99fa77e29572876ff0214d614ea03759eb301402",
+        "github:actions:32664601714"
+      ],
+      "decision_refs": [],
+      "outcome_refs": [],
+      "contradiction_refs": [],
+      "failure_refs": [],
+      "independent_audit_passed": false,
+      "terminal_business_outcome_observed": false,
+      "promotion_authorized": false,
+      "notes": "Technical shadow verification passed. Independent audit, merge authority, production authority and terminal business outcomes are intentionally not inferred."
+    }
+  ]
+}

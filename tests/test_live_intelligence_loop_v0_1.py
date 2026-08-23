@@ -115,3 +115,36 @@ def test_nba_human_gate_does_not_block_ranking_but_never_authorizes_execution():
     assert ranked[0].blocked is False
     assert "human gate" in " ".join(ranked[0].reasons)
     assert ranked[0].ranking_is_advisory is True
+
+
+def test_nba_allows_epistemic_resolution_to_break_contradiction_deadlock():
+    verify = _candidate(
+        "verify",
+        action_type="verification",
+        source_authority_ok=False,
+        unresolved_contradictions=2,
+        information_gain=1.0,
+        epistemic_resolution=True,
+    )
+    ranked = rank_next_best_actions((verify,))
+    assert ranked[0].blocked is False
+    joined = " ".join(ranked[0].reasons)
+    assert "limited to resolving" in joined or "limited to verification" in joined
+    assert "does not establish the missing fact" in joined
+
+
+def test_epistemic_resolution_does_not_bypass_dependencies_or_failure_memory():
+    verify = _candidate(
+        "verify",
+        action_type="verification",
+        source_authority_ok=False,
+        unresolved_contradictions=1,
+        epistemic_resolution=True,
+        dependency_ready=False,
+        prior_failures_consulted=False,
+    )
+    ranked = rank_next_best_actions((verify,))
+    assert ranked[0].blocked is True
+    joined = " ".join(ranked[0].reasons)
+    assert "dependency is not ready" in joined
+    assert "prior failures" in joined

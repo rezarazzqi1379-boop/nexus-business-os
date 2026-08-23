@@ -38,9 +38,12 @@ jobs:
       - name: PostgreSQL durability and concurrency tests
         working-directory: runtime/plo_cloud
         run: python tests/test_postgres.py
-      - name: One-shot worker
+      - name: SQLite one-shot worker
         working-directory: runtime/plo_cloud
-        run: python worker.py --db /tmp/nexus-plo-ci.db
+        run: python worker.py --backend sqlite --db /tmp/nexus-plo-ci.db
+      - name: PostgreSQL one-shot worker
+        working-directory: runtime/plo_cloud
+        run: python worker.py --backend postgres
       - name: Container build
         working-directory: runtime/plo_cloud
         run: docker build -t nexus-plo-cloud:ci .

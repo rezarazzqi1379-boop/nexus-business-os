@@ -1,0 +1,56 @@
+{
+  "benchmark_id": "nexus-intelligence-replay-v0.1",
+  "benchmark_type": "deterministic_contract_replay_proxy",
+  "production_claim": false,
+  "baseline": {
+    "accepted_decisions": 10,
+    "stale_memory_rejections": 1,
+    "source_authority_violations": 1,
+    "cross_project_contamination": 1,
+    "contradictions_detected": 2,
+    "recoverable_failures": 4,
+    "recovered_failures": 2,
+    "human_overrides": 2,
+    "duplicate_actions": 2,
+    "tool_calls": 50,
+    "context_units": 1000
+  },
+  "candidate": {
+    "accepted_decisions": 10,
+    "stale_memory_rejections": 4,
+    "source_authority_violations": 0,
+    "cross_project_contamination": 0,
+    "contradictions_detected": 4,
+    "recoverable_failures": 4,
+    "recovered_failures": 4,
+    "human_overrides": 1,
+    "duplicate_actions": 0,
+    "tool_calls": 36,
+    "context_units": 620
+  },
+  "derived": {
+    "baseline_recovery_rate": 0.5,
+    "candidate_recovery_rate": 1.0,
+    "recovery_rate_delta": 0.5,
+    "tool_calls_per_accepted_decision_baseline": 5.0,
+    "tool_calls_per_accepted_decision_candidate": 3.6,
+    "tool_calls_per_accepted_decision_delta": -1.4,
+    "context_units_per_accepted_decision_baseline": 100.0,
+    "context_units_per_accepted_decision_candidate": 62.0,
+    "context_units_per_accepted_decision_delta": -38.0,
+    "source_authority_violation_delta": -1,
+    "cross_project_contamination_delta": -1,
+    "duplicate_action_delta": -2,
+    "stale_memory_rejection_delta": 3
+  },
+  "interpretation": "candidate is replay-promotable under the benchmark contract, but this does not authorize production promotion or imply commercial ROI",
+  "next_measurement_gate": [
+    "real p50/p95 decision latency",
+    "real token/cost per accepted decision",
+    "real tool calls per accepted decision",
+    "real stale-memory rejection events",
+    "real human override rate",
+    "real failure recovery rate",
+    "commercial funnel outcomes through order and gross margin"
+  ]
+}

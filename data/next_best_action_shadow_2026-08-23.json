@@ -1,0 +1,64 @@
+{
+  "schema_version": "0.1",
+  "status": "shadow_non_live",
+  "generated_for": "NEXUS portfolio decision architecture",
+  "warning": "Scores are transparent heuristic priorities, not calibrated probabilities, ROI forecasts, live market truth, or execution authorization. Dynamic project facts require live refresh before material action.",
+  "candidates": [
+    {
+      "rank": 1,
+      "action_id": "nexus-live-telemetry-instrumentation",
+      "project_id": "NEXUS-CORE",
+      "action_type": "instrumentation",
+      "score": 0.8085,
+      "blocked": false,
+      "human_gate_required": false,
+      "epistemic_resolution": false,
+      "why": "Highest immediate information value for measuring latency, tool cost, context load, recovery, human override and accepted-decision quality with minimal external risk."
+    },
+    {
+      "rank": 2,
+      "action_id": "hydro-resolve-current-engineering-unknowns",
+      "project_id": "HYDROTESTER",
+      "action_type": "verification",
+      "score": 0.7925,
+      "blocked": false,
+      "human_gate_required": false,
+      "epistemic_resolution": true,
+      "why": "High information gain. Any open contradiction/unknown permits verification/research only; it does not authorize supplier commitment or requirement rewrite."
+    },
+    {
+      "rank": 3,
+      "action_id": "kcl-refresh-dynamic-commercial-state",
+      "project_id": "KCL",
+      "action_type": "research",
+      "score": 0.73,
+      "blocked": false,
+      "human_gate_required": false,
+      "epistemic_resolution": true,
+      "why": "Quantity, price, payment, permit and supplier availability are dynamic and must be refreshed before material commercial action."
+    },
+    {
+      "rank": 4,
+      "action_id": "can-forming-resolve-missing-production-geometry",
+      "project_id": "CAN_FORMING",
+      "action_type": "verification",
+      "score": 0.6535,
+      "blocked": false,
+      "human_gate_required": false,
+      "epistemic_resolution": true,
+      "why": "Production rate and final SKU geometry remain decision-sensitive unknowns; resolving them increases downstream sourcing quality."
+    },
+    {
+      "rank": 5,
+      "action_id": "heat-treatment-throughput-revalidation",
+      "project_id": "HEAT_TREATMENT",
+      "action_type": "verification",
+      "score": 0.6,
+      "blocked": false,
+      "human_gate_required": false,
+      "epistemic_resolution": true,
+      "why": "Historical throughput conflict requires revalidation before the value can be used as a stable requirement. Lower portfolio priority does not convert the working value into fact."
+    }
+  ],
+  "hard_rule": "Any external send, purchase, merge, deploy, permission change, production DB mutation, contract, payment or exact consequential action remains separately human-gated."
+}

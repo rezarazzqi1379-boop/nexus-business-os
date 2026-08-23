@@ -1,0 +1,45 @@
+{
+  "schema_version": "0.1",
+  "status": "shadow_regression_campaign",
+  "campaign": "nexus-intelligence-cross-layer-failure-injection-v0.1",
+  "scenarios": [
+    {
+      "scenario": "superseded_memory_reuse",
+      "injection": "Superseded KCl memory offered as current decision context",
+      "expected_guard": "memory lifecycle excludes it",
+      "observed_contract": "excluded"
+    },
+    {
+      "scenario": "competing_tier_a_authority",
+      "injection": "Two active Hydrotester Tier A sources govern the same scope",
+      "expected_guard": "source authority blocks conflict",
+      "observed_contract": "BLOCK_CONFLICT"
+    },
+    {
+      "scenario": "cross_project_outcome_contamination",
+      "injection": "Hydrotester quote proposed as progression from a KCl RFQ",
+      "expected_guard": "outcome graph rejects transition",
+      "observed_contract": "rejected"
+    },
+    {
+      "scenario": "duplicate_telemetry_identity",
+      "injection": "Two observed events reuse the same event_id",
+      "expected_guard": "telemetry aggregation rejects duplicate identity",
+      "observed_contract": "ValueError/fail-closed"
+    },
+    {
+      "scenario": "corrupted_runtime_state",
+      "injection": "Runtime reports state corruption with a verified reversible checkpoint",
+      "expected_guard": "recovery runtime rewinds rather than blind retry",
+      "observed_contract": "REWIND"
+    },
+    {
+      "scenario": "epistemic_deadlock",
+      "injection": "Open contradiction exists; both verification and material commitment are candidates",
+      "expected_guard": "verification remains rankable while material commitment remains blocked",
+      "observed_contract": "verification allowed for resolution; commitment blocked"
+    }
+  ],
+  "interpretation": "These are bounded regression injections over deterministic contracts. They are not evidence of production resilience against every real connector/model/network failure.",
+  "production_authority": false
+}

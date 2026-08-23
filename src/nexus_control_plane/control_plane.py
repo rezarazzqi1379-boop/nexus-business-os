@@ -4,6 +4,12 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Mapping, Optional, Set, Tuple
 
+from nexus_control_plane.forge_preflight import (
+    ForgePreflightRequest,
+    PreflightDecision,
+    evaluate_registered_forge_preflight,
+)
+
 
 class Maturity(str, Enum):
     DESIGNED = "designed"
@@ -34,6 +40,25 @@ class WorkState(str, Enum):
     REVIEW = "review"
     DONE = "done"
     REJECTED = "rejected"
+
+
+_MATERIAL_CHANGE_KINDS = {
+    "agent_change",
+    "architecture_change",
+    "business_engine_change",
+    "connector_change",
+    "evaluator_change",
+    "learning_change",
+    "project_mechanism_change",
+    "workflow_change",
+}
+
+
+def requires_forge_preflight(kind: object) -> bool:
+    if not isinstance(kind, str):
+        return False
+    normalized = kind.strip()
+    return normalized in _MATERIAL_CHANGE_KINDS or normalized.startswith("change:")
 
 
 @dataclass(frozen=True)
@@ -78,6 +103,7 @@ class WorkItem:
     dedupe_key: Optional[str] = None
     assigned_agent: Optional[str] = None
     blockers: List[str] = field(default_factory=list)
+    forge_preflight: Optional[ForgePreflightRequest] = None
 
 
 @dataclass(frozen=True)
@@ -126,6 +152,22 @@ class ControlPlane:
             raise ValueError(f"duplicate work id: {item.id}")
         if item.goal_id not in self.goals:
             raise ValueError(f"unknown goal: {item.goal_id}")
+
+        if requires_forge_preflight(item.kind):
+            if item.forge_preflight is None:
+                item.state = WorkState.BLOCKED
+                item.blockers.append("forge_preflight_required")
+            else:
+                result = evaluate_registered_forge_preflight(item.forge_preflight)
+                if result.decision is PreflightDecision.BLOCK:
+                    item.state = WorkState.BLOCKED
+                    item.blockers.extend(f"forge_block:{reason}" for reason in result.blockers)
+                elif result.decision is PreflightDecision.HOLD:
+                    item.state = WorkState.REVIEW
+                    item.blockers.extend(f"forge_hold:{reason}" for reason in result.warnings)
+                elif result.decision is PreflightDecision.SHADOW_READY:
+                    item.state = WorkState.READY
+
         if item.dedupe_key and item.dedupe_key in self.completed_dedupe_keys:
             item.state = WorkState.REJECTED
             item.blockers.append("duplicate_of_completed_action")
@@ -171,6 +213,10 @@ class ControlPlane:
 
     def route(self, item_id: str) -> Optional[str]:
         item = self.work[item_id]
+        if item.state is WorkState.REVIEW:
+            return None
+        if item.state is WorkState.BLOCKED and any(blocker.startswith("forge_") for blocker in item.blockers):
+            return None
         if item.state in {WorkState.DONE, WorkState.REJECTED, WorkState.RUNNING}:
             return item.assigned_agent
         if not self._deps_done(item):

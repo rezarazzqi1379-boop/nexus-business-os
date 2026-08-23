@@ -23,6 +23,11 @@ Recent research adds four architecture implications:
 - Caller-supplied incident references are not automatically marked consulted; only memory actually read by the internal retrieval path is.
 - Failure-memory integrity is fail-closed.
 - Tests prove relevant retrieval for evaluation/security concerns and preserve the explicit caller-consultation boundary.
+- Exact-head GitHub Actions run #560 passes 158/158 tests in 0.39s at head `26b4ee7ceedd1e9e8e13dcba8342bb38941b824a`.
+
+## Current branch-integration warning
+
+`feature/nexus-forge-loop-v0-1` is currently 34 commits ahead and 16 commits behind `experiment/altari-public-patterns-v0-1`; GitHub temporarily reports PR #36 as non-mergeable at the current state. This is an integration-state issue, not a failed Forge test. Do not force-update or blindly rebase. Reconcile the moving base deliberately before any merge review.
 
 ## Decision-system upgrade direction
 

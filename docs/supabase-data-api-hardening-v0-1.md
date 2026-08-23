@@ -1,101 +1,93 @@
-# Supabase Data API Hardening v0.1
+# Supabase Data API Hardening v0.2
 
-Status: **PROPOSAL / NOT APPLIED**
+Status: **LIVE POSTURE REVERIFIED / HARDENING NOT APPLIED**
 
-This document records the verified 2026-08-20 NEXUS Supabase access posture and a reversible hardening plan. It does not authorize or apply any production access change.
+Verified: 2026-08-23
+Project: `jhmhtrzhcpdfkoflnsac`
 
-## Verified current state
+This document is a Forge re-verification of the NEXUS Supabase posture. It records current read-only evidence and a reversible hardening plan. It does not authorize or apply any production access change.
 
-Project: `jhmhtrzhcpdfkoflnsac` (`ACTIVE_HEALTHY`).
+## Current verified state
 
-Seventeen `public.nexus_*` tables are owned by `postgres`, have RLS enabled, and currently have zero RLS policies. Current PostgreSQL grants give `anon` and `authenticated` direct table privileges including SELECT/INSERT/UPDATE/DELETE. With RLS enabled and no policies, ordinary Data API row access fails closed, but the broad grants increase future risk if a weak policy is later added.
+- Supabase project status: `ACTIVE_HEALTHY`.
+- Live SQL access succeeds as `postgres` in schema `public`.
+- Current inventory contains 30 base tables matching `public.nexus_*`; information-schema inventory also exposes 33 `nexus_*` relations when non-base-table relations are included.
+- `nexus_projects`: 13 rows.
+- `nexus_runtime_state`: 21 rows.
+- `nexus_lessons`: 2 rows.
+- `nexus_promotion_gates`: 3 rows.
+- `nexus_outcomes`: 1 row.
+- Public PostgreSQL function count at re-verification: 0.
 
-The current NEXUS schema does not provide a shared `user_id`, `tenant_id`, or `workspace_id` ownership column across these tables. Therefore user-scoped policies based on `auth.uid()` cannot be honestly introduced without a separate ownership/tenancy design.
+The earlier repository wording that Supabase connector access was permission-blocked is stale for the current session. PR #31's basic claim that a Supabase runtime exists is now supported by live evidence, but individual runtime-state/content claims must still be checked field-by-field before use.
 
-The active Edge Function `nexus-proposal-qualifier` has `verify_jwt=true` and does not read or write database tables. A live audit found no PostgreSQL functions in the `public` schema. Repository searches found no current Supabase JS/SSR client, `NEXT_PUBLIC_SUPABASE_*`, `/rest/v1`, `/graphql/v1`, or `supabase.co` application dependency. The Supabase API log was empty for the previous 24 hours at the time of verification. This is strong evidence of no current Data API dependency, but not proof that no historical or external consumer has ever existed.
+## RLS / grant posture
 
-Default privileges in `public` currently auto-grant table/function/sequence privileges to API roles for objects created by `postgres` and `supabase_admin`. Therefore hardening only today's 17 tables is not future-safe.
+Security Advisor currently reports `rls_enabled_no_policy` on many `public.nexus_*` tables. The direct catalog replay confirms the base tables have RLS enabled and zero policies.
+
+This does **not** by itself prove data exposure. With RLS enabled and no policies, ordinary API row access is fail-closed. However, the grant surface is broader than necessary for an internal-only data model:
+
+- `service_role` currently has table privileges across all 33 discovered `nexus_*` relations in the role-grant inventory.
+- `anon` and `authenticated` currently hold broad relation privileges on 16 discovered relations in the role-grant inventory.
+- For the 30 base tables inspected directly, 13 currently show `anon` and `authenticated` grants while RLS remains enabled with zero policies.
+
+This combination is currently fail-closed at the row-policy layer, but it creates unnecessary future risk: adding a weak RLS policy later could unexpectedly expose a relation that already has API-role grants.
+
+## Forge diagnosis
+
+Observed mechanism:
+`public schema + Data API roles + table grants + RLS`
+
+Current protection:
+`RLS enabled + no policies -> row access denied`
+
+Current weakness:
+`broad grants remain latent authority and increase the blast radius of a future policy mistake`
+
+Do not “fix” the Advisor by inventing permissive policies. NEXUS still lacks a proven shared ownership/tenancy model suitable for honest `auth.uid()` row authorization across all internal tables.
 
 ## Recommended end state
 
-### Preferred option — disable Data API if dependency remains zero
+### Preferred — internal data plane not exposed to browser/API roles
 
-If a final dependency check confirms no required REST/GraphQL client path, disable the Supabase Data API at the project integration level. Keep Edge Functions separately authenticated. This creates the simplest boundary: internal tables remain database/backend state rather than an accidental public API surface.
+If final dependency verification confirms no required REST/GraphQL client path, keep NEXUS operational tables as backend/internal state and remove unnecessary `anon`/`authenticated` grants. If product configuration allows a clean separation, disabling or narrowing the Data API exposure for the internal schema is simpler than maintaining fake user policies.
 
-Disabling the Data API is a production access change and requires an explicit human gate plus an immediate smoke test of all known live application paths.
+### If a user-facing data plane is required later
 
-### Defense-in-depth option — least-privilege grants
+Design explicit tenancy/ownership first (`workspace_id`, `tenant_id`, membership/role model). Then expose only a small allowlisted API surface through dedicated tables/views/RPCs with reviewed RLS. Do not retrofit one generic policy across all NEXUS tables.
 
-If Data API must remain enabled, remove direct `anon` and `authenticated` access from internal NEXUS tables and future defaults. Re-grant only explicitly required relations later.
+## Required pre-mutation gates
 
-Proposed SQL, **not yet applied**:
+Before any `REVOKE`, Data API configuration change, schema move, or RLS-policy write:
+1. verify current frontend/backend dependencies;
+2. capture exact ACL/default-privilege snapshot;
+3. confirm which relations, if any, require `anon` or `authenticated` access;
+4. smoke-test Edge Functions and deployed application paths;
+5. define rollback as minimum per-relation re-grants, not blanket restoration;
+6. require exact human approval for the production mutation.
 
-```sql
-begin;
+## Acceptance matrix after any approved hardening
 
-revoke all on table public.nexus_action_risk_taxonomy from anon, authenticated;
-revoke all on table public.nexus_agent_runs from anon, authenticated;
-revoke all on table public.nexus_agents from anon, authenticated;
-revoke all on table public.nexus_entities from anon, authenticated;
-revoke all on table public.nexus_evidence from anon, authenticated;
-revoke all on table public.nexus_experiments from anon, authenticated;
-revoke all on table public.nexus_identity_candidates from anon, authenticated;
-revoke all on table public.nexus_identity_tests from anon, authenticated;
-revoke all on table public.nexus_need_hypotheses from anon, authenticated;
-revoke all on table public.nexus_opportunities from anon, authenticated;
-revoke all on table public.nexus_outcomes from anon, authenticated;
-revoke all on table public.nexus_proposal_claims from anon, authenticated;
-revoke all on table public.nexus_proposals from anon, authenticated;
-revoke all on table public.nexus_relationships from anon, authenticated;
-revoke all on table public.nexus_requirements from anon, authenticated;
-revoke all on table public.nexus_runtime_state from anon, authenticated;
-revoke all on table public.nexus_signals from anon, authenticated;
+1. Inventory parity is preserved.
+2. Internal NEXUS tables have no unintended `anon` CRUD.
+3. `authenticated` access is only explicit/allowlisted.
+4. Future default privileges do not silently widen API-role access.
+5. Edge Functions and backend paths still work.
+6. Deployed UI has no legitimate Data API regression.
+7. API/Postgres logs show no new legitimate permission failures.
+8. Security Advisor is rerun and findings are interpreted in context rather than “fixed” by permissive policies.
+9. No service-role key appears in public/client code.
+10. Rollback proof exists for the exact changed permissions.
 
-alter default privileges for role postgres in schema public
-  revoke select, insert, update, delete on tables from anon, authenticated;
-alter default privileges for role postgres in schema public
-  revoke execute on functions from anon, authenticated;
-alter default privileges for role postgres in schema public
-  revoke usage, select on sequences from anon, authenticated;
+## Current decision
 
-commit;
-```
-
-`service_role` is deliberately not revoked in this proposal because future trusted server-side/database workflows may require it. Any service-role use must remain server-only and must never be exposed in frontend code.
-
-## Rollback concept
-
-Rollback must restore only privileges that are proven necessary, not blindly reinstate blanket access. If an application dependency is discovered after a revoke, identify the exact relation and operation and grant only that minimum permission, for example:
-
-```sql
-grant select on public.some_explicit_api_table to authenticated;
-```
-
-Do not restore blanket CRUD to all NEXUS tables merely to make an unknown client work.
-
-If the Data API itself was disabled and a validated dependency requires it, re-enable the integration first, then apply explicit per-object grants plus reviewed RLS policies.
-
-## Acceptance test matrix
-
-1. **Inventory parity** — read-only audit lists exactly the intended `public.nexus_*` relations and their RLS/policy/grant state.
-2. **Anon denial** — `anon` has no direct SELECT/INSERT/UPDATE/DELETE privilege on internal NEXUS tables after hardening.
-3. **Authenticated denial** — `authenticated` has no direct CRUD privilege unless explicitly allowlisted.
-4. **Future-safe defaults** — newly created internal tables/functions/sequences do not automatically gain API-role privileges.
-5. **Edge Function continuity** — `nexus-proposal-qualifier` still accepts a valid JWT and produces the same pure-compute response.
-6. **Frontend smoke test** — current deployed web application routes still load without Supabase Data API errors.
-7. **API log check** — no unexpected 401/403/42501 spike from a legitimate dependency after hardening.
-8. **Security Advisor** — rerun security advisor and classify remaining RLS-no-policy findings in context; internal ungranted tables may intentionally have no user policy.
-9. **No privilege widening** — no remediation may introduce service-role secrets into browser/client code.
-10. **Rollback readiness** — exact previous ACL snapshot is captured before any production mutation.
-
-## Longer-term architecture
-
-If NEXUS develops a real user-facing Supabase data plane, first design explicit ownership/tenancy (`workspace_id`/`tenant_id`/user membership), then expose a small dedicated API schema or allowlisted views/RPCs. Internal operational tables should move toward a non-exposed schema rather than treating `public` as the permanent internal storage boundary.
+**HOLD production mutation.** The hardening hypothesis remains plausible and stronger than the old broad-grant posture, but the next action is dependency verification plus exact ACL/default-privilege capture. No production SQL was changed in this Forge pass.
 
 ## Non-goals
 
-- no invented RLS policies without a real ownership model;
-- no production migration from this document alone;
-- no Data API enable/disable without explicit human approval;
-- no frontend service-role key;
-- no claim that RLS lint alone proves data leakage.
+- no invented RLS policy;
+- no automatic Data API disable;
+- no production revoke from this document;
+- no service-role exposure;
+- no claim that an Advisor lint alone proves data leakage;
+- no claim that project health equals application correctness.

@@ -3,33 +3,21 @@ from typing import Literal
 
 
 EvidenceClass = Literal[
-    "fact",
-    "sourced_claim",
-    "unsourced_claim",
-    "estimate",
-    "inference",
-    "hypothesis",
-    "assumption",
-    "unknown",
+    "fact", "sourced_claim", "unsourced_claim", "estimate", "inference",
+    "hypothesis", "assumption", "unknown",
 ]
 ActionMode = Literal["internal", "human_gated"]
 ProductDecision = Literal["keep", "modify", "reject"]
 
+CONSEQUENTIAL_ACTIONS = frozenset({
+    "external_send", "contract", "purchase_order", "payment", "signature",
+    "permission_change", "production_deploy", "protected_merge", "public_publish",
+    "destructive_database_change",
+})
 
-CONSEQUENTIAL_ACTIONS = frozenset(
-    {
-        "external_send",
-        "contract",
-        "purchase_order",
-        "payment",
-        "signature",
-        "permission_change",
-        "production_deploy",
-        "protected_merge",
-        "public_publish",
-        "destructive_database_change",
-    }
-)
+
+def _tenant_prefix(tenant_id: str) -> str:
+    return f"{tenant_id}::"
 
 
 @dataclass(frozen=True)
@@ -71,7 +59,6 @@ class ProductizationRecord:
 
     def validate(self) -> list[str]:
         errors: list[str] = []
-
         required_text = (
             ("config.tenant_id", self.config.tenant_id),
             ("config.organization_name", self.config.organization_name),
@@ -90,6 +77,11 @@ class ProductizationRecord:
         if self.workflow_input.tenant_id != self.config.tenant_id:
             errors.append("workflow_input.tenant_id must match config.tenant_id")
 
+        prefix = _tenant_prefix(self.config.tenant_id)
+        if isinstance(self.workflow_input.case_id, str) and self.workflow_input.case_id and not self.workflow_input.case_id.startswith(prefix):
+            errors.append("workflow_input.case_id must be tenant-scoped")
+        if isinstance(self.workflow_output.case_id, str) and self.workflow_output.case_id and not self.workflow_output.case_id.startswith(prefix):
+            errors.append("workflow_output.case_id must be tenant-scoped")
         if self.workflow_output.case_id != self.workflow_input.case_id:
             errors.append("workflow_output.case_id must match workflow_input.case_id")
 
@@ -100,22 +92,22 @@ class ProductizationRecord:
             errors.append("workflow_input.evidence_refs must not be empty")
         if len(set(self.workflow_input.evidence_refs)) != len(self.workflow_input.evidence_refs):
             errors.append("workflow_input.evidence_refs must be unique")
+        if any(not isinstance(ref, str) or not ref.startswith(prefix) for ref in self.workflow_input.evidence_refs):
+            errors.append("workflow_input.evidence_refs must be tenant-scoped")
 
         if not self.workflow_input.evidence_classes:
             errors.append("workflow_input.evidence_classes must not be empty")
-        missing_required = set(self.config.required_evidence_classes) - set(
-            self.workflow_input.evidence_classes
-        )
+        missing_required = set(self.config.required_evidence_classes) - set(self.workflow_input.evidence_classes)
         if missing_required:
             errors.append(
                 "workflow_input.evidence_classes missing tenant-required classes: "
                 + ", ".join(sorted(missing_required))
             )
 
-        if not set(self.workflow_output.evidence_refs).issubset(
-            set(self.workflow_input.evidence_refs)
-        ):
+        if not set(self.workflow_output.evidence_refs).issubset(set(self.workflow_input.evidence_refs)):
             errors.append("workflow_output.evidence_refs must come from workflow input")
+        if any(not isinstance(ref, str) or not ref.startswith(prefix) for ref in self.workflow_output.evidence_refs):
+            errors.append("workflow_output.evidence_refs must be tenant-scoped")
 
         must_gate = (
             self.workflow_input.requested_action in CONSEQUENTIAL_ACTIONS
@@ -126,18 +118,14 @@ class ProductizationRecord:
 
         if self.workflow_output.decision == "keep" and self.workflow_output.blockers:
             errors.append("keep decision cannot contain blockers")
-
         if self.workflow_output.decision in {"modify", "reject"} and not self.workflow_output.blockers:
             errors.append("modify/reject decision must explain at least one blocker")
-
         return errors
 
 
 def productization_ready(records: tuple[ProductizationRecord, ...]) -> bool:
-    """Return True only when at least two distinct project types pass the same contract."""
-    if len(records) < 2:
-        return False
-    if any(record.validate() for record in records):
+    """Stage 1 proof: >=2 distinct project types for one valid tenant contract."""
+    if len(records) < 2 or any(record.validate() for record in records):
         return False
     project_types = {record.workflow_input.project_type for record in records}
     tenant_ids = {record.config.tenant_id for record in records}

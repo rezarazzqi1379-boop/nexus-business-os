@@ -12,9 +12,11 @@ _CANONICAL_OWNERS = {
     "decision_outcome_learning": "PR7",
     "audit_metadata": "PR10",
     "security_policy_threat_model": "PR12",
+    "supabase_least_privilege": "PR16",
     "evolution": "PR19",
     "capability_adoption_governor": "PR28",
     "hydrotester_authority": "PR29",
+    "cross_project_runtime": "PR31",
     "business_genome": "PR33",
     "public_pattern_reconstruction": "PR35",
     "forge_lifecycle": "PR36",
@@ -32,19 +34,15 @@ def canonical_owner(concern: str) -> str | None:
 
 def validate_canonical_owner_registry() -> tuple[str, ...]:
     errors: list[str] = []
-    seen_owners: dict[str, list[str]] = {}
     for concern, owner in CANONICAL_OWNERS.items():
         if not isinstance(concern, str) or not concern.strip() or concern != concern.strip():
             errors.append("invalid concern metadata")
             continue
         if not isinstance(owner, str) or not owner.strip() or owner != owner.strip():
             errors.append(f"invalid owner metadata for {concern}")
-            continue
-        seen_owners.setdefault(owner, []).append(concern)
 
-    # A PR can intentionally own more than one concern, but every concern must have
-    # exactly one owner. Dict construction guarantees concern uniqueness; this check
-    # keeps the validation contract explicit and fail-closed for malformed values.
+    # A PR may intentionally own more than one concern, but one concern must never
+    # resolve to multiple owners. Dict construction enforces that invariant here.
     if len(CANONICAL_OWNERS) != len(set(CANONICAL_OWNERS.keys())):
         errors.append("duplicate canonical concern")
     return tuple(errors)

@@ -20,6 +20,7 @@ _CANONICAL_OWNERS = {
     "business_genome": "PR33",
     "public_pattern_reconstruction": "PR35",
     "forge_lifecycle": "PR36",
+    "recursive_evolution": "PR36",
     "exact_external_approval": "PR37",
 }
 

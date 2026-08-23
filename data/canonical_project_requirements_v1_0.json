@@ -1,0 +1,77 @@
+{
+  "effective_date": "2026-08-23",
+  "projects": {
+    "PRJ-HYD-01": {
+      "canonical_source_id": "PRJ-HYD-01-ENG",
+      "confirmed": {
+        "application": "API 5CT hydrostatic testing",
+        "outside_diameter_mm": "approximately 89-180",
+        "pressure_logic": "pressure varies by size/configuration; some required duty points need up to 120 MPa; 120 MPa is not blanket pressure for every geometry",
+        "throughput": "approximately 60 pipes/hour",
+        "qualification_rule": "supplier must guarantee pressure-versus-OD/ID/wall-thickness/end-condition envelope and applicable axial-force/design basis"
+      },
+      "unknown_requires_fresh_verification": [
+        "exact pressure matrix by OD/ID/wall thickness",
+        "pipe-end condition and sealing/contact restrictions",
+        "pressure tolerance / decay acceptance criteria",
+        "FAT/TPI requirements and calibration traceability",
+        "utilities, layout and integration details",
+        "size-specific cycle-time degradation"
+      ]
+    },
+    "PRJ-HTL-01": {
+      "canonical_source_id": "PRJ-HTL-01-ENG",
+      "confirmed": {
+        "application": "API 5CT steel pipe/OCTG",
+        "outside_diameter_mm": "approximately 63.5-177.8",
+        "wall_thickness_mm": "2-20",
+        "length_m": "6-12",
+        "process": "Quench + Normalize + Temper",
+        "throughput": "approximately 40 pipes/hour"
+      },
+      "unknown_requires_fresh_verification": [
+        "current project activation status / management go-ahead",
+        "engineering amendments after 21 Aug 2026",
+        "final utilities/layout/interface constraints for selected plant"
+      ]
+    },
+    "PRJ-KCL-01": {
+      "canonical_source_id": "PRJ-KCL-01-ACC",
+      "confirmed": {
+        "material": "white potassium chloride / MOP used as SOP unit feed",
+        "moisture_max_percent": 0.5,
+        "water_soluble_K2O_min_percent": 61,
+        "NaCl_max_percent": 2,
+        "MgCl2_max_percent": 1,
+        "granulometry": "75% at 0.1-0.4 mm; 1 mm max 0.5%; below 0.1 mm max 23.5%",
+        "black_impurities": "none visible to naked eye",
+        "solubility_min_percent": 99.5
+      },
+      "unknown_requires_fresh_verification": [
+        "current purchase quantity / forecast and buying authority",
+        "current permit/legal requirements and permit owner",
+        "current destination, Incoterm, price target, payment route and sanctions/logistics feasibility",
+        "current supplier availability and export terms"
+      ]
+    },
+    "PRJ-CAN-01": {
+      "canonical_source_id": "PRJ-CAN-01-ENG",
+      "confirmed": {
+        "application": "cylindrical metal can/tube approximately diameter 52-99 mm",
+        "operations": ["necking", "flanging", "beading"],
+        "comparison_scope": "where relevant compare necking-only and full-set configurations",
+        "rfq_minimum_fields": ["model/range", "CPM", "power", "dimensions/weight", "utilities", "photos/video", "price", "delivery", "warranty", "spares", "installation", "export references", "long-term support"]
+      },
+      "unknown_requires_fresh_verification": [
+        "final buyer-selected production rate and exact product geometry for each SKU",
+        "mandatory operations in the next purchase stage",
+        "final acceptance test, tooling/changeover and support requirements"
+      ]
+    }
+  },
+  "cross_project_invariants": [
+    "Hydrotester throughput is approximately 60 pipes/hour",
+    "Heat Treatment throughput is approximately 40 pipes/hour",
+    "these throughput values must never be transferred between projects"
+  ]
+}

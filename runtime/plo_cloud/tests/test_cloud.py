@@ -11,7 +11,7 @@ def test_approval_before_side_effect():
     td,s=fresh(); r=s.enqueue('send','k1',True); c=s.claim_next('w')
     try: s.authorize_operation(r,'op','send:a',c['_lease_token'],'w'); raise AssertionError()
     except ApprovalError: pass
-    a=s.request_approval(r,'send:a'); s.decide_approval(a,'approved'); tok=s.authorize_operation(r,'op','send:a',c['_lease_token'],'w'); s.record_intent(r,'op',tok); assert s.operation_state('op')=='intended'; td.cleanup()
+    a=s.request_approval(r,'send:a'); s.decide_approval(a,'approved'); tok=s.authorize_operation(r,'op','send:a',c['_lease_token'],'w'); s.record_intent(r,'op',tok,c['_lease_token'],'w'); assert s.operation_state('op')=='intended'; td.cleanup()
 def test_stale_version():
     td,s=fresh(); r=s.enqueue('x','k2',True); a=s.request_approval(r,'send:a'); c=s.claim_next('w'); s.decide_approval(a,'approved')
     try: s.authorize_operation(r,'op','send:a',c['_lease_token'],'w'); raise AssertionError()
@@ -22,10 +22,26 @@ def test_expired_lease_cannot_renew():
     try: s.renew_lease(r,c['_lease_token'],'w'); raise AssertionError()
     except OwnershipError: pass
     td.cleanup()
+def test_expired_lease_cannot_authorize():
+    td,s=fresh(); r=s.enqueue('send','k6',True); c=s.claim_next('w',-1); a=s.request_approval(r,'send:a'); s.decide_approval(a,'approved')
+    try: s.authorize_operation(r,'op-exp','send:a',c['_lease_token'],'w'); raise AssertionError('expired lease authorized')
+    except OwnershipError: pass
+    td.cleanup()
+def test_expired_lease_cannot_record_intent():
+    td,s=fresh(); r=s.enqueue('send','k7',True); c=s.claim_next('w',1); a=s.request_approval(r,'send:a'); s.decide_approval(a,'approved'); tok=s.authorize_operation(r,'op-gap','send:a',c['_lease_token'],'w')
+    s.renew_lease(r,c['_lease_token'],'w',-1)
+    try: s.record_intent(r,'op-gap',tok,c['_lease_token'],'w'); raise AssertionError('expired lease recorded intent')
+    except OwnershipError: pass
+    td.cleanup()
+def test_mark_executed_requires_intent():
+    td,s=fresh(); r=s.enqueue('send','k8',True); c=s.claim_next('w'); a=s.request_approval(r,'send:a'); s.decide_approval(a,'approved'); s.authorize_operation(r,'op-order','send:a',c['_lease_token'],'w')
+    try: s.mark_executed('op-order'); raise AssertionError('executed without intent')
+    except ApprovalError: pass
+    td.cleanup()
 def test_recovery():
     td,s=fresh(); r=s.enqueue('x','k4'); s.claim_next('w',-1); assert r in s.recover_orphans(); assert s.metrics()['pending']==1; td.cleanup()
 def test_duplicate_metric():
-    td,s=fresh(); r=s.enqueue('send','k5',True); c=s.claim_next('w'); a=s.request_approval(r,'send:a'); s.decide_approval(a,'approved'); tok=s.authorize_operation(r,'op','send:a',c['_lease_token'],'w'); s.record_intent(r,'op',tok); s.mark_executed('op'); s.mark_executed('op'); assert s.metrics()['duplicate_execution_count']==1; td.cleanup()
+    td,s=fresh(); r=s.enqueue('send','k5',True); c=s.claim_next('w'); a=s.request_approval(r,'send:a'); s.decide_approval(a,'approved'); tok=s.authorize_operation(r,'op','send:a',c['_lease_token'],'w'); s.record_intent(r,'op',tok,c['_lease_token'],'w'); s.mark_executed('op'); s.mark_executed('op'); assert s.metrics()['duplicate_execution_count']==1; td.cleanup()
 def test_gmail_read_only():
     g=GmailReadOnly(lambda q,n:['m1']); assert g.find_sent(deterministic_message_id('op')).state is State.FOUND
     try: g.send(); raise AssertionError()

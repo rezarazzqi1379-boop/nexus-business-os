@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
 from typing import Mapping
 
 from nexus_control_plane.forge import content_write_needed
+from nexus_control_plane.forge_failure_memory import relevant_failure_refs, validate_failure_memory
 from nexus_control_plane.forge_registry import CANONICAL_OWNERS, validate_canonical_owner_registry
 
 
@@ -51,6 +52,25 @@ def _valid_unique_refs(refs: object, *, required: bool) -> bool:
             return False
         normalized.append(ref)
     return len(set(normalized)) == len(normalized)
+
+
+def hydrate_preflight_with_failure_memory(request: ForgePreflightRequest) -> ForgePreflightRequest:
+    """Retrieve known concern-specific failures when the caller supplied none.
+
+    Caller-supplied failure references retain the stricter existing contract: the caller
+    must explicitly state whether those references were consulted. Automatic hydration is
+    used only for the canonical internal registry, where this function itself performs the
+    read step and can truthfully mark those retrieved memories as consulted.
+    """
+
+    if not isinstance(request, ForgePreflightRequest):
+        return request
+    if request.prior_failure_refs:
+        return request
+    refs = relevant_failure_refs(request.concern)
+    if not refs:
+        return request
+    return replace(request, prior_failure_refs=refs, prior_failures_consulted=True)
 
 
 def evaluate_forge_preflight(
@@ -125,17 +145,23 @@ def evaluate_forge_preflight(
 
 
 def evaluate_registered_forge_preflight(request: ForgePreflightRequest) -> ForgePreflightResult:
-    """Run preflight against the project-wide canonical owner registry.
+    """Run preflight against canonical ownership and retrievable failure memory.
 
-    A broken registry blocks shadow work rather than silently falling back to an empty
-    mapping or permitting a new competing owner.
+    Broken registries block shadow work rather than silently falling back. Known internal
+    failures are retrieved automatically before the gate so stored lessons are actually
+    read and applied; caller-supplied failure references remain explicitly caller-owned.
     """
 
     registry_errors = validate_canonical_owner_registry()
-    if registry_errors:
+    memory_errors = validate_failure_memory()
+    if registry_errors or memory_errors:
         return ForgePreflightResult(
             PreflightDecision.BLOCK,
-            tuple(f"canonical registry invalid: {error}" for error in registry_errors),
+            tuple(
+                [f"canonical registry invalid: {error}" for error in registry_errors]
+                + [f"failure memory invalid: {error}" for error in memory_errors]
+            ),
             (),
         )
-    return evaluate_forge_preflight(request, canonical_owners=CANONICAL_OWNERS)
+    hydrated = hydrate_preflight_with_failure_memory(request)
+    return evaluate_forge_preflight(hydrated, canonical_owners=CANONICAL_OWNERS)

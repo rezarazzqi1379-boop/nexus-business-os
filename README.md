@@ -1,45 +1,49 @@
 # NEXUS Business OS
 
-NEXUS is the control and learning layer for turning real business evidence into structured decisions and measurable outcomes.
+NEXUS is an evidence-governed Business Decision OS for procurement, engineering qualification, commercial opportunity discovery and controlled execution.
 
-## Current focus
+## Current transformation
 
-The first coded vertical is **Procurement Signal-to-Outcome**:
+The target shadow architecture is documented in [`docs/nexus-transformation-v2.md`](docs/nexus-transformation-v2.md).
 
-`Evidence → Relationship → Signal → Opportunity → Outcome`
+NEXUS now treats source authority as a first-class control:
 
-The goal is not to maximize architecture. The goal is to prove a closed loop on real commercial cases and only then automate or scale agents.
+- `data/canonical_source_registry_v1_0.json` mirrors the current canonical authority set for deterministic validation.
+- `data/canonical_project_requirements_v1_0.json` mirrors stable engineering/acceptance anchors and explicitly separates unresolved/dynamic fields.
+- Forge project preflight blocks cross-project contamination, stale dynamic evidence, competing canonical sources and attempts to promote supplier/research claims into stable authority.
+- material decisions can be represented as unified Decision Packets linking canonical sources, live evidence, claims, unknowns, contradictions, prior failures, outcome targets and approval class.
 
 ## Source-of-truth split
 
-- **GitHub** — canonical source for code, tests, CI configuration and technical version history
-- **Supabase/PostgreSQL** — structured runtime state when verified access is healthy; current connector read access is permission-blocked, so schema must not be guessed
-- **Notion** — human-readable operating context, canonical registry map, research/experiments, outcomes and cross-AI handoff
-- **Gmail** — primary evidence for live commercial interactions and draft/reply state
-- **Vercel** — deployment surface; current production deployment is only a bootstrap checkpoint and is not parity with the latest Python vertical
+- **Canonical project sources** — stable approved operating/engineering/acceptance authority; deliberately small and explicitly versioned.
+- **GitHub** — canonical code, tests, CI configuration and technical version history.
+- **Supabase/PostgreSQL** — structured runtime state when live-verified. Current project status was re-verified as `ACTIVE_HEALTHY`; runtime claims must still be refreshed rather than inherited from historical checkpoints.
+- **Notion** — human-facing operating context, recovery/checkpoint surface and structured working state where applicable; duplicate historical containers are not authority by name alone.
+- **Gmail / Drive / official sources** — live evidence for changing commercial facts, proposals, threads and current counterpart state.
+
+## Core operating chain
+
+`Signal → Qualified Opportunity → Conversation → RFQ → Quote → Negotiation → Order → Gross Margin → Repeat Business`
+
+Control/evolution chain:
+
+`Sense → Capture Claims → Resolve → Verify → Test → Understand → Predict → Match → Decide → Approve → Execute → Measure → Learn → Evolve`
 
 ## Operating rules
 
 1. Designed != Implemented != Tested != Deployed != Production.
 2. No net-new agent/registry/framework unless an existing measured bottleneck justifies it.
 3. Progress claims require retrievable evidence.
-4. Consequential external actions remain human-gated.
-5. Canonical objects receive writes; backup/snapshot copies are read-only.
+4. Consequential external actions remain exact-scope human-gated.
+5. Canonical objects receive writes; backup/snapshot copies are recovery evidence, not authority.
 6. Supplier statements remain claims unless independently supported; provenance alone does not convert a claim into a fact.
-7. Uncalibrated heuristic scores must not be presented as probabilities or precise confidence.
-8. Claude is used as an independent auditor/second opinion via the shared Notion handoff layer.
+7. Dynamic commercial facts must be live-refreshed before consequential action.
+8. Cross-project engineering values must never be transferred without explicit authority.
+9. Uncalibrated heuristic scores must not be presented as probabilities or precise confidence.
+10. Recursive evolution may continue across open-ended generations, but every generation is bounded, self-stopping, auditable and rollback-capable.
 
 ## Current maturity
 
-- Main Vertical 01 invariants and real-case fixtures are implemented.
-- GitHub Actions is operational and has passed on real draft-PR heads.
-- Draft PR #1 adds explicit epistemic evidence classification and remains unmerged pending independent review.
-- Draft PR #2 implements a buyer-side Requirement Readiness Gate in **shadow mode**; its tests pass, but workflow value still requires 3–5 real comparable RFQ observations.
-- Supabase runtime adapter work is blocked until live schema access is restored and verified.
-- Current Vercel production is not the latest NEXUS runtime.
+Forge, Failure Memory retrieval, canonical-owner checks, source authority, project preflight, contradiction/outcome gates, Generation Ledger and Recursive Evolution are implemented in shadow branches/PRs and covered by CI. They are not production authority or autonomous self-promotion.
 
-For the live verified state, blockers and near-term proof targets, read [`docs/architecture/current-state.md`](docs/architecture/current-state.md).
-
-## Repository status
-
-This repository is intentionally minimal. The next milestone is repeated evidence-backed procurement loops with measurable outcomes, not a large platform skeleton.
+The current transformation objective is not more agents. It is fewer ambiguous authorities, fewer duplicated state containers, stronger project isolation, explicit contradictions, measurable outcomes and increasingly autonomous low-risk execution under bounded control.

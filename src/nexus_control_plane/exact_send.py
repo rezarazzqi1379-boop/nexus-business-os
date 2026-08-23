@@ -9,6 +9,7 @@ from unicodedata import category
 _MAX_ID = 256
 _MAX_TEXT = 100_000
 _DISALLOWED_CATEGORIES = {"Cc", "Cf", "Zl", "Zp"}
+_ALLOWED_BODY_CONTROLS = {"\n", "\r", "\t"}
 
 
 @dataclass(frozen=True)
@@ -37,6 +38,19 @@ def _clean_control_text(name: str, value: object, max_len: int) -> str:
     return value
 
 
+def _clean_message_body(value: object) -> str:
+    if not isinstance(value, str):
+        raise ValueError("body must be a string")
+    if not value.strip():
+        raise ValueError("body must be non-empty")
+    if len(value) > _MAX_TEXT:
+        raise ValueError("body is too long")
+    for ch in value:
+        if category(ch) in _DISALLOWED_CATEGORIES and ch not in _ALLOWED_BODY_CONTROLS:
+            raise ValueError("body contains disallowed control/formatting characters")
+    return value
+
+
 def exact_send_action_id(
     *,
     batch_id: str,
@@ -56,7 +70,7 @@ def exact_send_action_id(
     message_id = _clean_control_text("message_id", message_id, _MAX_ID)
     target = _clean_control_text("target", target, _MAX_ID)
     subject = _clean_control_text("subject", subject, _MAX_TEXT)
-    body = _clean_control_text("body", body, _MAX_TEXT)
+    body = _clean_message_body(body)
     if thread_ref is not None:
         thread_ref = _clean_control_text("thread_ref", thread_ref, _MAX_ID)
 

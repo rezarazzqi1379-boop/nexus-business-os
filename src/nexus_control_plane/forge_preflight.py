@@ -5,6 +5,7 @@ from enum import Enum
 from typing import Mapping
 
 from nexus_control_plane.forge import content_write_needed
+from nexus_control_plane.forge_registry import CANONICAL_OWNERS, validate_canonical_owner_registry
 
 
 class PreflightDecision(str, Enum):
@@ -121,3 +122,20 @@ def evaluate_forge_preflight(
     if warnings:
         return ForgePreflightResult(PreflightDecision.HOLD, (), tuple(warnings))
     return ForgePreflightResult(PreflightDecision.SHADOW_READY, (), (), False)
+
+
+def evaluate_registered_forge_preflight(request: ForgePreflightRequest) -> ForgePreflightResult:
+    """Run preflight against the project-wide canonical owner registry.
+
+    A broken registry blocks shadow work rather than silently falling back to an empty
+    mapping or permitting a new competing owner.
+    """
+
+    registry_errors = validate_canonical_owner_registry()
+    if registry_errors:
+        return ForgePreflightResult(
+            PreflightDecision.BLOCK,
+            tuple(f"canonical registry invalid: {error}" for error in registry_errors),
+            (),
+        )
+    return evaluate_forge_preflight(request, canonical_owners=CANONICAL_OWNERS)

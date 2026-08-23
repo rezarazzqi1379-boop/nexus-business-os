@@ -1,12 +1,18 @@
 -- NEXUS least-privilege hardening migration
--- STATUS: REVIEWED ARTIFACT ONLY / NOT YET APPLIED
--- This file intentionally does not create user-scoped RLS policies because the current
--- schema has no shared ownership/tenant key. It only removes direct API-role grants.
+-- STATUS: REVIEWED ARTIFACT ONLY / NOT APPLIED IN THIS FORGE PASS
 -- Human Gate required before production execution.
+--
+-- Forge lesson (2026-08-23): a prior production hardening pass revoked grants from the
+-- 17 then-existing NEXUS tables, but later-created NEXUS relations inherited broad
+-- anon/authenticated privileges again. The old 17 remain revoked; newer relations drifted.
+-- Therefore current-object cleanup alone is insufficient. This artifact revokes all
+-- current NEXUS base-table privileges dynamically AND hardens future default privileges.
+-- It intentionally does not create user-scoped RLS policies because the current schema
+-- has no proven shared ownership/tenant key.
 
 begin;
 
--- Fail closed if the reviewed inventory changed. Re-audit before editing this number.
+-- Fail closed if reviewed inventory or RLS-policy state changed.
 do $$
 declare
   nexus_table_count integer;
@@ -19,8 +25,8 @@ begin
     and c.relkind = 'r'
     and c.relname like 'nexus_%';
 
-  if nexus_table_count <> 17 then
-    raise exception 'NEXUS table inventory drifted: expected 17, found %; rerun audit first', nexus_table_count;
+  if nexus_table_count <> 30 then
+    raise exception 'NEXUS table inventory drifted: expected reviewed count 30, found %; rerun audit before hardening', nexus_table_count;
   end if;
 
   select count(*) into unexpected_policy_count
@@ -35,23 +41,27 @@ begin
   end if;
 end $$;
 
-revoke all privileges on table public.nexus_action_risk_taxonomy from anon, authenticated;
-revoke all privileges on table public.nexus_agent_runs from anon, authenticated;
-revoke all privileges on table public.nexus_agents from anon, authenticated;
-revoke all privileges on table public.nexus_entities from anon, authenticated;
-revoke all privileges on table public.nexus_evidence from anon, authenticated;
-revoke all privileges on table public.nexus_experiments from anon, authenticated;
-revoke all privileges on table public.nexus_identity_candidates from anon, authenticated;
-revoke all privileges on table public.nexus_identity_tests from anon, authenticated;
-revoke all privileges on table public.nexus_need_hypotheses from anon, authenticated;
-revoke all privileges on table public.nexus_opportunities from anon, authenticated;
-revoke all privileges on table public.nexus_outcomes from anon, authenticated;
-revoke all privileges on table public.nexus_proposal_claims from anon, authenticated;
-revoke all privileges on table public.nexus_proposals from anon, authenticated;
-revoke all privileges on table public.nexus_relationships from anon, authenticated;
-revoke all privileges on table public.nexus_requirements from anon, authenticated;
-revoke all privileges on table public.nexus_runtime_state from anon, authenticated;
-revoke all privileges on table public.nexus_signals from anon, authenticated;
+-- Revoke current NEXUS base-table privileges dynamically so newly-added reviewed tables
+-- are not omitted by a stale hardcoded list.
+do $$
+declare
+  qualified_table text;
+begin
+  for qualified_table in
+    select quote_ident(n.nspname) || '.' || quote_ident(c.relname)
+    from pg_class c
+    join pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = 'public'
+      and c.relkind = 'r'
+      and c.relname like 'nexus_%'
+    order by c.relname
+  loop
+    execute format(
+      'revoke all privileges on table %s from anon, authenticated',
+      qualified_table
+    );
+  end loop;
+end $$;
 
 -- Remove direct privileges on current NEXUS-named sequences if present.
 do $$
@@ -71,7 +81,8 @@ begin
   end loop;
 end $$;
 
--- Future-safe defaults for objects created by postgres.
+-- Future-safe defaults for objects created by postgres. This is the critical recurrence
+-- guard learned from the observed 17-table -> 30-table privilege drift.
 alter default privileges for role postgres in schema public
   revoke select, insert, update, delete, truncate, references, trigger on tables from anon, authenticated;
 alter default privileges for role postgres in schema public
@@ -79,10 +90,9 @@ alter default privileges for role postgres in schema public
 alter default privileges for role postgres in schema public
   revoke usage, select, update on sequences from anon, authenticated;
 
--- Supabase-managed object creation has also shown public default ACLs under supabase_admin.
--- These statements require authority over supabase_admin. If that authority is absent,
--- the transaction must fail/rollback and the equivalent change should be performed only
--- through an authorized platform owner rather than silently skipping the default ACL.
+-- Supabase-managed object creation may also use supabase_admin. These statements require
+-- authority over that role. If unavailable, the transaction must fail/rollback rather
+-- than silently leave future defaults unsafe.
 alter default privileges for role supabase_admin in schema public
   revoke select, insert, update, delete, truncate, references, trigger on tables from anon, authenticated;
 alter default privileges for role supabase_admin in schema public

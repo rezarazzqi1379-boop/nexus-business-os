@@ -18,6 +18,7 @@ class StepDisposition(str, Enum):
     RUNNABLE = "runnable"
     HUMAN_GATE = "human_gate"
     BLOCKED = "blocked"
+    COMPLETED = "completed"
 
 
 @dataclass(frozen=True)
@@ -34,6 +35,7 @@ class PlannedStep:
     capability: CapabilitySpec
     disposition: StepDisposition
     missing_inputs: tuple[str, ...]
+    unmet_dependencies: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -52,6 +54,10 @@ class WorkflowPlan:
     @property
     def blocked(self) -> tuple[PlannedStep, ...]:
         return tuple(step for step in self.steps if step.disposition is StepDisposition.BLOCKED)
+
+    @property
+    def completed(self) -> tuple[PlannedStep, ...]:
+        return tuple(step for step in self.steps if step.disposition is StepDisposition.COMPLETED)
 
 
 WORKFLOW_TEMPLATES: dict[WorkflowKind, tuple[WorkflowStep, ...]] = {
@@ -92,6 +98,15 @@ def _capability_index() -> dict[str, CapabilitySpec]:
     return {item.capability_id: item for item in catalog()}
 
 
+def _canonical_string_set(values: Iterable[str], *, field_name: str) -> set[str]:
+    normalized: set[str] = set()
+    for value in values:
+        if not isinstance(value, str) or not value or value.strip() != value:
+            raise ValueError(f"{field_name} must contain canonical non-empty strings")
+        normalized.add(value)
+    return normalized
+
+
 def validate_template(steps: Iterable[WorkflowStep]) -> tuple[WorkflowStep, ...]:
     normalized = tuple(steps)
     if not normalized:
@@ -114,31 +129,44 @@ def validate_template(steps: Iterable[WorkflowStep]) -> tuple[WorkflowStep, ...]
     return normalized
 
 
-def compile_workflow(kind: WorkflowKind, available_inputs: Iterable[str]) -> WorkflowPlan:
+def compile_workflow(
+    kind: WorkflowKind,
+    available_inputs: Iterable[str],
+    completed_steps: Iterable[str] = (),
+) -> WorkflowPlan:
+    """Compile current workflow state without pretending planned predecessors already ran."""
     if not isinstance(kind, WorkflowKind):
         raise ValueError("kind must be WorkflowKind")
-    available = {item for item in available_inputs if isinstance(item, str) and item.strip() == item and item}
+    available = _canonical_string_set(available_inputs, field_name="available_inputs")
+    completed = _canonical_string_set(completed_steps, field_name="completed_steps")
     steps = validate_template(WORKFLOW_TEMPLATES[kind])
-    capability_index = _capability_index()
+    known_step_ids = {step.step_id for step in steps}
+    unknown_completed = completed - known_step_ids
+    if unknown_completed:
+        raise ValueError(f"completed_steps contains unknown step IDs: {sorted(unknown_completed)}")
 
+    capability_index = _capability_index()
     planned: list[PlannedStep] = []
-    completed: set[str] = set()
     for step in steps:
         capability = capability_index[step.capability_id]
         missing_inputs = tuple(name for name in step.required_inputs if name not in available)
-        dependency_blocked = any(dep not in completed for dep in step.depends_on)
+        unmet_dependencies = tuple(dep for dep in step.depends_on if dep not in completed)
 
-        if missing_inputs or dependency_blocked:
+        if step.step_id in completed:
+            if missing_inputs:
+                raise ValueError(f"completed step {step.step_id} is missing required inputs")
+            if unmet_dependencies:
+                raise ValueError(f"completed step {step.step_id} has unmet dependencies")
+            disposition = StepDisposition.COMPLETED
+        elif missing_inputs or unmet_dependencies:
             disposition = StepDisposition.BLOCKED
         elif capability.requires_human_approval or capability.action_class in {
             ActionClass.EXTERNAL_WRITE,
             ActionClass.FINANCIAL,
         }:
             disposition = StepDisposition.HUMAN_GATE
-            completed.add(step.step_id)
         else:
             disposition = StepDisposition.RUNNABLE
-            completed.add(step.step_id)
 
         planned.append(
             PlannedStep(
@@ -146,6 +174,7 @@ def compile_workflow(kind: WorkflowKind, available_inputs: Iterable[str]) -> Wor
                 capability=capability,
                 disposition=disposition,
                 missing_inputs=missing_inputs,
+                unmet_dependencies=unmet_dependencies,
             )
         )
 
@@ -153,12 +182,9 @@ def compile_workflow(kind: WorkflowKind, available_inputs: Iterable[str]) -> Wor
 
 
 def next_actionable_steps(plan: WorkflowPlan) -> tuple[PlannedStep, ...]:
-    """Return the first currently actionable frontier; never skip a blocked predecessor."""
-    frontier: list[PlannedStep] = []
-    for step in plan.steps:
-        if step.disposition is StepDisposition.BLOCKED:
-            break
-        frontier.append(step)
-        if step.disposition is StepDisposition.HUMAN_GATE:
-            break
-    return tuple(frontier)
+    """Return only the current runnable/human-gated frontier, never future blocked work."""
+    return tuple(
+        step
+        for step in plan.steps
+        if step.disposition in {StepDisposition.RUNNABLE, StepDisposition.HUMAN_GATE}
+    )

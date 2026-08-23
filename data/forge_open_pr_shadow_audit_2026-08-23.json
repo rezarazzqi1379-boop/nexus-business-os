@@ -3,6 +3,19 @@
   "scope": "27 open NEXUS pull requests returned by connected GitHub inventory",
   "status": "shadow_observation_not_merge_authority",
   "inventory_count": 27,
+  "metrics": {
+    "canonical_registry_coverage": "16/16",
+    "keep_like": 14,
+    "experimental_incubator_extract": 6,
+    "superseded_open": 3,
+    "unresolved_hold_checkpoint": 3,
+    "integration_only": 1,
+    "attention_flags": [
+      "superseded_open_prs_present",
+      "unresolved_or_hardening_hold_work_present",
+      "integration_only_pr_should_not_accumulate_features"
+    ]
+  },
   "records": [
     {"pr_number":37,"disposition":"keep","concern":"exact_external_approval","owner":"PR37","evidence_ref":"https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/37","rationale":"Small Core-oriented extraction of exact per-send approval; CI 38/38; remains Draft."},
     {"pr_number":36,"disposition":"keep_shadow","concern":"forge_lifecycle","owner":"PR36","evidence_ref":"https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/36","rationale":"Forge lifecycle, preflight and owner registry; shadow only and non-authorizing."},

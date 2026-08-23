@@ -81,6 +81,18 @@ Alignment with a human decision, CI success, responsiveness, a reply, an RFQ, or
 
 PR #33 currently records 5/5 recommendation-human agreement across five real procurement observations, one reply-stage success, and zero final contract/order outcomes. Forge therefore must keep such evidence in EXPERIMENT/SHADOW rather than treating alignment alone as proof of commercial superiority or production readiness.
 
+## Live Supabase re-verification
+The earlier connector-permission-blocked wording is now stale for the current session. Live Forge verification on 2026-08-23 established:
+- project `jhmhtrzhcpdfkoflnsac` is `ACTIVE_HEALTHY`;
+- SQL reads succeed as `postgres` in `public`;
+- 30 base `public.nexus_*` tables are present; 33 `nexus_*` relations appear in the wider information-schema/grant inventory;
+- runtime state is populated, including 13 projects, 21 runtime-state rows, 2 lessons, 3 promotion gates, and 1 outcome;
+- public PostgreSQL function count is 0.
+
+Therefore PR #31's basic claim that the Supabase cross-project runtime exists is supported. Its individual state claims still require field-level verification before consequential use.
+
+Security posture remains a separate concern: Security Advisor reports RLS-enabled/no-policy findings across many NEXUS tables. Direct replay shows RLS enabled with zero policies, while `anon`/`authenticated` retain broad grants on part of the relation set. This is currently fail-closed at the RLS row layer, not proof of leakage, but it leaves unnecessary latent authority. PR #16 now owns the least-privilege hardening proposal; no production permission mutation was applied in this Forge pass.
+
 ## PR disposition map
 
 ### KEEP / canonical candidate
@@ -93,6 +105,7 @@ PR #33 currently records 5/5 recommendation-human agreement across five real pro
 - PR #12: security policy/threat model candidate.
 - PR #28: small deterministic capability governor; never an automatic production oracle.
 - PR #29: current Hydrotester authority candidate preserving historical lineage.
+- PR #31: cross-project integration/runtime documentation candidate; runtime existence now reverified, but runtime-sensitive fields remain evidence-bound.
 - PR #33: Business Genome / opportunity / pattern-learning shadow engine; final-outcome evidence remains insufficient for promotion.
 - PR #35: public-pattern reconstruction/workforce experiment; public behavior only, no claim of private implementation access.
 - PR #36: Forge lifecycle/integration contract; remains stacked on PR #35 and must not duplicate PR #19.
@@ -101,7 +114,7 @@ PR #33 currently records 5/5 recommendation-human agreement across five real pro
 - PR #18: exact per-send approval hardening -> extract to Core security.
 - PR #24: extract A0-A8 authority, fail-closed supersession, maturity/benchmark, Can Forming scope-equivalence, and no-fake-precision rules; do not merge stale Hydrotester history mutation.
 - PR #14: provenance-first research-mesh ideas only if a measured source-recall/quality bottleneck justifies them.
-- PR #16: least-privilege Supabase audit/hardening proposal only after live state is reverified.
+- PR #16: least-privilege Supabase hardening proposal. Live access and broad-grant/RLS posture are now reverified; production mutation remains HOLD pending dependency and ACL/default-privilege verification.
 
 ### INCUBATOR / do not expand as Core merge units
 - PR #13: Autonomy Fabric. Preserve useful adapters/planner/checkpoint ideas; stop adding unrelated Core responsibility.
@@ -115,8 +128,8 @@ PR #33 currently records 5/5 recommendation-human agreement across five real pro
 - PR #8: superseded evaluation experiment; PR #6 is canonical.
 - PR #11: superseded trace experiment; PR #10 is canonical.
 
-## Contradiction / drift findings
-1. PR #31 states Supabase runtime is active/healthy and the cross-project graph is implemented, while the main current-state document previously recorded connector permission degradation. This runtime claim must be reverified live before PR #31 is treated as authoritative; documentation cannot resolve the contradiction by repetition.
+## Drift / overlap findings
+1. Supabase runtime drift was reverified and resolved at the availability layer: current access is healthy. Security/least-privilege posture remains open under PR #16.
 2. PR #13 and PR #17 contain valuable autonomy behavior but are too large/stacked to become Core merely because CI passes.
 3. PR #24 contains useful benchmark/authority ideas but mutates stale Hydrotester lineage; PR #29 is newer for that domain.
 4. PR #35/#36 are stacked experiments. Forge must not become a third capability/eval/learning registry.
@@ -143,10 +156,11 @@ A candidate may be considered for Core only when all are true:
 3. Extract PR #18 exact-send approval into the eventual minimal Core.
 4. Preserve PR #29 Hydrotester authority lineage; do not import stale PR #24 history mutation.
 5. Treat PR #33 as outcome-learning shadow evidence, not ROI proof.
-6. Reverify PR #31 Supabase/runtime claims before adopting its state wording.
-7. Keep PR #28 as a bounded governor and PR #19 as the existing evolution target; do not duplicate either.
-8. Run future changes through Forge gates before adding new agents, registries, evaluators, or learning engines.
-9. Promote hosted autonomy only after repeated real loops provide final-stage outcome evidence and safe-runtime proof.
+6. Treat PR #31's Supabase runtime-existence claim as reverified; keep field-level/runtime-sensitive claims evidence-bound.
+7. Keep PR #16 as a hardening proposal only until dependency/ACL/default-privilege evidence is complete and exact production approval exists.
+8. Keep PR #28 as a bounded governor and PR #19 as the existing evolution target; do not duplicate either.
+9. Run future changes through Forge gates before adding new agents, registries, evaluators, or learning engines.
+10. Promote hosted autonomy only after repeated real loops provide final-stage outcome evidence and safe-runtime proof.
 
 ## Non-goals
 This consolidation does not authorize merge, deploy, external messages, permissions/access broadening, production database mutation, contracts/payments, or self-promotion.

@@ -1,7 +1,8 @@
 {
   "snapshot_date": "2026-08-23",
-  "scope": "25 open NEXUS pull requests returned by connected GitHub inventory",
+  "scope": "27 open NEXUS pull requests returned by connected GitHub inventory",
   "status": "shadow_observation_not_merge_authority",
+  "inventory_count": 27,
   "records": [
     {"pr_number":37,"disposition":"keep","concern":"exact_external_approval","owner":"PR37","evidence_ref":"https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/37","rationale":"Small Core-oriented extraction of exact per-send approval; CI 38/38; remains Draft."},
     {"pr_number":36,"disposition":"keep_shadow","concern":"forge_lifecycle","owner":"PR36","evidence_ref":"https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/36","rationale":"Forge lifecycle, preflight and owner registry; shadow only and non-authorizing."},
@@ -27,6 +28,8 @@
     {"pr_number":8,"disposition":"superseded","evidence_ref":"https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/8","rationale":"Superseded evaluation experiment; useful concepts consolidated into canonical PR6."},
     {"pr_number":7,"disposition":"keep","concern":"decision_outcome_learning","owner":"PR7","evidence_ref":"https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/7","rationale":"Bounded decision/outcome learning with evidence-backed observations and no authorization semantics."},
     {"pr_number":6,"disposition":"keep","concern":"evaluation","owner":"PR6","evidence_ref":"https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/6","rationale":"Canonical deterministic evaluation and promotion-evidence layer."},
-    {"pr_number":4,"disposition":"keep","concern":"capability_action_routing","owner":"PR4","evidence_ref":"https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/4","rationale":"Canonical capability/action routing and action-scoped gate foundation."}
+    {"pr_number":4,"disposition":"keep","concern":"capability_action_routing","owner":"PR4","evidence_ref":"https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/4","rationale":"Canonical capability/action routing and action-scoped gate foundation."},
+    {"pr_number":2,"disposition":"keep","concern":"requirement_readiness","owner":"PR2","evidence_ref":"https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/2","rationale":"Canonical requirement-readiness shadow gate with explicit approved/provisional/unknown-blocking semantics."},
+    {"pr_number":1,"disposition":"keep","concern":"evidence_semantics","owner":"PR1","evidence_ref":"https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/1","rationale":"Canonical evidence-semantics owner preserving Fact/Claim/Estimate/Inference/Hypothesis/Assumption/Unknown separation."}
   ]
 }

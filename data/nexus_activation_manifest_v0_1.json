@@ -1,0 +1,38 @@
+{
+  "manifest_id": "nexus-activation-v0.1",
+  "mode": "shadow",
+  "production_authorized": false,
+  "components": [
+    {"component":"evidence_semantics","owner_pr":1,"mode":"shadow_enforced","production_authorized":false},
+    {"component":"requirement_readiness","owner_pr":2,"mode":"shadow_enforced","production_authorized":false},
+    {"component":"capability_runtime","owner_pr":4,"mode":"shadow_enforced","production_authorized":false},
+    {"component":"evaluation_harness","owner_pr":6,"mode":"shadow_enforced","production_authorized":false},
+    {"component":"decision_learning","owner_pr":7,"mode":"shadow_enforced","production_authorized":false},
+    {"component":"audit_envelope","owner_pr":10,"mode":"shadow_enforced","production_authorized":false},
+    {"component":"security_policy","owner_pr":12,"mode":"policy_active","production_authorized":false},
+    {"component":"supabase_hardening","owner_pr":16,"mode":"hold","production_authorized":false},
+    {"component":"evolution_kernel","owner_pr":19,"mode":"shadow_enforced","production_authorized":false},
+    {"component":"capability_governor","owner_pr":28,"mode":"shadow_enforced","production_authorized":false},
+    {"component":"hydrotester_authority","owner_pr":29,"mode":"shadow_enforced","production_authorized":false},
+    {"component":"consolidation_checkpoint","owner_pr":30,"mode":"governance_active","production_authorized":false},
+    {"component":"cross_project_contract","owner_pr":31,"mode":"governance_active","production_authorized":false},
+    {"component":"business_genome","owner_pr":33,"mode":"shadow_enforced","production_authorized":false},
+    {"component":"forge","owner_pr":36,"mode":"shadow_enforced","production_authorized":false},
+    {"component":"exact_external_action","owner_pr":37,"mode":"shadow_enforced","production_authorized":false},
+    {"component":"productization_contract","owner_pr":39,"mode":"experiment","production_authorized":false},
+    {"component":"plo_execution_substrate","owner_pr":40,"mode":"shadow_runtime","production_authorized":false}
+  ],
+  "incubators": [13,14,15,17,18,24,35],
+  "superseded": [8,11],
+  "integration_only": [9],
+  "global_invariants": [
+    "single_canonical_owner_per_concern",
+    "verified_state_before_state_change",
+    "exact_action_human_gate_for_consequential_actions",
+    "no_draft_or_unmerged_component_may_claim_production",
+    "telemetry_failure_must_not_repeat_business_action",
+    "failure_memory_must_be_consulted_before_material_change",
+    "recursive_evolution_is_bounded_per_generation",
+    "llm_judge_is_advisory_not_promotion_authority"
+  ]
+}

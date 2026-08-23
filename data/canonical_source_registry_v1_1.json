@@ -1,0 +1,77 @@
+{
+  "effective_date": "2026-08-24",
+  "registry_version": "1.1",
+  "authority_model": {
+    "A": "canonical stable authority",
+    "B": "live changing evidence; refresh before action",
+    "C": "operational state linked to evidence",
+    "D": "research/claims; never authority until verified and promoted"
+  },
+  "canonical_sources": [
+    {
+      "source_id": "NEXUS-MASTER-CONTEXT",
+      "project_id": "NEXUS",
+      "file": "NEXUS_Master_Context_v1.4_2026-08-24.docx",
+      "version": "1.4",
+      "status": "CANONICAL",
+      "tier": "A",
+      "authority_scope": "project-wide operating rules, architecture, authority, integrity, automation and active-program anchors",
+      "effective_date": "2026-08-24",
+      "supersedes": "NEXUS_Master_Context_v1.3_2026-08-23.docx"
+    },
+    {
+      "source_id": "PRJ-HYD-01-ENG",
+      "project_id": "PRJ-HYD-01",
+      "file": "Hydrostatic_Tester_Engineering_Master_v1.1_2026-08-24.docx",
+      "version": "1.1",
+      "status": "CANONICAL",
+      "tier": "A",
+      "authority_scope": "hydrotester engineering, qualification, contract-review and FAT basis",
+      "effective_date": "2026-08-24",
+      "supersedes": "Hydrostatic_Tester_Engineering_Master_v1.0_2026-08-23.docx"
+    },
+    {
+      "source_id": "PRJ-KCL-01-ACC",
+      "project_id": "PRJ-KCL-01",
+      "file": "KCl_SOP_Acceptance_Master_v1.0_2026-08-23.docx",
+      "version": "1.0",
+      "status": "CANONICAL",
+      "tier": "A",
+      "authority_scope": "KCl / MOP SOP-feed acceptance specification",
+      "effective_date": "2026-08-23"
+    },
+    {
+      "source_id": "PRJ-HTL-01-ENG",
+      "project_id": "PRJ-HTL-01",
+      "file": "OCTG_Heat_Treatment_Master_v1.1_2026-08-24.docx",
+      "version": "1.1",
+      "status": "CANONICAL_WITH_REVALIDATION_HOLD",
+      "tier": "A",
+      "authority_scope": "stable heat-treatment process/dimensional basis; throughput remains controlled working state pending engineering revalidation",
+      "effective_date": "2026-08-24",
+      "supersedes": "OCTG_Heat_Treatment_Master_v1.0_2026-08-23.docx"
+    },
+    {
+      "source_id": "PRJ-CAN-01-ENG",
+      "project_id": "PRJ-CAN-01",
+      "file": "Can_Forming_Engineering_Master_v1.0_2026-08-23.docx",
+      "version": "1.0",
+      "status": "CANONICAL",
+      "tier": "A",
+      "authority_scope": "can/tube end-forming scope and RFQ requirements",
+      "effective_date": "2026-08-23"
+    }
+  ],
+  "production_activation_gap": {
+    "source_id": "ATF-ASSET-REGISTRY",
+    "status": "PENDING_PRODUCTION_LOCK",
+    "requirement": "register approved letterhead/logo/stamp/signature binaries with stable asset_id, version, SHA-256, effective date and intended usage before production use"
+  },
+  "conflict_rules": [
+    "filename recency alone never determines authority",
+    "canonical-looking conflict blocks consequential use until authority is resolved",
+    "supplier proposals/quotations/catalogues remain evidence unless explicitly promoted",
+    "emails/WhatsApp are live evidence and must be refreshed before action",
+    "old canonical versions remain historical evidence and must not remain active after replacement"
+  ]
+}

@@ -35,7 +35,7 @@ class PLOStore:
               operation_key TEXT PRIMARY KEY, run_id TEXT NOT NULL, scope TEXT NOT NULL,
               auth_token TEXT NOT NULL, state TEXT NOT NULL, created_at TEXT NOT NULL);
             CREATE TABLE IF NOT EXISTS execution_log(
-              id INTEGER PRIMARY KEY AUTOINCREMENT, operation_key TEXT NOT NULL, ts TEXT NOT NULL);
+              id INTEGER PRIMARY KEY AUTOINCREMENT, operation_key TEXT NOT NULL UNIQUE, ts TEXT NOT NULL);
             CREATE TABLE IF NOT EXISTS audit(
               id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, action TEXT NOT NULL,
               run_id TEXT, result TEXT);
@@ -107,9 +107,12 @@ class PLOStore:
         with self.tx() as db:
             row=db.execute("SELECT state FROM operations WHERE operation_key=?",(op_key,)).fetchone()
             if not row: raise ApprovalError("unknown operation")
-            if row[0] not in ("intended","executed"): raise ApprovalError("operation was not intended")
-            db.execute("UPDATE operations SET state='executed' WHERE operation_key=?",(op_key,))
+            if row[0]=="executed": return False
+            if row[0]!="intended": raise ApprovalError("operation was not intended")
+            db.execute("UPDATE operations SET state='executed' WHERE operation_key=? AND state='intended'",(op_key,))
+            if db.execute("SELECT changes()").fetchone()[0]!=1: raise ApprovalError("execution state changed concurrently")
             db.execute("INSERT INTO execution_log(operation_key,ts) VALUES(?,?)",(op_key,now()))
+            return True
     def recover_orphans(self):
         with self.tx() as db:
             rows=[r[0] for r in db.execute("SELECT run_id FROM tasks WHERE status='RUNNING' AND lock_expires_at<?",(now(),)).fetchall()]

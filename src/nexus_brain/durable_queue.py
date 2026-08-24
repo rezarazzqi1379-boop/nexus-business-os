@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import Protocol
 import uuid
 
@@ -61,7 +61,7 @@ class InMemoryDurableShadowQueue:
         self._by_idempotency: dict[str, str] = {}
 
     def enqueue(self, envelope: ShadowExecutionEnvelope) -> DurableShadowTask:
-        if envelope.execution_class != "SHADOW" or envelope.external_effect or envelope.approval_ref is not None:
+        if envelope.execution_class != "SHADOW" or envelope.external_effect or envelope.exact_approval_ref is not None:
             raise DurableQueueError("durable v0.1 queue accepts shadow-only envelopes")
         existing_run = self._by_idempotency.get(envelope.idempotency_key)
         if existing_run:

@@ -31,7 +31,7 @@ def test_shadow_cannot_smuggle_approval_ref():
         pass
 
 
-def test_consequential_requires_upstream_exact_approval_reference():
+def test_consequential_requires_upstream_exact_approval_reference_at_schema_level():
     try:
         validate_envelope(env(execution_class=ExecutionClass.CONSEQUENTIAL, external_effect=True))
         raise AssertionError("consequential envelope without approval ref accepted")
@@ -101,18 +101,16 @@ def test_legacy_unbound_key_cannot_be_silently_adopted_by_control_bridge():
             pass
 
 
-def test_consequential_enqueue_marks_approval_required_but_does_not_authorize():
+def test_consequential_control_intake_is_disabled_even_with_textual_approval_ref():
     with tempfile.TemporaryDirectory() as td:
         s = PLOStore(os.path.join(td, "p.db"))
         e = env(execution_class=ExecutionClass.CONSEQUENTIAL, external_effect=True, exact_approval_ref="APR-EXACT-1", idempotency_key="idem-2")
-        rid = enqueue_from_control(s, e)
-        c = s.claim_next("w")
-        assert c and c["run_id"] == rid
         try:
-            s.authorize_operation(rid, "op", "send:a", c["_lease_token"], "w")
-            raise AssertionError("bridge granted approval")
-        except Exception:
+            enqueue_from_control(s, e)
+            raise AssertionError("consequential control intake enabled before approval authority consolidation")
+        except EnvelopeError:
             pass
+        assert s.metrics()["pending"] == 0
 
 
 def main():

@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "NEXUS Business OS coded verticals"
 requires-python = ">=3.11"
 
+[project.optional-dependencies]
+postgres = ["psycopg[binary]>=3.2,<4"]
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]

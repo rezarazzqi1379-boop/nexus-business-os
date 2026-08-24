@@ -124,13 +124,14 @@ def test_orphan_recovery_and_fencing():
         pass
 
 
-def test_duplicate_execution_metric():
+def test_mark_executed_is_idempotent():
     s = fresh(); rid = s.enqueue("send", "dup", True); c = s.claim_next("A")
     aid = s.request_approval(rid, "send:a"); s.decide_approval(aid, "approved")
     tok = s.authorize_operation(rid, "op-dup", "send:a", c["_lease_token"], "A")
     s.record_intent(rid, "op-dup", tok, c["_lease_token"], "A")
-    s.mark_executed("op-dup"); s.mark_executed("op-dup")
-    assert s.metrics()["duplicate_execution_count"] == 1
+    assert s.mark_executed("op-dup") is True
+    assert s.mark_executed("op-dup") is False
+    assert s.metrics()["duplicate_execution_count"] == 0
 
 
 def main():

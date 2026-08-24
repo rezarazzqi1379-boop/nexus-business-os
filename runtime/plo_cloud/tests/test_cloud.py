@@ -40,6 +40,9 @@ def test_mark_executed_requires_intent():
     td.cleanup()
 def test_recovery():
     td,s=fresh(); r=s.enqueue('x','k4'); s.claim_next('w',-1); assert r in s.recover_orphans(); assert s.metrics()['pending']==1; td.cleanup()
+def test_orphan_with_intent_requires_reconciliation():
+    td,s=fresh(); r=s.enqueue('send','k9',True); c=s.claim_next('w',30); a=s.request_approval(r,'send:a'); s.decide_approval(a,'approved'); tok=s.authorize_operation(r,'op-uncertain','send:a',c['_lease_token'],'w'); s.record_intent(r,'op-uncertain',tok,c['_lease_token'],'w'); s.renew_lease(r,c['_lease_token'],'w',-1)
+    assert r in s.recover_orphans(); m=s.metrics(); assert m['reconciliation_required']==1 and m['pending']==0; assert s.claim_next('other') is None; td.cleanup()
 def test_mark_executed_is_idempotent():
     td,s=fresh(); r=s.enqueue('send','k5',True); c=s.claim_next('w'); a=s.request_approval(r,'send:a'); s.decide_approval(a,'approved'); tok=s.authorize_operation(r,'op','send:a',c['_lease_token'],'w'); s.record_intent(r,'op',tok,c['_lease_token'],'w'); assert s.mark_executed('op') is True; assert s.mark_executed('op') is False; assert s.metrics()['duplicate_execution_count']==0; td.cleanup()
 def test_gmail_read_only():

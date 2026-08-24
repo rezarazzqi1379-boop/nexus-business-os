@@ -38,6 +38,9 @@ jobs:
       - name: Control-to-PLO boundary tests
         working-directory: runtime/plo_cloud
         run: python tests/test_control_bridge.py
+      - name: Audit projection boundary tests
+        working-directory: runtime/plo_cloud
+        run: python tests/test_audit_projection.py
       - name: Hydrotester Brain-to-PLO shadow vertical replay
         if: github.event_name == 'pull_request'
         working-directory: runtime/plo_cloud

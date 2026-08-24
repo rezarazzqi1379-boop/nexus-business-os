@@ -10,13 +10,15 @@ class PostgresPLOStore(_BasePostgresPLOStore):
     """Schema-isolated PLO store.
 
     PLO execution state is intentionally kept out of public/business schemas.
-    Runtime connections use only the dedicated nexus_plo schema. Schema creation
-    remains an explicit migration/provisioning action; worker startup never runs DDL.
+    Runtime connections resolve application objects only from the dedicated
+    `nexus_plo` schema (plus `pg_catalog` for PostgreSQL built-ins). Schema
+    creation remains an explicit migration/provisioning action; worker startup
+    never runs DDL.
     """
 
     def connect(self):
         conn = psycopg.connect(self.dsn, row_factory=dict_row)
-        conn.execute(f"SET search_path TO {PLO_SCHEMA}, public")
+        conn.execute(f"SET search_path TO {PLO_SCHEMA}, pg_catalog")
         return conn
 
     def migrate(self):
@@ -25,5 +27,5 @@ class PostgresPLOStore(_BasePostgresPLOStore):
         with psycopg.connect(self.dsn, row_factory=dict_row) as conn:
             with conn.cursor() as cur:
                 cur.execute(f"CREATE SCHEMA IF NOT EXISTS {PLO_SCHEMA}")
-                cur.execute(f"SET search_path TO {PLO_SCHEMA}, public")
+                cur.execute(f"SET search_path TO {PLO_SCHEMA}, pg_catalog")
                 cur.execute(SCHEMA_SQL)

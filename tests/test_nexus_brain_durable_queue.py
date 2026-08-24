@@ -11,7 +11,7 @@ from nexus_brain.durable_queue import (
     QueueOwnershipError,
 )
 from nexus_brain.execution import build_read_only_execution_intent
-from nexus_brain.execution_bridge import build_shadow_execution_envelope
+from nexus_brain.execution_bridge import to_shadow_execution_envelope
 from nexus_brain.live_snapshot import load_live_snapshot
 
 
@@ -23,7 +23,7 @@ def envelope():
     graph, _ = load_live_snapshot("data/operational/live_evidence_snapshot_2026-08-24.json")
     rec = next(a for a in recommend_internal_actions(graph) if a.source_node_id == "LIVE-HYD-GH-REV12-ACK-20260823")
     intent = build_read_only_execution_intent(graph, rec, created_at=CREATED, payload={"mode": "normalize_against_rev_1_2"})
-    return build_shadow_execution_envelope(graph, intent)
+    return to_shadow_execution_envelope(graph, intent)
 
 
 def test_duplicate_enqueue_is_idempotent():
@@ -39,7 +39,7 @@ def test_idempotency_rebind_fails_closed():
     e = envelope()
     q.enqueue(e)
     with pytest.raises(IdempotencyConflictError):
-        q.enqueue(replace(e, decision_ref="gmail:tampered"))
+        q.enqueue(replace(e, decision_ref="LIVE-HYD-TAMPERED"))
 
 
 def test_claim_and_read_only_completion_require_current_lease_owner():
@@ -88,7 +88,7 @@ def test_queue_has_no_path_for_consequential_or_external_envelope():
     for bad in (
         replace(e, execution_class="CONSEQUENTIAL"),
         replace(e, external_effect=True),
-        replace(e, approval_ref="approval:any"),
+        replace(e, exact_approval_ref="approval:any"),
     ):
         with pytest.raises(DurableQueueError):
             q.enqueue(bad)

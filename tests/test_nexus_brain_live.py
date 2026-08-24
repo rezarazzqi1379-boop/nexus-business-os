@@ -1,4 +1,5 @@
 import json
+from dataclasses import replace
 from pathlib import Path
 
 from nexus_brain.command import recommend_internal_actions
@@ -64,6 +65,62 @@ def test_duplicate_live_evidence_fails_closed():
         assert "duplicate live evidence" in str(exc)
     else:
         raise AssertionError("duplicate connector evidence must fail closed")
+
+
+def test_unknown_project_fails_closed():
+    graph = canonical_portfolio_graph()
+    signal = replace(load_signals()[0], project_id="PRJ-NOT-REAL")
+    try:
+        apply_live_evidence_signals(graph, [signal])
+    except ValueError as exc:
+        assert "unknown project" in str(exc)
+    else:
+        raise AssertionError("cross-project/unscoped evidence must fail closed")
+
+
+def test_naive_or_invalid_observed_at_fails_closed():
+    for value in ("2026-08-24T08:00:00", "not-a-time", ""):
+        graph = canonical_portfolio_graph()
+        signal = replace(load_signals()[0], observed_at=value)
+        try:
+            apply_live_evidence_signals(graph, [signal])
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("ambiguous observed_at accepted")
+
+
+def test_non_boolean_action_required_fails_closed():
+    graph = canonical_portfolio_graph()
+    signal = replace(load_signals()[0], action_required="true")
+    try:
+        apply_live_evidence_signals(graph, [signal])
+    except ValueError as exc:
+        assert "boolean" in str(exc)
+    else:
+        raise AssertionError("truthy non-boolean action_required accepted")
+
+
+def test_control_and_format_characters_in_metadata_fail_closed():
+    for field, bad in (("id", "LIVE-BAD\nX"), ("source_ref", "gmail:\u202eabc"), ("topic", "permit\nadmin")):
+        graph = canonical_portfolio_graph()
+        signal = replace(load_signals()[0], **{field: bad})
+        try:
+            apply_live_evidence_signals(graph, [signal])
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"unsafe {field} accepted")
+
+
+def test_malformed_signal_object_fails_closed():
+    graph = canonical_portfolio_graph()
+    try:
+        apply_live_evidence_signals(graph, [{"id": "not-a-signal"}])
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("malformed signal object accepted")
 
 
 def test_command_recommendations_are_internal_only_and_deterministic():

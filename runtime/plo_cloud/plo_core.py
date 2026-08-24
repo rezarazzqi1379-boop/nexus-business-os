@@ -1,7 +1,7 @@
 import contextlib, sqlite3, uuid
 from datetime import datetime, timezone, timedelta
 
-STATES={"PENDING","RUNNING","COMPLETED","FAILED","CANCELLED"}
+STATES={"PENDING","RUNNING","WAITING","COMPLETED","FAILED","CANCELLED"}
 
 def now(): return datetime.now(timezone.utc).isoformat()
 class PLOError(Exception): pass
@@ -117,7 +117,10 @@ class PLOStore:
         with self.tx() as db:
             rows=[r[0] for r in db.execute("SELECT run_id FROM tasks WHERE status='RUNNING' AND lock_expires_at<?",(now(),)).fetchall()]
             for rid in rows:
-                db.execute("UPDATE tasks SET status='PENDING',task_version=task_version+1,lease_token=NULL,lease_owner=NULL,lock_expires_at=NULL,retry_count=retry_count+1 WHERE run_id=? AND status='RUNNING'",(rid,))
+                uncertain=db.execute("SELECT 1 FROM operations WHERE run_id=? AND state='intended' LIMIT 1",(rid,)).fetchone() is not None
+                next_status="WAITING" if uncertain else "PENDING"
+                db.execute("UPDATE tasks SET status=?,task_version=task_version+1,lease_token=NULL,lease_owner=NULL,lock_expires_at=NULL,retry_count=retry_count+1 WHERE run_id=? AND status='RUNNING'",(next_status,rid))
+                self.audit(db,"orphan_recovered",rid,"reconciliation_required" if uncertain else "requeued")
             return rows
     def operation_state(self,op_key):
         db=sqlite3.connect(self.path); row=db.execute("SELECT state FROM operations WHERE operation_key=?",(op_key,)).fetchone(); db.close(); return row[0] if row else None
@@ -125,4 +128,5 @@ class PLOStore:
         db=sqlite3.connect(self.path)
         dup=db.execute("SELECT COUNT(*) FROM (SELECT operation_key,COUNT(*) n FROM execution_log GROUP BY operation_key HAVING n>1)").fetchone()[0]
         pending=db.execute("SELECT COUNT(*) FROM tasks WHERE status='PENDING'").fetchone()[0]
-        db.close(); return {"duplicate_execution_count":dup,"pending":pending}
+        waiting=db.execute("SELECT COUNT(*) FROM tasks WHERE status='WAITING'").fetchone()[0]
+        db.close(); return {"duplicate_execution_count":dup,"pending":pending,"reconciliation_required":waiting}

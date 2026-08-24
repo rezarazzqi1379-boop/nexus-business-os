@@ -1,45 +1,65 @@
 # NEXUS Business OS
 
-NEXUS is the control and learning layer for turning real business evidence into structured decisions and measurable outcomes.
+NEXUS is a governed business knowledge-and-action layer for turning real evidence into structured decisions, controlled actions, measurable commercial outcomes and reusable learning.
 
 ## Current focus
 
-The first coded vertical is **Procurement Signal-to-Outcome**:
+The core commercial chain remains:
 
-`Evidence → Relationship → Signal → Opportunity → Outcome`
+`Evidence → Resolved Entity → Signal → Opportunity → Next Action → Outcome → Learning`
 
-The goal is not to maximize architecture. The goal is to prove a closed loop on real commercial cases and only then automate or scale agents.
+NEXUS Brain adds a shared governed substrate beneath project verticals:
+
+`Evidence → Claim/Requirement → Authority Check → Contradiction/Unknown Gate → Read-only Decision Projection`
+
+The objective is not to maximize architecture, dashboards or agent count. New infrastructure must remove a measured bottleneck or improve a real workflow outcome.
+
+## Current implemented Brain scope
+
+**NEXUS Brain v0.2** is implemented, tested and merged to `main`.
+
+It currently provides:
+
+- governed graph primitives with provenance and authority tiers;
+- explicit fact / claim / inference / unknown semantics;
+- fail-closed contradiction and blocking-unknown gates;
+- project isolation;
+- read-only JSON project/portfolio projections;
+- a dependency-free read-only HTML command surface;
+- a four-project governed acceptance fixture covering Hydrostatic Tester, KCl, Heat Treatment and Can Forming.
+
+Brain v0.2 is **not deployed and not production**. The command surface does not grant external-write authority.
 
 ## Source-of-truth split
 
-- **GitHub** — canonical source for code, tests, CI configuration and technical version history
-- **Supabase/PostgreSQL** — structured runtime state when verified access is healthy; current connector read access is permission-blocked, so schema must not be guessed
-- **Notion** — human-readable operating context, canonical registry map, research/experiments, outcomes and cross-AI handoff
-- **Gmail** — primary evidence for live commercial interactions and draft/reply state
-- **Vercel** — deployment surface; current production deployment is only a bootstrap checkpoint and is not parity with the latest Python vertical
+- **Canonical project masters / Source Registry** — stable business and engineering authority.
+- **GitHub** — canonical source for code, tests, CI and technical version history.
+- **Gmail / Drive / official sources** — changing live evidence that must be refreshed before action.
+- **Operational state systems** — current workflow state, always linked to evidence and never silently promoted to engineering authority.
+- **ChatGPT / NEXUS HQ** — reasoning/orchestration/execution interface, not sole memory store.
+- **Agents / APIs / orchestration** — execution layers, never authority by themselves.
 
 ## Operating rules
 
 1. Designed != Implemented != Tested != Deployed != Production.
-2. No net-new agent/registry/framework unless an existing measured bottleneck justifies it.
-3. Progress claims require retrievable evidence.
-4. Consequential external actions remain human-gated.
-5. Canonical objects receive writes; backup/snapshot copies are read-only.
-6. Supplier statements remain claims unless independently supported; provenance alone does not convert a claim into a fact.
-7. Uncalibrated heuristic scores must not be presented as probabilities or precise confidence.
-8. Claude is used as an independent auditor/second opinion via the shared Notion handoff layer.
+2. Facts and consequential relationships require retrievable provenance.
+3. Supplier statements remain claims unless independently supported/promoted under authority rules.
+4. Cross-project values never transfer merely because field names look similar.
+5. Conflicts are retained and surfaced; they are not averaged or silently resolved.
+6. Blocking unknowns fail closed for consequential use.
+7. Consequential external actions remain exact-scope human-gated.
+8. Uncalibrated heuristic scores are not probabilities.
+9. Persistent graph/vector retrieval, GraphRAG and durable orchestration remain gated by measured need and separate test evidence.
 
-## Current maturity
+## Validation state
 
-- Main Vertical 01 invariants and real-case fixtures are implemented.
-- GitHub Actions is operational and has passed on real draft-PR heads.
-- Draft PR #1 adds explicit epistemic evidence classification and remains unmerged pending independent review.
-- Draft PR #2 implements a buyer-side Requirement Readiness Gate in **shadow mode**; its tests pass, but workflow value still requires 3–5 real comparable RFQ observations.
-- Supabase runtime adapter work is blocked until live schema access is restored and verified.
-- Current Vercel production is not the latest NEXUS runtime.
+- Brain v0.1 was merged through PR #41 after 70/70 regression tests.
+- Brain v0.2 was merged through PR #42 after **81/81** pull-request CI tests on Python 3.12.
+- The repository current-state manifest has been synchronized to 24 Aug 2026.
+- Current Brain v0.2 code is not represented as a production deployment.
 
-For the live verified state, blockers and near-term proof targets, read [`docs/architecture/current-state.md`](docs/architecture/current-state.md).
+For the verified implementation state, hard gates and next proof target, read [`docs/architecture/current-state.md`](docs/architecture/current-state.md).
 
-## Repository status
+## Next proof target
 
-This repository is intentionally minimal. The next milestone is repeated evidence-backed procurement loops with measurable outcomes, not a large platform skeleton.
+Connect the read-only Brain projection to retrievable live operational state without production writes, then measure whether it reduces stale-source use, duplicate work and decision latency on real procurement loops. Only after that proof should persistent GraphRAG, durable orchestration or broader production infrastructure be promoted.

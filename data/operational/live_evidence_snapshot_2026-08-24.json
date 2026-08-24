@@ -1,0 +1,54 @@
+{
+  "snapshot_id": "LIVE-EVIDENCE-2026-08-24-A",
+  "snapshot_mode": "MANUAL_CONNECTOR_READ_ONLY",
+  "captured_at": "2026-08-24T08:08:00Z",
+  "authority": "TIER_B_LIVE_EVIDENCE",
+  "continuous_sync": false,
+  "notes": [
+    "This snapshot records connector-retrieved communication state only.",
+    "It is not canonical engineering/business authority and does not promote supplier assertions to facts.",
+    "No email was sent, modified or labeled to create this snapshot."
+  ],
+  "signals": [
+    {
+      "id": "LIVE-KCL-EUROCHEM-20260824",
+      "project_id": "PRJ-KCL-01",
+      "observed_at": "2026-08-24T07:02:51Z",
+      "source_ref": "gmail:1a032944cf64e85f",
+      "label": "EuroChem export-routing reply received",
+      "topic": "supplier_route",
+      "summary": "EuroChem Russia/CIS sales stated that it cannot provide export-sales information and directed export inquiries to info@eurochemgroup.com.",
+      "action_required": false
+    },
+    {
+      "id": "LIVE-KCL-OMS-PERMIT-20260824",
+      "project_id": "PRJ-KCL-01",
+      "observed_at": "2026-08-24T06:58:23Z",
+      "source_ref": "gmail:1a03290562e816d1",
+      "label": "OMS requests KCl import-permit confirmation",
+      "topic": "permit",
+      "summary": "OMS asked whether ASAK or the buyer has Ministry of Agriculture import permits for KCl and requested a copy; the permit question remains unresolved in current NEXUS authority.",
+      "action_required": true
+    },
+    {
+      "id": "LIVE-HYD-GH-REV12-ACK-20260823",
+      "project_id": "PRJ-HYD-01",
+      "observed_at": "2026-08-23T14:48:06Z",
+      "source_ref": "gmail:1a02f17fe9dd0b73",
+      "label": "GH Petro acknowledges Rev.1.2 package",
+      "topic": "supplier_reply",
+      "summary": "GH Petro acknowledged receipt of the full Rev.1.2 HPG-180 / 120 MPa package and returned an updated technical proposal; supplier capability remains subject to the canonical qualification holds.",
+      "action_required": true
+    },
+    {
+      "id": "LIVE-CAN-GE-SPEED-20260820",
+      "project_id": "PRJ-CAN-01",
+      "observed_at": "2026-08-20T07:06:59Z",
+      "source_ref": "gmail:1a01dfeb54c2a1c5",
+      "label": "Golden Eagle D73/D99 reply with speed and line configuration",
+      "topic": "supplier_reply",
+      "summary": "Golden Eagle stated 500 CPM maximum and 400 CPM stable; it described D73 as a four-station necking/flanging/beading/seaming combination and D99 as separate necking plus a three-station FBS combination. These remain supplier evidence, not acceptance authority.",
+      "action_required": false
+    }
+  ]
+}

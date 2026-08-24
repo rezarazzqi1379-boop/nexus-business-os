@@ -176,6 +176,34 @@ class PostgresPLOStore:
                 if not cur.fetchone():
                     raise PostgresOwnershipError("lease invalid, expired, or no longer owned")
 
+    def complete_read_only(self, run_id: str, lease_token: str, worker: str, result_ref: str):
+        if not isinstance(result_ref, str) or not result_ref.strip() or result_ref != result_ref.strip():
+            raise PostgresPLOError("invalid result_ref")
+        with self.connect() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT status,lease_token,lease_owner,lock_expires_at,approval_required FROM plo_tasks WHERE run_id=%s::uuid FOR UPDATE",
+                    (run_id,),
+                )
+                task = cur.fetchone()
+                if (not task or task["status"] != "RUNNING" or str(task["lease_token"]) != lease_token
+                        or task["lease_owner"] != worker or task["lock_expires_at"] is None or task["lock_expires_at"] <= utcnow()):
+                    raise PostgresOwnershipError("lease invalid, expired, or not current owner")
+                if task["approval_required"]:
+                    raise PostgresApprovalError("consequential task cannot use read-only completion")
+                cur.execute("SELECT 1 FROM plo_operations WHERE run_id=%s::uuid LIMIT 1", (run_id,))
+                if cur.fetchone():
+                    raise PostgresApprovalError("task with operation journal cannot use read-only completion")
+                cur.execute(
+                    """UPDATE plo_tasks SET status='COMPLETED',lease_token=NULL,lease_owner=NULL,lock_expires_at=NULL
+                       WHERE run_id=%s::uuid AND status='RUNNING' AND lease_token=%s::uuid RETURNING run_id""",
+                    (run_id, lease_token),
+                )
+                if not cur.fetchone():
+                    raise PostgresOwnershipError("task state changed concurrently")
+                cur.execute("INSERT INTO plo_audit(action,run_id,result) VALUES('read_only_completed',%s::uuid,%s)", (run_id, result_ref))
+                return True
+
     def request_approval(self, run_id: str, scope: str, ttl_seconds: int = 3600):
         aid = uuid.uuid4()
         expiry = utcnow() + timedelta(seconds=ttl_seconds)
@@ -313,4 +341,6 @@ class PostgresPLOStore:
                 pending = cur.fetchone()["n"]
                 cur.execute("SELECT count(*) AS n FROM plo_tasks WHERE status='WAITING'")
                 waiting = cur.fetchone()["n"]
-                return {"duplicate_execution_count": dup, "pending": pending, "reconciliation_required": waiting}
+                cur.execute("SELECT count(*) AS n FROM plo_tasks WHERE status='COMPLETED'")
+                completed = cur.fetchone()["n"]
+                return {"duplicate_execution_count": dup, "pending": pending, "reconciliation_required": waiting, "completed": completed}

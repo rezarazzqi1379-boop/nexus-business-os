@@ -15,6 +15,10 @@ def test_schema_isolation():
     s.reset_for_tests()
     with s.connect() as conn:
         with conn.cursor() as cur:
+            cur.execute("SHOW search_path")
+            search_path = cur.fetchone()["search_path"].replace('"', '')
+            assert search_path == f"{PLO_SCHEMA}, pg_catalog"
+            assert "public" not in search_path
             cur.execute("SELECT current_schema() AS s")
             assert cur.fetchone()["s"] == PLO_SCHEMA
             cur.execute(

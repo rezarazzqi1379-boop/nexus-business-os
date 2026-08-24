@@ -35,6 +35,9 @@ jobs:
       - name: SQLite safety tests
         working-directory: runtime/plo_cloud
         run: python tests/test_cloud.py
+      - name: PostgreSQL schema isolation tests
+        working-directory: runtime/plo_cloud
+        run: python tests/test_postgres_isolation.py
       - name: PostgreSQL durability and concurrency tests
         working-directory: runtime/plo_cloud
         run: python tests/test_postgres.py

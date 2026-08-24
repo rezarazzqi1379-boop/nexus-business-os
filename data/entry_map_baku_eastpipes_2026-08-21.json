@@ -1,0 +1,66 @@
+{
+  "as_of": "2026-08-21",
+  "outreach_authorized": false,
+  "duplicate_email_search": {
+    "baku_steel_azerboru": 0,
+    "east_pipes": 0
+  },
+  "opportunities": [
+    {
+      "opportunity_id": "east-coating-line-2026",
+      "company": "East Pipes Integrated Company for Industry",
+      "status": "open",
+      "fit": "adjacent",
+      "fact": "The board approved a SAR 78.5m external coating line starting February 2026; machinery and equipment contracts are to be concluded with several parties and completion is planned for Q1 FY2027-28.",
+      "hypothesis": "A vendor-introduction route could expose adjacent pipe handling, inspection, or testing packages, but the disclosed scope is coating rather than a hydrotester.",
+      "unknowns": ["named package owners", "supplier prequalification route", "whether any hydrotest scope exists"],
+      "source_urls": ["https://www.eastpipes.com/announcements/east-pipes-integrated-company-for-industry-announces-establish-a-new-external-steel-pipe-coating-line/"],
+      "route": "Procurement leadership plus corporate switchboard; do not treat sales@eastpipes.com as a verified procurement inbox."
+    },
+    {
+      "opportunity_id": "east-material-handling-2026",
+      "company": "East Pipes Integrated Company for Industry",
+      "status": "partial_award",
+      "fit": "adjacent",
+      "fact": "The SAR 33.6m material-handling program was delayed in March 2026; public reporting in July identified awards of about SAR 7.2m to Saudi Liebherr and SAR 1.725m to Vacuworx.",
+      "hypothesis": "Other packages may remain, but subtracting disclosed awards from the program ceiling is not proof of an available balance.",
+      "unknowns": ["remaining package list", "whether the program ceiling changed", "current bid window"],
+      "source_urls": ["https://www.eastpipes.com/announcements/east-pipes-integrated-company-for-industry-announces-an-update-on-the-company-announcement-of-the-capital-investment-of-strategic-material-handling-assets/", "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-news/issuer-announcements/issuer-announcements-details/?anCat=1&anId=94104&cs=1321&locale=en"],
+      "route": "Verify remaining scope with procurement before positioning; do not claim an open SAR 24.7m package."
+    },
+    {
+      "opportunity_id": "east-hsaw-line-2025",
+      "company": "East Pipes Integrated Company for Industry",
+      "status": "completed",
+      "fit": "historical_reference",
+      "fact": "The new 100,000 t/y HSAW line completed construction and installation and commenced operation by 15 March 2026.",
+      "hypothesis": "The line can motivate an aftermarket or optimization conversation, not a claim that the original equipment package is still open.",
+      "unknowns": ["aftermarket gaps", "hydrotest line configuration", "performance bottlenecks"],
+      "source_urls": ["https://www.eastpipes.com/announcements/east-pipes-integrated-company-for-industry-announces-an-update-on-establishment-of-a-new-production-line-for-helical-submerged-arc-welded-hsaw-steel-pipes/"],
+      "route": "Operations/projects discovery only after procurement-route validation."
+    },
+    {
+      "opportunity_id": "baku-azerboru-next-phase",
+      "company": "Baku Steel Company / Azerboru",
+      "status": "unproven",
+      "fit": "potential",
+      "fact": "Phase one modernization was completed, including threading, transport automation, ultrasonic and magnetic-particle inspection; BSC says capability development will continue.",
+      "hypothesis": "A later phase may include pressure testing or finishing equipment, but no current hydrotester package or 2026 tender was found.",
+      "unknowns": ["next-phase scope", "CAPEX timing", "hydrotester requirement", "Iran-origin commercial feasibility"],
+      "source_urls": ["https://www.bakusteel.com/en/articles/press-releases/43/baku-steel-company-has-completed-the-first-phase-of-the-modernization-of-azerboru", "https://www.bakusteel.com/en/poster/tender-announcements"],
+      "route": "Monitor the official tender page and use tender@bakusteel.com only for a specific published tender or approved supplier-introduction message."
+    },
+    {
+      "opportunity_id": "baku-straightener-foundation-031",
+      "company": "Baku Steel Company / Azerboru",
+      "status": "expired",
+      "fit": "historical_reference",
+      "fact": "Tender 031 covered construction of a foundation for a pipe straightening machine and closed on 9 June 2025.",
+      "hypothesis": "The tender proves a functioning international supplier process, but not a current equipment need.",
+      "unknowns": ["awardee", "future related tenders"],
+      "source_urls": ["https://www.bakusteel.com/en/poster/tender-announcements/57/construction-of-foundation-for-pipe-straightening-machine"],
+      "route": "Historical process reference only; never submit against the expired deadline.",
+      "deadline": "2025-06-09"
+    }
+  ]
+}

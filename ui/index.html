@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#080b12">
+  <title>NEXUS Operator Console</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">پرش به محتوای اصلی</a>
+  <div class="shell">
+    <aside class="sidebar" data-component="sidebar-nav" aria-label="ناوبری اصلی">
+      <div class="brand"><span class="brand-mark">N</span><div><strong>NEXUS</strong><small>Operator Console</small></div></div>
+      <nav>
+        <a class="active" href="#command">مرکز فرمان</a><a href="#approvals">تأییدها <span class="count">2</span></a>
+        <a href="#tasks">وظایف</a><a href="#evidence">شواهد</a><a href="#network">شبکه شرکت‌ها</a>
+      </nav>
+      <div class="mode"><span class="dot safe"></span><div><strong>Read-only Pilot</strong><small>ارسال خارجی غیرفعال</small></div></div>
+    </aside>
+
+    <main id="main">
+      <header class="topbar" id="command">
+        <div><p class="eyebrow">NEXUS BUSINESS OS</p><h1>مرکز عملیات خودمختاری کنترل‌شده</h1><p>وضعیت، شواهد، ابزارها و تصمیم‌های حساس در یک سطح قابل‌ممیزی.</p></div>
+        <button class="command-search" data-component="search" id="search-open" aria-haspopup="dialog"><span>جست‌وجوی پروژه، شرکت یا مدرک</span><kbd>/</kbd></button>
+      </header>
+
+      <section class="metrics" aria-label="شاخص‌های اصلی">
+        <article><span>پروژه‌های فعال</span><strong id="metric-projects">—</strong><small>بدون محدودیت مصنوعی پرتفوی</small></article>
+        <article><span>در انتظار تأیید</span><strong class="amber" id="metric-approvals">—</strong><small>هیچ اقدام خارجی خودکار نیست</small></article>
+        <article><span>Unknown باز</span><strong id="metric-unknowns">—</strong><small>به Fact ارتقا نیافته‌اند</small></article>
+        <article><span>تست‌های موفق</span><strong class="green" id="metric-tests">—</strong><small>آخرین بسته محلی</small></article>
+      </section>
+
+      <section class="grid two">
+        <article class="panel" data-component="task-rows" id="tasks">
+          <div class="panel-head"><div><span class="index">06</span><h2>اجرای وظایف</h2></div><span class="live"><i></i> زنده</span></div>
+          <div class="task-list" id="project-list" aria-live="polite"></div>
+        </article>
+
+        <article class="panel" data-component="flowchart">
+          <div class="panel-head"><div><span class="index">16</span><h2>Workflow جاری</h2></div><span class="tag">Observe → Verify</span></div>
+          <div class="flow" aria-label="گردش کار">
+            <div class="node done"><b>۱</b><span>دریافت ایمیل<small>Gmail · Read</small></span></div>
+            <div class="connector"></div><div class="node done"><b>۲</b><span>تطبیق هویت<small>Entity Resolver</small></span></div>
+            <div class="connector"></div><div class="node running"><b>۳</b><span>طبقه‌بندی شواهد<small>CLAIM · 68%</small></span></div>
+            <div class="connector"></div><div class="node waiting"><b>۴</b><span>بازبینی انسانی<small>در انتظار</small></span></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="grid three">
+        <article class="panel" data-component="loading-state"><div class="panel-head"><div><span class="index">01</span><h2>Loading State</h2></div></div><div class="loader-demo"><span class="pixel-loader" aria-label="در حال پردازش"></span><strong>بازیابی زمینه پروژه</strong><small id="elapsed">0.0 ثانیه</small></div></article>
+        <article class="panel" data-component="thinking"><div class="panel-head"><div><span class="index">02</span><h2>مراحل تحلیل</h2></div></div><details open><summary>خلاصه روند قابل‌ممیزی</summary><ol class="steps"><li class="done">خواندن منابع</li><li class="done">تفکیک Claim از Fact</li><li class="running">بررسی تناقض‌ها</li><li>پیشنهاد اقدام امن</li></ol></details><p class="notice">زنجیره فکری خصوصی نمایش داده نمی‌شود؛ فقط مراحل و دلایل قابل‌بررسی.</p></article>
+        <article class="panel" data-component="tool-chips"><div class="panel-head"><div><span class="index">05</span><h2>Tool Calls</h2></div></div><div class="chips"><button>Gmail <b>خواندن</b></button><button>Need Radar <b>اجرا شد</b></button><button>Web <b>۳ منبع</b></button><button class="broken">Apollo <b>خطای Auth</b></button></div></article>
+      </section>
+
+      <section class="grid two">
+        <article class="panel approval" data-component="approval-card" id="approvals">
+          <div class="panel-head"><div><span class="index">04</span><h2>Approval Inbox</h2></div><span class="risk">ریسک بالا</span></div>
+          <p>ارسال پیش‌نویس RFQ برای Hydrostatic Tester</p>
+          <dl><div><dt>اقدام</dt><dd>send_email</dd></div><div><dt>گیرنده</dt><dd>vendor@example.com</dd></div><div><dt>انقضا</dt><dd>۵۸ دقیقه</dd></div></dl>
+          <div class="fingerprint" data-nexus-component="approval-fingerprint"><span>Action fingerprint</span><code>sha256: 8bd1…e72c</code></div>
+          <label class="confirm"><input type="checkbox" id="scope-check"> محدوده، گیرنده و پیوست را بررسی کردم</label>
+          <div class="actions"><button class="secondary" data-demo-decision="deny">رد کردن</button><button class="primary" data-demo-decision="approve" disabled>تأیید Preview</button></div>
+          <p class="demo-warning">حالت آزمایشی: این دکمه هیچ ایمیلی ارسال نمی‌کند و Approval واقعی ثبت نمی‌کند.</p>
+        </article>
+
+        <article class="panel" data-component="recommendation-card">
+          <div class="panel-head"><div><span class="index">09</span><h2>پیشنهاد Agent</h2></div><span class="confidence">اطمینان متوسط</span></div>
+          <h3>ابتدا Pressure Basis را از مهندس بگیریم</h3><p>عدد 120 MPa هنوز بین الزام عملیاتی و Design Rating تفکیک نشده است.</p>
+          <div class="evidence-scale"><span style="width:68%"></span></div>
+          <ul><li><b>گزینه A:</b> تکمیل مشخصات — پیشنهادی</li><li><b>گزینه B:</b> مقایسه مشروط قیمت‌ها</li><li class="muted"><b>گزینه C:</b> ارسال فوری — مسدود</li></ul>
+        </article>
+      </section>
+
+      <section class="grid two" id="evidence">
+        <article class="panel" data-component="context-cards">
+          <div class="panel-head"><div><span class="index">10</span><h2>Context & Evidence</h2></div><button class="ghost">۳ منبع</button></div>
+          <div class="context-card"><span class="class fact">FACT</span><div><b>طول لوله ۶ تا ۱۲ متر</b><small>منبع: پاسخ مهندس · 2026-08-20</small></div></div>
+          <div class="context-card"><span class="class claim">CLAIM</span><div><b>حداکثر سرعت 500 CPM</b><small>منبع: Gmail · Golden Eagle</small></div></div>
+          <div class="context-card"><span class="class unknown">UNKNOWN</span><div><b>Pressure envelope واقعی</b><small>نیازمند محاسبه و تأیید فنی</small></div></div>
+        </article>
+
+        <article class="panel" data-nexus-component="evidence-ledger">
+          <div class="panel-head"><div><span class="nexus-index">N1</span><h2>Evidence Ledger</h2></div><span class="tag">اختصاصی NEXUS</span></div>
+          <table><thead><tr><th>نوع</th><th>تعداد</th><th>قابلیت تصمیم</th></tr></thead><tbody><tr><td>FACT</td><td>12</td><td>قابل استناد</td></tr><tr><td>CLAIM</td><td>18</td><td>نیازمند تأیید</td></tr><tr><td>ESTIMATE</td><td>4</td><td>وابسته به فرض</td></tr><tr><td>UNKNOWN</td><td>11</td><td>مانع تصمیم قطعی</td></tr></tbody></table>
+        </article>
+      </section>
+
+      <section class="panel" data-component="diff-table">
+        <div class="panel-head"><div><span class="index">11</span><h2>Diff پیشنهادی AI</h2></div><span class="tag">هیچ تغییری اعمال نشده</span></div>
+        <div class="diff"><div class="removed"><span>−</span><code>capacity: 40–60 pipes/minute</code><small>این عدد مربوط به خط عملیات حرارتی بود</small></div><div class="added"><span>+</span><code>hydrotester_capacity: UNKNOWN</code><small>تا زمان پاسخ مهندس</small></div></div>
+      </section>
+
+      <section class="grid two" id="network">
+        <article class="panel wide-table" data-component="records-table">
+          <div class="panel-head"><div><span class="index">12</span><h2>شبکه شرکت‌ها</h2></div><span class="tag">هویت canonical</span></div>
+          <table><thead><tr><th>شرکت</th><th>نقش</th><th>پروژه</th><th>رابطه</th></tr></thead><tbody><tr><td>Golden Eagle</td><td>تأمین‌کننده</td><td>Can Forming</td><td>مستقیم</td></tr><tr><td>Boyu</td><td>تأمین‌کننده</td><td>Hydrotester</td><td><span class="status hold">خارج از Outreach</span></td></tr><tr><td>Uralkali</td><td>تأمین‌کننده احتمالی</td><td>KCl</td><td>نیازمند بازیابی</td></tr></tbody></table>
+        </article>
+        <article class="panel" data-nexus-component="connector-health">
+          <div class="panel-head"><div><span class="nexus-index">N2</span><h2>سلامت Connectorها</h2></div></div><div id="connector-list" class="connector-list"></div>
+        </article>
+      </section>
+
+      <section class="grid two">
+        <article class="panel" data-component="filter-table">
+          <div class="panel-head"><div><span class="index">13</span><h2>صف وظایف</h2></div></div>
+          <div class="filters" role="group" aria-label="فیلتر وضعیت"><button class="active" data-filter="all">همه ۵</button><button data-filter="running">در حال اجرا ۲</button><button data-filter="waiting">منتظر ۲</button><button data-filter="done">تمام ۱</button></div>
+          <div class="filter-rows"><div data-status="running">تحلیل پیشنهاد Can Forming <span>در حال اجرا</span></div><div data-status="waiting">تکمیل مشخصات Hydrotester <span>منتظر</span></div><div data-status="done">اصلاح Approval race <span>تمام</span></div><div data-status="running">Need Radar <span>در حال اجرا</span></div><div data-status="waiting">API live test <span>منتظر شارژ</span></div></div>
+        </article>
+        <article class="panel" data-nexus-component="constraint-guard">
+          <div class="panel-head"><div><span class="nexus-index">N3</span><h2>Constraint Guard</h2></div><span class="safe-label">فعال</span></div>
+          <ul class="guard-list"><li><span>Heat Treatment</span><b>HOLD</b></li><li><span>Boyu Outreach</span><b>BLOCKED</b></li><li><span>Apollo</span><b>OPTIONAL / BROKEN</b></li><li><span>External Writes</span><b>APPROVAL REQUIRED</b></li></ul>
+        </article>
+      </section>
+
+      <section class="grid three">
+        <article class="panel" data-component="insight-cards"><div class="panel-head"><div><span class="index">17</span><h2>Insight</h2></div></div><p class="big-insight">بزرگ‌ترین مانع تصمیم Hydrotester، نبود Pressure Basis معتبر است.</p><div class="mini-chart"><i style="height:45%"></i><i style="height:72%"></i><i style="height:58%"></i><i style="height:90%"></i></div></article>
+        <article class="panel" data-nexus-component="cost-meter"><div class="panel-head"><div><span class="nexus-index">N4</span><h2>هزینه و بودجه</h2></div></div><div class="donut"><strong>$0</strong><small>مصرف API امروز</small></div><p>Live Model Test به‌دلیل اعتبار صفر اجرا نشده است.</p></article>
+        <article class="panel" data-nexus-component="recovery-checkpoint"><div class="panel-head"><div><span class="nexus-index">N5</span><h2>Recovery & Vault</h2></div></div><dl><div><dt>نسخه</dt><dd>v1.9 Runner Guard</dd></div><div><dt>Vault Queue</dt><dd id="vault-queue">—</dd></div><div><dt>Generated</dt><dd id="vault-generated">—</dd></div><div><dt>آخرین تست</dt><dd id="checkpoint-time">—</dd></div></dl><button class="secondary" id="copy-checkpoint">کپی خلاصه انتقال</button></article>
+      </section>
+
+      <section class="grid two">
+        <article class="panel" data-component="streaming-text"><div class="panel-head"><div><span class="index">03</span><h2>Streaming Result</h2></div><button id="stream-replay" class="ghost">بازپخش</button></div><p id="stream-output" class="stream-output" aria-live="polite"></p><div class="source-row"><span>Gmail</span><span>مهندس شرکت</span><span>Project Memory</span></div></article>
+        <article class="panel" data-component="code-block"><div class="panel-head"><div><span class="index">18</span><h2>Code Block</h2></div><button class="ghost" data-copy-code>کپی</button></div><pre><code id="code-sample">if action.risk == "external_write":
+    return require_exact_approval(action.digest)
+return execute_safe_work(action)</code></pre></article>
+      </section>
+
+      <section class="grid two">
+        <article class="panel" data-component="fine-tune-card"><div class="panel-head"><div><span class="index">19</span><h2>تنظیم نمایش</h2></div></div><label>تراکم رابط <input id="density" type="range" min="0" max="2" value="1"></label><label>شعاع کارت <input id="radius" type="range" min="8" max="28" value="18"></label><label class="confirm"><input id="reduce-motion" type="checkbox"> کاهش حرکت</label></article>
+        <article class="panel" data-component="selection-actions"><div class="panel-head"><div><span class="index">20</span><h2>Selection Actions</h2></div></div><p id="editable-text">متن را انتخاب کنید تا بتوانید آن را برای توضیح، کوتاه‌سازی یا تبدیل به Draft علامت‌گذاری کنید.</p><div class="selection-tools"><button data-select-action="explain">توضیح</button><button data-select-action="shorten">کوتاه کن</button><button data-select-action="draft">Draft</button></div><output id="selection-result">هنوز متنی انتخاب نشده است.</output></article>
+      </section>
+
+      <section class="panel chat-panel" data-component="chat">
+        <div class="panel-head"><div><span class="index">07</span><h2>Operator Chat</h2></div><span class="tag">بدون ارسال خارجی</span></div>
+        <div class="messages" id="messages"><div class="message user">وضعیت Hydrotester را بگو.</div><div class="message agent"><span>بررسی زمینه · ۴ منبع</span>پیشنهاد قیمت دریافت شده، اما Pressure Basis، Steel Grade و ظرفیت واقعی هنوز UNKNOWN هستند.</div></div>
+        <form class="prompt-bar" data-component="prompt-bar" id="prompt-form"><button type="button" aria-label="افزودن منبع">＋</button><input id="prompt-input" autocomplete="off" placeholder="دستور یا سؤال؛ برای جست‌وجو / را بزنید"><select aria-label="حالت اجرا"><option>تحلیل امن</option><option>Draft فقط</option></select><button class="send" type="submit">ارسال</button></form>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="search-dialog"><form method="dialog"><button class="dialog-close" aria-label="بستن">×</button><h2>جست‌وجوی NEXUS</h2><input id="global-search" autofocus placeholder="مثلاً KCl، Golden Eagle یا UNKNOWN"><div class="search-results" id="search-results"></div></form></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="/assets/app.js" defer></script>
+</body>
+</html>

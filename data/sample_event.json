@@ -1,0 +1,16 @@
+{
+  "event_id": "hydro-engineer-20260820-01",
+  "project": "hydrostatic_tester",
+  "event_type": "buyer_engineering_update",
+  "payload": {
+    "od_mm": [89, 180],
+    "wall_mm": [5, 12],
+    "length_m": [6, 12],
+    "hold_seconds": [5, 10],
+    "target_pressure_mpa": 120,
+    "steel_grade": null,
+    "end_configuration": null,
+    "requested_action": "classify"
+  }
+}
+

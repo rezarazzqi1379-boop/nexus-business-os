@@ -1,0 +1,43 @@
+{
+  "snapshot": {
+    "message_id": "1a01dfeb54c2a1c5",
+    "thread_id": "19ff470eb2bdc458",
+    "sender": "xugan@zjjyspjx.com",
+    "recipients": ["rezarazzqi1379@gmail.com"],
+    "subject": "Re: RFQ – Can Body Necking / Flanging / Beading Machine – Ø73 mm and Ø99 mm",
+    "sent_at": "2026-08-20T07:06:59Z",
+    "body": "Supplier states maximum speed is 500 CPM and stable speed is 400 CPM. D73 is described as a four-station Necking, Flanging, Beading and Seaming line. D99 is described as a single Necking machine plus a three-station Flanging, Beading and Seaming line.",
+    "attachment_names": [
+      "500CPM（MAX） can body line-D73mm can body-20260820.pdf",
+      "500CPM（MAX） can body line-D99mm can body-20260820.pdf"
+    ]
+  },
+  "proposal": {
+    "company_id": "zhejiang-golden-eagle-food-machinery",
+    "company_name": "Zhejiang Golden Eagle Food Machinery Co., Ltd.",
+    "company_role": "supplier",
+    "project_id": "can_forming",
+    "need_hypothesis": "Golden Eagle has supplied two configurations that require technical and commercial qualification against the buyer's actual throughput and integration requirements.",
+    "fit": "plausible",
+    "timing": "current",
+    "relationship": "direct",
+    "evidence_classification": "CLAIM",
+    "evidence_statement": "Supplier states max 500 CPM, stable 400 CPM, describes separate D73/D99 configurations and attached two quotation PDFs.",
+    "unknowns": [
+      "guaranteed continuous speed under actual can specifications",
+      "impact of 400 CPM stable speed on 600/650 CPM rated lines",
+      "buffering and line-integration design",
+      "tooling and changeover scope",
+      "commercial exclusions and guarantees"
+    ],
+    "contradictions": []
+  },
+  "gold": {
+    "disposition": "supply_research",
+    "next_safe_action": "qualify_supply_or_solution",
+    "company_role": "supplier",
+    "evidence_classification": "CLAIM",
+    "allowed_action": "research_only",
+    "outreach_authorized": false
+  }
+}

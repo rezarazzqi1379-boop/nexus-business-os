@@ -1,0 +1,87 @@
+{
+  "as_of": "2026-08-21",
+  "send_authorized": false,
+  "packets": [
+    {
+      "packet_id": "east-linkedin-procurement-route",
+      "company": "East Pipes Integrated Company for Industry",
+      "priority": 1,
+      "state": "prepared",
+      "channel": "LinkedIn",
+      "recipient": "Sabir Abdul Azeez — Leader Procurement",
+      "recipient_confidence": "verified",
+      "objective": "Obtain the official supplier-registration route and identify the package owner for the external coating-line project.",
+      "message": "Dear Mr. Abdul Azeez, I am Reza Razzaghi, Commercial Manager at Asak Tejarat Fater. We represent industrial pipe-equipment capabilities, including hydrostatic testing solutions. I noted East Pipes' announced external coating-line expansion. I do not want to send an unsolicited technical offer to the wrong channel. Could you please advise the official supplier registration/prequalification route and the responsible procurement contact for machinery and auxiliary equipment packages? If relevant, I can first provide a one-page capability profile for review. Best regards, Reza Razzaghi",
+      "questions": [
+        "What is the official vendor-registration or prequalification process?",
+        "Who owns procurement for machinery and auxiliary packages of the external coating-line project?",
+        "Are pressure-testing, pipe handling, or inspection interfaces still open or already awarded?",
+        "Are non-Saudi manufacturers accepted directly, or is a local Saudi agent required?"
+      ],
+      "attachments": [],
+      "stop_conditions": [
+        "Do not send a quotation before the package scope is confirmed.",
+        "Do not state that East Pipes needs a hydrotester.",
+        "Stop if sanctions, banking, export-control, or end-use screening fails."
+      ]
+    },
+    {
+      "packet_id": "east-switchboard-procurement-route",
+      "company": "East Pipes Integrated Company for Industry",
+      "priority": 2,
+      "state": "prepared",
+      "channel": "Phone",
+      "recipient": "+966 13 8616801 — corporate switchboard",
+      "recipient_confidence": "verified",
+      "objective": "Confirm the procurement department's official email and vendor-registration route.",
+      "message": "Hello, my name is Reza Razzaghi, Commercial Manager at Asak Tejarat Fater. We are seeking the correct supplier-registration route for industrial pipe machinery and auxiliary equipment. Could you please connect me to Procurement, or provide the official procurement/vendor-registration email? This is a registration inquiry only; I am not calling to submit an unsolicited quotation.",
+      "questions": [
+        "What is the official procurement email?",
+        "Is there an online vendor portal?",
+        "Who handles machinery packages for the coating-line expansion?"
+      ],
+      "attachments": [],
+      "stop_conditions": [
+        "Do not discuss pricing on the switchboard call.",
+        "Do not send documents to sales@eastpipes.com unless Procurement explicitly redirects there."
+      ]
+    },
+    {
+      "packet_id": "baku-linkedin-supplier-introduction",
+      "company": "Baku Steel Company / Azerboru",
+      "priority": 3,
+      "state": "prepared",
+      "channel": "LinkedIn",
+      "recipient": "Yalchin Amirbekov — Deputy Director of Procurement and Supply Chain",
+      "recipient_confidence": "verified",
+      "objective": "Ask for the supplier-introduction/prequalification route without asserting an open hydrotester tender.",
+      "message": "Dear Mr. Amirbekov, I am Reza Razzaghi, Commercial Manager at Asak Tejarat Fater. We have been reviewing Baku Steel's modernization program and the completed first phase at Azerboru. Our scope includes industrial pipe hydrostatic testing equipment. I understand that no current hydrotester tender is publicly listed, so I am not submitting an offer. Could you please advise whether BSC maintains a general supplier prequalification process for future pipe-finishing and testing equipment, and which channel should be used for a brief capability introduction? Best regards, Reza Razzaghi",
+      "questions": [
+        "Does BSC accept general supplier prequalification outside a published tender?",
+        "Is tender@bakusteel.com appropriate for capability registration or only active contests?",
+        "Is any future pipe testing/finishing CAPEX scope approved but not yet tendered?",
+        "Which PQQ documents should a foreign supplier prepare in advance?"
+      ],
+      "attachments": [],
+      "stop_conditions": [
+        "Do not imply a current phase-two tender exists.",
+        "Do not submit against contest 031 or 032; both are expired.",
+        "Stop if Iran-linked trade compliance cannot be cleared."
+      ]
+    },
+    {
+      "packet_id": "baku-tender-monitor",
+      "company": "Baku Steel Company / Azerboru",
+      "priority": 4,
+      "state": "prepared",
+      "channel": "Monitoring",
+      "recipient": "https://www.bakusteel.com/en/poster/tender-announcements",
+      "recipient_confidence": "verified",
+      "objective": "Monitor for a new tender before using tender@bakusteel.com.",
+      "message": "No outbound message. Check for a new contest number, publication date, deadline, scope, PQQ, contact person, fee, and submission format.",
+      "questions": ["Is there a new 2026 contest?", "Does it cover pipe testing, finishing, handling, inspection, utilities, or automation?"],
+      "attachments": [],
+      "stop_conditions": ["Never reuse an expired tender's deadline or password procedure without checking the new notice."]
+    }
+  ]
+}

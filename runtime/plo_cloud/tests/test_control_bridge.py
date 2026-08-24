@@ -2,8 +2,8 @@ import os, sys, tempfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
-from plo_core import PLOStore
-from control_bridge import ExecutionClass, ExecutionEnvelope, EnvelopeError, enqueue_from_control, validate_envelope
+from plo_core import IdempotencyConflictError, PLOStore
+from control_bridge import ExecutionClass, ExecutionEnvelope, EnvelopeError, enqueue_from_control, immutable_binding_digest, validate_envelope
 
 D = "a" * 64
 
@@ -49,6 +49,12 @@ def test_digest_is_strict_sha256_hex():
             pass
 
 
+def test_binding_digest_is_deterministic_and_approval_token_independent():
+    a = env(execution_class=ExecutionClass.CONSEQUENTIAL, external_effect=True, exact_approval_ref="APR-1")
+    b = env(execution_class=ExecutionClass.CONSEQUENTIAL, external_effect=True, exact_approval_ref="APR-2")
+    assert immutable_binding_digest(a) == immutable_binding_digest(b)
+
+
 def test_bridge_only_enqueues_and_preserves_idempotency():
     with tempfile.TemporaryDirectory() as td:
         s = PLOStore(os.path.join(td, "p.db"))
@@ -57,6 +63,42 @@ def test_bridge_only_enqueues_and_preserves_idempotency():
         b = enqueue_from_control(s, e)
         assert a == b
         assert s.metrics()["pending"] == 1
+
+
+def test_same_idempotency_key_with_changed_action_fails_closed():
+    with tempfile.TemporaryDirectory() as td:
+        s = PLOStore(os.path.join(td, "p.db"))
+        enqueue_from_control(s, env())
+        changed = env(action_digest="b" * 64)
+        try:
+            enqueue_from_control(s, changed)
+            raise AssertionError("idempotency key rebound to changed action")
+        except IdempotencyConflictError:
+            pass
+        assert s.metrics()["pending"] == 1
+
+
+def test_same_idempotency_key_with_changed_project_or_decision_fails_closed():
+    with tempfile.TemporaryDirectory() as td:
+        s = PLOStore(os.path.join(td, "p.db"))
+        enqueue_from_control(s, env())
+        for changed in (env(project_id="PRJ-HTL-01"), env(decision_ref="DEC-2"), env(control_ref="FORGE-2")):
+            try:
+                enqueue_from_control(s, changed)
+                raise AssertionError("idempotency key rebound across immutable control context")
+            except IdempotencyConflictError:
+                pass
+
+
+def test_legacy_unbound_key_cannot_be_silently_adopted_by_control_bridge():
+    with tempfile.TemporaryDirectory() as td:
+        s = PLOStore(os.path.join(td, "p.db"))
+        s.enqueue("legacy", "idem-1")
+        try:
+            enqueue_from_control(s, env())
+            raise AssertionError("legacy unbound idempotency key silently adopted")
+        except IdempotencyConflictError:
+            pass
 
 
 def test_consequential_enqueue_marks_approval_required_but_does_not_authorize():

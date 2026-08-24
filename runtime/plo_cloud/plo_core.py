@@ -82,6 +82,22 @@ class PLOStore:
             if status!="RUNNING" or cur!=token or owner!=worker or not exp or exp<=now(): raise OwnershipError("lease invalid or expired")
             new=(datetime.now(timezone.utc)+timedelta(seconds=extend_seconds)).isoformat()
             db.execute("UPDATE tasks SET lock_expires_at=? WHERE run_id=? AND lease_token=?",(new,rid,token))
+    def complete_read_only(self,rid,lease_token,worker,result_ref):
+        if not isinstance(result_ref,str) or not result_ref.strip() or result_ref!=result_ref.strip():
+            raise PLOError("invalid result_ref")
+        with self.tx() as db:
+            task=db.execute("SELECT status,lease_token,lease_owner,lock_expires_at,approval_required FROM tasks WHERE run_id=?",(rid,)).fetchone()
+            if not task or task[0]!="RUNNING" or task[1]!=lease_token or task[2]!=worker or not task[3] or task[3]<=now():
+                raise OwnershipError("lease invalid, expired, or not owned")
+            if task[4]:
+                raise ApprovalError("consequential task cannot use read-only completion")
+            if db.execute("SELECT 1 FROM operations WHERE run_id=? LIMIT 1",(rid,)).fetchone() is not None:
+                raise ApprovalError("task with operation journal cannot use read-only completion")
+            db.execute("UPDATE tasks SET status='COMPLETED',lease_token=NULL,lease_owner=NULL,lock_expires_at=NULL WHERE run_id=? AND status='RUNNING' AND lease_token=?",(rid,lease_token))
+            if db.execute("SELECT changes()").fetchone()[0]!=1:
+                raise OwnershipError("task state changed concurrently")
+            self.audit(db,"read_only_completed",rid,result_ref)
+            return True
     def request_approval(self,rid,scope,ttl_seconds=3600):
         with self.tx() as db:
             row=db.execute("SELECT task_version FROM tasks WHERE run_id=?",(rid,)).fetchone()
@@ -140,4 +156,5 @@ class PLOStore:
         dup=db.execute("SELECT COUNT(*) FROM (SELECT operation_key,COUNT(*) n FROM execution_log GROUP BY operation_key HAVING n>1)").fetchone()[0]
         pending=db.execute("SELECT COUNT(*) FROM tasks WHERE status='PENDING'").fetchone()[0]
         waiting=db.execute("SELECT COUNT(*) FROM tasks WHERE status='WAITING'").fetchone()[0]
-        db.close(); return {"duplicate_execution_count":dup,"pending":pending,"reconciliation_required":waiting}
+        completed=db.execute("SELECT COUNT(*) FROM tasks WHERE status='COMPLETED'").fetchone()[0]
+        db.close(); return {"duplicate_execution_count":dup,"pending":pending,"reconciliation_required":waiting,"completed":completed}

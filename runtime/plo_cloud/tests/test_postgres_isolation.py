@@ -17,9 +17,15 @@ def test_schema_isolation():
         with conn.cursor() as cur:
             cur.execute("SELECT current_schema() AS s")
             assert cur.fetchone()["s"] == PLO_SCHEMA
-            cur.execute("SELECT count(*) AS n FROM pg_tables WHERE schemaname=%s AND tablename LIKE 'plo_%'", (PLO_SCHEMA,))
+            cur.execute(
+                "SELECT count(*) AS n FROM pg_tables WHERE schemaname=%s AND tablename LIKE %s",
+                (PLO_SCHEMA, "plo_%"),
+            )
             assert cur.fetchone()["n"] >= 5
-            cur.execute("SELECT count(*) AS n FROM pg_tables WHERE schemaname='public' AND tablename LIKE 'plo_%'")
+            cur.execute(
+                "SELECT count(*) AS n FROM pg_tables WHERE schemaname=%s AND tablename LIKE %s",
+                ("public", "plo_%"),
+            )
             assert cur.fetchone()["n"] == 0
 
 

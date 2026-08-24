@@ -1,6 +1,6 @@
-import os,sys,tempfile
+import os,sys,tempfile,sqlite3
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0,ROOT)
-from plo_core import PLOStore,ApprovalError,OwnershipError
+from plo_core import PLOStore,ApprovalError,OwnershipError,MAX_ORPHAN_RETRIES
 from gmail_readonly import GmailReadOnly,ReadOnlyViolation,deterministic_message_id,State
 from reconciliation import decide,Decision
 
@@ -52,6 +52,15 @@ def test_read_only_completion_rejects_expired_lease():
     td.cleanup()
 def test_recovery():
     td,s=fresh(); r=s.enqueue('x','k4'); s.claim_next('w',-1); assert r in s.recover_orphans(); assert s.metrics()['pending']==1; td.cleanup()
+def test_orphan_retry_budget_exhaustion_holds_task():
+    td,s=fresh(); r=s.enqueue('x','retry-budget')
+    for i in range(MAX_ORPHAN_RETRIES):
+        c=s.claim_next(f'w{i}',-1); assert c and c['run_id']==r
+        assert r in s.recover_orphans()
+    m=s.metrics(); assert m['pending']==0 and m['reconciliation_required']==1
+    assert s.claim_next('after-budget') is None
+    db=sqlite3.connect(s.path); row=db.execute("SELECT status,retry_count FROM tasks WHERE run_id=?",(r,)).fetchone(); audit=db.execute("SELECT result FROM audit WHERE run_id=? AND action='orphan_recovered' ORDER BY id DESC LIMIT 1",(r,)).fetchone(); db.close()
+    assert row==('WAITING',MAX_ORPHAN_RETRIES); assert audit==('retry_budget_exhausted',); td.cleanup()
 def test_orphan_with_intent_requires_reconciliation():
     td,s=fresh(); r=s.enqueue('send','k9',True); c=s.claim_next('w',30); a=s.request_approval(r,'send:a'); s.decide_approval(a,'approved'); tok=s.authorize_operation(r,'op-uncertain','send:a',c['_lease_token'],'w'); s.record_intent(r,'op-uncertain',tok,c['_lease_token'],'w'); s.renew_lease(r,c['_lease_token'],'w',-1)
     assert r in s.recover_orphans(); m=s.metrics(); assert m['reconciliation_required']==1 and m['pending']==0; assert s.claim_next('other') is None; td.cleanup()

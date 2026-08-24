@@ -21,11 +21,16 @@ class PostgresApprovalError(PostgresPLOError):
     pass
 
 
+class PostgresIdempotencyConflictError(PostgresPLOError):
+    pass
+
+
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS plo_tasks (
   run_id uuid PRIMARY KEY,
   task_id text NOT NULL,
   idempotency_key text NOT NULL UNIQUE,
+  binding_digest text,
   status text NOT NULL CHECK (status IN ('PENDING','RUNNING','WAITING','COMPLETED','FAILED','CANCELLED')),
   task_version bigint NOT NULL DEFAULT 1,
   approval_required boolean NOT NULL DEFAULT false,
@@ -35,6 +40,7 @@ CREATE TABLE IF NOT EXISTS plo_tasks (
   retry_count integer NOT NULL DEFAULT 0,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE plo_tasks ADD COLUMN IF NOT EXISTS binding_digest text;
 CREATE INDEX IF NOT EXISTS idx_plo_tasks_claim ON plo_tasks(status, lock_expires_at, created_at);
 
 CREATE TABLE IF NOT EXISTS plo_approvals (
@@ -103,23 +109,31 @@ class PostgresPLOStore:
             with conn.cursor() as cur:
                 cur.execute("TRUNCATE plo_execution_log, plo_operations, plo_approvals, plo_tasks, plo_audit RESTART IDENTITY CASCADE")
 
-    def enqueue(self, task_id: str, idempotency_key: str, approval_required: bool = False):
+    def enqueue(self, task_id: str, idempotency_key: str, approval_required: bool = False, binding_digest: str | None = None):
         rid = uuid.uuid4()
         with self.connect() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    """INSERT INTO plo_tasks(run_id,task_id,idempotency_key,status,approval_required)
-                       VALUES(%s,%s,%s,'PENDING',%s)
+                    """INSERT INTO plo_tasks(run_id,task_id,idempotency_key,binding_digest,status,approval_required)
+                       VALUES(%s,%s,%s,%s,'PENDING',%s)
                        ON CONFLICT(idempotency_key) DO NOTHING
                        RETURNING run_id""",
-                    (rid, task_id, idempotency_key, approval_required),
+                    (rid, task_id, idempotency_key, binding_digest, approval_required),
                 )
                 row = cur.fetchone()
                 if row:
                     cur.execute("INSERT INTO plo_audit(action,run_id,result) VALUES('enqueue',%s,'created')", (row['run_id'],))
                     return str(row["run_id"])
-                cur.execute("SELECT run_id FROM plo_tasks WHERE idempotency_key=%s", (idempotency_key,))
-                return str(cur.fetchone()["run_id"])
+                cur.execute("SELECT run_id,binding_digest FROM plo_tasks WHERE idempotency_key=%s FOR UPDATE", (idempotency_key,))
+                existing = cur.fetchone()
+                if not existing:
+                    raise PostgresIdempotencyConflictError("idempotency race left no existing task")
+                if binding_digest is not None:
+                    if existing["binding_digest"] is None:
+                        raise PostgresIdempotencyConflictError("existing idempotency key has no immutable binding")
+                    if existing["binding_digest"] != binding_digest:
+                        raise PostgresIdempotencyConflictError("idempotency key rebound to different payload")
+                return str(existing["run_id"])
 
     def claim_next(self, worker: str, lock_seconds: int = 30):
         token = uuid.uuid4()

@@ -1,0 +1,47 @@
+{
+  "project_id": "PRJ-HYD-01",
+  "canonical_source": "PRJ-HYD-01-ENG v1.1",
+  "requirements": [
+    {"id": "REQ-HYD-OD", "field": "od_mm", "value": "89-180", "status": "fact", "blocking": false},
+    {"id": "REQ-HYD-WT", "field": "wall_thickness_mm", "value": "6-20", "status": "fact", "blocking": false},
+    {"id": "REQ-HYD-LEN", "field": "length_m", "value": "9-12", "status": "fact", "blocking": false},
+    {"id": "REQ-HYD-PMAX", "field": "max_pressure_mpa", "value": 120, "status": "fact", "blocking": false},
+    {"id": "REQ-HYD-HOLD", "field": "hold_time_s", "value": "5-10", "status": "fact", "blocking": false},
+    {"id": "REQ-HYD-TPH", "field": "throughput_pipes_per_hour", "value": 60, "status": "fact", "blocking": false}
+  ],
+  "open_holds": [
+    {"id": "UNK-HYD-MATRIX", "field": "critical_duty_matrix", "blocking": true},
+    {"id": "UNK-HYD-PASSFAIL", "field": "pressure_accuracy_stability_rule", "blocking": true},
+    {"id": "UNK-HYD-ENDS", "field": "end_condition_exclusions", "blocking": true},
+    {"id": "UNK-HYD-FAT", "field": "fat_tpi_itp_final_basis", "blocking": true}
+  ],
+  "supplier_claims": [
+    {
+      "id": "CLM-HYD-GH-120",
+      "supplier": "GH Petro",
+      "field": "max_pressure_mpa",
+      "value": 120,
+      "status": "claim",
+      "source": "GH-Technical Proposal for 89-180mm 120Mpa.docx",
+      "note": "Nominal claim; does not close signed pressure/geometry envelope or FAT output."
+    },
+    {
+      "id": "CLM-HYD-GH-CAP",
+      "supplier": "GH Petro",
+      "field": "throughput_pipes_per_hour_at_120_mpa_reference",
+      "value": 50,
+      "status": "claim",
+      "source": "GH-Technical Proposal for 89-180mm 120Mpa.docx",
+      "note": "Known 168.3 mm reference at 120 MPa; not automatically equivalent to buyer 60/h basis."
+    },
+    {
+      "id": "CLM-HYD-YAX-PMAX",
+      "supplier": "KARAT / Yaxing",
+      "field": "max_pressure_mpa",
+      "value": 150,
+      "status": "claim",
+      "source": "SYJ-I A-219 brochure",
+      "note": "High-value candidate; cycle time and 60/h remain unproven."
+    }
+  ]
+}

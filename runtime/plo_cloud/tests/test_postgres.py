@@ -3,7 +3,7 @@ import os, sys, threading
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
-from postgres_store import PostgresPLOStore, PostgresApprovalError, PostgresOwnershipError, PostgresIdempotencyConflictError
+from postgres_store import PostgresPLOStore, PostgresApprovalError, PostgresOwnershipError, PostgresIdempotencyConflictError, MAX_ORPHAN_RETRIES
 
 DSN = os.environ["NEXUS_PLO_DATABASE_URL"]
 os.environ["NEXUS_PLO_ALLOW_TEST_RESET"] = "1"
@@ -105,6 +105,21 @@ def test_orphan_recovery_and_fencing():
     s = fresh(); rid = s.enqueue("task", "orphan"); old = s.claim_next("A", -1); recovered = s.recover_orphans(); assert rid in recovered; new = s.claim_next("B", 30); assert new and new["run_id"] == rid
     try: s.renew_lease(rid, old["_lease_token"], "A"); raise AssertionError("stale worker revived")
     except PostgresOwnershipError: pass
+
+
+def test_orphan_retry_budget_exhaustion_holds_task():
+    s=fresh(); rid=s.enqueue("task","retry-budget")
+    for i in range(MAX_ORPHAN_RETRIES):
+        c=s.claim_next(f"W{i}",-1); assert c and c["run_id"]==rid
+        assert rid in s.recover_orphans()
+    m=s.metrics(); assert m["pending"]==0 and m["reconciliation_required"]==1
+    assert s.claim_next("after-budget") is None
+    with s.connect() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT status,retry_count FROM plo_tasks WHERE run_id=%s::uuid",(rid,)); row=cur.fetchone()
+            cur.execute("SELECT result FROM plo_audit WHERE run_id=%s::uuid AND action='orphan_recovered' ORDER BY id DESC LIMIT 1",(rid,)); audit=cur.fetchone()
+    assert row["status"]=="WAITING" and row["retry_count"]==MAX_ORPHAN_RETRIES
+    assert audit["result"]=="retry_budget_exhausted"
 
 
 def test_orphan_with_intent_requires_reconciliation():

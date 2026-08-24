@@ -3,7 +3,7 @@ import os, sys, threading
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
-from postgres_store import PostgresPLOStore, PostgresApprovalError, PostgresOwnershipError
+from postgres_store import PostgresPLOStore, PostgresApprovalError, PostgresOwnershipError, PostgresIdempotencyConflictError
 
 DSN = os.environ["NEXUS_PLO_DATABASE_URL"]
 os.environ["NEXUS_PLO_ALLOW_TEST_RESET"] = "1"
@@ -21,6 +21,28 @@ def test_idempotent_enqueue():
     a = s.enqueue("task", "same-key")
     b = s.enqueue("task", "same-key")
     assert a == b
+
+
+def test_bound_idempotent_enqueue():
+    s = fresh()
+    a = s.enqueue("task", "bound-key", False, "a" * 64)
+    b = s.enqueue("task", "bound-key", False, "a" * 64)
+    assert a == b
+    try:
+        s.enqueue("task", "bound-key", False, "b" * 64)
+        raise AssertionError("bound idempotency key rebound")
+    except PostgresIdempotencyConflictError:
+        pass
+
+
+def test_bound_enqueue_rejects_legacy_unbound_collision():
+    s = fresh()
+    s.enqueue("legacy", "legacy-key")
+    try:
+        s.enqueue("task", "legacy-key", False, "c" * 64)
+        raise AssertionError("bound enqueue adopted legacy key")
+    except PostgresIdempotencyConflictError:
+        pass
 
 
 def test_two_workers_only_one_claims():

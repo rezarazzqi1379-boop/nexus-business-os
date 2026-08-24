@@ -1,5 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from enum import Enum
+import hashlib
+import json
 import re
 
 
@@ -47,8 +49,24 @@ def validate_envelope(e: ExecutionEnvelope) -> None:
         raise EnvelopeError("unsupported execution class")
 
 
+def immutable_binding_digest(e: ExecutionEnvelope) -> str:
+    """Bind logical idempotency to the immutable action/control snapshot, not an approval token."""
+    validate_envelope(e)
+    payload = {
+        "project_id": e.project_id,
+        "task_id": e.task_id,
+        "decision_ref": e.decision_ref,
+        "control_ref": e.control_ref,
+        "action_digest": e.action_digest,
+        "execution_class": e.execution_class.value,
+        "external_effect": e.external_effect,
+    }
+    raw = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()
+
+
 def enqueue_from_control(store, envelope: ExecutionEnvelope):
     """Persist execution intent only. This never validates or grants upstream approval."""
-    validate_envelope(envelope)
+    binding = immutable_binding_digest(envelope)
     approval_required = envelope.execution_class is ExecutionClass.CONSEQUENTIAL
-    return store.enqueue(envelope.task_id, envelope.idempotency_key, approval_required)
+    return store.enqueue(envelope.task_id, envelope.idempotency_key, approval_required, binding_digest=binding)

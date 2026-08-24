@@ -1,23 +1,43 @@
-# NEXUS PLO Cloud Runtime v0.2.1
+# NEXUS PLO Cloud Execution Substrate v0.3
 
-Linux/Docker-native continuation of the verified PLO safety work. It removes Windows from the critical path.
+Linux/Docker-native durable execution substrate for NEXUS. It removes Windows from the critical path while remaining a shadow/CI-tested component rather than a second source of truth or a production authorization system.
 
-## Safety state
+## Canonical ownership boundary
+- PR #4 / PR #37 own consequential exact-action approval semantics.
+- PR #16 owns Supabase least-privilege / ACL / RLS hardening.
+- PLO owns durable task/run state, leases/fencing, crash/orphan recovery, operation intent/execution journal, duplicate-execution telemetry, provider reconciliation state, and Linux/PostgreSQL runtime mechanics.
+- Compatibility approval fixtures in this isolated runtime are test scaffolding only; production authorization must consume the canonical Core gate rather than create a second authority.
+
+## Verified safety state
 - Gmail/search adapter: READ-ONLY.
 - Gmail send/draft/modify: hard-disabled.
-- Approval is consumed before an approval-required side effect can be recorded.
-- Approval is bound to exact task version and scope.
-- Expired leases cannot be resurrected.
-- Expired RUNNING tasks are recoverable.
+- Uncertain provider reconciliation is HOLD, never blind resend.
+- Expired leases cannot renew, authorize, or cross the authorize -> intent gap.
+- `executed` cannot be recorded before `intended`.
+- Stale task-version approvals fail closed.
+- Expired RUNNING tasks are recoverable and old workers remain fenced.
 - Duplicate logical execution is measured from an append-only execution log.
-- Uncertain Gmail reconciliation is HOLD, never blind resend.
+- PostgreSQL two-worker claim isolation is tested with row locking / `SKIP LOCKED`.
+- Worker backend selection is explicit/observable: `auto`, `sqlite`, or `postgres`.
+- Runtime PostgreSQL worker does **not** perform DDL migrations; migration/provisioning is a separate deployment concern so the runtime role can remain least-privileged.
 
-## Run
+## Local / CI usage
 ```bash
 python tests/test_cloud.py
-python worker.py --db ./data/nexus_plo.db
-docker build -t nexus-plo-cloud:v0.2.1 .
-docker run --rm -v "$PWD/data:/data" nexus-plo-cloud:v0.2.1
+
+# SQLite local fallback
+python worker.py --backend sqlite --db ./data/nexus_plo.db
+
+# PostgreSQL requires a separately provisioned/migrated schema
+export NEXUS_PLO_DATABASE_URL='postgresql://...'
+python tests/test_postgres.py
+python worker.py --backend postgres
+
+docker build -t nexus-plo-cloud:v0.3 .
+docker run --rm -v "$PWD/data:/data" nexus-plo-cloud:v0.3
 ```
 
-GitHub Actions is CI/reproducibility, not durable storage. A persistent volume or server database is required for durable runtime state.
+## Production gate
+Current maturity is **Implemented + CI-tested in isolated/shadow runtime**. It is not merged, not deployed, and not production-authorized. Before production promotion: use a dedicated least-privilege runtime DB role, isolate PLO state from canonical business tables, separately provision schema/migrations, verify Supabase/hosted PostgreSQL compatibility, run hosted restart/crash tests, and collect live telemetry.
+
+GitHub Actions is CI/reproducibility, not durable storage. A persistent volume or server PostgreSQL backend is required for durable hosted runtime state.

@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS plo_tasks (
   run_id uuid PRIMARY KEY,
   task_id text NOT NULL,
   idempotency_key text NOT NULL UNIQUE,
-  status text NOT NULL CHECK (status IN ('PENDING','RUNNING','COMPLETED','FAILED','CANCELLED')),
+  status text NOT NULL CHECK (status IN ('PENDING','RUNNING','WAITING','COMPLETED','FAILED','CANCELLED')),
   task_version bigint NOT NULL DEFAULT 1,
   approval_required boolean NOT NULL DEFAULT false,
   lease_token uuid,
@@ -97,6 +97,9 @@ class PostgresPLOStore:
 
     def reset_for_tests(self):
         with self.connect() as conn:
+            host = (conn.info.host or "").lower()
+            if os.getenv("NEXUS_PLO_ALLOW_TEST_RESET") != "1" or host not in {"localhost", "127.0.0.1", "::1"}:
+                raise PostgresPLOError("destructive test reset is allowed only on an explicitly opted-in local database")
             with conn.cursor() as cur:
                 cur.execute("TRUNCATE plo_execution_log, plo_operations, plo_approvals, plo_tasks, plo_audit RESTART IDENTITY CASCADE")
 
@@ -270,12 +273,22 @@ class PostgresPLOStore:
         with self.connect() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    """UPDATE plo_tasks SET status='PENDING',task_version=task_version+1,
+                    """UPDATE plo_tasks t SET
+                       status=CASE WHEN EXISTS (
+                           SELECT 1 FROM plo_operations o WHERE o.run_id=t.run_id AND o.state='intended'
+                       ) THEN 'WAITING' ELSE 'PENDING' END,
+                       task_version=task_version+1,
                        lease_token=NULL,lease_owner=NULL,lock_expires_at=NULL,retry_count=retry_count+1
                        WHERE status='RUNNING' AND lock_expires_at < now()
-                       RETURNING run_id"""
+                       RETURNING run_id,status"""
                 )
-                return [str(r["run_id"]) for r in cur.fetchall()]
+                rows=cur.fetchall()
+                for row in rows:
+                    cur.execute(
+                        "INSERT INTO plo_audit(action,run_id,result) VALUES('orphan_recovered',%s,%s)",
+                        (row["run_id"], "reconciliation_required" if row["status"]=="WAITING" else "requeued"),
+                    )
+                return [str(r["run_id"]) for r in rows]
 
     def metrics(self):
         with self.connect() as conn:
@@ -284,4 +297,6 @@ class PostgresPLOStore:
                 dup = cur.fetchone()["n"]
                 cur.execute("SELECT count(*) AS n FROM plo_tasks WHERE status='PENDING'")
                 pending = cur.fetchone()["n"]
-                return {"duplicate_execution_count": dup, "pending": pending}
+                cur.execute("SELECT count(*) AS n FROM plo_tasks WHERE status='WAITING'")
+                waiting = cur.fetchone()["n"]
+                return {"duplicate_execution_count": dup, "pending": pending, "reconciliation_required": waiting}

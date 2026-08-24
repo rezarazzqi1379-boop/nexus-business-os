@@ -64,6 +64,7 @@ def test_duplicate_shadow_result_fails_closed():
         source_node_id=item.source_node_id,
         status="completed",
         summary="done",
+        evidence_refs=(f"shadow-run:{item.task_id}",),
     )
     apply_shadow_results(graph, [result])
     try:
@@ -72,6 +73,24 @@ def test_duplicate_shadow_result_fails_closed():
         assert "duplicate shadow result" in str(exc)
     else:
         raise AssertionError("duplicate shadow result must fail closed")
+
+
+def test_shadow_result_without_provenance_fails_closed():
+    graph = _graph_with_live_evidence()
+    item = build_shadow_intents(graph)[0]
+    result = ShadowTaskResult(
+        task_id=item.task_id,
+        project_id=item.project_id,
+        source_node_id=item.source_node_id,
+        status="completed",
+        summary="unproven result",
+    )
+    try:
+        apply_shadow_results(graph, [result])
+    except ValueError as exc:
+        assert "fact requires provenance" in str(exc)
+    else:
+        raise AssertionError("shadow result without provenance must fail closed")
 
 
 def test_shadow_result_cannot_reference_unknown_project_or_source():

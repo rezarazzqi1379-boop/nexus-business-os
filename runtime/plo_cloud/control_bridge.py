@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from enum import Enum
 import hashlib
 import json
@@ -66,7 +66,13 @@ def immutable_binding_digest(e: ExecutionEnvelope) -> str:
 
 
 def enqueue_from_control(store, envelope: ExecutionEnvelope):
-    """Persist execution intent only. This never validates or grants upstream approval."""
+    """Persist a SHADOW execution intent only; never grant approval or external-write authority.
+
+    Consequential intake is intentionally disabled until the canonical exact-action
+    approval primitive is consolidated into a verified upstream approval consumer.
+    A textual approval reference is provenance, not authorization.
+    """
     binding = immutable_binding_digest(envelope)
-    approval_required = envelope.execution_class is ExecutionClass.CONSEQUENTIAL
-    return store.enqueue(envelope.task_id, envelope.idempotency_key, approval_required, binding_digest=binding)
+    if envelope.execution_class is not ExecutionClass.SHADOW:
+        raise EnvelopeError("consequential control-to-PLO intake is disabled pending exact-approval consolidation")
+    return store.enqueue(envelope.task_id, envelope.idempotency_key, False, binding_digest=binding)

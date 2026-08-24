@@ -1,0 +1,26 @@
+[
+  {
+    "event_id": "friction:hydrotester:pipe-end-condition",
+    "project_id": "hydrotester",
+    "category": "pre_rfq_readiness_gap",
+    "missing_or_misaligned_item": "pipe-end condition / end-sealing basis remained open after supplier evaluation had begun",
+    "consequence": "supplier evaluation required a later controlling Rev.1.2 clarification before final engineering/proposal preparation",
+    "source_ref": "gmail:1a027e0f8091a009"
+  },
+  {
+    "event_id": "friction:can-forming:scope-mismatch",
+    "project_id": "can-forming",
+    "category": "pre_rfq_readiness_gap",
+    "missing_or_misaligned_item": "supplier quoted complete can-body production lines while buyer evaluation focused on end-forming modules",
+    "consequence": "clarification/rework was required after quotations were received to realign supplier scope with buyer need",
+    "source_ref": "gmail:1a01e603db04f3d9"
+  },
+  {
+    "event_id": "friction:kcl:import-permit",
+    "project_id": "kcl-oms",
+    "category": "pre_rfq_readiness_gap",
+    "missing_or_misaligned_item": "required KCl import permit from the Soil and Water Institute was not confirmed before commercial discussion",
+    "consequence": "commercial discussion was gated until the regulatory prerequisite could be verified/obtained",
+    "source_ref": "gmail:1a01dfe6f78ea7f1"
+  }
+]

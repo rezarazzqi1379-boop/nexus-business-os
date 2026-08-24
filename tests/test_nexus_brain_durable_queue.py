@@ -12,15 +12,19 @@ from nexus_brain.durable_queue import (
 )
 from nexus_brain.execution import build_read_only_execution_intent
 from nexus_brain.execution_bridge import to_shadow_execution_envelope
-from nexus_brain.live_snapshot import load_live_snapshot
+from nexus_brain.fixtures import canonical_portfolio_graph
+from nexus_brain.live import apply_live_evidence_signals
+from nexus_brain.runtime_snapshot import load_manual_snapshot
 
 
 NOW = datetime(2026, 8, 24, 9, 0, tzinfo=timezone.utc)
 CREATED = "2026-08-24T08:50:00Z"
+SNAPSHOT = "data/operational/live_evidence_snapshot_2026-08-24.json"
 
 
 def envelope():
-    graph, _ = load_live_snapshot("data/operational/live_evidence_snapshot_2026-08-24.json")
+    graph = canonical_portfolio_graph()
+    apply_live_evidence_signals(graph, load_manual_snapshot(SNAPSHOT))
     rec = next(a for a in recommend_internal_actions(graph) if a.source_node_id == "LIVE-HYD-GH-REV12-ACK-20260823")
     intent = build_read_only_execution_intent(graph, rec, created_at=CREATED, payload={"mode": "normalize_against_rev_1_2"})
     return to_shadow_execution_envelope(graph, intent)

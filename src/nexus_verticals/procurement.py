@@ -2,7 +2,26 @@ from dataclasses import dataclass
 from typing import Literal
 
 
+EvidenceKind = Literal[
+    "fact",
+    "claim",
+    "estimate",
+    "inference",
+    "hypothesis",
+    "assumption",
+    "unknown",
+]
 OutcomeStatus = Literal["open", "won", "lost", "stalled"]
+
+_ALLOWED_EVIDENCE_KINDS = {
+    "fact",
+    "claim",
+    "estimate",
+    "inference",
+    "hypothesis",
+    "assumption",
+    "unknown",
+}
 
 
 @dataclass(frozen=True)
@@ -13,6 +32,7 @@ class Evidence:
     summary: str
     observed_at: str
     confidence: float
+    kind: EvidenceKind
 
 
 @dataclass(frozen=True)
@@ -74,6 +94,7 @@ class ProcurementVerticalRecord:
             ("evidence.source_ref", self.evidence.source_ref),
             ("evidence.summary", self.evidence.summary),
             ("evidence.observed_at", self.evidence.observed_at),
+            ("evidence.kind", self.evidence.kind),
             ("relationship.relationship_id", self.relationship.relationship_id),
             ("relationship.from_entity", self.relationship.from_entity),
             ("relationship.to_entity", self.relationship.to_entity),
@@ -88,6 +109,9 @@ class ProcurementVerticalRecord:
         for name, value in required_values:
             if not value.strip():
                 errors.append(f"{name} is required")
+
+        if self.evidence.kind not in _ALLOWED_EVIDENCE_KINDS:
+            errors.append("evidence.kind must be a supported epistemic class")
 
         for name, value in (
             ("evidence.confidence", self.evidence.confidence),

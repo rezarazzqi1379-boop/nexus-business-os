@@ -48,6 +48,9 @@ def main():
         assert blocked_public_ddl, "runtime role unexpectedly created table in public"
 
         admin.execute("RESET ROLE")
+        # The runtime role owns no objects, but GRANTs create dependency records.
+        # Revoke/drop those test-only privileges before removing the ephemeral CI role.
+        admin.execute(f"DROP OWNED BY {ROLE}")
         admin.execute(f"DROP ROLE {ROLE}")
 
     print("least_privilege_runtime_role: PASS")

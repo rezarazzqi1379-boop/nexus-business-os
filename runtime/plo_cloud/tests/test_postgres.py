@@ -6,6 +6,7 @@ sys.path.insert(0, ROOT)
 from postgres_store import PostgresPLOStore, PostgresApprovalError, PostgresOwnershipError
 
 DSN = os.environ["NEXUS_PLO_DATABASE_URL"]
+os.environ["NEXUS_PLO_ALLOW_TEST_RESET"] = "1"
 
 
 def fresh():
@@ -122,6 +123,17 @@ def test_orphan_recovery_and_fencing():
         raise AssertionError("stale worker revived")
     except PostgresOwnershipError:
         pass
+
+
+def test_orphan_with_intent_requires_reconciliation():
+    s = fresh(); rid = s.enqueue("send", "orphan-intent", True); c = s.claim_next("A", 30)
+    aid = s.request_approval(rid, "send:a"); s.decide_approval(aid, "approved")
+    tok = s.authorize_operation(rid, "op-uncertain", "send:a", c["_lease_token"], "A")
+    s.record_intent(rid, "op-uncertain", tok, c["_lease_token"], "A")
+    s.renew_lease(rid, c["_lease_token"], "A", -1)
+    recovered = s.recover_orphans(); assert rid in recovered
+    metrics = s.metrics(); assert metrics["reconciliation_required"] == 1 and metrics["pending"] == 0
+    assert s.claim_next("B", 30) is None
 
 
 def test_mark_executed_is_idempotent():

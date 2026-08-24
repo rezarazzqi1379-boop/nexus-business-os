@@ -252,10 +252,19 @@ class PostgresPLOStore:
                 row = cur.fetchone()
                 if not row:
                     raise PostgresApprovalError("unknown operation")
-                if row["state"] not in ("intended", "executed"):
+                if row["state"] == "executed":
+                    return False
+                if row["state"] != "intended":
                     raise PostgresApprovalError("operation was not intended")
-                cur.execute("UPDATE plo_operations SET state='executed', executed_at=now() WHERE operation_key=%s", (operation_key,))
+                cur.execute(
+                    "UPDATE plo_operations SET state='executed', executed_at=now() WHERE operation_key=%s AND state='intended' RETURNING run_id",
+                    (operation_key,),
+                )
+                changed = cur.fetchone()
+                if not changed:
+                    raise PostgresApprovalError("execution state changed concurrently")
                 cur.execute("INSERT INTO plo_execution_log(operation_key,run_id) VALUES(%s,%s)", (operation_key, row["run_id"]))
+                return True
 
     def recover_orphans(self):
         with self.connect() as conn:

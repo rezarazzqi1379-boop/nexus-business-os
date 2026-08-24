@@ -39,7 +39,7 @@ def test_fact_without_provenance_is_rejected():
         raise AssertionError("Tier A fact without provenance must fail closed")
 
 
-def test_cross_project_edge_is_not_implicitly_resolved():
+def test_cross_project_values_are_isolated():
     graph = BrainGraph(
         nodes=[
             node("HYD", type=NodeType.PROJECT, tier=AuthorityTier.A, status=EpistemicStatus.FACT, refs=("master:hyd",)),
@@ -60,7 +60,7 @@ def test_cross_project_edge_is_not_implicitly_resolved():
     assert graph.project_nodes("PRJ-HTL-01") == (graph.nodes["HTL-TPH"],)
 
 
-def test_lower_authority_supplier_claim_conflict_is_visible_but_governing_fact_remains_identifiable():
+def test_lower_authority_claim_about_same_assertion_conflicts_with_governing_fact():
     graph = BrainGraph(
         nodes=[
             node(
@@ -69,18 +69,18 @@ def test_lower_authority_supplier_claim_conflict_is_visible_but_governing_fact_r
                 tier=AuthorityTier.A,
                 status=EpistemicStatus.FACT,
                 refs=("PRJ-HYD-01-ENG:v1.1",),
-                subject="hydrotester",
-                predicate="max_pressure_mpa",
+                subject="hydrotester-buyer-basis",
+                predicate="required_upper_capability_mpa",
                 value=120,
                 governing=True,
             ),
             node(
-                "CLM-YAX-PMAX",
+                "CLM-BUYER-NEEDS-150",
                 tier=AuthorityTier.D,
                 status=EpistemicStatus.CLAIM,
-                refs=("brochure:yaxing",),
-                subject="hydrotester",
-                predicate="max_pressure_mpa",
+                refs=("research:synthetic-conflict-fixture",),
+                subject="hydrotester-buyer-basis",
+                predicate="required_upper_capability_mpa",
                 value=150,
             ),
         ]
@@ -89,6 +89,34 @@ def test_lower_authority_supplier_claim_conflict_is_visible_but_governing_fact_r
     assert len(contradictions) == 1
     assert contradictions[0].reason == "lower-authority evidence conflicts with governing value"
     assert graph.decision_context("PRJ-HYD-01").consequential_use_allowed is False
+
+
+def test_supplier_capability_above_requirement_is_not_misclassified_as_same_assertion_conflict():
+    graph = BrainGraph(
+        nodes=[
+            node(
+                "REQ-HYD-PMAX",
+                type=NodeType.REQUIREMENT,
+                tier=AuthorityTier.A,
+                status=EpistemicStatus.FACT,
+                refs=("PRJ-HYD-01-ENG:v1.1",),
+                subject="hydrotester-buyer-basis",
+                predicate="required_upper_capability_mpa",
+                value=120,
+                governing=True,
+            ),
+            node(
+                "CLM-YAX-PMAX",
+                tier=AuthorityTier.D,
+                status=EpistemicStatus.CLAIM,
+                refs=("brochure:yaxing",),
+                subject="yaxing-machine-capability",
+                predicate="advertised_max_capability_mpa",
+                value=150,
+            ),
+        ]
+    )
+    assert graph.detect_value_contradictions("PRJ-HYD-01") == ()
 
 
 def test_same_authority_conflict_fails_closed():
@@ -100,7 +128,7 @@ def test_same_authority_conflict_fails_closed():
                 tier=AuthorityTier.A,
                 status=EpistemicStatus.FACT,
                 refs=("master:a",),
-                subject="hydrotester",
+                subject="hydrotester-buyer-basis",
                 predicate="throughput_pipes_per_hour",
                 value=60,
             ),
@@ -110,7 +138,7 @@ def test_same_authority_conflict_fails_closed():
                 tier=AuthorityTier.A,
                 status=EpistemicStatus.FACT,
                 refs=("master:b",),
-                subject="hydrotester",
+                subject="hydrotester-buyer-basis",
                 predicate="throughput_pipes_per_hour",
                 value=50,
             ),
@@ -132,8 +160,8 @@ def test_blocking_unknown_prevents_consequential_use():
                 status=EpistemicStatus.FACT,
                 refs=("master:hyd",),
                 governing=True,
-                subject="hydrotester",
-                predicate="max_pressure_mpa",
+                subject="hydrotester-buyer-basis",
+                predicate="required_upper_capability_mpa",
                 value=120,
             ),
             node(

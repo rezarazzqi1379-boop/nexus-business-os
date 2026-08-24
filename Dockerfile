@@ -2,7 +2,7 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /app
 COPY . /app
-RUN pip install --no-cache-dir .
+RUN pip install --no-cache-dir "fastapi>=0.116,<1" "uvicorn[standard]>=0.35,<1"
 RUN useradd --system --uid 10001 nexus && mkdir -p /data && chown -R nexus:nogroup /data /app
 USER nexus
 ENV NEXUS_STATE_DB=/data/state.db \

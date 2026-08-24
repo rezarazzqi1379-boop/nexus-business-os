@@ -7,14 +7,17 @@ from nexus_brain.execution import (
     validate_execution_intent_binding,
 )
 from nexus_brain.fixtures import canonical_portfolio_graph
-from nexus_brain.live_snapshot import load_live_snapshot
+from nexus_brain.live import apply_live_evidence_signals
+from nexus_brain.runtime_snapshot import load_manual_snapshot
 
 
 CREATED = "2026-08-24T08:50:00Z"
+SNAPSHOT = "data/operational/live_evidence_snapshot_2026-08-24.json"
 
 
 def live_graph():
-    graph, _ = load_live_snapshot("data/operational/live_evidence_snapshot_2026-08-24.json")
+    graph = canonical_portfolio_graph()
+    apply_live_evidence_signals(graph, load_manual_snapshot(SNAPSHOT))
     return graph
 
 

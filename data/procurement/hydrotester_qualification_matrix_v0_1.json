@@ -1,5 +1,5 @@
 {
-  "matrix_version": "0.1",
+  "matrix_version": "0.2",
   "as_of": "2026-08-21",
   "project": "OCTG hydrostatic tester 89-180 mm / up to 120 MPa",
   "buyer_baseline": {
@@ -7,12 +7,17 @@
     "wall_thickness_mm": {"min": 5, "max": 12, "status": "confirmed"},
     "pipe_length_m": {"min": 6, "max": 12, "status": "confirmed"},
     "hold_time_s": {"min": 5, "max": 10, "status": "confirmed"},
-    "maximum_machine_design_rating_mpa": {"value": 120, "status": "target_not_yet_required_across_full_od_range"},
+    "required_throughput_pipes_per_hour": {"value": 60, "qualifier": "approximately", "status": "buyer_engineering_confirmed", "blocking": false},
+    "maximum_machine_design_rating_mpa": {"value": 120, "status": "confirmed_upper_required_capability_for_relevant_duty_points"},
+    "pressure_logic": {"value": "test pressure varies by pipe size/configuration in accordance with API 5CT; some production sizes may require up to 120 MPa", "status": "buyer_engineering_confirmed"},
     "required_test_pressure_envelope": {"status": "unknown", "blocking": true},
-    "required_throughput": {"status": "unknown", "blocking": true},
     "pipe_end_geometry_and_sealing_interface": {"status": "unknown", "blocking": true},
     "governing_api_acceptance_and_fat_protocol": {"status": "unknown", "blocking": true}
   },
+  "authority_refs": [
+    {"type": "notion", "ref": "3c0b8b40-ace2-81ad-a2e2-d2151d577672", "supports": "canonical buyer-side engineering update and current Hydrotester state"},
+    {"type": "project_master_context", "ref": "NEXUS_Master_Context_v1.2_2026-08-21.docx", "supports": "60 pipes/hour, pressure logic, Heat Treatment separation, GH/Marley impact"}
+  ],
   "qualification_fields": [
     "od_range",
     "wall_thickness_range",
@@ -39,7 +44,7 @@
     {
       "supplier_id": "marley-wuxi",
       "qualification_state": "technical_proposal_received_needs_clarification",
-      "evidence_refs": ["1a0231062d088821", "Iran 120Mpa steel pipe hydraulic press.pdf"],
+      "evidence_refs": ["1a0231062d088821", "Iran 120Mpa steel pipe hydraulic press.pdf", "1a025ff31411734b"],
       "fields": {
         "od_range": {"value": "89-180 mm", "status": "supplier_stated_match"},
         "wall_thickness_range": {"value": "5-12 mm", "status": "supplier_stated_match"},
@@ -49,7 +54,7 @@
         "hold_time": {"value": "5-30 s adjustable", "status": "supplier_stated_match"},
         "axial_restraint": {"value": "500 t equipment tensile load", "status": "supplier_stated_needs_engineering_basis"},
         "sealing_method": {"value": "end-face / radial low-clearance sealing", "status": "supplier_stated_needs_interface_confirmation"},
-        "cycle_time_or_throughput": {"value": null, "status": "missing_blocker"},
+        "cycle_time_or_throughput": {"value": null, "status": "missing_against_confirmed_approximately_60_pipes_per_hour"},
         "automation": {"value": "automatic loading/unloading; one-touch auto/manual", "status": "supplier_stated"},
         "pressure_recording": {"value": "dual pressure monitoring, real-time curve, historical records, printing, end cameras", "status": "supplier_stated"},
         "fat_and_reference_machine": {"value": null, "status": "missing_blocker"},
@@ -63,8 +68,8 @@
         "iran_supply_support": {"value": null, "status": "not_explicitly_confirmed"}
       },
       "priority_questions": [
-        "Provide guaranteed pressure envelope versus pipe OD, ID, wall thickness and grade, not only maximum machine rating.",
-        "State guaranteed cycle time / pipes per hour at representative pressures and 5-10 s hold.",
+        "Provide guaranteed pressure envelope versus pipe OD, ID, wall thickness and end/sealing condition, not only maximum machine rating.",
+        "Confirm approximately 60 pipes/hour and state cycle time / pipes per hour at representative pressures and highest-pressure duty points with 5-10 s hold.",
         "Reconcile 260 kVA versus 30 kW power figures and give full utility list.",
         "Provide axial-force calculation basis and maximum safe internal pressure by pipe geometry.",
         "Provide reference machines and FAT protocol demonstrating comparable pressure and dimensions.",
@@ -74,17 +79,17 @@
     {
       "supplier_id": "yaxing-dezhou",
       "qualification_state": "budgetary_quote_received_major_engineering_gaps",
-      "evidence_refs": ["1a023fec9e15fbac"],
+      "evidence_refs": ["1a023fec9e15fbac", "1a025ff42412983d"],
       "fields": {
         "od_range": {"value": "project discussion 89-180 mm", "status": "buyer_request_not_supplier_guarantee"},
-        "wall_thickness_range": {"value": null, "status": "missing"},
-        "length_range": {"value": null, "status": "missing_blocker"},
+        "wall_thickness_range": {"value": "5-12 mm buyer-confirmed basis", "status": "supplier_guarantee_pending"},
+        "length_range": {"value": "6-12 m buyer-confirmed basis", "status": "supplier_guarantee_pending"},
         "pressure_capability": {"value": "custom machine discussed around 120 MPa target", "status": "budgetary_not_engineering_verified"},
         "pressure_envelope_vs_geometry": {"value": null, "status": "missing_blocker"},
-        "hold_time": {"value": null, "status": "missing"},
+        "hold_time": {"value": "5-10 s buyer-confirmed basis", "status": "supplier_guarantee_pending"},
         "axial_restraint": {"value": null, "status": "missing_blocker"},
         "sealing_method": {"value": null, "status": "missing"},
-        "cycle_time_or_throughput": {"value": "1 pc/min", "status": "supplier_stated_budgetary"},
+        "cycle_time_or_throughput": {"value": "1 pc/min", "status": "supplier_stated_budgetary", "qualification_note": "numerically matches the approximate buyer rate but is not yet verified for highest-pressure duty points or complete cycle definition"},
         "automation": {"value": null, "status": "missing"},
         "pressure_recording": {"value": null, "status": "missing"},
         "fat_and_reference_machine": {"value": null, "status": "missing_blocker"},
@@ -98,43 +103,54 @@
         "iran_supply_support": {"value": null, "status": "missing"}
       },
       "priority_questions": [
-        "Confirm guaranteed 6-12 m pipe-length range and 5-12 mm wall-thickness range.",
-        "Provide guaranteed pressure envelope versus OD/ID/wall thickness and axial-force/end-restraint calculation.",
-        "Define sealing method, hold-time range and whether 1 pc/min includes fill, pressurization, hold, depressurization and handling.",
-        "Provide full technical proposal, FAT criteria and comparable reference machine evidence.",
+        "Guarantee 6-12 m pipe-length and 5-12 mm wall-thickness capability for the proposed configuration.",
+        "Provide guaranteed pressure envelope versus OD/ID/wall thickness/end condition and axial-force/end-restraint calculation.",
+        "Confirm whether 1 pc/min is guaranteed including fill, pressurization, 5-10 s hold, depressurization and handling, especially at highest-pressure duty points.",
+        "Define sealing method and provide full technical proposal, FAT criteria and comparable reference-machine evidence.",
         "Provide lead time, payment, warranty, installation/training, utilities and Iran support terms."
       ]
     },
     {
       "supplier_id": "gh-petro",
-      "qualification_state": "manufacturer_channel_supported_project_proposal_pending",
-      "evidence_refs": ["1a0154f33233ec08"],
+      "qualification_state": "commercial_quote_received_technical_validation_required",
+      "evidence_refs": ["Quotation for HPG-180 Hydrostatic Testing Machine _260820_182427.pdf", "1a0154f33233ec08", "1a025ff0ddfb2531"],
+      "commercial_quote": {
+        "model": "HPG-180",
+        "applicable_od_mm": "89-180",
+        "nominal_max_pressure_mpa": 120,
+        "price_usd": 542800,
+        "incoterm": "FOB Dalian",
+        "delivery_days": 120,
+        "payment_terms": "30% T/T advance / 70% T/T before shipment",
+        "note": "commercial evidence only; does not count as technical readiness until project-specific guarantees are supplied"
+      },
       "fields": {
-        "od_range": {"value": null, "status": "project_specific_missing"},
-        "wall_thickness_range": {"value": null, "status": "project_specific_missing"},
-        "length_range": {"value": null, "status": "project_specific_missing"},
-        "pressure_capability": {"value": "public model families currently recorded at 70-80 MPa; 120 MPa project capability not verified", "status": "not_verified_for_requirement"},
+        "od_range": {"value": null, "status": "project_specific_supplier_guarantee_pending"},
+        "wall_thickness_range": {"value": null, "status": "project_specific_guarantee_missing"},
+        "length_range": {"value": null, "status": "project_specific_guarantee_missing"},
+        "pressure_capability": {"value": null, "status": "quoted_nominal_max_not_duty_envelope_verified"},
         "pressure_envelope_vs_geometry": {"value": null, "status": "missing_blocker"},
-        "hold_time": {"value": null, "status": "missing"},
+        "hold_time": {"value": null, "status": "project_specific_missing"},
         "axial_restraint": {"value": null, "status": "missing_blocker"},
         "sealing_method": {"value": null, "status": "missing"},
-        "cycle_time_or_throughput": {"value": null, "status": "missing_blocker"},
+        "cycle_time_or_throughput": {"value": null, "status": "missing_against_confirmed_approximately_60_pipes_per_hour"},
         "automation": {"value": null, "status": "missing"},
         "pressure_recording": {"value": null, "status": "missing"},
-        "fat_and_reference_machine": {"value": "supplier promised references/proposal after engineering review", "status": "pending"},
+        "fat_and_reference_machine": {"value": null, "status": "missing_blocker"},
         "power_and_utilities": {"value": null, "status": "missing"},
-        "price": {"value": null, "status": "pending"},
-        "incoterm": {"value": null, "status": "pending"},
-        "lead_time": {"value": null, "status": "pending"},
-        "payment_terms": {"value": null, "status": "pending"},
-        "warranty": {"value": null, "status": "pending"},
-        "installation_training": {"value": null, "status": "pending"},
-        "iran_supply_support": {"value": null, "status": "pending"}
+        "price": {"value": null, "status": "commercial_quote_recorded_separately_not_readiness_evidence"},
+        "incoterm": {"value": null, "status": "commercial_quote_recorded_separately_not_readiness_evidence"},
+        "lead_time": {"value": null, "status": "commercial_quote_recorded_separately_not_readiness_evidence"},
+        "payment_terms": {"value": null, "status": "commercial_quote_recorded_separately_not_readiness_evidence"},
+        "warranty": {"value": null, "status": "not_stated_in_extracted_quote"},
+        "installation_training": {"value": null, "status": "quotation_note_needs_scope_confirmation"},
+        "iran_supply_support": {"value": null, "status": "not_explicitly_confirmed"}
       },
       "priority_questions": [
-        "Confirm whether GH-Petro will engineer a 120 MPa design for OD 89-180 mm, 5-12 mm wall and 6-12 m length.",
-        "Provide pressure envelope, axial-force basis, sealing system and guaranteed cycle time.",
-        "Provide preliminary technical/commercial proposal, references, FAT, utilities, lead time and Iran support."
+        "Provide guaranteed pressure envelope versus OD/ID/wall thickness/end condition for the HPG-180, not only nominal Max.120 MPa.",
+        "Confirm approximately 60 pipes/hour and state achievable cycle/throughput at highest-pressure duty points with 5-10 s hold.",
+        "Guarantee the confirmed 6-12 m length and 5-12 mm wall-thickness range for the proposed configuration.",
+        "Provide axial-force basis, sealing system, FAT/reference evidence, utilities, warranty and detailed commissioning scope."
       ]
     }
   ],
@@ -143,8 +159,8 @@
       "channel_id": "suppliertr-yakup",
       "status": "identity_gate_hold",
       "technical_signal": "standard route up to 500 bar; special-engineered route up to 1200 bar under evaluation",
-      "action": "request underlying OEM identity before authorizing further supplier distribution",
-      "evidence_ref": "1a01e12668971ef3"
+      "action": "request underlying OEM identity and guaranteed duty envelope before qualification",
+      "evidence_ref": "1a025fef7fb3e0ea"
     },
     {
       "channel_id": "yedi-mavi-ali",
@@ -156,20 +172,27 @@
     {
       "channel_id": "anz-global",
       "status": "identity_gate_hold",
-      "action": "require OEM identity before distribution",
-      "evidence_ref": "1a022ee83ef19768"
+      "action": "require OEM identity, pressure-size envelope and throughput evidence",
+      "evidence_ref": "1a025fedb9cd2342"
     },
     {
       "channel_id": "sinoqat",
       "status": "identity_gate_hold",
-      "action": "require OEM identity before distribution",
-      "evidence_ref": "1a01ffb633f08224"
+      "action": "require OEM identity, technical basis and commercial terms",
+      "evidence_ref": "1a025ff54f3e065d"
+    }
+  ],
+  "excluded_or_parked": [
+    {
+      "supplier_id": "boyu-petro",
+      "status": "parked_no_further_action",
+      "reason": "buyer explicitly instructed no further Boyu pursuit for now",
+      "reactivation_rule": "only on explicit buyer instruction"
     }
   ],
   "current_decision": {
-    "shortlist": ["marley-wuxi", "yaxing-dezhou"],
-    "conditional": ["gh-petro"],
+    "shortlist": ["marley-wuxi", "yaxing-dezhou", "gh-petro"],
     "selected_supplier": null,
-    "reason": "No candidate yet has independently verified 120 MPa capability across the required geometry envelope and no final buyer test-pressure envelope/throughput is available."
+    "reason": "Buyer throughput is now approximately 60 pipes/hour and upper capability may reach 120 MPa for relevant API 5CT duty points, but no candidate yet has supplied a guaranteed pressure-versus-geometry/end-condition envelope plus verified high-pressure throughput/FAT basis. Boyu is parked by buyer instruction."
   }
 }

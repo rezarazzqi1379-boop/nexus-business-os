@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from nexus_brain.command import recommend_internal_actions
 from nexus_brain.fixtures import canonical_portfolio_graph
 from nexus_brain.live import LiveEvidenceSignal, action_required_signals, apply_live_evidence_signals
 from nexus_brain.projection import project_projection
@@ -63,3 +64,16 @@ def test_duplicate_live_evidence_fails_closed():
         assert "duplicate live evidence" in str(exc)
     else:
         raise AssertionError("duplicate connector evidence must fail closed")
+
+
+def test_command_recommendations_are_internal_only_and_deterministic():
+    graph = apply_live_evidence_signals(canonical_portfolio_graph(), load_signals())
+    actions = recommend_internal_actions(graph)
+    by_source = {item.source_node_id: item for item in actions}
+    oms = by_source["LIVE-KCL-OMS-PERMIT-20260824"]
+    gh = by_source["LIVE-HYD-GH-REV12-ACK-20260823"]
+    assert oms.action == "verify_permit_authority_and_current_buyer_status"
+    assert oms.priority_class == "P0_EVIDENCE_BLOCKER"
+    assert gh.action == "normalize_supplier_reply_against_canonical_qualification_matrix"
+    assert gh.priority_class == "P0_NEW_PRIMARY_EVIDENCE"
+    assert all(item.external_execution_allowed is False for item in actions)

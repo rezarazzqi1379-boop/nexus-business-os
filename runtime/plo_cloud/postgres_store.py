@@ -4,6 +4,8 @@ from datetime import datetime, timezone, timedelta
 import psycopg
 from psycopg.rows import dict_row
 
+MAX_ORPHAN_RETRIES = 3
+
 
 def utcnow():
     return datetime.now(timezone.utc)
@@ -315,22 +317,31 @@ class PostgresPLOStore:
         with self.connect() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    """UPDATE plo_tasks t SET
-                       status=CASE WHEN EXISTS (
+                    """SELECT run_id,retry_count,EXISTS (
                            SELECT 1 FROM plo_operations o WHERE o.run_id=t.run_id AND o.state='intended'
-                       ) THEN 'WAITING' ELSE 'PENDING' END,
-                       task_version=task_version+1,
-                       lease_token=NULL,lease_owner=NULL,lock_expires_at=NULL,retry_count=retry_count+1
+                       ) AS uncertain
+                       FROM plo_tasks t
                        WHERE status='RUNNING' AND lock_expires_at < now()
-                       RETURNING run_id,status"""
+                       FOR UPDATE"""
                 )
                 rows=cur.fetchall()
+                recovered=[]
                 for row in rows:
+                    exhausted=(row["retry_count"]+1)>=MAX_ORPHAN_RETRIES
+                    next_status="WAITING" if row["uncertain"] or exhausted else "PENDING"
+                    result="reconciliation_required" if row["uncertain"] else ("retry_budget_exhausted" if exhausted else "requeued")
+                    cur.execute(
+                        """UPDATE plo_tasks SET status=%s,task_version=task_version+1,
+                           lease_token=NULL,lease_owner=NULL,lock_expires_at=NULL,retry_count=retry_count+1
+                           WHERE run_id=%s AND status='RUNNING'""",
+                        (next_status,row["run_id"]),
+                    )
                     cur.execute(
                         "INSERT INTO plo_audit(action,run_id,result) VALUES('orphan_recovered',%s,%s)",
-                        (row["run_id"], "reconciliation_required" if row["status"]=="WAITING" else "requeued"),
+                        (row["run_id"],result),
                     )
-                return [str(r["run_id"]) for r in rows]
+                    recovered.append(str(row["run_id"]))
+                return recovered
 
     def metrics(self):
         with self.connect() as conn:

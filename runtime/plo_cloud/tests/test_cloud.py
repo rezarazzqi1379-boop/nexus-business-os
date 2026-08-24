@@ -38,6 +38,18 @@ def test_mark_executed_requires_intent():
     try: s.mark_executed('op-order'); raise AssertionError('executed without intent')
     except ApprovalError: pass
     td.cleanup()
+def test_read_only_completion():
+    td,s=fresh(); r=s.enqueue('research','ro-1'); c=s.claim_next('w'); assert s.complete_read_only(r,c['_lease_token'],'w','RESULT:brain-hydro') is True; m=s.metrics(); assert m['completed']==1 and m['pending']==0; td.cleanup()
+def test_read_only_completion_rejects_consequential_task():
+    td,s=fresh(); r=s.enqueue('send','ro-2',True); c=s.claim_next('w')
+    try: s.complete_read_only(r,c['_lease_token'],'w','RESULT:nope'); raise AssertionError('consequential task completed through read-only path')
+    except ApprovalError: pass
+    td.cleanup()
+def test_read_only_completion_rejects_expired_lease():
+    td,s=fresh(); r=s.enqueue('research','ro-3'); c=s.claim_next('w',-1)
+    try: s.complete_read_only(r,c['_lease_token'],'w','RESULT:nope'); raise AssertionError('expired lease completed read-only task')
+    except OwnershipError: pass
+    td.cleanup()
 def test_recovery():
     td,s=fresh(); r=s.enqueue('x','k4'); s.claim_next('w',-1); assert r in s.recover_orphans(); assert s.metrics()['pending']==1; td.cleanup()
 def test_orphan_with_intent_requires_reconciliation():

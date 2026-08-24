@@ -7,6 +7,7 @@ def now(): return datetime.now(timezone.utc).isoformat()
 class PLOError(Exception): pass
 class OwnershipError(PLOError): pass
 class ApprovalError(PLOError): pass
+class IdempotencyConflictError(PLOError): pass
 
 class PLOStore:
     def __init__(self,path): self.path=path; self._init()
@@ -25,6 +26,7 @@ class PLOStore:
             db.executescript('''
             CREATE TABLE IF NOT EXISTS tasks(
               run_id TEXT PRIMARY KEY, task_id TEXT NOT NULL, idempotency_key TEXT UNIQUE NOT NULL,
+              binding_digest TEXT,
               status TEXT NOT NULL, task_version INTEGER NOT NULL DEFAULT 1,
               approval_required INTEGER NOT NULL DEFAULT 0,
               lease_token TEXT, lease_owner TEXT, lock_expires_at TEXT, retry_count INTEGER NOT NULL DEFAULT 0);
@@ -40,18 +42,27 @@ class PLOStore:
               id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, action TEXT NOT NULL,
               run_id TEXT, result TEXT);
             ''')
+            cols={r[1] for r in db.execute("PRAGMA table_info(tasks)").fetchall()}
+            if "binding_digest" not in cols:
+                db.execute("ALTER TABLE tasks ADD COLUMN binding_digest TEXT")
             db.commit()
         finally:
             db.close()
     def audit(self,db,action,run_id=None,result=None):
         db.execute("INSERT INTO audit(ts,action,run_id,result) VALUES(?,?,?,?)",(now(),action,run_id,result))
-    def enqueue(self,task_id,idempotency_key,approval_required=False):
+    def enqueue(self,task_id,idempotency_key,approval_required=False,binding_digest=None):
         with self.tx() as db:
-            row=db.execute("SELECT run_id FROM tasks WHERE idempotency_key=?",(idempotency_key,)).fetchone()
-            if row: return row[0]
+            row=db.execute("SELECT run_id,binding_digest FROM tasks WHERE idempotency_key=?",(idempotency_key,)).fetchone()
+            if row:
+                if binding_digest is not None:
+                    if row[1] is None:
+                        raise IdempotencyConflictError("existing idempotency key has no immutable binding")
+                    if row[1] != binding_digest:
+                        raise IdempotencyConflictError("idempotency key rebound to different payload")
+                return row[0]
             rid=str(uuid.uuid4())
-            db.execute("INSERT INTO tasks(run_id,task_id,idempotency_key,status,approval_required) VALUES(?,?,?,?,?)",
-                       (rid,task_id,idempotency_key,"PENDING",int(approval_required)))
+            db.execute("INSERT INTO tasks(run_id,task_id,idempotency_key,binding_digest,status,approval_required) VALUES(?,?,?,?,?,?)",
+                       (rid,task_id,idempotency_key,binding_digest,"PENDING",int(approval_required)))
             self.audit(db,"enqueue",rid,"created"); return rid
     def claim_next(self,worker,lock_seconds=30):
         with self.tx() as db:

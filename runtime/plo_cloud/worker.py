@@ -12,8 +12,10 @@ def run_once(db=None, backend="auto"):
         if not dsn:
             raise RuntimeError("NEXUS_PLO_DATABASE_URL is required for postgres backend")
         from postgres_store import PostgresPLOStore
+        # Production/runtime workers intentionally do NOT run DDL migrations.
+        # Schema provisioning is a separate, explicit deployment step so the
+        # runtime DB role can remain least-privileged.
         store = PostgresPLOStore(dsn)
-        store.migrate()
         location = "postgres"
     elif selected == "sqlite":
         db = db or os.getenv("NEXUS_PLO_DB", "/data/nexus_plo.db")
@@ -29,6 +31,7 @@ def run_once(db=None, backend="auto"):
         "backend": selected,
         "state_location": location,
         "gmail_write_enabled": False,
+        "runtime_migrations_enabled": False,
         "recovered": recovered,
         "metrics": store.metrics(),
     }

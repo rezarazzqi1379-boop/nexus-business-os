@@ -20,6 +20,11 @@
       "sync_state": "BINARY_SOURCE_AVAILABLE_OUTSIDE_GITHUB_CONNECTOR"
     }
   ],
+  "live_registry_structure_verified": true,
+  "live_registry_verification_note": "Source Registry v1.6 uses row-local statuses including CANONICAL + HOLD. Authority parsing was hardened so a pending/non-canonical row cannot borrow a later row's CANONICAL marker.",
+  "latest_verified_branch_head": "b6f28bc3b171baf16ceb3c3753c56c36b838d41a",
+  "latest_verified_ci_run": 33107668597,
+  "latest_verified_ci_conclusion": "success",
   "production_authorized": false,
   "merge_authorized": false
 }

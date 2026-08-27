@@ -1,6 +1,6 @@
 from dataclasses import replace
 
-from exact_external_gate import ExactApproval, ExactExternalMessage, authorize_exact_external_message, exact_external_action_id
+from nexus_security.exact_external_gate import ExactApproval, ExactExternalMessage, authorize_exact_external_message, exact_external_action_id
 
 
 def _message(**changes):

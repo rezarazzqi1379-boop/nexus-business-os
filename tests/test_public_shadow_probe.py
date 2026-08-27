@@ -13,6 +13,7 @@ def test_openrouter_request_is_fixed_public_probe_only():
     assert request.body["messages"][0]["content"] == PUBLIC_PROBE_PROMPT
     assert EXPECTED_TEXT in PUBLIC_PROBE_PROMPT
     assert request.body["model"] == "openrouter/free"
+    assert "test-secret" not in repr(request)
 
 
 def test_google_request_requires_key_and_uses_fixed_prompt():
@@ -20,6 +21,10 @@ def test_google_request_requires_key_and_uses_fixed_prompt():
         build_public_probe_request("google_ai_studio", env={})
     request = build_public_probe_request("google_ai_studio", env={"GEMINI_API_KEY": "test-secret"})
     assert request.body["contents"][0]["parts"][0]["text"] == PUBLIC_PROBE_PROMPT
+    assert "?key=" not in request.url
+    assert "test-secret" not in request.url
+    assert request.headers["x-goog-api-key"] == "test-secret"
+    assert "test-secret" not in repr(request)
 
 
 def test_cloudflare_request_requires_account_and_token():

@@ -261,6 +261,10 @@ class CanonicalStore:
                 if len(matches) != 1:
                     raise KeyError(f"registry_declared_source_version_missing:{source_id}:{declared}")
                 selected.append(matches[0])
+            elif len(source_rows) == 1:
+                selected.append(source_rows[0])
+            else:
+                raise KeyError(f"registry_declaration_required_for_versioned_source:{source_id}")
         if not selected:
             raise KeyError(f"project_not_declared_canonical_in_registry:{project_id}")
         if len(selected) != 1:

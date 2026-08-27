@@ -18,6 +18,9 @@ class ProviderRecord:
     production_role: str
     free_limit: str
     data_training: str
+    max_sensitivity: str = "public"
+    production_approved: bool = False
+    policy_verified: bool = False
     official_source: str | None = None
     notes: str = ""
 
@@ -64,10 +67,12 @@ def discovery_promotion_allowed(record: DiscoveryRecord, *, official_source_veri
 
 
 class ResourceRouter:
-    """Fail-closed model/provider selector for low-risk NEXUS workloads.
+    """Fail-closed provider selector for bounded NEXUS workloads.
 
-    This module is a policy layer only. It never holds credentials, performs network calls,
-    or grants authority for consequential/external actions.
+    The router is policy only: no credentials, no provider calls, no spend authority and no
+    consequential/external execution authority.  v0.2 deliberately treats public data as the
+    default maximum for third-party/free providers until a separate policy review explicitly
+    raises that boundary.
     """
 
     def __init__(self, providers: Iterable[ProviderRecord]):
@@ -75,6 +80,9 @@ class ResourceRouter:
         ids = [p.id for p in self.providers]
         if len(ids) != len(set(ids)):
             raise ValueError("duplicate provider id")
+        for provider in self.providers:
+            if provider.max_sensitivity not in SENSITIVITY_ORDER:
+                raise ValueError(f"invalid max_sensitivity for {provider.id}")
 
     @staticmethod
     def _eligible(provider: ProviderRecord, request: RoutingRequest) -> tuple[bool, str]:
@@ -84,16 +92,16 @@ class ResourceRouter:
             return False, "missing capability"
         if request.require_openai_compatible and not provider.openai_compatible:
             return False, "not OpenAI-compatible"
+        if SENSITIVITY_ORDER[request.sensitivity] > SENSITIVITY_ORDER[provider.max_sensitivity]:
+            return False, "request sensitivity exceeds provider approval"
         if request.sensitivity in {"confidential", "restricted"} and not provider.sensitive_data_allowed:
             return False, "provider not approved for sensitive data"
         if not request.allow_unverified and provider.authority != "OFFICIAL_DOCS_VERIFIED":
             return False, "provider is discovery-only/unverified"
-        if request.production and (
-            provider.status != "VERIFIED_CANDIDATE"
-            or "DISABLED" in provider.production_role
-            or "EXPERIMENT" in provider.production_role
-        ):
-            return False, "not approved as production candidate"
+        if not request.allow_unverified and not provider.policy_verified:
+            return False, "provider policy review incomplete"
+        if request.production and not provider.production_approved:
+            return False, "provider not explicitly production-approved"
         return True, "eligible"
 
     def route(self, request: RoutingRequest) -> RoutingDecision:
@@ -107,14 +115,14 @@ class ResourceRouter:
             score = 0
             if provider.authority == "OFFICIAL_DOCS_VERIFIED":
                 score += 50
+            if provider.policy_verified:
+                score += 20
             if request.prefer_free:
                 score += 10
             if provider.openai_compatible:
                 score += 8
             if "multi_provider" in provider.capabilities:
                 score += 5
-            if provider.id == "vercel_ai_gateway":
-                score += 4
             ranked.append((score, provider.id))
 
         ranked.sort(reverse=True)
@@ -122,12 +130,12 @@ class ResourceRouter:
             return RoutingDecision(
                 provider_id=None,
                 allowed=False,
-                reason="No provider satisfies current capability/sensitivity/verification policy.",
+                reason="No provider satisfies current capability, sensitivity, verification and production policy.",
                 alternatives=tuple(rejected),
             )
         return RoutingDecision(
             provider_id=ranked[0][1],
             allowed=True,
-            reason="Selected by NEXUS policy: verified first, then compatibility/routing utility.",
+            reason="Selected by NEXUS policy after verification and sensitivity gates.",
             alternatives=tuple(provider_id for _, provider_id in ranked[1:]),
         )

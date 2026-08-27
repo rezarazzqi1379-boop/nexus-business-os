@@ -1,0 +1,30 @@
+{
+  "schema_version": "nexus.canonical-refresh-evidence.v1",
+  "captured_at": "2026-08-27",
+  "authority_note": "This file records the exact externally supplied canonical artifacts that must replace the stale active repository copies. It is evidence/verification metadata, not a substitute for the source DOCX files.",
+  "targets": [
+    {
+      "source_id": "NEXUS-MASTER-CONTEXT",
+      "version": "1.9",
+      "artifact_name": "NEXUS_Master_Context_v1.9_2026-08-27-1.docx",
+      "sha256": "f26da16096e7a5440e854640b24a95b64cf3e98b83247a56e9415542008c520c",
+      "repository_active_version_before": "1.4",
+      "sync_state": "BINARY_SOURCE_AVAILABLE_OUTSIDE_GITHUB_CONNECTOR"
+    },
+    {
+      "source_id": "NEXUS-SOURCE-REGISTRY",
+      "version": "1.6",
+      "artifact_name": "NEXUS_Source_Registry_v1.6_2026-08-27(1).docx",
+      "sha256": "e185dff640235cef8c3ad0b454e9e3c5c1d16b400d6e10ed29b84a4e722b9070",
+      "repository_active_version_before": "1.1",
+      "sync_state": "BINARY_SOURCE_AVAILABLE_OUTSIDE_GITHUB_CONNECTOR"
+    }
+  ],
+  "live_registry_structure_verified": true,
+  "live_registry_verification_note": "Source Registry v1.6 uses row-local statuses including CANONICAL + HOLD. Authority parsing was hardened so a pending/non-canonical row cannot borrow a later row's CANONICAL marker.",
+  "latest_verified_branch_head": "b6f28bc3b171baf16ceb3c3753c56c36b838d41a",
+  "latest_verified_ci_run": 33107668597,
+  "latest_verified_ci_conclusion": "success",
+  "production_authorized": false,
+  "merge_authorized": false
+}

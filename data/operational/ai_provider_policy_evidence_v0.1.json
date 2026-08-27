@@ -1,0 +1,70 @@
+{
+  "schema_version": "nexus.provider-policy-evidence.v1",
+  "reviewed_at": "2026-08-27T11:10:00Z",
+  "review_rule": "Only current official provider documentation can support policy verification. Directory claims remain discovery-only.",
+  "providers": [
+    {
+      "id": "cloudflare_workers_ai",
+      "policy_verified": true,
+      "max_sensitivity": "public",
+      "production_approved": false,
+      "pricing_evidence": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+      "privacy_evidence": "https://developers.cloudflare.com/workers-ai/platform/data-usage/",
+      "facts": [
+        "10,000 Neurons/day free allocation resets daily at 00:00 UTC",
+        "Cloudflare states Workers AI customer content is not used to train AI models or improve Cloudflare/third-party services without explicit consent",
+        "Some models require paid billing"
+      ],
+      "decision": "APPROVED_FOR_PUBLIC_SHADOW_ONLY",
+      "unknowns": ["account/region availability", "model-specific license constraints", "live latency and quality"]
+    },
+    {
+      "id": "openrouter_free",
+      "policy_verified": true,
+      "max_sensitivity": "public",
+      "production_approved": false,
+      "pricing_evidence": "https://openrouter.ai/pricing",
+      "privacy_evidence": "https://openrouter.ai/docs/guides/privacy/data-collection",
+      "provider_policy_evidence": "https://openrouter.ai/providers/",
+      "facts": [
+        "Free plan lists 25+ free models and 50 requests/day",
+        "OpenRouter prompt/response retention is opt-in at the OpenRouter layer",
+        "Upstream model providers have different retention/training policies",
+        "The free router dynamically selects among free models"
+      ],
+      "decision": "APPROVED_FOR_PUBLIC_SHADOW_ONLY",
+      "unknowns": ["which upstream provider will serve any given free-router request", "live quality variance", "account/region availability"]
+    },
+    {
+      "id": "vercel_ai_gateway",
+      "policy_verified": true,
+      "max_sensitivity": "public",
+      "production_approved": false,
+      "gateway_evidence": "https://vercel.com/ai-gateway",
+      "privacy_evidence": "https://vercel.com/i/what-is-an-ai-gateway",
+      "facts": [
+        "Vercel states AI Gateway does not store or train on prompts",
+        "Upstream provider retention remains provider-specific",
+        "ZDR routing and provider allowlists are supported",
+        "Gateway exposes request cost/performance observability and fallback routing"
+      ],
+      "decision": "APPROVED_FOR_PUBLIC_SHADOW_ONLY",
+      "unknowns": ["account-specific free allowance", "OIDC/BYOK configuration", "upstream provider selection and live cost"]
+    },
+    {
+      "id": "google_ai_studio",
+      "policy_verified": true,
+      "max_sensitivity": "public",
+      "production_approved": false,
+      "pricing_evidence": "https://ai.google.dev/gemini-api/docs/pricing",
+      "rate_limit_evidence": "https://ai.google.dev/gemini-api/docs/rate-limits",
+      "facts": [
+        "Free-tier limits are model/project/account dependent and active limits must be viewed in AI Studio",
+        "Google states free-tier content may be used to improve products",
+        "Paid tier states content is not used to improve products"
+      ],
+      "decision": "APPROVED_FOR_PUBLIC_SHADOW_ONLY",
+      "unknowns": ["active account-specific quotas", "region/account eligibility", "live latency and eval quality"]
+    }
+  ]
+}

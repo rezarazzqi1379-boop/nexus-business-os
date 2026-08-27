@@ -227,7 +227,7 @@ class CanonicalStore:
                 if "CANONICAL" not in window:
                     return None
                 for candidate in window:
-                    version = _match(candidate, r"\bv([0-9]+(?:\.[0-9]+)+)\b")
+                    version = _match(candidate, r"v([0-9]+(?:\.[0-9]+)+)")
                     if version:
                         return version
                 return None

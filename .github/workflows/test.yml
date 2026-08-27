@@ -40,4 +40,6 @@ jobs:
         run: python -m unittest discover -s evals -v
 
       - name: Run pytest regression suite
+        env:
+          PYTHONPATH: src
         run: pytest -q tests

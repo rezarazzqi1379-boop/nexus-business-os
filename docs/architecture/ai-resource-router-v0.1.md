@@ -1,6 +1,6 @@
 # NEXUS AI Resource Router v0.1
 
-Status: IMPLEMENTED ON FEATURE BRANCH — CI / MERGE / DEPLOYMENT PENDING.
+Status: IMPLEMENTED + TESTED + MERGED TO MAIN through PR #56 on 27 Aug 2026. Superseded for routing-policy behavior by AI Resource Router Hardening v0.2 / PR #57. Not deployed and not production-enabled.
 
 ## Purpose
 
@@ -15,10 +15,10 @@ This module does not call providers, hold API keys, send external messages, or g
 ## Authority boundary
 
 - FreeLLM and similar directories are Tier D discovery/research only.
-- Current official provider documentation is required before a provider becomes routable by default.
+- Current official provider documentation is required before a provider becomes a candidate; v0.2 additionally requires explicit policy verification before routing.
 - Provider routing never overrides NEXUS project/engineering/business authority.
-- Sensitive data is fail-closed unless a provider is explicitly approved for it.
-- Production routing remains a separate gate from implementation/test success.
+- Sensitive data is fail-closed unless a provider is explicitly approved for the relevant sensitivity class.
+- Production routing remains a separate gate from implementation/test/merge success.
 
 ## Intended low-risk uses
 
@@ -31,7 +31,7 @@ This module does not call providers, hold API keys, send external messages, or g
 
 ## Explicitly blocked by default
 
-Do not route Gmail contents, RFQs, quotations, engineering masters, contracts, customer records, supplier negotiations, credentials, payments, legal files, or restricted internal data through unapproved free providers.
+Do not route Gmail contents, RFQs, quotations, engineering masters, contracts, customer records, supplier negotiations, credentials, payments, legal files, or restricted internal data through unapproved providers.
 
 ## Promotion gates
 
@@ -46,6 +46,10 @@ Before any provider is enabled for production or sensitive workloads:
 7. prove fallback semantics and duplicate prevention;
 8. pass repository CI on exact branch head;
 9. obtain explicit production promotion approval.
+
+## Historical note
+
+The initial PR #56 CI proved the canonical `evals/` suite but did not execute the new pytest router suite. That proof gap was discovered after merge and is explicitly corrected by v0.2 / PR #57, which also hardens sensitivity and production approval semantics. Do not use the original PR #56 CI result alone as evidence of full router regression coverage.
 
 ## Non-goals
 

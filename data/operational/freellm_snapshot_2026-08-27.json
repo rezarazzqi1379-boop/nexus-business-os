@@ -1,0 +1,28 @@
+{
+  "schema_version": "nexus.freellm-discovery.v1",
+  "captured_at": "2026-08-27T11:05:00Z",
+  "source": "https://freellm.sh/",
+  "authority": "DISCOVERY_ONLY",
+  "warning": "FreeLLM explicitly warns entries may be out of date. No entry may self-promote into trusted NEXUS policy or production approval.",
+  "summary": {"models": 18, "providers": 16},
+  "entries": [
+    {"id":"api-airforce","provider":"Api.Airforce","claim":"most are paid, some are free","access":"Free tier (limited)"},
+    {"id":"cerebras","provider":"Cerebras","claim":"1M tokens/day, 5 req/min per model","access":"Free tier (limited)","card_required":true},
+    {"id":"cloudflare-workers-ai","provider":"Cloudflare Workers AI","claim":"10,000 neurons/day","access":"Free tier (limited)"},
+    {"id":"cohere","provider":"Cohere","claim":"1,000 requests/month, 20 req/min shared","access":"Free tier (limited)"},
+    {"id":"free-llm-api-resources","provider":"GitHub","claim":"repository with a list of free LLM resources","access":"Free forever","kind":"Collection"},
+    {"id":"gemini-2.5-flash","provider":"Google AI Studio","claim":"1,500 requests/day","access":"Free forever"},
+    {"id":"github-models","provider":"GitHub Models","claim":"rate limits tied to Copilot tier","access":"Free tier (limited)"},
+    {"id":"huggingface-inference","provider":"Hugging Face","claim":"$0.10/month credits subject to change","access":"Free tier (limited)"},
+    {"id":"kilo-gateway","provider":"Kilo Gateway","claim":"200 requests/hour/IP shared for free models","access":"Free tier (limited)","no_signup":true,"data_training":true},
+    {"id":"mistral-codestral","provider":"Mistral Codestral","claim":"2,000 requests/day, 30 req/min","access":"Free tier (limited)","phone_required":true},
+    {"id":"mistral-la-plateforme","provider":"Mistral La Plateforme","claim":"Experiment plan, limits set per model","access":"Free tier (limited)","phone_required":true,"data_training":true},
+    {"id":"nvidia-nim","provider":"NVIDIA","claim":"100+ free LLMs","access":"Free tier (limited)","phone_required":true},
+    {"id":"opencode-zen","provider":"OpenCode Zen","claim":"7 free models, no published quota","access":"Free tier (limited)","data_training":true},
+    {"id":"openrouter","provider":"OpenRouter","claim":"free for some models","access":"Free tier (limited)"},
+    {"id":"orcarouter-offers","provider":"OrcaRouter","claim":"coupons for free usage; check Offers page","access":"Signup credits"},
+    {"id":"tokenrouter","provider":"TokenRouter","claim":"free models appear occasionally; check catalog","access":"Free tier (limited)"},
+    {"id":"vercel-ai-gateway","provider":"Vercel AI Gateway","claim":"$5/month recurring","access":"Free tier (limited)"},
+    {"id":"zenmux","provider":"Zenmux","claim":"free for some models","access":"Free tier (limited)"}
+  ]
+}

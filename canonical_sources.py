@@ -222,15 +222,15 @@ class CanonicalStore:
             return None
         lines = [line.strip() for line in registry["content"].splitlines() if line.strip()]
         for index, line in enumerate(lines):
-            if line == source_id:
-                window = lines[index + 1:index + 8]
-                if "CANONICAL" not in window:
-                    return None
-                for candidate in window:
-                    version = _match(candidate, r"v([0-9]+(?:\.[0-9]+)+)")
-                    if version:
-                        return version
+            if line != source_id:
+                continue
+            if index + 2 >= len(lines):
                 return None
+            status = lines[index + 1].casefold()
+            if not status.startswith("canonical"):
+                return None
+            canonical_file = lines[index + 2]
+            return _match(canonical_file, r"v([0-9]+(?:\.[0-9]+)+)")
         return None
 
     def status(self) -> dict:

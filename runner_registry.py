@@ -38,6 +38,9 @@ class RunnerManifest:
     open_beta: bool
     known_blockers: tuple[str, ...]
     allowed_capabilities: tuple[CapabilityRisk, ...] = (CapabilityRisk.READ,)
+    sandbox_required: bool = False
+    network_allowed: bool = False
+    can_receive_secrets: bool = False
 
 
 OPENWORKER = RunnerManifest(
@@ -52,6 +55,29 @@ OPENWORKER = RunnerManifest(
         "untrusted_xlsx_preview_dependency_requires_remediation",
         "live_nexus_compatibility_not_verified",
     ),
+)
+
+
+# OpenCode is intentionally registered as an experimental shadow worker, not an authority.
+# It may prepare/rewrite/test code only inside an explicitly scoped sandbox packet. It cannot
+# receive NEXUS approvals, secrets, network authority, or any external-action capability.
+OPENCODE_SHADOW = RunnerManifest(
+    runner_id="opencode",
+    version="unverified-latest",
+    status=RunnerStatus.EXPERIMENTAL,
+    local_first=True,
+    signed_binary=False,
+    open_beta=True,
+    known_blockers=(
+        "exact_runtime_version_not_pinned",
+        "provider_terms_and_retention_not_verified_for_sensitive_data",
+        "live_nexus_repo_benchmark_not_completed",
+        "no_production_promotion_authorized",
+    ),
+    allowed_capabilities=(CapabilityRisk.READ, CapabilityRisk.WRITE_LOCAL, CapabilityRisk.EXEC),
+    sandbox_required=True,
+    network_allowed=False,
+    can_receive_secrets=False,
 )
 
 
@@ -74,12 +100,16 @@ class WorkPacket:
         return hashlib.sha256(encoded).hexdigest()
 
 
+def _normalized_workspace(path: str) -> str:
+    return path.replace("\\", "/").strip("/")
+
+
 def validate_runner_packet(packet: WorkPacket, runner: RunnerManifest = OPENWORKER) -> dict[str, Any]:
     if packet.schema_version != "nexus.runner.v1":
         raise ValueError("unsupported_runner_schema")
     if not all((packet.packet_id.strip(), packet.project_id.strip(), packet.objective.strip())):
         raise ValueError("invalid_runner_packet_identity")
-    if packet.workspace_subpath.startswith(("/", "\\")) or ".." in packet.workspace_subpath.split("/"):
+    if packet.workspace_subpath.startswith(("/", "\\")) or ".." in packet.workspace_subpath.replace("\\", "/").split("/"):
         raise ValueError("workspace_scope_escape")
     serialized = json.dumps(packet.inputs, ensure_ascii=False)
     if _SECRET_PATTERN.search(serialized):
@@ -90,12 +120,27 @@ def validate_runner_packet(packet: WorkPacket, runner: RunnerManifest = OPENWORK
         raise ValueError("runner_capability_not_allowed")
     if packet.approval_id:
         raise ValueError("approval_delegation_forbidden")
+    if bool(packet.inputs.get("network_enabled")) and not runner.network_allowed:
+        raise ValueError("runner_network_not_allowed")
+    if bool(packet.inputs.get("contains_secrets")) and not runner.can_receive_secrets:
+        raise ValueError("runner_secret_access_not_allowed")
+    workspace = _normalized_workspace(packet.workspace_subpath)
+    if runner.sandbox_required and packet.capability in (CapabilityRisk.WRITE_LOCAL, CapabilityRisk.EXEC):
+        if not workspace.casefold().startswith("sandbox/"):
+            raise ValueError("sandbox_scope_required")
+
+    disposition = "prepare_only"
+    if runner.sandbox_required and packet.capability in (CapabilityRisk.WRITE_LOCAL, CapabilityRisk.EXEC):
+        disposition = "sandbox_only"
     return {
         "runner_id": runner.runner_id,
         "packet_digest": packet.digest,
-        "disposition": "prepare_only",
+        "disposition": disposition,
+        "workspace_subpath": workspace,
+        "network_authorized": False,
         "external_action_authorized": False,
         "nexus_approval_remains_authoritative": True,
+        "runner_is_authority": False,
     }
 
 

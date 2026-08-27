@@ -1,5 +1,5 @@
-from exact_external_gate import ExactApproval, authorize_exact_external_message, exact_external_action_id
-from external_ingress_guard import build_exact_message_from_reviewed_payload, build_review_descriptor, ingest_external_message
+from nexus_security.exact_external_gate import ExactApproval, authorize_exact_external_message, exact_external_action_id
+from nexus_security.external_ingress_guard import build_exact_message_from_reviewed_payload, build_review_descriptor, ingest_external_message
 
 
 def _malicious_ingress():

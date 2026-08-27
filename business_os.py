@@ -101,15 +101,30 @@ class BusinessOSVault:
 
     @staticmethod
     def _atomic_create(target: Path, content: str) -> bool:
+        """Publish a fully-written file exactly once.
+
+        Writing directly to an O_EXCL target exposes a short window where a losing
+        concurrent writer can observe and parse a partial JSON file.  Write and fsync a
+        private temporary first, then publish it with an atomic hard-link create.  The
+        target therefore either does not exist or contains the complete durable payload.
+        """
         target.parent.mkdir(parents=True, exist_ok=True)
+        temporary = target.with_name(f".{target.name}.{uuid.uuid4().hex}.tmp")
         try:
-            with target.open("x", encoding="utf-8", newline="\n") as stream:
+            with temporary.open("x", encoding="utf-8", newline="\n") as stream:
                 stream.write(content)
                 stream.flush()
                 os.fsync(stream.fileno())
-            return True
-        except FileExistsError:
-            return False
+            try:
+                os.link(temporary, target)
+                return True
+            except FileExistsError:
+                return False
+        finally:
+            try:
+                temporary.unlink()
+            except FileNotFoundError:
+                pass
 
     def enqueue(self, request: VaultRequest) -> Path:
         request.validate()

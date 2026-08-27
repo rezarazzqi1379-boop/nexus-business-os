@@ -13,12 +13,18 @@ PUBLIC_PROBE_PROMPT = "Return exactly this token and nothing else: NEXUS_PUBLIC_
 EXPECTED_TEXT = "NEXUS_PUBLIC_PROBE_OK"
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, repr=False)
 class ProbeRequest:
     provider_id: str
     url: str
     headers: dict[str, str]
     body: dict
+
+    def __repr__(self) -> str:
+        return (
+            f"ProbeRequest(provider_id={self.provider_id!r}, url={self.url!r}, "
+            "headers=<redacted>, body=<synthetic-public-probe>)"
+        )
 
 
 @dataclass(frozen=True)
@@ -70,8 +76,8 @@ def build_public_probe_request(provider_id: str, *, env: dict[str, str] | None =
             raise ValueError("missing_public_probe_model")
         return ProbeRequest(
             provider_id=provider_id,
-            url=f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}",
-            headers={"Content-Type": "application/json"},
+            url=f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+            headers={"x-goog-api-key": key, "Content-Type": "application/json"},
             body={
                 "contents": [{"parts": [{"text": PUBLIC_PROBE_PROMPT}]}],
                 "generationConfig": {"temperature": 0, "maxOutputTokens": 16},

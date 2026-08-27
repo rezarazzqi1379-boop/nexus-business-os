@@ -36,5 +36,10 @@ jobs:
       - name: Compile Python sources
         run: python -m compileall -q .
 
-      - name: Run canonical test suite
+      - name: Run canonical unittest suite
         run: python -m unittest discover -s evals -v
+
+      - name: Run pytest regression suite
+        env:
+          PYTHONPATH: src
+        run: pytest -q tests

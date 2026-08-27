@@ -76,6 +76,19 @@ def _match(text: str, pattern: str) -> str | None:
     return found.group(1).strip() if found else None
 
 
+def _version_tuple(version: str | None) -> tuple[int, ...]:
+    if not version:
+        return ()
+    found = re.fullmatch(r"v?(\d+(?:\.\d+)*)", version.strip(), re.IGNORECASE)
+    if not found:
+        return ()
+    return tuple(int(part) for part in found.group(1).split("."))
+
+
+def _version_storage_key(version: str | None) -> str:
+    return version.strip().lower() if version else "__unversioned__"
+
+
 def parse_source(path: Path) -> CanonicalSource:
     content = extract_docx_text(path)
     digest = hashlib.sha256()
@@ -100,6 +113,13 @@ def parse_source(path: Path) -> CanonicalSource:
 
 
 class CanonicalStore:
+    """Version-preserving canonical source store.
+
+    v2 keeps historical versions side-by-side. The legacy v1 table is left intact and copied
+    forward on first open, so migration is additive and reversible. Active project selection is
+    governed by the newest canonical Source Registry declaration, not filesystem or ingest order.
+    """
+
     def __init__(self, path: Path):
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -109,6 +129,31 @@ class CanonicalStore:
                 source_id TEXT PRIMARY KEY, project_id TEXT, title TEXT NOT NULL, version TEXT,
                 status TEXT NOT NULL, effective_date TEXT, sha256 TEXT NOT NULL UNIQUE,
                 content TEXT NOT NULL, ingested_at TEXT NOT NULL)""")
+            db.execute("""CREATE TABLE IF NOT EXISTS canonical_source_versions (
+                source_id TEXT NOT NULL,
+                version_key TEXT NOT NULL,
+                project_id TEXT,
+                title TEXT NOT NULL,
+                version TEXT,
+                status TEXT NOT NULL,
+                effective_date TEXT,
+                sha256 TEXT NOT NULL UNIQUE,
+                content TEXT NOT NULL,
+                ingested_at TEXT NOT NULL,
+                PRIMARY KEY (source_id, version_key))""")
+            legacy = db.execute(
+                "SELECT source_id,project_id,title,version,status,effective_date,sha256,content,ingested_at "
+                "FROM canonical_sources"
+            ).fetchall()
+            for row in legacy:
+                db.execute(
+                    "INSERT OR IGNORE INTO canonical_source_versions "
+                    "(source_id,version_key,project_id,title,version,status,effective_date,sha256,content,ingested_at) "
+                    "VALUES (?,?,?,?,?,?,?,?,?,?)",
+                    (row["source_id"], _version_storage_key(row["version"]), row["project_id"], row["title"],
+                     row["version"], row["status"], row["effective_date"], row["sha256"], row["content"],
+                     row["ingested_at"]),
+                )
 
     def _connect(self) -> sqlite3.Connection:
         db = sqlite3.connect(self.path, timeout=10)
@@ -118,14 +163,22 @@ class CanonicalStore:
 
     def ingest(self, path: Path) -> tuple[CanonicalSource, bool]:
         source = parse_source(path.resolve())
+        version_key = _version_storage_key(source.version)
         with self._connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            existing = db.execute("SELECT sha256 FROM canonical_sources WHERE source_id=?", (source.source_id,)).fetchone()
-            if existing and existing[0] != source.sha256:
-                raise ValueError("canonical_source_collision")
+            existing = db.execute(
+                "SELECT sha256 FROM canonical_source_versions WHERE source_id=? AND version_key=?",
+                (source.source_id, version_key),
+            ).fetchone()
+            if existing:
+                if existing["sha256"] != source.sha256:
+                    raise ValueError("canonical_source_version_collision")
+                return source, False
             inserted = db.execute(
-                "INSERT OR IGNORE INTO canonical_sources VALUES (?,?,?,?,?,?,?,?,?)",
-                (source.source_id, source.project_id, source.title, source.version, source.status,
+                "INSERT INTO canonical_source_versions "
+                "(source_id,version_key,project_id,title,version,status,effective_date,sha256,content,ingested_at) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?)",
+                (source.source_id, version_key, source.project_id, source.title, source.version, source.status,
                  source.effective_date, source.sha256, source.content, datetime.now(timezone.utc).isoformat()),
             ).rowcount == 1
         return source, inserted
@@ -139,17 +192,80 @@ class CanonicalStore:
             result.append({**item, "inserted": inserted})
         return result
 
-    def status(self) -> dict:
+    def _all_rows(self) -> list[sqlite3.Row]:
         with self._connect() as db:
-            rows = db.execute("SELECT source_id,project_id,title,version,status,effective_date,sha256 FROM canonical_sources ORDER BY source_id").fetchall()
-        return {"schema_version": "nexus.canonical-status.v1", "count": len(rows), "sources": [dict(row) for row in rows]}
+            return db.execute(
+                "SELECT source_id,project_id,title,version,status,effective_date,sha256,content,ingested_at "
+                "FROM canonical_source_versions"
+            ).fetchall()
+
+    @staticmethod
+    def _highest_version(rows: list[sqlite3.Row]) -> sqlite3.Row:
+        if not rows:
+            raise KeyError("canonical_source_missing")
+        ranked = sorted(rows, key=lambda row: (_version_tuple(row["version"]), row["effective_date"] or "", row["sha256"]),
+                        reverse=True)
+        top_key = (_version_tuple(ranked[0]["version"]), ranked[0]["effective_date"] or "")
+        ties = [row for row in ranked if (_version_tuple(row["version"]), row["effective_date"] or "") == top_key]
+        if len(ties) > 1 and len({row["sha256"] for row in ties}) > 1:
+            raise ValueError("ambiguous_canonical_source_version")
+        return ranked[0]
+
+    def latest_for_source(self, source_id: str) -> sqlite3.Row:
+        rows = [row for row in self._all_rows() if row["source_id"] == source_id]
+        return self._highest_version(rows)
+
+    def _registry_declared_version(self, source_id: str) -> str | None:
+        try:
+            registry = self.latest_for_source("NEXUS-SOURCE-REGISTRY")
+        except KeyError:
+            return None
+        lines = [line.strip() for line in registry["content"].splitlines() if line.strip()]
+        for index, line in enumerate(lines):
+            if line == source_id:
+                window = lines[index + 1:index + 8]
+                if "CANONICAL" not in window:
+                    return None
+                for candidate in window:
+                    version = _match(candidate, r"\bv([0-9]+(?:\.[0-9]+)+)\b")
+                    if version:
+                        return version
+                return None
+        return None
+
+    def status(self) -> dict:
+        rows = self._all_rows()
+        sources = []
+        for row in sorted(rows, key=lambda item: (item["source_id"], _version_tuple(item["version"]))):
+            item = {key: row[key] for key in ("source_id", "project_id", "title", "version", "status",
+                                               "effective_date", "sha256")}
+            declared = self._registry_declared_version(row["source_id"])
+            item["active"] = bool(declared and row["version"] == declared)
+            if row["source_id"] == "NEXUS-SOURCE-REGISTRY":
+                item["active"] = row["sha256"] == self.latest_for_source("NEXUS-SOURCE-REGISTRY")["sha256"]
+            elif row["source_id"] == "NEXUS-MASTER-CONTEXT" and declared is None:
+                item["active"] = row["sha256"] == self.latest_for_source("NEXUS-MASTER-CONTEXT")["sha256"]
+            sources.append(item)
+        return {"schema_version": "nexus.canonical-status.v2", "count": len(rows), "sources": sources}
 
     def latest_for_project(self, project_id: str) -> sqlite3.Row:
-        with self._connect() as db:
-            row = db.execute("SELECT * FROM canonical_sources WHERE project_id=? ORDER BY ingested_at DESC LIMIT 1", (project_id,)).fetchone()
-        if row is None:
+        rows = [row for row in self._all_rows() if row["project_id"] == project_id]
+        if not rows:
             raise KeyError("canonical_project_source_missing")
-        return row
+        selected: list[sqlite3.Row] = []
+        for source_id in sorted({row["source_id"] for row in rows}):
+            source_rows = [row for row in rows if row["source_id"] == source_id]
+            declared = self._registry_declared_version(source_id)
+            if declared:
+                matches = [row for row in source_rows if row["version"] == declared]
+                if len(matches) != 1:
+                    raise KeyError(f"registry_declared_source_version_missing:{source_id}:{declared}")
+                selected.append(matches[0])
+        if not selected:
+            raise KeyError(f"project_not_declared_canonical_in_registry:{project_id}")
+        if len(selected) != 1:
+            raise ValueError(f"ambiguous_canonical_project_source:{project_id}")
+        return selected[0]
 
 
 def hydrostatic_hold_points(store: CanonicalStore) -> dict:

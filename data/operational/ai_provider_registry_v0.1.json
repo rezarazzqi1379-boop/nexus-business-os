@@ -1,0 +1,103 @@
+{
+  "schema_version": "nexus-provider-registry-v0.1",
+  "generated_at": "2026-08-27",
+  "discovery_source": {
+    "name": "FreeLLM",
+    "url": "https://freellm.sh/",
+    "authority": "DISCOVERY_ONLY",
+    "rule": "Never treat directory claims as source of truth; verify official provider documentation before activation."
+  },
+  "providers": [
+    {
+      "id": "cloudflare_workers_ai",
+      "status": "VERIFIED_CANDIDATE",
+      "authority": "OFFICIAL_DOCS_VERIFIED",
+      "free_limit": "10000 neurons/day",
+      "capabilities": ["text", "embeddings", "vision"],
+      "openai_compatible": false,
+      "data_training": "POLICY_REVIEW_REQUIRED",
+      "sensitive_data_allowed": false,
+      "production_role": "LOW_RISK_BATCH_OR_FALLBACK",
+      "official_source": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+      "notes": "Model availability and paid-only exceptions can change."
+    },
+    {
+      "id": "openrouter_free",
+      "status": "VERIFIED_CANDIDATE",
+      "authority": "OFFICIAL_DOCS_VERIFIED",
+      "free_limit": "Free plan/rate limits are dynamic; verify before execution",
+      "capabilities": ["text", "image_input", "tool_calling", "structured_output"],
+      "openai_compatible": true,
+      "data_training": "ROUTING_POLICY_DEPENDENT",
+      "sensitive_data_allowed": false,
+      "production_role": "EXPERIMENT_OR_NON_SENSITIVE_FALLBACK",
+      "official_source": "https://openrouter.ai/pricing",
+      "notes": "Free-model inventory changes; not a sole production backbone."
+    },
+    {
+      "id": "vercel_ai_gateway",
+      "status": "VERIFIED_CANDIDATE",
+      "authority": "OFFICIAL_DOCS_VERIFIED",
+      "free_limit": "Account/plan allowance must be verified live",
+      "capabilities": ["multi_provider", "fallback", "observability", "cost_routing", "openai_compatible"],
+      "openai_compatible": true,
+      "data_training": "UPSTREAM_PROVIDER_DEPENDENT",
+      "sensitive_data_allowed": false,
+      "production_role": "GATEWAY_CANDIDATE_AFTER_ACCOUNT_POLICY_REVIEW",
+      "official_source": "https://vercel.com/ai-gateway",
+      "notes": "Strong provider-abstraction candidate; upstream privacy still governs data handling."
+    },
+    {
+      "id": "google_ai_studio",
+      "status": "VERIFIED_CANDIDATE",
+      "authority": "OFFICIAL_DOCS_VERIFIED",
+      "free_limit": "Model/account-specific; inspect active AI Studio limits",
+      "capabilities": ["text", "vision", "structured_output", "tool_calling"],
+      "openai_compatible": false,
+      "data_training": "PLAN_AND_TERMS_DEPENDENT",
+      "sensitive_data_allowed": false,
+      "production_role": "NON_SENSITIVE_RESEARCH_AND_BATCH",
+      "official_source": "https://ai.google.dev/gemini-api/docs/rate-limits",
+      "notes": "Do not hard-code directory rate-limit claims."
+    },
+    {
+      "id": "cerebras",
+      "status": "DISCOVERY_PENDING_REVERIFY",
+      "authority": "FREELLM_DISCOVERY",
+      "free_limit": "Directory claim only; official re-verification required",
+      "capabilities": ["text", "code"],
+      "openai_compatible": true,
+      "data_training": "UNKNOWN",
+      "sensitive_data_allowed": false,
+      "production_role": "DISABLED_UNTIL_OFFICIAL_REVERIFY",
+      "official_source": null,
+      "notes": "Potential fast inference candidate; disabled until verified."
+    },
+    {
+      "id": "kilo_gateway",
+      "status": "DISCOVERY_PENDING_REVERIFY",
+      "authority": "FREELLM_DISCOVERY",
+      "free_limit": "Directory claim only; official re-verification required",
+      "capabilities": ["text", "multi_provider"],
+      "openai_compatible": true,
+      "data_training": "REPORTED_RISK_REQUIRES_REVIEW",
+      "sensitive_data_allowed": false,
+      "production_role": "DISABLED_FOR_COMPANY_DATA",
+      "official_source": null,
+      "notes": "Never use for Gmail, RFQ, engineering, contract or customer data until policy review."
+    },
+    {
+      "id": "nvidia_nim",
+      "status": "DISCOVERY_PENDING_REVERIFY",
+      "authority": "FREELLM_DISCOVERY",
+      "free_limit": "Directory claim only; official re-verification required",
+      "capabilities": ["text", "code", "vision"],
+      "openai_compatible": true,
+      "data_training": "UNKNOWN",
+      "sensitive_data_allowed": false,
+      "production_role": "DISABLED_UNTIL_OFFICIAL_REVERIFY",
+      "official_source": null,
+      "notes": "Experiment candidate only after official terms and limits are captured."
+    }
+  ]
+}

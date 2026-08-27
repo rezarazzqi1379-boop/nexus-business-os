@@ -91,6 +91,43 @@ class CanonicalAuthorityV2Tests(unittest.TestCase):
         reopened = CanonicalStore(self.root / "canonical.db")
         self.assertEqual(reopened.latest_for_project("PRJ-TST-01")["version"], "2.0")
 
+    def test_canonical_hold_status_is_a_valid_registry_declaration(self):
+        registry = self.root / "NEXUS_Source_Registry_v1.6.docx"
+        _docx(registry, [
+            "NEXUS SOURCE REGISTRY v1.6",
+            "PRJ-TST-01-ENG",
+            "CANONICAL + HOLD",
+            "Test_Master_v2.0.docx",
+            "Held but still governing authority",
+            "PRJ-NEXT-01-ENG",
+            "CANONICAL",
+            "Next_Master_v9.9.docx",
+        ])
+        store = CanonicalStore(self.root / "canonical.db")
+        store.ingest(registry)
+        store.ingest(self._project("1.0", "historical"))
+        store.ingest(self._project("2.0", "held-active"))
+        self.assertEqual(store.latest_for_project("PRJ-TST-01")["version"], "2.0")
+
+    def test_pending_status_cannot_borrow_next_rows_canonical_marker(self):
+        registry = self.root / "NEXUS_Source_Registry_v1.6.docx"
+        _docx(registry, [
+            "NEXUS SOURCE REGISTRY v1.6",
+            "PRJ-TST-01-ENG",
+            "PENDING LOCK",
+            "Test_Master_v2.0.docx",
+            "Not active",
+            "PRJ-NEXT-01-ENG",
+            "CANONICAL",
+            "Next_Master_v9.9.docx",
+        ])
+        store = CanonicalStore(self.root / "canonical.db")
+        store.ingest(registry)
+        store.ingest(self._project("1.0", "historical"))
+        store.ingest(self._project("2.0", "must-not-self-promote"))
+        with self.assertRaisesRegex(KeyError, "registry_declaration_required_for_versioned_source"):
+            store.latest_for_project("PRJ-TST-01")
+
 
 if __name__ == "__main__":
     unittest.main()

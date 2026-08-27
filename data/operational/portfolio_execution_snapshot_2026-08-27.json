@@ -1,0 +1,63 @@
+{
+  "snapshot_id": "NEXUS-PORTFOLIO-EXEC-2026-08-27-v0.1",
+  "authority": {
+    "master_context": "NEXUS_Master_Context_v1.9_2026-08-27.docx",
+    "source_registry": "NEXUS_Source_Registry_v1.6_2026-08-27.docx",
+    "dynamic_evidence_refreshed_at": "2026-08-27T23:39:00+03:30"
+  },
+  "maturity": "SHADOW_REVIEWABLE",
+  "production_authorized": false,
+  "external_send_authorized": false,
+  "projects": [
+    {
+      "project_id": "PRJ-HYD-01",
+      "status": "ACTIVE_QUALIFICATION",
+      "canonical_source": "Hydrostatic_Tester_Engineering_Master_v1.1_2026-08-24.docx",
+      "live_evidence": ["gmail:1a039508f63a0dea", "gmail:1a032fb8986d2da6"],
+      "next_safe_action": "reconcile_latest_proposals_against_rev1_2_without_duplicate_outreach",
+      "blockers": ["signed_GH_10_point_addendum", "final_duty_envelope", "PO_ready_closure"]
+    },
+    {
+      "project_id": "PRJ-HTL-01",
+      "status": "PAUSED_BY_MANAGEMENT",
+      "canonical_source": "OCTG_Heat_Treatment_Master_v1.1_2026-08-24.docx",
+      "live_evidence": ["gmail:1a032f33b0019d77"],
+      "next_safe_action": "preserve_and_monitor_only",
+      "blockers": ["management_restart_approval", "throughput_revalidation"]
+    },
+    {
+      "project_id": "PRJ-KCL-01",
+      "status": "COMMERCIAL_REFRESH_HOLD",
+      "canonical_source": "KCl_SOP_Acceptance_Master_v1.0_2026-08-23.docx",
+      "live_evidence": ["gmail:1a03362c348d6993", "gmail:1a03290562e816d1", "gmail:1a032944cf64e85f"],
+      "next_safe_action": "read_and_reconcile_current_threads_then_build_refresh_packet",
+      "blockers": ["current_quantity", "permit_owner", "destination_incoterm", "target_price_payment_route", "sanctions_logistics"]
+    },
+    {
+      "project_id": "PRJ-CAN-01",
+      "status": "ENGINEERING_CLARIFICATION",
+      "canonical_source": "Can_Forming_Engineering_Master_v1.0_2026-08-23.docx",
+      "live_evidence": [],
+      "next_safe_action": "prepare_single_engineering_clarification_packet",
+      "blockers": ["final_geometry", "mandatory_operations", "production_rate"]
+    }
+  ],
+  "repository": {
+    "main_baseline": "95e46c2e6d58aa771dc2ade8fa8381f77e9776e6",
+    "canonical_authority_v2": "MERGED_TESTED_MAIN",
+    "open_new_lanes": {
+      "64": "OPENCODE_SHADOW_ADAPTER_DRAFT",
+      "65": "MODEL_RUNNER_ARENA_DRAFT",
+      "66": "CONVERGENCE_WAVE_DRAFT_CI_GREEN",
+      "67": "EXACT_EXTERNAL_GATE_DRAFT_CI_GREEN",
+      "68": "EXTERNAL_INGRESS_GUARD_DRAFT_STACKED_NOT_READY"
+    }
+  },
+  "global_rules": {
+    "safe_auto_classes": ["READ", "RESEARCH", "DRAFT", "TEST"],
+    "exact_approval_classes": ["EXTERNAL_SEND", "MERGE", "DEPLOY", "PRODUCTION_MUTATION", "PAY", "SIGN", "ORDER", "PUBLISH", "ACCESS_CHANGE", "DESTRUCTIVE"],
+    "dynamic_facts_require_live_refresh": true,
+    "cross_project_contamination": "FAIL_CLOSED",
+    "supplier_claim_is_authority": false
+  }
+}

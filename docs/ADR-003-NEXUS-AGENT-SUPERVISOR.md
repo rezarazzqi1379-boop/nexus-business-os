@@ -2,7 +2,7 @@
 
 ## Status
 
-Experimental; isolated behind a draft pull request.
+Accepted as an experimental, disabled-by-default capability. Merged by PR #80\non 2026-08-28; no live Herdr installation or production activation is implied.
 
 ## Decision
 

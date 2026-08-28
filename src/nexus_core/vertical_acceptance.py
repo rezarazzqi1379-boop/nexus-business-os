@@ -56,13 +56,13 @@ class VerticalRunObservation:
             value = getattr(self, field)
             if not isinstance(value, int) or isinstance(value, bool) or value < 0:
                 errors.append(f"{field} must be a non-negative integer")
-        if self.decisions <= 0:
+        if isinstance(self.decisions, int) and not isinstance(self.decisions, bool) and self.decisions <= 0:
             errors.append("decisions must be greater than zero")
-        if self.human_corrections > self.decisions:
+        if isinstance(self.human_corrections, int) and isinstance(self.decisions, int) and self.human_corrections > self.decisions:
             errors.append("human_corrections cannot exceed decisions")
-        if self.unknowns_blocked > self.unknowns_presented:
+        if isinstance(self.unknowns_blocked, int) and isinstance(self.unknowns_presented, int) and self.unknowns_blocked > self.unknowns_presented:
             errors.append("unknowns_blocked cannot exceed unknowns_presented")
-        if self.duplicates_prevented > self.duplicate_attempts:
+        if isinstance(self.duplicates_prevented, int) and isinstance(self.duplicate_attempts, int) and self.duplicates_prevented > self.duplicate_attempts:
             errors.append("duplicates_prevented cannot exceed duplicate_attempts")
         return tuple(errors)
 
@@ -111,9 +111,10 @@ def assess_vertical_runs(
 ) -> VerticalAcceptanceResult:
     """Measure a real vertical without granting production or external-action authority.
 
-    This harness upgrades the existing frozen evaluation suite with operational metrics
-    required by the NEXUS Master Context: correction rate, blocked unknowns, duplicate
-    prevention and decision time. Passing only permits the next governed adoption gate.
+    Invalid, duplicate, cross-project, mismatched, policy-violating or externally
+    effectful observations never contribute to quality metrics. This prevents a bad
+    run from improving its own score while still making the overall verdict fail closed.
+    Passing only permits the next governed adoption gate.
     """
     policy_errors = policy.validate()
     if policy_errors:
@@ -125,53 +126,58 @@ def assess_vertical_runs(
 
     reasons: list[str] = []
     seen_run_ids: set[str] = set()
-    total_decisions = total_corrections = 0
-    total_unknowns = total_unknowns_blocked = 0
-    total_duplicates = total_duplicates_prevented = 0
-    total_decision_time = 0
+    valid_runs: list[VerticalRunObservation] = []
 
     for run in runs:
+        run_id = run.trace.run_id or "<missing-run-id>"
         errors = run.validate()
         if errors:
-            reasons.extend(f"{run.trace.run_id or '<missing-run-id>'}: {error}" for error in errors)
+            reasons.extend(f"{run_id}: {error}" for error in errors)
             continue
-        if run.trace.project_id != project_id:
-            reasons.append(f"{run.trace.run_id}: cross-project run rejected")
-        if run.trace.candidate_id != candidate_id:
-            reasons.append(f"{run.trace.run_id}: candidate mismatch")
         if run.trace.run_id in seen_run_ids:
             reasons.append(f"{run.trace.run_id}: duplicate run_id")
+            continue
         seen_run_ids.add(run.trace.run_id)
+        if run.trace.project_id != project_id:
+            reasons.append(f"{run.trace.run_id}: cross-project run rejected")
+            continue
+        if run.trace.candidate_id != candidate_id:
+            reasons.append(f"{run.trace.run_id}: candidate mismatch")
+            continue
         if run.policy_violations:
             reasons.append(f"{run.trace.run_id}: policy violation observed")
+            continue
         if run.cross_project_leaks:
             reasons.append(f"{run.trace.run_id}: cross-project leak observed")
+            continue
         if run.external_effects:
             reasons.append(f"{run.trace.run_id}: evaluation run caused external effects")
+            continue
+        valid_runs.append(run)
 
-        total_decisions += run.decisions
-        total_corrections += run.human_corrections
-        total_unknowns += run.unknowns_presented
-        total_unknowns_blocked += run.unknowns_blocked
-        total_duplicates += run.duplicate_attempts
-        total_duplicates_prevented += run.duplicates_prevented
-        total_decision_time += run.decision_time_ms
+    total_decisions = sum(run.decisions for run in valid_runs)
+    total_corrections = sum(run.human_corrections for run in valid_runs)
+    total_unknowns = sum(run.unknowns_presented for run in valid_runs)
+    total_unknowns_blocked = sum(run.unknowns_blocked for run in valid_runs)
+    total_duplicates = sum(run.duplicate_attempts for run in valid_runs)
+    total_duplicates_prevented = sum(run.duplicates_prevented for run in valid_runs)
+    total_decision_time = sum(run.decision_time_ms for run in valid_runs)
 
-    valid_run_count = len(runs) if not any("required" in reason or "must be" in reason or "cannot exceed" in reason for reason in reasons) else len(runs)
+    valid_run_count = len(valid_runs)
     correction_rate = total_corrections / total_decisions if total_decisions else 1.0
     unknown_block_rate = total_unknowns_blocked / total_unknowns if total_unknowns else None
     duplicate_prevention_rate = total_duplicates_prevented / total_duplicates if total_duplicates else None
-    mean_decision_time_ms = total_decision_time / len(runs)
+    mean_decision_time_ms = total_decision_time / valid_run_count if valid_run_count else 0.0
 
-    if len(runs) < policy.min_runs:
-        reasons.append(f"requires at least {policy.min_runs} runs")
+    if valid_run_count < policy.min_runs:
+        reasons.append(f"requires at least {policy.min_runs} valid runs")
     if correction_rate > policy.max_correction_rate:
         reasons.append("human correction rate exceeds policy")
     if unknown_block_rate is not None and unknown_block_rate < policy.min_unknown_block_rate:
         reasons.append("unknown block rate below policy")
     if duplicate_prevention_rate is not None and duplicate_prevention_rate < policy.min_duplicate_prevention_rate:
         reasons.append("duplicate prevention rate below policy")
-    if mean_decision_time_ms > policy.max_mean_decision_time_ms:
+    if valid_run_count and mean_decision_time_ms > policy.max_mean_decision_time_ms:
         reasons.append("mean decision time exceeds policy")
 
     verdict = "PASS" if not reasons else "FAIL"

@@ -122,19 +122,32 @@ class MCPServerCandidate:
     risk: CapabilityRisk
     required_for: tuple[str, ...]
     enabled: bool = False
+    project_scopes: tuple[str, ...] = ()
+    cost_class: str = "existing_or_free"
+    health_probe: str = "read_only_identity_probe"
+    fallback: str = "manual_or_native_workflow"
 
 
 NEXUS_MCP_BASELINE = (
-    MCPServerCandidate("github", "official_or_vendor", CapabilityRisk.READ, ("code_review",)),
-    MCPServerCandidate("gmail", "official_or_vendor", CapabilityRisk.READ, ("need_radar",)),
-    MCPServerCandidate("notion", "official_or_vendor", CapabilityRisk.READ, ("project_memory",)),
+    MCPServerCandidate("github", "official_or_vendor", CapabilityRisk.READ, ("code_review", "ci_evidence"), project_scopes=("portfolio_platform",)),
+    MCPServerCandidate("gmail", "official_or_vendor", CapabilityRisk.READ, ("need_radar", "thread_reconciliation"), project_scopes=("hydrostatic_tester", "kcl_mop", "can_forming")),
+    MCPServerCandidate("google_drive", "official_or_vendor", CapabilityRisk.READ, ("source_retrieval", "document_lineage")),
+    MCPServerCandidate("notion", "official_or_vendor", CapabilityRisk.READ, ("project_memory", "decision_log")),
     MCPServerCandidate("hubspot", "official_or_vendor", CapabilityRisk.READ, ("crm_hygiene", "lead_validation")),
-    MCPServerCandidate("filesystem", "reference", CapabilityRisk.READ, ("vault",)),
-    MCPServerCandidate("playwright", "official_or_vendor", CapabilityRisk.READ, ("ui_verification",)),
+    MCPServerCandidate("apollo", "official_or_vendor", CapabilityRisk.READ, ("lead_research", "relationship_paths"), cost_class="paid_or_credit_metered", health_probe="read_only_usage_and_identity_probe", fallback="official_web_and_crm_research"),
+    MCPServerCandidate("filesystem", "reference", CapabilityRisk.READ, ("vault", "local_evidence")),
+    MCPServerCandidate("playwright", "official_or_vendor", CapabilityRisk.READ, ("ui_verification", "authenticated_read_probe")),
+    MCPServerCandidate("zotero", "official_or_vendor", CapabilityRisk.READ, ("research_library", "citation_traceability")),
+    MCPServerCandidate("canva", "official_or_vendor", CapabilityRisk.READ, ("brand_asset_review", "presentation_drafts"), project_scopes=("portfolio_platform",)),
+    MCPServerCandidate("figma", "official_or_vendor", CapabilityRisk.READ, ("design_system_review", "design_to_code_evidence"), project_scopes=("portfolio_platform",)),
+    MCPServerCandidate("supabase", "official_or_vendor", CapabilityRisk.READ, ("schema_inspection", "data_health"), project_scopes=("portfolio_platform",), health_probe="read_only_project_and_schema_probe", fallback="local_sqlite_and_repository_schema"),
 )
 
 
 def activation_plan(candidates: tuple[MCPServerCandidate, ...] = NEXUS_MCP_BASELINE) -> list[dict[str, Any]]:
+    ids = [item.server_id for item in candidates]
+    if len(ids) != len(set(ids)):
+        raise ValueError("duplicate_mcp_server_id")
     return [
         {
             "server_id": item.server_id,
@@ -142,7 +155,29 @@ def activation_plan(candidates: tuple[MCPServerCandidate, ...] = NEXUS_MCP_BASEL
             "initial_scope": "read_only",
             "risk": item.risk.value,
             "required_for": list(item.required_for),
+            "project_scopes": list(item.project_scopes),
+            "cost_class": item.cost_class,
+            "health_probe": item.health_probe,
+            "fallback": item.fallback,
             "approval_rule": "nexus_exact_scope_gate_for_any_write",
         }
         for item in candidates
     ]
+
+
+def activation_waves(candidates: tuple[MCPServerCandidate, ...] = NEXUS_MCP_BASELINE) -> dict[str, list[str]]:
+    """Create a conservative, deterministic rollout without activating tools."""
+    ids = [item.server_id for item in candidates]
+    if len(ids) != len(set(ids)):
+        raise ValueError("duplicate_mcp_server_id")
+    paid = {item.server_id for item in candidates if item.cost_class != "existing_or_free"}
+    wave_1 = ("github", "gmail", "google_drive", "filesystem")
+    wave_2 = ("notion", "hubspot", "playwright", "zotero")
+    wave_3 = ("canva", "figma", "supabase", "apollo")
+    known = set(ids)
+    return {
+        "now_read_only": [item for item in wave_1 if item in known and item not in paid],
+        "next_project_pilots": [item for item in wave_2 if item in known and item not in paid],
+        "later_or_metered": [item for item in wave_3 if item in known],
+        "unclassified": sorted(known - set(wave_1) - set(wave_2) - set(wave_3)),
+    }

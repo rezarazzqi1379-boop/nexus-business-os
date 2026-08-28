@@ -55,6 +55,22 @@ OPENWORKER = RunnerManifest(
 )
 
 
+HERDR = RunnerManifest(
+    runner_id="herdr",
+    version="0.8.2",
+    status=RunnerStatus.EXPERIMENTAL,
+    local_first=True,
+    signed_binary=False,
+    open_beta=False,
+    known_blockers=(
+        "live_nexus_compatibility_not_verified",
+        "windows_plugins_are_preview",
+        "agent_state_detection_can_fall_back_to_idle",
+        "requires_owner_managed_machine_or_remote_host",
+    ),
+)
+
+
 @dataclass(frozen=True)
 class WorkPacket:
     packet_id: str

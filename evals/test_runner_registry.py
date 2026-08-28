@@ -46,7 +46,7 @@ class RunnerRegistryTests(unittest.TestCase):
 
     def test_mcp_baseline_is_disabled_and_read_only(self):
         plan = activation_plan()
-        self.assertEqual(len(plan), 6)
+        self.assertEqual(len(plan), 12)
         self.assertTrue(all(not row["enabled"] for row in plan))
         self.assertTrue(all(row["initial_scope"] == "read_only" for row in plan))
 

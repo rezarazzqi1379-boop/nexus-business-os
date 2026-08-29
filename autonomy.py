@@ -32,7 +32,13 @@ def utc_now() -> datetime:
 
 
 class AutonomyStore:
-    """Durable queue, approval inbox, budget ledger, and circuit breakers."""
+    """Durable work queue, budget ledger, and circuit breakers.
+
+    Approval authority deliberately lives in the canonical ApprovalStore. This
+    execution-state store must not create or interpret a second approval system.
+    Existing legacy SQLite files may still contain an unused approval_inbox table;
+    this code neither reads nor drops it.
+    """
 
     def __init__(self, path: Path) -> None:
         self.path = path
@@ -45,11 +51,6 @@ class AutonomyStore:
                     payload_json TEXT NOT NULL, priority INTEGER NOT NULL, status TEXT NOT NULL,
                     attempts INTEGER NOT NULL, max_attempts INTEGER NOT NULL,
                     not_before TEXT NOT NULL, lease_owner TEXT, lease_until TEXT, last_error TEXT
-                );
-                CREATE TABLE IF NOT EXISTS approval_inbox (
-                    approval_id TEXT PRIMARY KEY, work_id TEXT NOT NULL, action_digest TEXT NOT NULL,
-                    summary TEXT NOT NULL, status TEXT NOT NULL, created_at TEXT NOT NULL,
-                    decided_at TEXT, UNIQUE(work_id, action_digest)
                 );
                 CREATE TABLE IF NOT EXISTS usage_ledger (
                     usage_id TEXT PRIMARY KEY, project TEXT NOT NULL, cost_usd REAL NOT NULL,

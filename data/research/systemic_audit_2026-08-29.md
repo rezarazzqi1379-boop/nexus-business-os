@@ -1,6 +1,6 @@
 # NEXUS Systemic Audit — 2026-08-29
 
-Basis: canonical Master Context v1.9 + Source Registry v1.6 recovered locally; current GitHub main/PR state refreshed live. This is an internal audit record, not authority expansion.
+Basis: canonical Master Context v1.9 + Source Registry v1.6 recovered locally; current GitHub main/PR state and Hydrotester Gmail evidence refreshed live. This is an internal audit record, not authority expansion.
 
 ## Executive finding
 NEXUS has strong fail-closed governance primitives, but current risk has shifted from missing controls to architecture/consolidation debt. The system has many overlapping historical Draft PRs, several duplicate/superseded lanes, a non-protected `main` branch, and incomplete production/runtime proof. The highest-value work is therefore convergence + measured vertical acceptance, not adding more agents or databases.
@@ -14,7 +14,7 @@ NEXUS has strong fail-closed governance primitives, but current risk has shifted
 6. **Approval authority duplication risk — FACT.** Multiple historical branches implement or discuss approval gates. Current work must reuse one canonical exact-action approval authority; mutable booleans and textual approval references are not authority.
 
 ## Project portfolio review
-- PRJ-HYD-01 Hydrotester: ACTIVE QUALIFICATION. Fresh vendor replies supersede the old “await replies” state, but neither vendor is PO-ready. GH is conditional technical lead; Marley is commercial benchmark with material throughput deviation. Internal normalization and contractual/FAT closure remain higher value than duplicate outreach.
+- PRJ-HYD-01 Hydrotester: ACTIVE QUALIFICATION. Fresh vendor replies supersede the old “await replies” state. GH is conditional technical lead; Marley remains commercial benchmark with material throughput deviation; neither is PO-ready. New live evidence on 29 Aug: ANZ Global confirmed it is actively reviewing candidate OEMs against Rev.1.2 and expects its best quote by early next week. This is a pipeline-status FACT/CLAIM from the live thread, not a technical/commercial qualification result. Do not chase ANZ before that stated window unless new evidence requires it.
 - PRJ-HTL-01 Heat Treatment: PAUSED_BY_MANAGEMENT. Preserve stable master; no supplier/RFQ restart. Throughput conflict remains a future revalidation hold.
 - PRJ-KCL-01 KCl/SOP: COMMERCIAL REFRESH HOLD. Acceptance master governs; quantity/permit/destination/Incoterm/price/payment/sanctions/logistics are dynamic unknowns until live refresh. Historical 1,200 MT/month is not a current commitment.
 - PRJ-CAN-01 Can Forming: ENGINEERING CLARIFICATION. D73/D99/400 g/model references remain evidence/candidate configuration, not stable buyer requirement. Final geometry/operations/rate need engineer confirmation before consequential comparison.
@@ -30,6 +30,12 @@ Recent PR #86 work now supplies:
 - settlement planner;
 - atomic non-failure defer that restores claim attempt budget;
 - settlement executor that maps COMPLETE/RETRY/WAIT paths to durable store primitives while leaving HOLD non-mutating.
+
+Exact-head CI evidence:
+- defer primitive head `9d96a3438a9bdc4b3a95432050cf4c746af69594`: GitHub Actions run #829 SUCCESS.
+- settlement-executor + systemic-audit head `852bcf4c2c466e22d884b60c6d3ce7ef85cb202e`: GitHub Actions run #832 SUCCESS.
+- PR #83 measured vertical acceptance head `f93db28ce67537c58e0810015ae664d1fe8152be`: GitHub Actions run #815 SUCCESS.
+These are implementation/test facts only; none is merged/deployed/production authority.
 
 ## Remaining design defect
 `HOLD` currently has no explicit durable parked/manual-review state in the root AutonomyStore. Leaving a held leased item untouched eventually lets its lease expire and may consume future attempt budget when reclaimed. Do not paper over this by treating HOLD as failure or endless defer. Measure real hold cases first, then add the smallest explicit park/resume primitive if repeated need is demonstrated.

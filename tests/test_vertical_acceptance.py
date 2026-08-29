@@ -16,7 +16,7 @@ def _policy() -> VerticalAcceptancePolicy:
     )
 
 
-def _run(run_id: str, *, corrections: int = 0, unknowns: int = 1, blocked: int = 1, duplicates: int = 1, prevented: int = 1, time_ms: int | None = 900, project_id: str = "PRJ-HYD-01", candidate_id: str = "hydro-v1", external_effects: int = 0, leaks: int = 0, violations: int = 0, sensitive: bool = False, decisions: int = 10) -> VerticalRunObservation:
+def _run(run_id: str, *, corrections: int | None = 0, unknowns: int = 1, blocked: int = 1, duplicates: int = 1, prevented: int = 1, time_ms: int | None = 900, project_id: str = "PRJ-HYD-01", candidate_id: str = "hydro-v1", external_effects: int = 0, leaks: int = 0, violations: int = 0, sensitive: bool = False, decisions: int = 10) -> VerticalRunObservation:
     return VerticalRunObservation(
         trace=TraceEnvelope(
             workflow_name="hydrotester-qualification",
@@ -169,3 +169,27 @@ def test_partial_timing_coverage_cannot_hide_an_unmeasured_run():
     assert result.verdict == "FAIL"
     assert result.mean_decision_time_ms == 1000
     assert any("coverage is incomplete" in reason for reason in result.reasons)
+
+
+def test_missing_human_correction_measurement_blocks_acceptance_without_inventing_zero():
+    result = assess_vertical_runs(
+        "PRJ-HYD-01",
+        "hydro-v1",
+        [_run("r1", corrections=None), _run("r2", corrections=None)],
+        _policy(),
+    )
+    assert result.verdict == "FAIL"
+    assert result.correction_rate is None
+    assert any("human correction" in reason for reason in result.reasons)
+
+
+def test_partial_human_correction_coverage_cannot_hide_an_unreviewed_run():
+    result = assess_vertical_runs(
+        "PRJ-HYD-01",
+        "hydro-v1",
+        [_run("r1", corrections=0), _run("r2", corrections=None)],
+        _policy(),
+    )
+    assert result.verdict == "FAIL"
+    assert result.correction_rate == 0
+    assert any("human correction coverage is incomplete" in reason for reason in result.reasons)

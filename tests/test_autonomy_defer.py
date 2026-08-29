@@ -21,6 +21,14 @@ def read_row(store: AutonomyStore, work_id: str):
         return db.execute("SELECT * FROM work_items WHERE work_id=?", (work_id,)).fetchone()
 
 
+def test_autonomy_store_does_not_create_parallel_approval_authority(tmp_path):
+    store = AutonomyStore(tmp_path / "autonomy.db")
+    with sqlite3.connect(store.path) as db:
+        tables = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+    assert "approval_inbox" not in tables
+    assert {"work_items", "usage_ledger", "circuit_breakers"}.issubset(tables)
+
+
 def test_defer_releases_lease_without_burning_attempt(tmp_path):
     store = AutonomyStore(tmp_path / "autonomy.db")
     assert store.enqueue(item(), now=NOW)

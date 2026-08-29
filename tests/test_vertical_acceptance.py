@@ -156,15 +156,16 @@ def test_missing_decision_time_remains_unknown_and_blocks_acceptance():
     )
     assert result.verdict == "FAIL"
     assert result.mean_decision_time_ms is None
-    assert any("decision time is unmeasured" in reason for reason in result.reasons)
+    assert any("decision time" in reason for reason in result.reasons)
 
 
-def test_partial_timing_uses_only_measured_runs_without_inventing_missing_values():
+def test_partial_timing_coverage_cannot_hide_an_unmeasured_run():
     result = assess_vertical_runs(
         "PRJ-HYD-01",
         "hydro-v1",
         [_run("r1", time_ms=1000), _run("r2", time_ms=None)],
         _policy(),
     )
-    assert result.verdict == "PASS"
+    assert result.verdict == "FAIL"
     assert result.mean_decision_time_ms == 1000
+    assert any("coverage is incomplete" in reason for reason in result.reasons)

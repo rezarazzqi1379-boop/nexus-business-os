@@ -120,6 +120,37 @@ class AutonomyStore:
         if changed != 1:
             raise PermissionError("lease_owner_mismatch")
 
+    def defer(self, work_id: str, worker_id: str, reason: str, *, delay_seconds: int = 60, now: datetime | None = None) -> str:
+        """Release a lease for a non-failure wait without consuming execution retry budget."""
+        if delay_seconds <= 0:
+            raise ValueError("invalid_defer_delay")
+        current = now or utc_now()
+        not_before = (current + timedelta(seconds=delay_seconds)).isoformat()
+        db = self._connect()
+        try:
+            db.execute("BEGIN IMMEDIATE")
+            row = db.execute(
+                "SELECT attempts FROM work_items WHERE work_id=? AND lease_owner=? AND status='leased'",
+                (work_id, worker_id),
+            ).fetchone()
+            if row is None:
+                raise PermissionError("lease_owner_mismatch")
+            restored_attempts = max(0, row["attempts"] - 1)
+            changed = db.execute(
+                "UPDATE work_items SET status='queued', attempts=?, not_before=?, lease_owner=NULL, "
+                "lease_until=NULL, last_error=? WHERE work_id=? AND status='leased' AND lease_owner=?",
+                (restored_attempts, not_before, f"deferred:{reason}"[:500], work_id, worker_id),
+            ).rowcount
+            if changed != 1:
+                raise PermissionError("lease_owner_mismatch")
+            db.execute("COMMIT")
+            return "queued"
+        except Exception:
+            db.execute("ROLLBACK")
+            raise
+        finally:
+            db.close()
+
     def fail(self, work_id: str, worker_id: str, error: str, *, now: datetime | None = None) -> str:
         current = now or utc_now()
         db = self._connect()
@@ -185,4 +216,3 @@ class AutonomyStore:
                 (capability, failures, state, (now or utc_now()).isoformat() if state == "open" else None),
             )
         return state
-

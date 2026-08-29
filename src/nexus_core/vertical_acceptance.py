@@ -33,7 +33,7 @@ class VerticalRunObservation:
     unknowns_blocked: int
     duplicate_attempts: int
     duplicates_prevented: int
-    decision_time_ms: int
+    decision_time_ms: int | None
     policy_violations: int = 0
     cross_project_leaks: int = 0
     external_effects: int = 0
@@ -47,7 +47,6 @@ class VerticalRunObservation:
             "unknowns_blocked",
             "duplicate_attempts",
             "duplicates_prevented",
-            "decision_time_ms",
             "policy_violations",
             "cross_project_leaks",
             "external_effects",
@@ -56,6 +55,12 @@ class VerticalRunObservation:
             value = getattr(self, field)
             if not isinstance(value, int) or isinstance(value, bool) or value < 0:
                 errors.append(f"{field} must be a non-negative integer")
+        if self.decision_time_ms is not None and (
+            not isinstance(self.decision_time_ms, int)
+            or isinstance(self.decision_time_ms, bool)
+            or self.decision_time_ms < 0
+        ):
+            errors.append("decision_time_ms must be a non-negative integer or None")
         if isinstance(self.decisions, int) and not isinstance(self.decisions, bool) and self.decisions <= 0:
             errors.append("decisions must be greater than zero")
         if isinstance(self.human_corrections, int) and isinstance(self.decisions, int) and self.human_corrections > self.decisions:
@@ -99,7 +104,7 @@ class VerticalAcceptanceResult:
     correction_rate: float
     unknown_block_rate: float | None
     duplicate_prevention_rate: float | None
-    mean_decision_time_ms: float
+    mean_decision_time_ms: float | None
     reasons: tuple[str, ...]
 
 
@@ -112,17 +117,17 @@ def assess_vertical_runs(
     """Measure a real vertical without granting production or external-action authority.
 
     Invalid, duplicate, cross-project, mismatched, policy-violating or externally
-    effectful observations never contribute to quality metrics. This prevents a bad
-    run from improving its own score while still making the overall verdict fail closed.
+    effectful observations never contribute to quality metrics. Missing measurements
+    remain explicitly unknown and cannot satisfy a positive acceptance threshold.
     Passing only permits the next governed adoption gate.
     """
     policy_errors = policy.validate()
     if policy_errors:
-        return VerticalAcceptanceResult("INVALID", 0, 1.0, None, None, 0.0, policy_errors)
+        return VerticalAcceptanceResult("INVALID", 0, 1.0, None, None, None, policy_errors)
     if not project_id.strip() or not candidate_id.strip():
-        return VerticalAcceptanceResult("INVALID", 0, 1.0, None, None, 0.0, ("project_id and candidate_id required",))
+        return VerticalAcceptanceResult("INVALID", 0, 1.0, None, None, None, ("project_id and candidate_id required",))
     if not runs:
-        return VerticalAcceptanceResult("INVALID", 0, 1.0, None, None, 0.0, ("at least one run required",))
+        return VerticalAcceptanceResult("INVALID", 0, 1.0, None, None, None, ("at least one run required",))
 
     reasons: list[str] = []
     seen_run_ids: set[str] = set()
@@ -161,23 +166,29 @@ def assess_vertical_runs(
     total_unknowns_blocked = sum(run.unknowns_blocked for run in valid_runs)
     total_duplicates = sum(run.duplicate_attempts for run in valid_runs)
     total_duplicates_prevented = sum(run.duplicates_prevented for run in valid_runs)
-    total_decision_time = sum(run.decision_time_ms for run in valid_runs)
+    measured_times = [run.decision_time_ms for run in valid_runs if run.decision_time_ms is not None]
 
     valid_run_count = len(valid_runs)
     correction_rate = total_corrections / total_decisions if total_decisions else 1.0
     unknown_block_rate = total_unknowns_blocked / total_unknowns if total_unknowns else None
     duplicate_prevention_rate = total_duplicates_prevented / total_duplicates if total_duplicates else None
-    mean_decision_time_ms = total_decision_time / valid_run_count if valid_run_count else 0.0
+    mean_decision_time_ms = sum(measured_times) / len(measured_times) if measured_times else None
 
     if valid_run_count < policy.min_runs:
         reasons.append(f"requires at least {policy.min_runs} valid runs")
     if correction_rate > policy.max_correction_rate:
         reasons.append("human correction rate exceeds policy")
-    if unknown_block_rate is not None and unknown_block_rate < policy.min_unknown_block_rate:
+    if policy.min_unknown_block_rate > 0 and unknown_block_rate is None:
+        reasons.append("unknown blocking is unmeasured")
+    elif unknown_block_rate is not None and unknown_block_rate < policy.min_unknown_block_rate:
         reasons.append("unknown block rate below policy")
-    if duplicate_prevention_rate is not None and duplicate_prevention_rate < policy.min_duplicate_prevention_rate:
+    if policy.min_duplicate_prevention_rate > 0 and duplicate_prevention_rate is None:
+        reasons.append("duplicate prevention is unmeasured")
+    elif duplicate_prevention_rate is not None and duplicate_prevention_rate < policy.min_duplicate_prevention_rate:
         reasons.append("duplicate prevention rate below policy")
-    if valid_run_count and mean_decision_time_ms > policy.max_mean_decision_time_ms:
+    if mean_decision_time_ms is None:
+        reasons.append("decision time is unmeasured")
+    elif mean_decision_time_ms > policy.max_mean_decision_time_ms:
         reasons.append("mean decision time exceeds policy")
 
     verdict = "PASS" if not reasons else "FAIL"

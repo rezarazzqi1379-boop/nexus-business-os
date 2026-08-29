@@ -186,7 +186,9 @@ def assess_vertical_runs(
         reasons.append("duplicate prevention is unmeasured")
     elif duplicate_prevention_rate is not None and duplicate_prevention_rate < policy.min_duplicate_prevention_rate:
         reasons.append("duplicate prevention rate below policy")
-    if mean_decision_time_ms is None:
+    if valid_run_count and len(measured_times) != valid_run_count:
+        reasons.append("decision time coverage is incomplete")
+    elif mean_decision_time_ms is None:
         reasons.append("decision time is unmeasured")
     elif mean_decision_time_ms > policy.max_mean_decision_time_ms:
         reasons.append("mean decision time exceeds policy")

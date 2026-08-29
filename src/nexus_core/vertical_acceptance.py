@@ -28,7 +28,7 @@ class TraceEnvelope:
 class VerticalRunObservation:
     trace: TraceEnvelope
     decisions: int
-    human_corrections: int
+    human_corrections: int | None
     unknowns_presented: int
     unknowns_blocked: int
     duplicate_attempts: int
@@ -42,7 +42,6 @@ class VerticalRunObservation:
         errors = list(self.trace.validate())
         count_fields = (
             "decisions",
-            "human_corrections",
             "unknowns_presented",
             "unknowns_blocked",
             "duplicate_attempts",
@@ -55,6 +54,12 @@ class VerticalRunObservation:
             value = getattr(self, field)
             if not isinstance(value, int) or isinstance(value, bool) or value < 0:
                 errors.append(f"{field} must be a non-negative integer")
+        if self.human_corrections is not None and (
+            not isinstance(self.human_corrections, int)
+            or isinstance(self.human_corrections, bool)
+            or self.human_corrections < 0
+        ):
+            errors.append("human_corrections must be a non-negative integer or None")
         if self.decision_time_ms is not None and (
             not isinstance(self.decision_time_ms, int)
             or isinstance(self.decision_time_ms, bool)
@@ -63,7 +68,12 @@ class VerticalRunObservation:
             errors.append("decision_time_ms must be a non-negative integer or None")
         if isinstance(self.decisions, int) and not isinstance(self.decisions, bool) and self.decisions <= 0:
             errors.append("decisions must be greater than zero")
-        if isinstance(self.human_corrections, int) and isinstance(self.decisions, int) and self.human_corrections > self.decisions:
+        if (
+            isinstance(self.human_corrections, int)
+            and not isinstance(self.human_corrections, bool)
+            and isinstance(self.decisions, int)
+            and self.human_corrections > self.decisions
+        ):
             errors.append("human_corrections cannot exceed decisions")
         if isinstance(self.unknowns_blocked, int) and isinstance(self.unknowns_presented, int) and self.unknowns_blocked > self.unknowns_presented:
             errors.append("unknowns_blocked cannot exceed unknowns_presented")
@@ -101,7 +111,7 @@ class VerticalAcceptancePolicy:
 class VerticalAcceptanceResult:
     verdict: str
     run_count: int
-    correction_rate: float
+    correction_rate: float | None
     unknown_block_rate: float | None
     duplicate_prevention_rate: float | None
     mean_decision_time_ms: float | None
@@ -123,11 +133,11 @@ def assess_vertical_runs(
     """
     policy_errors = policy.validate()
     if policy_errors:
-        return VerticalAcceptanceResult("INVALID", 0, 1.0, None, None, None, policy_errors)
+        return VerticalAcceptanceResult("INVALID", 0, None, None, None, None, policy_errors)
     if not project_id.strip() or not candidate_id.strip():
-        return VerticalAcceptanceResult("INVALID", 0, 1.0, None, None, None, ("project_id and candidate_id required",))
+        return VerticalAcceptanceResult("INVALID", 0, None, None, None, None, ("project_id and candidate_id required",))
     if not runs:
-        return VerticalAcceptanceResult("INVALID", 0, 1.0, None, None, None, ("at least one run required",))
+        return VerticalAcceptanceResult("INVALID", 0, None, None, None, None, ("at least one run required",))
 
     reasons: list[str] = []
     seen_run_ids: set[str] = set()
@@ -161,7 +171,9 @@ def assess_vertical_runs(
         valid_runs.append(run)
 
     total_decisions = sum(run.decisions for run in valid_runs)
-    total_corrections = sum(run.human_corrections for run in valid_runs)
+    measured_correction_runs = [run for run in valid_runs if run.human_corrections is not None]
+    total_corrections = sum(run.human_corrections or 0 for run in measured_correction_runs)
+    total_correction_decisions = sum(run.decisions for run in measured_correction_runs)
     total_unknowns = sum(run.unknowns_presented for run in valid_runs)
     total_unknowns_blocked = sum(run.unknowns_blocked for run in valid_runs)
     total_duplicates = sum(run.duplicate_attempts for run in valid_runs)
@@ -169,14 +181,18 @@ def assess_vertical_runs(
     measured_times = [run.decision_time_ms for run in valid_runs if run.decision_time_ms is not None]
 
     valid_run_count = len(valid_runs)
-    correction_rate = total_corrections / total_decisions if total_decisions else 1.0
+    correction_rate = total_corrections / total_correction_decisions if total_correction_decisions else None
     unknown_block_rate = total_unknowns_blocked / total_unknowns if total_unknowns else None
     duplicate_prevention_rate = total_duplicates_prevented / total_duplicates if total_duplicates else None
     mean_decision_time_ms = sum(measured_times) / len(measured_times) if measured_times else None
 
     if valid_run_count < policy.min_runs:
         reasons.append(f"requires at least {policy.min_runs} valid runs")
-    if correction_rate > policy.max_correction_rate:
+    if valid_run_count and len(measured_correction_runs) != valid_run_count:
+        reasons.append("human correction coverage is incomplete")
+    elif correction_rate is None:
+        reasons.append("human correction rate is unmeasured")
+    elif correction_rate > policy.max_correction_rate:
         reasons.append("human correction rate exceeds policy")
     if policy.min_unknown_block_rate > 0 and unknown_block_rate is None:
         reasons.append("unknown blocking is unmeasured")

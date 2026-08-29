@@ -1,4 +1,10 @@
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
+import sys
+
+# The durable AutonomyStore currently lives at the repository root rather than under src/.
+# CI sets PYTHONPATH=src, so make the repository root explicit for this integration fixture.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from autonomy import AutonomyStore, WorkItem
 from nexus_core.access_authority_registry import AccessState, ConnectorAccess

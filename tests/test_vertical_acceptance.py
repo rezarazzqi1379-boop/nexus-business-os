@@ -16,7 +16,7 @@ def _policy() -> VerticalAcceptancePolicy:
     )
 
 
-def _run(run_id: str, *, corrections: int = 0, unknowns: int = 1, blocked: int = 1, duplicates: int = 1, prevented: int = 1, time_ms: int = 900, project_id: str = "PRJ-HYD-01", candidate_id: str = "hydro-v1", external_effects: int = 0, leaks: int = 0, violations: int = 0, sensitive: bool = False, decisions: int = 10) -> VerticalRunObservation:
+def _run(run_id: str, *, corrections: int = 0, unknowns: int = 1, blocked: int = 1, duplicates: int = 1, prevented: int = 1, time_ms: int | None = 900, project_id: str = "PRJ-HYD-01", candidate_id: str = "hydro-v1", external_effects: int = 0, leaks: int = 0, violations: int = 0, sensitive: bool = False, decisions: int = 10) -> VerticalRunObservation:
     return VerticalRunObservation(
         trace=TraceEnvelope(
             workflow_name="hydrotester-qualification",
@@ -123,12 +123,48 @@ def test_invalid_run_cannot_inflate_denominator_or_reduce_correction_rate():
     assert any("decisions must be greater than zero" in reason for reason in result.reasons)
 
 
-def test_zero_duplicate_attempts_do_not_invent_a_prevention_score():
+def test_zero_duplicate_attempts_are_unmeasured_not_a_pass():
     result = assess_vertical_runs(
         "PRJ-HYD-01",
         "hydro-v1",
         [_run("r1", duplicates=0, prevented=0), _run("r2", duplicates=0, prevented=0)],
         _policy(),
     )
-    assert result.verdict == "PASS"
+    assert result.verdict == "FAIL"
     assert result.duplicate_prevention_rate is None
+    assert any("duplicate prevention is unmeasured" in reason for reason in result.reasons)
+
+
+def test_zero_unknowns_are_unmeasured_not_a_pass():
+    result = assess_vertical_runs(
+        "PRJ-HYD-01",
+        "hydro-v1",
+        [_run("r1", unknowns=0, blocked=0), _run("r2", unknowns=0, blocked=0)],
+        _policy(),
+    )
+    assert result.verdict == "FAIL"
+    assert result.unknown_block_rate is None
+    assert any("unknown blocking is unmeasured" in reason for reason in result.reasons)
+
+
+def test_missing_decision_time_remains_unknown_and_blocks_acceptance():
+    result = assess_vertical_runs(
+        "PRJ-HYD-01",
+        "hydro-v1",
+        [_run("r1", time_ms=None), _run("r2", time_ms=None)],
+        _policy(),
+    )
+    assert result.verdict == "FAIL"
+    assert result.mean_decision_time_ms is None
+    assert any("decision time is unmeasured" in reason for reason in result.reasons)
+
+
+def test_partial_timing_uses_only_measured_runs_without_inventing_missing_values():
+    result = assess_vertical_runs(
+        "PRJ-HYD-01",
+        "hydro-v1",
+        [_run("r1", time_ms=1000), _run("r2", time_ms=None)],
+        _policy(),
+    )
+    assert result.verdict == "PASS"
+    assert result.mean_decision_time_ms == 1000

@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1",
+  "observed_at": "2026-08-28",
+  "entries": [
+    {
+      "catalog_id": "AGT-OMNIROUTE",
+      "name": "OmniRoute",
+      "kind": "MODEL_ROUTER",
+      "source_url": "https://github.com/diegosouzapw/OmniRoute",
+      "source_ref": "release/v3.8.50",
+      "lifecycle": "EXPERIMENT",
+      "problem_tags": ["model-router", "provider-aggregation", "fallback", "quota-routing", "coding-agent-gateway", "mcp", "a2a"],
+      "capabilities": ["openai-compatible-gateway", "multi-provider-routing", "quota-aware-routing", "provider-health", "mcp", "a2a", "self-hosting"],
+      "revisit_triggers": ["provider-fragmentation-cost", "coding-arena-needs-common-gateway", "free-tier-routing-policy-ready", "provider-compliance-allowlist-ready", "omniroute-major-release"],
+      "acceptance_test": "Pin an exact release and run at least three synthetic/sanitized frozen tasks through a self-hosted instance with an explicit NEXUS provider allowlist; require zero policy/security/cross-project regressions, actual-provider traceability, tested rollback and measured improvement in correction burden, duration or cost.",
+      "rollback": "Remove OmniRoute adapter/config and route directly through the existing NEXUS Resource Router / Provider Economy path.",
+      "notes": "Keep as gateway adapter only. Upstream provider/model/free-tier counts are claims and change over time. Upstream ToS flags are advisory, not global routing gates. Built-in guardrails are documented fail-open. Never treat provider fallback or free availability as business/compliance authority."
+    }
+  ]
+}

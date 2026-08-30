@@ -1,0 +1,59 @@
+{
+  "base_url": "https://nexus-business-os-production.up.railway.app",
+  "checks": [
+    {
+      "body_sha256": "dd21082e65d47d65b612c9d32f7e1f49cebbc2f8111e9394e05c2c18e8c0a0fb",
+      "expected_status": 200,
+      "missing_security_headers": [],
+      "name": "health",
+      "observed_status": 200,
+      "passed": true,
+      "path": "/health",
+      "semantic_ok": true
+    },
+    {
+      "body_sha256": "31bf75f4c0a97cc1f7b60df824fa390b3be9ba014f29b63c87c698ba63d9a9fd",
+      "expected_status": 200,
+      "missing_security_headers": [],
+      "name": "ready",
+      "observed_status": 200,
+      "passed": true,
+      "path": "/ready",
+      "semantic_ok": true
+    },
+    {
+      "body_sha256": "d950ae9d64a721a5244ad0d822548cdc07c645dd8091d125c3d760dc2fbbf1ce",
+      "expected_status": 200,
+      "missing_security_headers": [],
+      "name": "login",
+      "observed_status": 200,
+      "passed": true,
+      "path": "/login",
+      "semantic_ok": true
+    },
+    {
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected_status": 303,
+      "missing_security_headers": [],
+      "name": "console_redirect",
+      "observed_status": 303,
+      "passed": true,
+      "path": "/console",
+      "semantic_ok": true
+    },
+    {
+      "body_sha256": "61ca0baff7a777623de14c4f51695396b50d8ea37a9b3383bf1a01627f35d407",
+      "expected_status": 401,
+      "missing_security_headers": [],
+      "name": "api_guard",
+      "observed_status": 401,
+      "passed": true,
+      "path": "/v1/system/diagnostics",
+      "semantic_ok": true
+    }
+  ],
+  "credential_mode": "public-boundary-only",
+  "observed_at": "2026-08-30T22:30:10.986509+00:00",
+  "passed": true,
+  "schema_version": "nexus.production-proof.v1"
+}

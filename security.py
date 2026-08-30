@@ -15,6 +15,7 @@ PUBLIC_PATHS = frozenset({"/health", "/ready", "/login", "/auth/login", "/assets
 MAX_REQUEST_BYTES = 1_048_576
 SESSION_COOKIE = "nexus_session"
 DEFAULT_SESSION_TTL_SECONDS = 28_800
+MIN_OWNER_PASSWORD_LENGTH = 16
 
 
 def auth_required() -> bool:
@@ -25,8 +26,41 @@ def configured_token() -> str:
     return os.getenv("NEXUS_ACCESS_TOKEN", "")
 
 
+def configured_owner_password() -> str:
+    return os.getenv("NEXUS_OWNER_PASSWORD", "")
+
+
+def configured_session_secret() -> str:
+    return os.getenv("NEXUS_SESSION_SECRET", "")
+
+
+def legacy_owner_login() -> bool:
+    return not bool(configured_owner_password())
+
+
 def auth_config_valid() -> bool:
     return (not auth_required()) or len(configured_token()) >= 32
+
+
+def login_config_valid() -> bool:
+    owner_password = configured_owner_password()
+    session_secret = configured_session_secret()
+    owner_ok = not owner_password or len(owner_password) >= MIN_OWNER_PASSWORD_LENGTH
+    session_ok = not session_secret or len(session_secret) >= 32
+    return auth_config_valid() and owner_ok and session_ok
+
+
+def _owner_credential() -> str:
+    return configured_owner_password() or configured_token()
+
+
+def _session_key() -> str:
+    return configured_session_secret() or configured_token()
+
+
+def login_password_authorized(supplied: str) -> bool:
+    expected = _owner_credential()
+    return login_config_valid() and bool(expected) and hmac.compare_digest(supplied, expected)
 
 
 def session_ttl_seconds() -> int:
@@ -54,19 +88,23 @@ def _authorized(header: str) -> bool:
     return hmac.compare_digest(supplied, token)
 
 
+def _owner_fingerprint() -> str:
+    return hashlib.sha256(_owner_credential().encode("utf-8")).hexdigest()[:16]
+
+
 def issue_session(now: int | None = None) -> str:
-    token = configured_token()
-    if len(token) < 32:
-        raise ValueError("service_auth_misconfigured")
+    key = _session_key()
+    if not login_config_valid() or len(key) < 32:
+        raise ValueError("owner_login_misconfigured")
     expires = (int(time.time()) if now is None else int(now)) + session_ttl_seconds()
-    payload = f"nexus-session-v1:{expires}"
-    signature = hmac.new(token.encode("utf-8"), payload.encode("ascii"), hashlib.sha256).hexdigest()
+    payload = f"nexus-session-v2:{expires}:{_owner_fingerprint()}"
+    signature = hmac.new(key.encode("utf-8"), payload.encode("ascii"), hashlib.sha256).hexdigest()
     return f"{expires}.{signature}"
 
 
 def session_authorized(cookie: str, now: int | None = None) -> bool:
-    token = configured_token()
-    if not cookie or len(token) < 32:
+    key = _session_key()
+    if not cookie or not login_config_valid() or len(key) < 32:
         return False
     try:
         expiry_text, supplied_signature = cookie.split(".", 1)
@@ -76,8 +114,8 @@ def session_authorized(cookie: str, now: int | None = None) -> bool:
     current = int(time.time()) if now is None else int(now)
     if expires < current or expires > current + session_ttl_seconds() + 60:
         return False
-    payload = f"nexus-session-v1:{expires}"
-    expected = hmac.new(token.encode("utf-8"), payload.encode("ascii"), hashlib.sha256).hexdigest()
+    payload = f"nexus-session-v2:{expires}:{_owner_fingerprint()}"
+    expected = hmac.new(key.encode("utf-8"), payload.encode("ascii"), hashlib.sha256).hexdigest()
     return hmac.compare_digest(supplied_signature, expected)
 
 

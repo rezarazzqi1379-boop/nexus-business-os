@@ -17,7 +17,8 @@ from business_os import BusinessOSVault
 from state import EventRecord, EventStore
 from canonical_sources import CanonicalStore, hydrostatic_hold_points
 from security import (SESSION_COOKIE, SecurityMiddleware, auth_config_valid, auth_required,
-                      issue_session, legacy_owner_login, login_config_valid, login_password_authorized,\n                      session_authorized, session_ttl_seconds)
+                      issue_session, legacy_owner_login, login_config_valid, login_password_authorized,
+                      session_authorized, session_ttl_seconds)
 from intake import evaluate_event
 
 

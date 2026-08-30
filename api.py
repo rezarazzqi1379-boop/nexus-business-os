@@ -71,8 +71,8 @@ def root() -> RedirectResponse:
     return RedirectResponse("/console", status_code=303)
 
 
-@app.get("/login", include_in_schema=False)
-def login_page(request: Request, next: str = "/console", error: str = "") -> HTMLResponse | RedirectResponse:
+@app.get("/login", include_in_schema=False, response_model=None)
+def login_page(request: Request, next: str = "/console", error: str = ""):
     if session_authorized(request.cookies.get(SESSION_COOKIE, "")):
         return RedirectResponse(_safe_next(next), status_code=303)
     template = (UI_ROOT / "login.html").read_text(encoding="utf-8")

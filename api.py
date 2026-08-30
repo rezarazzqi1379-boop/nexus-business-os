@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import hmac
 import os
 import sqlite3
+import time
 import uuid
 from pathlib import Path
+from urllib.parse import parse_qs
 
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from contracts import EventEnvelope
@@ -14,7 +17,8 @@ from console_contract import APP_VERSION, build_console_bootstrap
 from business_os import BusinessOSVault
 from state import EventRecord, EventStore
 from canonical_sources import CanonicalStore, hydrostatic_hold_points
-from security import SecurityMiddleware, auth_config_valid, auth_required
+from security import (SESSION_COOKIE, SecurityMiddleware, auth_config_valid, auth_required,
+                      configured_token, issue_session, session_authorized, session_ttl_seconds)
 from intake import evaluate_event
 
 
@@ -27,6 +31,10 @@ UI_ROOT = ROOT / "ui"
 app = FastAPI(title="NEXUS Autopilot", version=APP_VERSION)
 app.add_middleware(SecurityMiddleware)
 app.mount("/assets", StaticFiles(directory=UI_ROOT), name="assets")
+
+LOGIN_WINDOW_SECONDS = 300
+LOGIN_MAX_ATTEMPTS = 5
+_LOGIN_ATTEMPTS: dict[str, list[float]] = {}
 
 
 def _startup_checks() -> dict[str, bool]:
@@ -45,7 +53,61 @@ def _startup_checks() -> dict[str, bool]:
     return checks
 
 
+def _safe_next(value: str) -> str:
+    return value if value.startswith("/") and not value.startswith("//") else "/console"
+
+
+def _login_allowed(client_key: str, now: float) -> bool:
+    recent = [stamp for stamp in _LOGIN_ATTEMPTS.get(client_key, []) if now - stamp < LOGIN_WINDOW_SECONDS]
+    _LOGIN_ATTEMPTS[client_key] = recent
+    return len(recent) < LOGIN_MAX_ATTEMPTS
+
+
 READINESS_CHECKS = _startup_checks()
+
+
+@app.get("/", include_in_schema=False)
+def root() -> RedirectResponse:
+    return RedirectResponse("/console", status_code=303)
+
+
+@app.get("/login", include_in_schema=False, response_model=None)
+def login_page(request: Request, next: str = "/console", error: str = ""):
+    if session_authorized(request.cookies.get(SESSION_COOKIE, "")):
+        return RedirectResponse(_safe_next(next), status_code=303)
+    template = (UI_ROOT / "login.html").read_text(encoding="utf-8")
+    error_html = '<p class="error" role="alert">نام کاربری یا رمز دسترسی صحیح نیست.</p>' if error else ""
+    page = template.replace("{{ERROR}}", error_html).replace("{{NEXT}}", _safe_next(next))
+    return HTMLResponse(page)
+
+
+@app.post("/auth/login", include_in_schema=False)
+async def login(request: Request) -> RedirectResponse:
+    client_key = request.client.host if request.client else "unknown"
+    now = time.monotonic()
+    if not _login_allowed(client_key, now):
+        response = RedirectResponse("/login?error=rate_limited", status_code=303)
+        response.headers["Retry-After"] = str(LOGIN_WINDOW_SECONDS)
+        return response
+    body = (await request.body()).decode("utf-8", errors="replace")
+    fields = parse_qs(body, keep_blank_values=True)
+    password = fields.get("password", [""])[0]
+    next_path = _safe_next(fields.get("next", ["/console"])[0])
+    if not auth_config_valid() or not hmac.compare_digest(password, configured_token()):
+        _LOGIN_ATTEMPTS.setdefault(client_key, []).append(now)
+        return RedirectResponse(f"/login?error=invalid&next={next_path}", status_code=303)
+    _LOGIN_ATTEMPTS.pop(client_key, None)
+    response = RedirectResponse(next_path, status_code=303)
+    response.set_cookie(SESSION_COOKIE, issue_session(), max_age=session_ttl_seconds(), httponly=True,
+                        secure=True, samesite="strict", path="/")
+    return response
+
+
+@app.post("/auth/logout", include_in_schema=False)
+def logout() -> RedirectResponse:
+    response = RedirectResponse("/login", status_code=303)
+    response.delete_cookie(SESSION_COOKIE, path="/", secure=True, httponly=True, samesite="strict")
+    return response
 
 
 @app.get("/health")
@@ -73,7 +135,6 @@ def console() -> FileResponse:
 
 @app.get("/v1/console/bootstrap")
 def console_bootstrap() -> dict:
-    """Read-only pilot data. No connector write or approval decision is performed here."""
     payload = build_console_bootstrap()
     payload["vault"] = VAULT.status()
     return payload

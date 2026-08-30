@@ -1,15 +1,20 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import hmac
 import os
+import time
+from urllib.parse import quote
 
 from fastapi import Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-PUBLIC_PATHS = frozenset({"/health", "/ready"})
+PUBLIC_PATHS = frozenset({"/health", "/ready", "/login", "/auth/login", "/assets/login.css"})
 MAX_REQUEST_BYTES = 1_048_576
+SESSION_COOKIE = "nexus_session"
+DEFAULT_SESSION_TTL_SECONDS = 28_800
 
 
 def auth_required() -> bool:
@@ -22,6 +27,14 @@ def configured_token() -> str:
 
 def auth_config_valid() -> bool:
     return (not auth_required()) or len(configured_token()) >= 32
+
+
+def session_ttl_seconds() -> int:
+    raw = os.getenv("NEXUS_SESSION_TTL_SECONDS", str(DEFAULT_SESSION_TTL_SECONDS))
+    try:
+        return max(300, min(int(raw), 86_400))
+    except ValueError:
+        return DEFAULT_SESSION_TTL_SECONDS
 
 
 def _authorized(header: str) -> bool:
@@ -41,6 +54,33 @@ def _authorized(header: str) -> bool:
     return hmac.compare_digest(supplied, token)
 
 
+def issue_session(now: int | None = None) -> str:
+    token = configured_token()
+    if len(token) < 32:
+        raise ValueError("service_auth_misconfigured")
+    expires = (int(time.time()) if now is None else int(now)) + session_ttl_seconds()
+    payload = f"nexus-session-v1:{expires}"
+    signature = hmac.new(token.encode("utf-8"), payload.encode("ascii"), hashlib.sha256).hexdigest()
+    return f"{expires}.{signature}"
+
+
+def session_authorized(cookie: str, now: int | None = None) -> bool:
+    token = configured_token()
+    if not cookie or len(token) < 32:
+        return False
+    try:
+        expiry_text, supplied_signature = cookie.split(".", 1)
+        expires = int(expiry_text)
+    except (TypeError, ValueError):
+        return False
+    current = int(time.time()) if now is None else int(now)
+    if expires < current or expires > current + session_ttl_seconds() + 60:
+        return False
+    payload = f"nexus-session-v1:{expires}"
+    expected = hmac.new(token.encode("utf-8"), payload.encode("ascii"), hashlib.sha256).hexdigest()
+    return hmac.compare_digest(supplied_signature, expected)
+
+
 class SecurityMiddleware(BaseHTTPMiddleware):
     @staticmethod
     def _secure(response):
@@ -48,7 +88,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "no-referrer"
         response.headers["Cache-Control"] = "no-store"
-        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; frame-ancestors 'none'"
+        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; frame-ancestors 'none'; form-action 'self'; base-uri 'none'"
         return response
 
     async def dispatch(self, request: Request, call_next):
@@ -63,9 +103,15 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             if size < 0 or size > MAX_REQUEST_BYTES:
                 return self._secure(JSONResponse({"detail": "request_too_large"}, status_code=413))
         if auth_required() and request.url.path not in PUBLIC_PATHS:
+            header_ok = _authorized(request.headers.get("authorization", ""))
+            cookie_ok = session_authorized(request.cookies.get(SESSION_COOKIE, ""))
             if not auth_config_valid():
                 return self._secure(JSONResponse({"detail": "service_auth_misconfigured"}, status_code=503))
-            if not _authorized(request.headers.get("authorization", "")):
+            if not (header_ok or cookie_ok):
+                accepts_html = "text/html" in request.headers.get("accept", "")
+                if request.method == "GET" and accepts_html:
+                    next_path = quote(request.url.path, safe="/")
+                    return self._secure(RedirectResponse(f"/login?next={next_path}", status_code=303))
                 return self._secure(JSONResponse({"detail": "authentication_required"}, status_code=401,
                                                  headers={"WWW-Authenticate": 'Basic realm="NEXUS"'}))
         response = await call_next(request)

@@ -1,3 +1,11 @@
+..........                                                               [100%]
+=============================== warnings summary ===============================
+../../../../root/.cache/uv/archive-v0/I_v3cUotZrj1AWYo/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /root/.cache/uv/archive-v0/I_v3cUotZrj1AWYo/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+10 passed, 1 warning in 0.22s
 from __future__ import annotations
 
 import base64
@@ -109,7 +117,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
                 return self._secure(JSONResponse({"detail": "service_auth_misconfigured"}, status_code=503))
             if not (header_ok or cookie_ok):
                 accepts_html = "text/html" in request.headers.get("accept", "")
-                if request.method == "GET" and (request.url.path == "/console" or accepts_html):
+                if request.method == "GET" and accepts_html:
                     next_path = quote(request.url.path, safe="/")
                     return self._secure(RedirectResponse(f"/login?next={next_path}", status_code=303))
                 return self._secure(JSONResponse({"detail": "authentication_required"}, status_code=401,

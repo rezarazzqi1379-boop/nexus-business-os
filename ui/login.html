@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>ورود به NEXUS</title>
+  <link rel="stylesheet" href="/assets/login.css">
+</head>
+<body>
+  <main class="login-card">
+    <div class="mark">N</div>
+    <p class="eyebrow">NEXUS BUSINESS OS</p>
+    <h1>ورود امن</h1>
+    <p class="hint">رمز، همان مقدار <code>NEXUS_ACCESS_TOKEN</code> در Railway است. نام کاربری صرفاً برای تشخیص شماست.</p>
+    {{ERROR}}
+    <form method="post" action="/auth/login" autocomplete="on">
+      <input type="hidden" name="next" value="{{NEXT}}">
+      <label>نام کاربری<input name="username" autocomplete="username" required></label>
+      <label>رمز دسترسی<input name="password" type="password" autocomplete="current-password" required minlength="32"></label>
+      <button type="submit">ورود به کنسول</button>
+    </form>
+    <small>نشست حداکثر ۸ ساعت معتبر است و با تغییر توکن فوراً باطل می‌شود.</small>
+  </main>
+</body>
+</html>

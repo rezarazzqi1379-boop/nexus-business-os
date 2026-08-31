@@ -1,0 +1,51 @@
+{
+  "schema_version": "0.1",
+  "status": "shadow_fixture_not_live_state",
+  "note": "This file records replay/test inputs derived from current NEXUS project evidence. It is not live CRM or engineering authority.",
+  "projects": [
+    {
+      "project_id": "hydrotester",
+      "domain": "engineering",
+      "state": "active",
+      "coordination_action": "authority_first",
+      "evidence": [
+        "KARAT/Yaxing brochure supports a supplier-side nominal geometry/pressure candidate",
+        "buyer-authoritative hydrotester geometry/pressure/throughput fields remain the controlling gate"
+      ],
+      "target_metrics": ["late_blocker_rate", "unsupported_claim_rate", "time_to_decision"]
+    },
+    {
+      "project_id": "kcl",
+      "domain": "procurement",
+      "state": "active",
+      "coordination_action": "execute_measure",
+      "evidence": [
+        "supplier/commercial route evidence exists",
+        "compliance and exact use/HS applicability must remain evidence-linked"
+      ],
+      "target_metrics": ["supplier_qualification_precision", "unsupported_claim_rate", "time_to_decision"]
+    },
+    {
+      "project_id": "can-forming",
+      "domain": "engineering",
+      "state": "waiting",
+      "coordination_action": "watch_no_duplicate_action",
+      "evidence": [
+        "Golden Eagle catalogue confirms relevant machinery families",
+        "commercial retrofit scope and quoted full-line scope must remain distinct"
+      ],
+      "target_metrics": ["duplicate_outreach_rate", "scope_rework_rate", "time_to_decision"]
+    },
+    {
+      "project_id": "designops",
+      "domain": "design",
+      "state": "active",
+      "coordination_action": "optimize",
+      "evidence": [
+        "domain-specific regression learning exists",
+        "human visual disagreement is captured as evaluation evidence"
+      ],
+      "target_metrics": ["human_correction_rate", "revision_count", "release_cycle_time"]
+    }
+  ]
+}

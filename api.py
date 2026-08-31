@@ -125,7 +125,8 @@ def ready() -> dict:
 @app.get("/v1/system/diagnostics")
 def diagnostics() -> dict:
     return {"status": "ready" if all(READINESS_CHECKS.values()) else "not_ready",
-            "checks": READINESS_CHECKS, "auth_required": auth_required(),\n            "legacy_owner_login": legacy_owner_login()}
+            "checks": READINESS_CHECKS, "auth_required": auth_required(),
+            "legacy_owner_login": legacy_owner_login()}
 
 
 @app.get("/console", include_in_schema=False)

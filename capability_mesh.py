@@ -118,7 +118,6 @@ class CapabilityMesh:
             if not eligible:
                 return RouteDecision(False, (), True, f"insufficient_state:{role}")
 
-            # Pick the least-privileged eligible adapter, then most recently checked.
             eligible.sort(key=lambda r: (int(r.state), r.checked_at), reverse=False)
             candidates.append(eligible[0])
 
@@ -133,57 +132,11 @@ def live_probe_snapshot() -> tuple[ProbeRecord, ...]:
     consequential use because connector state is dynamic.
     """
     return (
-        ProbeRecord(
-            provider="notion",
-            state=CapabilityState.READ_VERIFIED,
-            role="knowledge_ops",
-            checked_at="2026-09-02T00:00:00Z",
-            evidence_locator="connector:notion/self",
-        ),
-        ProbeRecord(
-            provider="hubspot",
-            state=CapabilityState.READ_VERIFIED,
-            role="crm",
-            checked_at="2026-09-02T00:00:00Z",
-            evidence_locator="connector:hubspot/get_user_details",
-            blocker="portal_onboarding_incomplete",
-        ),
-        ProbeRecord(
-            provider="posthog",
-            state=CapabilityState.READ_VERIFIED,
-            role="observability",
-            checked_at="2026-09-02T00:00:00Z",
-            evidence_locator="connector:posthog/dashboard/2055621",
-        ),
-        ProbeRecord(
-            provider="canva",
-            state=CapabilityState.READ_VERIFIED,
-            role="design",
-            checked_at="2026-09-02T00:00:00Z",
-            evidence_locator="connector:canva/search-designs",
-        ),
-        ProbeRecord(
-            provider="supabase",
-            state=CapabilityState.READ_VERIFIED,
-            role="structured_memory",
-            checked_at="2026-09-02T00:00:00Z",
-            evidence_locator="connector:supabase/list_projects",
-            blocker="project_inactive",
-        ),
-        ProbeRecord(
-            provider="apollo",
-            state=CapabilityState.AVAILABLE,
-            role="lead_discovery",
-            checked_at="2026-09-02T00:00:00Z",
-            evidence_locator="connector:apollo/contacts_search",
-            blocker="invalid_access_credentials",
-        ),
-        ProbeRecord(
-            provider="granola",
-            state=CapabilityState.AVAILABLE,
-            role="meeting_intelligence",
-            checked_at="2026-09-02T00:00:00Z",
-            evidence_locator="connector:granola/get_account_info",
-            blocker="account_not_created",
-        ),
+        ProbeRecord("notion", CapabilityState.READ_VERIFIED, "knowledge_ops", "2026-09-02T00:00:00Z", "connector:notion/self"),
+        ProbeRecord("hubspot", CapabilityState.READ_VERIFIED, "crm", "2026-09-02T00:00:00Z", "connector:hubspot/manage_onboarding", blocker=None),
+        ProbeRecord("posthog", CapabilityState.READ_VERIFIED, "observability", "2026-09-02T00:00:00Z", "connector:posthog/dashboard/2055621"),
+        ProbeRecord("canva", CapabilityState.READ_VERIFIED, "design", "2026-09-02T00:00:00Z", "connector:canva/search-designs"),
+        ProbeRecord("supabase", CapabilityState.READ_VERIFIED, "structured_memory", "2026-09-02T00:00:00Z", "connector:supabase/list_projects", blocker="project_inactive"),
+        ProbeRecord("apollo", CapabilityState.AVAILABLE, "lead_discovery", "2026-09-02T00:00:00Z", "connector:apollo/contacts_search", blocker="invalid_access_credentials"),
+        ProbeRecord("granola", CapabilityState.AVAILABLE, "meeting_intelligence", "2026-09-02T00:00:00Z", "connector:granola/get_account_info", blocker="account_not_created"),
     )

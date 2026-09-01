@@ -4,13 +4,13 @@ from external_access_broker import ExternalAccessBroker, Gate, ProviderManifest
 
 
 class ExternalAccessBrokerTests(unittest.TestCase):
-    def test_signup_stops_at_terms_gate(self):
+    def test_routine_free_signup_can_auto_plan(self):
         plan = ExternalAccessBroker().plan_signup("posthog")
-        self.assertFalse(plan.allowed_automatically)
-        self.assertEqual(plan.human_gates, (Gate.TERMS,))
+        self.assertTrue(plan.allowed_automatically)
+        self.assertEqual(plan.human_gates, ())
 
-    def test_oauth_connect_is_gated(self):
-        plan = ExternalAccessBroker().plan_connect("hubspot")
+    def test_oauth_connect_surfaces_provider_handoff(self):
+        plan = ExternalAccessBroker().plan_connect("n8n")
         self.assertIn(Gate.OAUTH_CONSENT, plan.human_gates)
         self.assertFalse(plan.allowed_automatically)
 
@@ -29,12 +29,7 @@ class ExternalAccessBrokerTests(unittest.TestCase):
 
     def test_all_reel_tools_are_represented(self):
         providers = set(ExternalAccessBroker().providers())
-        required = {
-            "1password", "bitwarden", "deepl", "libretranslate", "intercom", "chatwoot",
-            "loom", "obs", "mixpanel", "posthog", "typeform", "google_forms", "miro",
-            "excalidraw", "otter", "granola", "airtable", "baserow", "figma", "penpot",
-            "zapier", "n8n", "dropbox", "nextcloud", "notion", "obsidian", "calendly", "cal_diy",
-        }
+        required = {"1password", "bitwarden", "deepl", "libretranslate", "intercom", "chatwoot", "loom", "obs", "mixpanel", "posthog", "typeform", "google_forms", "miro", "excalidraw", "otter", "granola", "airtable", "baserow", "figma", "penpot", "zapier", "n8n", "dropbox", "nextcloud", "notion", "obsidian", "calendly", "cal_diy"}
         self.assertTrue(required.issubset(providers))
 
     def test_local_tools_do_not_invent_human_gates(self):
@@ -43,9 +38,18 @@ class ExternalAccessBrokerTests(unittest.TestCase):
         self.assertTrue(broker.plan_connect("excalidraw").allowed_automatically)
         self.assertTrue(broker.plan_connect("obsidian").allowed_automatically)
 
-    def test_google_forms_requires_oauth_consent(self):
-        plan = ExternalAccessBroker().plan_connect("google_forms")
-        self.assertIn(Gate.OAUTH_CONSENT, plan.human_gates)
+    def test_google_forms_requires_oauth_handoff(self):
+        self.assertIn(Gate.OAUTH_CONSENT, ExternalAccessBroker().plan_connect("google_forms").human_gates)
+
+    def test_payment_always_requires_explicit_approval(self):
+        plan = ExternalAccessBroker().plan_payment("posthog")
+        self.assertFalse(plan.allowed_automatically)
+        self.assertEqual(plan.human_gates, (Gate.PAYMENT,))
+
+    def test_material_commitment_always_requires_explicit_approval(self):
+        plan = ExternalAccessBroker().plan_material_commitment("chatwoot")
+        self.assertFalse(plan.allowed_automatically)
+        self.assertEqual(plan.human_gates, (Gate.MATERIAL_COMMITMENT,))
 
     def test_n8n_is_orchestration_not_authority(self):
         self.assertEqual(ExternalAccessBroker().manifest("n8n").nexus_role, "orchestration")

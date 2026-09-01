@@ -42,6 +42,12 @@ SKIPPED means the provider is comparison-only or lacks a measured role in the ac
 - Granola: BLOCKED because connector reports no account created.
 - No direct ChatGPT plugins were discovered for n8n, Bitwarden/Vaultwarden, Chatwoot, Nextcloud, Cal.diy, Penpot, LibreTranslate, Excalidraw, or Baserow in the latest plugin search.
 
+## Auth-loop diagnostic correction
+
+A production login symptom reported as repeated username/password prompts has a concrete code-level candidate cause: unauthenticated API responses advertised `WWW-Authenticate: Basic`, which can trigger the browser's native Basic-auth dialog even though the application already has its own cookie-backed login form. The feature branch now keeps proactive Basic/Bearer authentication support but disables the HTTP Basic challenge by default. It can be explicitly re-enabled with `NEXUS_BASIC_CHALLENGE=1` for legacy clients. The login UI was also simplified to request only the access token actually validated by the backend. Regression tests cover the default-off and explicit-opt-in challenge behavior.
+
+This is an IMPLEMENTED + CI-TESTED correction candidate, not production proof. The actual Railway login loop remains unclosed until the exact build is deployed to a controlled target and three clean-session E2E logins pass.
+
 ## Fresh provisioning notes
 
 Nextcloud current stable administration documentation supports machine user creation via `occ user:add`, including `--password-from-env`, and app-token creation with `user:auth-tokens:add`. Its Provisioning API can also create and manage users remotely. These facts make Nextcloud a strong candidate for non-interactive bootstrap once a deployment target exists.

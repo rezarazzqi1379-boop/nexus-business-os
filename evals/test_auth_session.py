@@ -12,12 +12,19 @@ class AuthUpgradeTests(unittest.TestCase):
         os.environ["NEXUS_SESSION_TTL_SECONDS"] = "3600"
 
     def tearDown(self):
-        for key in ("NEXUS_ACCESS_TOKEN", "NEXUS_AUTH_REQUIRED", "NEXUS_SESSION_TTL_SECONDS"):
+        for key in ("NEXUS_ACCESS_TOKEN", "NEXUS_AUTH_REQUIRED", "NEXUS_SESSION_TTL_SECONDS", "NEXUS_BASIC_CHALLENGE"):
             os.environ.pop(key, None)
 
     def test_basic_auth_uses_password_component(self):
         header = "Basic " + base64.b64encode(("reza:" + "a" * 64).encode()).decode()
         self.assertTrue(security._authorized(header))
+
+    def test_basic_challenge_disabled_by_default(self):
+        self.assertFalse(security.basic_challenge_enabled())
+
+    def test_basic_challenge_can_be_explicitly_enabled(self):
+        os.environ["NEXUS_BASIC_CHALLENGE"] = "1"
+        self.assertTrue(security.basic_challenge_enabled())
 
     def test_signed_session_round_trip(self):
         cookie = security.issue_session(now=1000)

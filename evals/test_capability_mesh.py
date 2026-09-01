@@ -18,6 +18,11 @@ class CapabilityMeshTests(unittest.TestCase):
         self.assertTrue(decision.allowed)
         self.assertEqual(decision.providers, ("posthog",))
 
+    def test_hubspot_routes_crm_read_after_onboarding_goal_setup(self):
+        decision = self.mesh.route(RouteRequest("PRJ-NXO-01", "read", ("crm",)))
+        self.assertTrue(decision.allowed)
+        self.assertEqual(decision.providers, ("hubspot",))
+
     def test_blocked_probe_is_not_routable(self):
         decision = self.mesh.route(RouteRequest("PRJ-NXO-01", "read", ("lead_discovery",)))
         self.assertFalse(decision.allowed)

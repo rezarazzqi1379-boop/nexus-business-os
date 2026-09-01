@@ -12,11 +12,10 @@
     <div class="mark">N</div>
     <p class="eyebrow">NEXUS BUSINESS OS</p>
     <h1>ورود امن</h1>
-    <p class="hint">رمز، همان مقدار <code>NEXUS_ACCESS_TOKEN</code> در Railway است. نام کاربری صرفاً برای تشخیص شماست.</p>
+    <p class="hint">رمز دسترسی همان مقدار <code>NEXUS_ACCESS_TOKEN</code> در محیط اجرا است.</p>
     {{ERROR}}
     <form method="post" action="/auth/login" autocomplete="on">
       <input type="hidden" name="next" value="{{NEXT}}">
-      <label>نام کاربری<input name="username" autocomplete="username" required></label>
       <label>رمز دسترسی<input name="password" type="password" autocomplete="current-password" required minlength="32"></label>
       <button type="submit">ورود به کنسول</button>
     </form>

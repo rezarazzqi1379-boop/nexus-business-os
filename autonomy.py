@@ -32,7 +32,13 @@ def utc_now() -> datetime:
 
 
 class AutonomyStore:
-    """Durable queue, approval inbox, budget ledger, and circuit breakers."""
+    """Durable work queue, budget ledger, and circuit breakers.
+
+    Approval authority deliberately lives in the canonical ApprovalStore. This
+    execution-state store must not create or interpret a second approval system.
+    Existing legacy SQLite files may still contain an unused approval_inbox table;
+    this code neither reads nor drops it.
+    """
 
     def __init__(self, path: Path) -> None:
         self.path = path
@@ -45,11 +51,6 @@ class AutonomyStore:
                     payload_json TEXT NOT NULL, priority INTEGER NOT NULL, status TEXT NOT NULL,
                     attempts INTEGER NOT NULL, max_attempts INTEGER NOT NULL,
                     not_before TEXT NOT NULL, lease_owner TEXT, lease_until TEXT, last_error TEXT
-                );
-                CREATE TABLE IF NOT EXISTS approval_inbox (
-                    approval_id TEXT PRIMARY KEY, work_id TEXT NOT NULL, action_digest TEXT NOT NULL,
-                    summary TEXT NOT NULL, status TEXT NOT NULL, created_at TEXT NOT NULL,
-                    decided_at TEXT, UNIQUE(work_id, action_digest)
                 );
                 CREATE TABLE IF NOT EXISTS usage_ledger (
                     usage_id TEXT PRIMARY KEY, project TEXT NOT NULL, cost_usd REAL NOT NULL,
@@ -120,6 +121,37 @@ class AutonomyStore:
         if changed != 1:
             raise PermissionError("lease_owner_mismatch")
 
+    def defer(self, work_id: str, worker_id: str, reason: str, *, delay_seconds: int = 60, now: datetime | None = None) -> str:
+        """Release a lease for a non-failure wait without consuming execution retry budget."""
+        if delay_seconds <= 0:
+            raise ValueError("invalid_defer_delay")
+        current = now or utc_now()
+        not_before = (current + timedelta(seconds=delay_seconds)).isoformat()
+        db = self._connect()
+        try:
+            db.execute("BEGIN IMMEDIATE")
+            row = db.execute(
+                "SELECT attempts FROM work_items WHERE work_id=? AND lease_owner=? AND status='leased'",
+                (work_id, worker_id),
+            ).fetchone()
+            if row is None:
+                raise PermissionError("lease_owner_mismatch")
+            restored_attempts = max(0, row["attempts"] - 1)
+            changed = db.execute(
+                "UPDATE work_items SET status='queued', attempts=?, not_before=?, lease_owner=NULL, "
+                "lease_until=NULL, last_error=? WHERE work_id=? AND status='leased' AND lease_owner=?",
+                (restored_attempts, not_before, f"deferred:{reason}"[:500], work_id, worker_id),
+            ).rowcount
+            if changed != 1:
+                raise PermissionError("lease_owner_mismatch")
+            db.execute("COMMIT")
+            return "queued"
+        except Exception:
+            db.execute("ROLLBACK")
+            raise
+        finally:
+            db.close()
+
     def fail(self, work_id: str, worker_id: str, error: str, *, now: datetime | None = None) -> str:
         current = now or utc_now()
         db = self._connect()
@@ -185,4 +217,3 @@ class AutonomyStore:
                 (capability, failures, state, (now or utc_now()).isoformat() if state == "open" else None),
             )
         return state
-

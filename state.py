@@ -41,7 +41,8 @@ class EventStore:
         with self._connect() as db:
             db.execute("BEGIN IMMEDIATE")
             row = db.execute(
-                "SELECT payload_sha256, status FROM events WHERE event_id=?", (event.event_id,)
+                "SELECT project, event_type, payload_sha256, status FROM events WHERE event_id=?",
+                (event.event_id,),
             ).fetchone()
             if row is None:
                 db.execute(
@@ -49,7 +50,11 @@ class EventStore:
                     (event.event_id, event.project, event.event_type, serialized, digest),
                 )
                 return "new"
-            existing_digest, status = row
+            existing_project, existing_event_type, existing_digest, status = row
+            if existing_project != event.project:
+                raise ValueError("event_id_project_mismatch")
+            if existing_event_type != event.event_type:
+                raise ValueError("event_id_type_mismatch")
             if existing_digest != digest:
                 raise ValueError("event_id_payload_mismatch")
             if status == "retryable_error":

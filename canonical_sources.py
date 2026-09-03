@@ -272,16 +272,41 @@ class CanonicalStore:
         return selected[0]
 
 
+_CAPABILITY_MATRIX_NEGATION = (
+    r"(?:no|not|cannot|can't|unable to|without|will not|won't|declin(?:e[sd]?|ing)|reject(?:ed|s)?)"
+    r"[^.\n]{0,60}capability matrix"
+    r"|capability matrix[^.\n]{0,60}(?:not available|unavailable|cannot be provided|will not be provided|"
+    r"is declined|not possible)"
+)
+
+_FAT_NEGATION = (
+    r"(?:no|not|cannot|can't|unable to|without|will not|won't|declin(?:e[sd]?|ing)|reject(?:ed|s)?)"
+    r"[^.\n]{0,60}(?:FAT/TPI/ITP|FAT|TPI|ITP)"
+    r"|(?:FAT/TPI/ITP|FAT|TPI|ITP)[^.\n]{0,60}(?:not available|unavailable|cannot be provided|"
+    r"will not be provided|is declined|not possible)"
+)
+
+# Each rule is (code, severity, buyer_pattern, required_action, contradiction_kind, contradiction_spec).
+# contradiction_kind "numeric" pairs a value-extraction regex with the buyer's expected value: a supplier
+# statement citing a *different* value for the same unit is an explicit, conservative contradiction signal.
+# contradiction_kind "keyword" pairs an explicit negation regex: only an explicit decline/unavailability
+# statement counts as a contradiction -- mere silence on the topic is never inferred as one.
+HYD_HOLD_POINT_RULES = (
+    ("HYD-PRESSURE", "critical", r"120\s*MPa", "Require a signed geometry-specific pressure capability envelope.",
+     "numeric", {"value_pattern": r"(\d+(?:\.\d+)?)\s*MPa", "expected_value": "120"}),
+    ("HYD-THROUGHPUT", "high", r"60\s*pipes/hour", "Bind throughput to FAT geometry, pressure and hold time.",
+     "numeric", {"value_pattern": r"(\d+(?:\.\d+)?)\s*pipes\s*/\s*hour", "expected_value": "60"}),
+    ("HYD-CAPABILITY-MATRIX", "high", r"capability matrix", "Obtain the signed pressure-versus-geometry matrix.",
+     "keyword", {"negation_pattern": _CAPABILITY_MATRIX_NEGATION}),
+    ("HYD-FAT", "high", r"FAT/TPI/ITP", "Close acceptance criteria before manufacturing release.",
+     "keyword", {"negation_pattern": _FAT_NEGATION}),
+)
+
+
 def hydrostatic_hold_points(store: CanonicalStore) -> dict:
     row = store.latest_for_project("PRJ-HYD-01")
-    rules = (
-        ("HYD-PRESSURE", "critical", r"120\s*MPa", "Require a signed geometry-specific pressure capability envelope."),
-        ("HYD-THROUGHPUT", "high", r"60\s*pipes/hour", "Bind throughput to FAT geometry, pressure and hold time."),
-        ("HYD-CAPABILITY-MATRIX", "high", r"capability matrix", "Obtain the signed pressure-versus-geometry matrix."),
-        ("HYD-FAT", "high", r"FAT/TPI/ITP", "Close acceptance criteria before manufacturing release."),
-    )
     findings = []
-    for code, severity, pattern, required_action in rules:
+    for code, severity, pattern, required_action, _kind, _spec in HYD_HOLD_POINT_RULES:
         found = re.search(pattern, row["content"], re.IGNORECASE)
         if found:
             start, end = max(0, found.start() - 100), min(len(row["content"]), found.end() + 180)

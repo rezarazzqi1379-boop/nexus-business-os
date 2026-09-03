@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hmac
 import os
 import sqlite3
 import time
@@ -18,7 +17,8 @@ from business_os import BusinessOSVault
 from state import EventRecord, EventStore
 from canonical_sources import CanonicalStore, hydrostatic_hold_points
 from security import (SESSION_COOKIE, SecurityMiddleware, auth_config_valid, auth_required,
-                      configured_token, issue_session, session_authorized, session_ttl_seconds)
+                      issue_session, legacy_owner_login, login_config_valid, login_password_authorized,
+                      session_authorized, session_ttl_seconds)
 from intake import evaluate_event
 
 
@@ -38,7 +38,7 @@ _LOGIN_ATTEMPTS: dict[str, list[float]] = {}
 
 
 def _startup_checks() -> dict[str, bool]:
-    checks = {"auth": auth_config_valid(), "state": False, "canonical": False, "vault": False}
+    checks = {"auth": auth_config_valid(), "owner_login": login_config_valid(), "state": False, "canonical": False, "vault": False}
     try:
         with sqlite3.connect(STORE.path) as db:
             checks["state"] = db.execute("SELECT 1").fetchone()[0] == 1
@@ -93,7 +93,7 @@ async def login(request: Request) -> RedirectResponse:
     fields = parse_qs(body, keep_blank_values=True)
     password = fields.get("password", [""])[0]
     next_path = _safe_next(fields.get("next", ["/console"])[0])
-    if not auth_config_valid() or not hmac.compare_digest(password, configured_token()):
+    if not login_password_authorized(password):
         _LOGIN_ATTEMPTS.setdefault(client_key, []).append(now)
         return RedirectResponse(f"/login?error=invalid&next={next_path}", status_code=303)
     _LOGIN_ATTEMPTS.pop(client_key, None)
@@ -125,7 +125,8 @@ def ready() -> dict:
 @app.get("/v1/system/diagnostics")
 def diagnostics() -> dict:
     return {"status": "ready" if all(READINESS_CHECKS.values()) else "not_ready",
-            "checks": READINESS_CHECKS, "auth_required": auth_required()}
+            "checks": READINESS_CHECKS, "auth_required": auth_required(),
+            "legacy_owner_login": legacy_owner_login()}
 
 
 @app.get("/console", include_in_schema=False)

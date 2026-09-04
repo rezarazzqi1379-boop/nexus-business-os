@@ -8,6 +8,7 @@ from pathlib import Path
 from contracts import EvidenceClass
 from discovery_pipeline import (
     DEFAULT_DISCOVERY_SCORE_WEIGHTS,
+    ApprovalPackItem,
     BuyerClassification,
     DiscoveryScoreWeights,
     NormalizedDiscoveryResult,
@@ -498,6 +499,48 @@ class IngestExternalDiscoveriesTests(unittest.TestCase):
         results = ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
         self.assertEqual(len(results), 1)
 
+    def test_numeric_url_is_rejected_not_stringified(self):
+        rows = [self._row(url=12345)]
+        _write_jsonl(self.path, rows)
+        with self.assertRaisesRegex(ValueError, "non_string_required_field_at_line_1:url"):
+            ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
+
+    def test_dict_provider_is_rejected_not_stringified(self):
+        rows = [self._row(provider={"name": "external-live-research"})]
+        _write_jsonl(self.path, rows)
+        with self.assertRaisesRegex(ValueError, "non_string_required_field_at_line_1:provider"):
+            ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
+
+    def test_bool_required_field_is_rejected(self):
+        rows = [self._row(query=True)]
+        _write_jsonl(self.path, rows)
+        with self.assertRaises(ValueError):
+            ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
+
+    def test_non_string_optional_field_is_rejected(self):
+        rows = [self._row(entity_name_hint=["Example Company A"])]
+        _write_jsonl(self.path, rows)
+        with self.assertRaisesRegex(ValueError, "non_string_optional_field_at_line_1:entity_name_hint"):
+            ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
+
+    def test_list_country_hint_is_rejected(self):
+        rows = [self._row(country_hint=["Exampleland"])]
+        _write_jsonl(self.path, rows)
+        with self.assertRaisesRegex(ValueError, "non_string_optional_field_at_line_1:country_hint"):
+            ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
+
+    def test_int_buyer_type_hint_is_rejected(self):
+        rows = [self._row(buyer_type_hint=42)]
+        _write_jsonl(self.path, rows)
+        with self.assertRaisesRegex(ValueError, "non_string_optional_field_at_line_1:buyer_type_hint"):
+            ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
+
+    def test_null_optional_field_is_treated_as_absent(self):
+        rows = [self._row(published_at=None)]
+        _write_jsonl(self.path, rows)
+        results = ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
+        self.assertIsNone(results[0].published_at)
+
 
 class ApprovalPackTests(unittest.TestCase):
     def test_recommend_verification_for_high_scoring_queued_buyer(self):
@@ -548,6 +591,64 @@ class ApprovalPackTests(unittest.TestCase):
         pack = build_approval_pack(outcome, min_score_to_recommend=0.0)
         scores = [item.score for item in pack]
         self.assertEqual(scores, sorted(scores, reverse=True))
+
+    def test_threshold_below_zero_is_rejected(self):
+        outcome = process_discovery_batch(run(), (result(),))
+        with self.assertRaisesRegex(ValueError, "invalid_min_score_to_recommend"):
+            build_approval_pack(outcome, min_score_to_recommend=-0.01)
+
+    def test_threshold_above_one_is_rejected(self):
+        outcome = process_discovery_batch(run(), (result(),))
+        with self.assertRaisesRegex(ValueError, "invalid_min_score_to_recommend"):
+            build_approval_pack(outcome, min_score_to_recommend=1.01)
+
+    def test_threshold_zero_is_accepted(self):
+        outcome = process_discovery_batch(run(), (result(title="Example Steel Mill Ltd", snippet="a steel mill"),))
+        build_approval_pack(outcome, min_score_to_recommend=0.0)  # must not raise
+
+    def test_threshold_one_is_accepted(self):
+        outcome = process_discovery_batch(run(), (result(title="Example Steel Mill Ltd", snippet="a steel mill"),))
+        build_approval_pack(outcome, min_score_to_recommend=1.0)  # must not raise
+
+    def test_non_numeric_threshold_is_rejected(self):
+        outcome = process_discovery_batch(run(), (result(),))
+        with self.assertRaisesRegex(ValueError, "invalid_min_score_to_recommend"):
+            build_approval_pack(outcome, min_score_to_recommend="high")
+
+    def test_builder_output_items_all_pass_validate(self):
+        results = tuple(
+            result(url=f"https://example.invalid/{i}", entity_name_hint=f"Company {i}",
+                  title=f"Company {i} steel mill", snippet="tender procurement issued")
+            for i in range(3)
+        )
+        outcome = process_discovery_batch(run(), results, top_n=10)
+        pack = build_approval_pack(outcome, min_score_to_recommend=0.0)
+        self.assertTrue(pack)
+        for item in pack:
+            item.validate()  # must not raise -- builder output is always internally valid
+
+
+class ApprovalPackItemValidationTests(unittest.TestCase):
+    def _item(self, **changes) -> ApprovalPackItem:
+        values = dict(
+            entity_candidate_id="ent_1", normalized_name="example co", buyer_category="steel_mill",
+            score=0.8, verification_requirement="primary_source_required",
+            recommended_action="recommend_verification", supporting_urls=("https://example.invalid/x",),
+            reason="test",
+        )
+        values.update(changes)
+        return ApprovalPackItem(**values)
+
+    def test_valid_item_passes(self):
+        self._item().validate()
+
+    def test_invalid_verification_requirement_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "invalid_verification_requirement"):
+            self._item(verification_requirement="verified_by_ai").validate()
+
+    def test_verified_is_not_a_valid_requirement(self):
+        with self.assertRaises(ValueError):
+            self._item(verification_requirement="verified").validate()
 
 
 class EndToEndIngestToApprovalPackTests(unittest.TestCase):

@@ -696,14 +696,27 @@ def ingest_external_discoveries(path: Path, *, project_id: str | None,
         missing = [field for field in _INGEST_REQUIRED_FIELDS if field not in raw]
         if missing:
             raise ValueError(f"missing_fields_at_line_{line_number}:{','.join(missing)}")
+
+        def required_str(field: str) -> str:
+            value = raw.get(field)
+            if not isinstance(value, str):
+                raise ValueError(f"non_string_required_field_at_line_{line_number}:{field}")
+            return value
+
+        def optional_str(field: str) -> str | None:
+            if field not in raw or raw[field] is None:
+                return None
+            value = raw[field]
+            if not isinstance(value, str):
+                raise ValueError(f"non_string_optional_field_at_line_{line_number}:{field}")
+            return value or None
+
         result = NormalizedDiscoveryResult(
-            provider=str(raw["provider"]), query=str(raw["query"]), url=str(raw["url"]),
-            title=str(raw["title"]), snippet=str(raw["snippet"]), retrieved_at=str(raw["retrieved_at"]),
-            published_at=(str(raw["published_at"]) if raw.get("published_at") else None),
-            project_id=project_id, lane_id=lane_id,
-            entity_name_hint=(str(raw["entity_name_hint"]) if raw.get("entity_name_hint") else None),
-            country_hint=(str(raw["country_hint"]) if raw.get("country_hint") else None),
-            buyer_type_hint=(str(raw["buyer_type_hint"]) if raw.get("buyer_type_hint") else None),
+            provider=required_str("provider"), query=required_str("query"), url=required_str("url"),
+            title=required_str("title"), snippet=required_str("snippet"), retrieved_at=required_str("retrieved_at"),
+            published_at=optional_str("published_at"), project_id=project_id, lane_id=lane_id,
+            entity_name_hint=optional_str("entity_name_hint"), country_hint=optional_str("country_hint"),
+            buyer_type_hint=optional_str("buyer_type_hint"),
         )
         try:
             result.validate()
@@ -738,6 +751,8 @@ class ApprovalPackItem:
             raise ValueError("invalid_buyer_category")
         if self.recommended_action not in RECOMMENDED_ACTIONS:
             raise ValueError("invalid_recommended_action")
+        if self.verification_requirement not in VERIFICATION_REQUIREMENTS:
+            raise ValueError("invalid_verification_requirement")
         if not self.requires_human_approval:
             raise ValueError("approval_pack_item_must_require_human_approval")
         _unit_rate(self.score, "score")
@@ -755,6 +770,10 @@ def build_approval_pack(outcome: DiscoveryRunOutcome, *,
     but scored below threshold is "watch" (revisit later, don't act now); only a queued entity
     at or above threshold is "recommend_verification". Nothing here sends a message to anyone.
     """
+    if isinstance(min_score_to_recommend, bool) or not isinstance(min_score_to_recommend, (int, float)) \
+            or not 0.0 <= min_score_to_recommend <= 1.0:
+        raise ValueError("invalid_min_score_to_recommend")
+
     classifications_by_id = {c.entity_candidate_id: c for c in outcome.classifications}
     entities_by_id = {e.candidate_id: e for e in outcome.entities}
     groups_by_id = {g.group_id: g for g in outcome.groups}
@@ -780,4 +799,7 @@ def build_approval_pack(outcome: DiscoveryRunOutcome, *,
             recommended_action=action, supporting_urls=urls,
             reason=f"resolution={entity.resolution_state}; classification_basis={classification.basis}",
         ))
-    return tuple(sorted(items, key=lambda item: (-item.score, item.entity_candidate_id)))
+    ordered = tuple(sorted(items, key=lambda item: (-item.score, item.entity_candidate_id)))
+    for item in ordered:
+        item.validate()
+    return ordered

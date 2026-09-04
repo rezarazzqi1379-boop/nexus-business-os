@@ -25,10 +25,11 @@ silently mixes results declaring different project_id/lane_id.
 
 from __future__ import annotations
 
+import itertools
+import json
 import re
 import sys
 import time
-import itertools
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from hashlib import sha256
@@ -664,3 +665,119 @@ def process_discovery_batch(run: ResearchRun, results: Sequence[NormalizedDiscov
         store.write_report(run.run_id, vars(metrics) | {"source_diversity": dict(metrics.source_diversity)})
 
     return DiscoveryRunOutcome(run, groups, entities, classifications, scored, verification_queue, metrics)
+
+
+_INGEST_REQUIRED_FIELDS = ("provider", "query", "url", "title", "snippet", "retrieved_at")
+
+
+def ingest_external_discoveries(path: Path, *, project_id: str | None,
+                                lane_id: str | None) -> tuple[NormalizedDiscoveryResult, ...]:
+    """Ingest an externally-produced JSONL file (e.g. from a live research pass done outside
+    this pipeline) into this module's own normalized shape.
+
+    ``project_id``/``lane_id`` are always the caller's declared values for the whole batch --
+    never read from the file -- so external input can never claim its own project/lane scope.
+    Likewise, ``evidence_class``/``verification_state`` are never read from the file even if
+    present: every ingested row is forced to CLAIM/unverified, exactly like any other
+    NormalizedDiscoveryResult, because an external source's own confidence claim is not this
+    pipeline's evidence to promote. A malformed row fails the whole batch closed -- nothing is
+    partially ingested.
+    """
+    lines = Path(path).read_text(encoding="utf-8").splitlines()
+    results = []
+    for line_number, line in enumerate(lines, start=1):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            raw = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"invalid_jsonl_at_line_{line_number}") from exc
+        missing = [field for field in _INGEST_REQUIRED_FIELDS if field not in raw]
+        if missing:
+            raise ValueError(f"missing_fields_at_line_{line_number}:{','.join(missing)}")
+        result = NormalizedDiscoveryResult(
+            provider=str(raw["provider"]), query=str(raw["query"]), url=str(raw["url"]),
+            title=str(raw["title"]), snippet=str(raw["snippet"]), retrieved_at=str(raw["retrieved_at"]),
+            published_at=(str(raw["published_at"]) if raw.get("published_at") else None),
+            project_id=project_id, lane_id=lane_id,
+            entity_name_hint=(str(raw["entity_name_hint"]) if raw.get("entity_name_hint") else None),
+            country_hint=(str(raw["country_hint"]) if raw.get("country_hint") else None),
+            buyer_type_hint=(str(raw["buyer_type_hint"]) if raw.get("buyer_type_hint") else None),
+        )
+        try:
+            result.validate()
+        except ValueError as exc:
+            raise ValueError(f"invalid_row_at_line_{line_number}:{exc}") from exc
+        results.append(result)
+    return tuple(results)
+
+
+RECOMMENDED_ACTIONS = frozenset({"recommend_verification", "watch", "reject"})
+
+
+@dataclass(frozen=True)
+class ApprovalPackItem:
+    """One entity's entry in the human-approval-facing shortlist. ``requires_human_approval``
+    is structurally locked True -- this is the funnel's "Human Approval" step boundary, not an
+    autonomous decision, and this module never sends anything to anyone regardless of action.
+    """
+
+    entity_candidate_id: str
+    normalized_name: str
+    buyer_category: str
+    score: float
+    verification_requirement: str
+    recommended_action: str
+    supporting_urls: tuple[str, ...]
+    reason: str
+    requires_human_approval: bool = True
+
+    def validate(self) -> None:
+        if self.buyer_category not in BUYER_CATEGORIES:
+            raise ValueError("invalid_buyer_category")
+        if self.recommended_action not in RECOMMENDED_ACTIONS:
+            raise ValueError("invalid_recommended_action")
+        if not self.requires_human_approval:
+            raise ValueError("approval_pack_item_must_require_human_approval")
+        _unit_rate(self.score, "score")
+        if not self.supporting_urls:
+            raise ValueError("approval_pack_item_requires_supporting_urls")
+
+
+def build_approval_pack(outcome: DiscoveryRunOutcome, *,
+                        min_score_to_recommend: float = 0.6) -> tuple[ApprovalPackItem, ...]:
+    """The funnel's Recommend/Watch/Reject step, over an already-computed run outcome.
+
+    A logistics intermediary or unknown-category entity never appears here, regardless of
+    score -- it was never a buyer opportunity in the first place. An entity that didn't make
+    the verification queue is recommended "reject" (not enough signal to pursue); one that did
+    but scored below threshold is "watch" (revisit later, don't act now); only a queued entity
+    at or above threshold is "recommend_verification". Nothing here sends a message to anyone.
+    """
+    classifications_by_id = {c.entity_candidate_id: c for c in outcome.classifications}
+    entities_by_id = {e.candidate_id: e for e in outcome.entities}
+    groups_by_id = {g.group_id: g for g in outcome.groups}
+    queue_by_id = {item.entity_candidate_id: item for item in outcome.verification_queue}
+
+    items = []
+    for scored in outcome.scored:
+        classification = classifications_by_id.get(scored.entity_candidate_id)
+        if classification is None or not classification.is_buyer_opportunity:
+            continue
+        entity = entities_by_id[scored.entity_candidate_id]
+        urls = tuple(sorted({m.url for gid in entity.supporting_group_ids for m in groups_by_id[gid].members}))
+        queued = queue_by_id.get(scored.entity_candidate_id)
+        if queued is None:
+            action, requirement = "reject", "secondary_source_required"
+        elif scored.score >= min_score_to_recommend:
+            action, requirement = "recommend_verification", queued.requirement
+        else:
+            action, requirement = "watch", queued.requirement
+        items.append(ApprovalPackItem(
+            entity_candidate_id=scored.entity_candidate_id, normalized_name=entity.normalized_name,
+            buyer_category=classification.category, score=scored.score, verification_requirement=requirement,
+            recommended_action=action, supporting_urls=urls,
+            reason=f"resolution={entity.resolution_state}; classification_basis={classification.basis}",
+        ))
+    return tuple(sorted(items, key=lambda item: (-item.score, item.entity_candidate_id)))

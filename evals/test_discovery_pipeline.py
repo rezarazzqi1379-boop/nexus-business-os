@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -13,12 +14,14 @@ from discovery_pipeline import (
     NullDiscoveryAdapter,
     QueryExpansionPlan,
     ScoredEntity,
+    build_approval_pack,
     build_verification_queue,
     classify_buyer,
     compute_run_metrics,
     dedup_rate,
     default_discovery_adapters,
     group_duplicates,
+    ingest_external_discoveries,
     process_discovery_batch,
     resolve_entities,
     score_entity,
@@ -428,6 +431,173 @@ class HighVolumeDeterminismTests(unittest.TestCase):
             self.assertEqual(record.project_id, "PRJ-EXAMPLE-01")
             self.assertEqual(record.lane_id, "LANE-A")
             self.assertEqual(record.evidence_class, EvidenceClass.CLAIM)
+
+
+def _write_jsonl(path: Path, rows: list[dict]) -> None:
+    path.write_text("\n".join(json.dumps(row) for row in rows) + "\n", encoding="utf-8")
+
+
+class IngestExternalDiscoveriesTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.path = Path(self.temp.name) / "external.jsonl"
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def _row(self, **changes) -> dict:
+        row = dict(
+            provider="external-live-research", query="widget distributor Exampleland",
+            url="https://example.invalid/company-a", title="Example Company A steel mill",
+            snippet="A tender for widget procurement was issued.", retrieved_at=UTC_NOW,
+            published_at=RECENT, entity_name_hint="Example Company A", country_hint="Exampleland",
+        )
+        row.update(changes)
+        return row
+
+    def test_ingests_valid_rows(self):
+        _write_jsonl(self.path, [self._row(), self._row(url="https://example.invalid/company-b")])
+        results = ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
+        self.assertEqual(len(results), 2)
+        for r in results:
+            r.validate()
+
+    def test_project_and_lane_id_come_from_caller_not_file(self):
+        rows = [self._row()]
+        rows[0]["project_id"] = "PRJ-SHOULD-BE-IGNORED"
+        rows[0]["lane_id"] = "LANE-SHOULD-BE-IGNORED"
+        _write_jsonl(self.path, rows)
+        results = ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
+        self.assertEqual(results[0].project_id, "PRJ-EXAMPLE-01")
+        self.assertEqual(results[0].lane_id, "LANE-A")
+
+    def test_external_evidence_class_and_verification_are_never_trusted(self):
+        rows = [self._row()]
+        rows[0]["evidence_class"] = "FACT"
+        rows[0]["verification_state"] = "verified"
+        _write_jsonl(self.path, rows)
+        results = ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
+        self.assertEqual(results[0].evidence_class, EvidenceClass.CLAIM)
+        self.assertEqual(results[0].verification_state, "unverified")
+
+    def test_missing_required_field_fails_the_whole_batch(self):
+        rows = [self._row(), self._row()]
+        del rows[1]["url"]
+        _write_jsonl(self.path, rows)
+        with self.assertRaisesRegex(ValueError, "missing_fields_at_line_2"):
+            ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
+
+    def test_malformed_json_line_fails_closed(self):
+        self.path.write_text('{"provider": "x"\n', encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "invalid_jsonl_at_line_1"):
+            ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
+
+    def test_blank_lines_are_skipped(self):
+        _write_jsonl(self.path, [self._row()])
+        self.path.write_text(self.path.read_text(encoding="utf-8") + "\n\n", encoding="utf-8")
+        results = ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
+        self.assertEqual(len(results), 1)
+
+
+class ApprovalPackTests(unittest.TestCase):
+    def test_recommend_verification_for_high_scoring_queued_buyer(self):
+        results = (result(title="Example Steel Mill Ltd", snippet="a steel mill, tender procurement issued"),)
+        outcome = process_discovery_batch(run(), results)
+        pack = build_approval_pack(outcome, min_score_to_recommend=0.0)
+        self.assertEqual(len(pack), 1)
+        self.assertEqual(pack[0].recommended_action, "recommend_verification")
+        self.assertTrue(pack[0].requires_human_approval)
+        self.assertTrue(pack[0].supporting_urls)
+
+    def test_reject_when_not_in_verification_queue(self):
+        results = (result(title="Example Steel Mill Ltd", snippet="a steel mill"),)
+        outcome = process_discovery_batch(run(), results, top_n=0)
+        pack = build_approval_pack(outcome)
+        self.assertEqual(pack[0].recommended_action, "reject")
+
+    def test_watch_when_queued_but_below_threshold(self):
+        results = (result(title="Example Steel Mill Ltd", snippet="a steel mill"),)
+        outcome = process_discovery_batch(run(), results)
+        pack = build_approval_pack(outcome, min_score_to_recommend=0.99)
+        self.assertEqual(pack[0].recommended_action, "watch")
+
+    def test_logistics_intermediary_never_appears_in_the_pack(self):
+        results = tuple(
+            result(url=f"https://example.invalid/ship-{i}", entity_name_hint="Bsm Forwarding",
+                  title="Bsm Forwarding Co", snippet=f"shipment {i} handled by Bsm Forwarding")
+            for i in range(10)
+        )
+        outcome = process_discovery_batch(run(), results)
+        pack = build_approval_pack(outcome)
+        self.assertEqual(pack, ())
+
+    def test_pack_never_requires_anything_but_human_approval(self):
+        results = (result(title="Example Steel Mill Ltd", snippet="a steel mill, tender procurement issued"),)
+        outcome = process_discovery_batch(run(), results)
+        for item in build_approval_pack(outcome, min_score_to_recommend=0.0):
+            item.validate()
+            self.assertTrue(item.requires_human_approval)
+
+    def test_pack_is_sorted_by_descending_score(self):
+        results = tuple(
+            result(url=f"https://example.invalid/{i}", entity_name_hint=f"Company {i}",
+                  title=f"Company {i} steel mill", snippet="tender procurement issued" if i == 0 else "plain")
+            for i in range(3)
+        )
+        outcome = process_discovery_batch(run(), results, top_n=10)
+        pack = build_approval_pack(outcome, min_score_to_recommend=0.0)
+        scores = [item.score for item in pack]
+        self.assertEqual(scores, sorted(scores, reverse=True))
+
+
+class EndToEndIngestToApprovalPackTests(unittest.TestCase):
+    """The 'one vertical proof': external live-research JSONL -> ingest -> dedup -> entity
+    resolution -> buyer role -> score -> verification queue -> approval-ready shortlist.
+    """
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.path = Path(self.temp.name) / "external.jsonl"
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def test_full_vertical_from_external_jsonl_to_approval_pack(self):
+        rows = [
+            dict(provider="external-live-research", query="widget distributor Exampleland",
+                url="https://example.invalid/steelco", title="Example Steel Co",
+                snippet="Example Steel Co issued a tender for widget procurement.", retrieved_at=UTC_NOW,
+                published_at=RECENT, entity_name_hint="Example Steel Co", country_hint="Exampleland"),
+            dict(provider="external-live-research", query="widget distributor Exampleland",
+                url="https://example.invalid/steelco-2", title="Example Steel Co listing",
+                snippet="Another listing for Example Steel Co, a steel mill.", retrieved_at=UTC_NOW,
+                published_at=RECENT, entity_name_hint="Example Steel Co", country_hint="Exampleland"),
+            dict(provider="external-live-research", query="widget distributor Exampleland",
+                url="https://example.invalid/forwarder", title="Bsm Forwarding",
+                snippet="Bsm Forwarding handled shipment logistics.", retrieved_at=UTC_NOW,
+                published_at=RECENT, entity_name_hint="Bsm Forwarding", country_hint="Exampleland"),
+            dict(provider="external-live-research", query="widget distributor Exampleland",
+                url="https://example.invalid/unknown-1", title="Random Listing",
+                snippet="No useful signal here.", retrieved_at=UTC_NOW, published_at=None),
+        ]
+        _write_jsonl(self.path, rows)
+
+        ingested = ingest_external_discoveries(self.path, project_id="PRJ-EXAMPLE-01", lane_id="LANE-A")
+        self.assertEqual(len(ingested), 4)
+        for r in ingested:
+            self.assertEqual(r.evidence_class, EvidenceClass.CLAIM)
+            self.assertEqual(r.verification_state, "unverified")
+
+        outcome = process_discovery_batch(run(), ingested, top_n=10, primary_threshold=0.0)
+        pack = build_approval_pack(outcome, min_score_to_recommend=0.0)
+
+        # the steel co (2 independent sources) should be recommended; the forwarder must not appear
+        self.assertTrue(any(item.buyer_category == "steel_mill" for item in pack))
+        self.assertFalse(any(item.normalized_name == "bsm forwarding" for item in pack))
+        for item in pack:
+            item.validate()
+            self.assertTrue(item.requires_human_approval)
+            self.assertTrue(item.supporting_urls)
 
 
 if __name__ == "__main__":

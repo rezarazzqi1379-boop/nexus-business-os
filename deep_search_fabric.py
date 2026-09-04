@@ -3,31 +3,41 @@ core built on top of discovery_pipeline.py's single-pass dedup/entity-
 resolution/classification machinery. Optimizes for verified unique commercial
 entities and actionable evidence, not URL count.
 
-No live provider ships here. The recursive loop is driven by a caller-supplied
-``provider_fn`` -- in this v0.1, tests supply a deterministic synthetic
-function; a real adapter would be benchmarked and injected the same way
-research_evidence.py/discovery_pipeline.py already require. No new
-database -- every structure here is an in-memory, JSON-serializable dataclass.
+No live provider ships here. The recursive loop is driven by caller-supplied
+``provider_fns`` -- a ``{provider_id: callable}`` mapping. Tests supply
+deterministic synthetic functions; a real adapter would be benchmarked and
+injected the same way research_evidence.py/discovery_pipeline.py already
+require. No new database -- every structure here is an in-memory,
+JSON-serializable dataclass.
 
 Ten components, per the spec:
   1. QueryLattice / build_query_lattice        6. EvidenceGraph / EvidenceLink
   2. SearchFrontier                            7. expand_entity_relationships
-  3. generate_expansion_queries                8. detect_coverage_gaps (negative-evidence plan)
+  3. generate_expansion_queries                8. detect_coverage_gaps / reconcile_gap_history
   4. detect_coverage_gaps                      9. classify_temporal_state
   5. ProviderPerformanceTracker                10. allocate_budget
 
-Anti-spin: a coverage gap tracks the distinct (query_family, provider) pairs
-already attempted against it. Two attempts in the *same* family/provider that
-add no new evidence forces the next attempt to change family or provider;
-three distinct attempts that all add nothing marks the gap BLOCKED_UNKNOWN --
-never quietly retried forever.
+Scope isolation (P0): every result returned by a provider function is checked
+against the plan's own project_id/lane_id BEFORE it is added to any
+cumulative state. Any mismatch -- including a None/non-None mismatch --
+aborts the whole run_recursive_search call. This is a hard fail-closed
+boundary, not a per-result filter.
+
+Anti-spin: a coverage gap tracks the distinct (query_family, provider_id)
+pairs already attempted against it, using the *actual* provider that executed
+each query (never a hardcoded placeholder). Two attempts in the *same*
+family/provider that add no new evidence don't count as a second distinct
+strategy; three genuinely distinct (family, provider) attempts that all add
+nothing mark the gap BLOCKED_UNKNOWN. A gap that later becomes covered is
+marked RESOLVED and no longer penalizes the coverage ratio -- gap history is
+never deleted, only advanced forward (OPEN/BLOCKED_UNKNOWN -> RESOLVED).
 """
 
 from __future__ import annotations
 
 import re
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from hashlib import sha256
 from pathlib import Path
@@ -37,7 +47,6 @@ _SRC = Path(__file__).resolve().parent / "src"
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
-from contracts import EvidenceClass  # noqa: E402
 from discovery_pipeline import (  # noqa: E402
     BuyerClassification,
     DuplicateGroup,
@@ -51,17 +60,28 @@ from discovery_pipeline import (  # noqa: E402
     normalize_entity_name,
     resolve_entities,
 )
+from research_lab import _utc  # noqa: E402
 
 SCHEMA_VERSION = "nexus.deep-search-fabric.v2"
 
 FRONTIER_STATES = frozenset({"NEW", "QUEUED", "SEARCHED", "EXPAND", "VERIFY", "EXHAUSTED", "REJECTED"})
+_ALLOWED_TRANSITIONS: dict[str, frozenset] = {
+    "NEW": frozenset({"QUEUED", "REJECTED"}),
+    "QUEUED": frozenset({"SEARCHED", "REJECTED"}),
+    "SEARCHED": frozenset({"EXPAND", "VERIFY", "EXHAUSTED"}),
+    "EXPAND": frozenset(),
+    "VERIFY": frozenset(),
+    "EXHAUSTED": frozenset(),
+    "REJECTED": frozenset(),
+}
 TEMPORAL_STATES = frozenset({"current", "recent", "stale", "expired_historical"})
 STOP_REASONS = frozenset({
     "marginal_yield_below_threshold", "coverage_target_reached", "verification_target_reached",
     "budget_exhausted", "no_new_evidence_from_repeated_queries", "max_depth_reached",
 })
-GAP_STATES = frozenset({"OPEN", "BLOCKED_UNKNOWN"})
+GAP_STATES = frozenset({"OPEN", "BLOCKED_UNKNOWN", "RESOLVED"})
 _MAX_ATTEMPTS_BEFORE_BLOCKED = 3
+_FUTURE_TOLERANCE_DAYS = 1
 
 _RELATIONSHIP_KEYWORDS = (
     ("subsidiary_of", (" a subsidiary of ", " subsidiary of ", " part of ")),
@@ -89,7 +109,6 @@ class QueryNode:
     parent_query_id: str | None
     search_depth: int
     origin: str  # "initial" | "gap_expansion" | "relationship_expansion"
-    provider_hint: str | None = None
 
 
 @dataclass(frozen=True)
@@ -114,8 +133,9 @@ def build_query_lattice(plan: QueryExpansionPlan, *, max_queries: int = 500) -> 
 # ---------------------------------------------------------------------------
 
 class SearchFrontier:
-    """Idempotent query-node tracker: adding the same query_id twice is a no-op, so a query
-    already queued/searched/exhausted is never duplicated or re-executed by accident.
+    """Idempotent query-node tracker with a truthful, validated state machine:
+    NEW -> QUEUED -> SEARCHED -> {EXPAND | VERIFY | EXHAUSTED}, or NEW/QUEUED -> REJECTED for
+    an explicitly invalidated node. Any other transition raises rather than silently jumping.
     """
 
     def __init__(self) -> None:
@@ -134,6 +154,9 @@ class SearchFrontier:
             raise ValueError("invalid_frontier_state")
         if query_id not in self._nodes:
             raise KeyError("unknown_query_id")
+        current = self._states[query_id]
+        if state not in _ALLOWED_TRANSITIONS[current]:
+            raise ValueError(f"invalid_frontier_transition:{current}->{state}")
         self._states[query_id] = state
 
     def state(self, query_id: str) -> str:
@@ -187,26 +210,48 @@ class ProviderPerformanceTracker:
 
 def allocate_budget(tracker: ProviderPerformanceTracker, provider_ids: Sequence[str], total_budget: int,
                     *, min_floor: int = 1) -> dict[str, int]:
-    """Deterministic allocation: every provider gets at least ``min_floor``, remaining budget
-    split proportionally to observed marginal yield (even split if nothing observed yet).
-    Ties always break by sorted provider_id -- never by insertion order or randomness.
+    """Deterministic allocation that never exceeds ``total_budget`` and, whenever the budget
+    permits it, distributes every last unit (sum == total_budget) via largest-remainder
+    rounding. Ties always break by sorted provider_id. Duplicate provider_ids are deduplicated.
+    When ``total_budget`` can't even cover one floor per provider, floors are handed out one
+    unit at a time in sorted order until the budget runs out -- never fabricated beyond it.
     """
-    if not provider_ids or total_budget <= 0:
-        return {pid: 0 for pid in provider_ids}
-    sorted_ids = sorted(set(provider_ids))
-    allocation = {pid: min(min_floor, total_budget) for pid in sorted_ids}
-    remaining = total_budget - sum(allocation.values())
+    unique_ids = sorted(set(provider_ids))
+    if not unique_ids or total_budget <= 0:
+        return {pid: 0 for pid in unique_ids}
+
+    allocation = {pid: 0 for pid in unique_ids}
+    n = len(unique_ids)
+
+    if total_budget < n * min_floor:
+        remaining = total_budget
+        for pid in unique_ids:
+            if remaining <= 0:
+                break
+            take = min(min_floor, remaining)
+            allocation[pid] += take
+            remaining -= take
+        return allocation
+
+    for pid in unique_ids:
+        allocation[pid] = min_floor
+    remaining = total_budget - n * min_floor
     if remaining <= 0:
         return allocation
-    yields = {pid: tracker.marginal_yield(pid) for pid in sorted_ids}
+
+    yields = {pid: tracker.marginal_yield(pid) for pid in unique_ids}
     total_yield = sum(yields.values())
     if total_yield > 0:
-        for pid in sorted_ids:
-            allocation[pid] += int(remaining * (yields[pid] / total_yield))
+        raw_shares = {pid: remaining * (yields[pid] / total_yield) for pid in unique_ids}
     else:
-        base = remaining // len(sorted_ids)
-        for pid in sorted_ids:
-            allocation[pid] += base
+        raw_shares = {pid: remaining / n for pid in unique_ids}
+    base_shares = {pid: int(raw_shares[pid]) for pid in unique_ids}
+    leftover = remaining - sum(base_shares.values())
+    ranked_for_remainder = sorted(unique_ids, key=lambda pid: (-(raw_shares[pid] - base_shares[pid]), pid))
+    for pid in ranked_for_remainder[:leftover]:
+        base_shares[pid] += 1
+    for pid in unique_ids:
+        allocation[pid] += base_shares[pid]
     return allocation
 
 
@@ -215,11 +260,23 @@ def allocate_budget(tracker: ProviderPerformanceTracker, provider_ids: Sequence[
 # ---------------------------------------------------------------------------
 
 def classify_temporal_state(retrieved_at: str, publication_date: str | None) -> str:
-    """Expired evidence is never discarded -- it's labeled, not dropped, per the rule that
-    an expired tender remains valid buyer-history evidence."""
+    """Expired evidence is never discarded -- it's labeled, not dropped, per the rule that an
+    expired tender remains valid buyer-history evidence. This classifies evidence AGE only; it
+    never infers a tender's own expiry/opportunity state from that age -- those are separate
+    concerns tracked elsewhere (review_state / opportunity scoring), not conflated here.
+
+    Both timestamps must be valid, timezone-aware ISO-8601 strings (enforced via the same
+    ``_utc`` helper used across this codebase) or this raises rather than guessing. A
+    publication_date materially in the future relative to retrieved_at (more than a small
+    clock-skew tolerance) is rejected outright, not classified as "current".
+    """
+    retrieved = datetime.fromisoformat(_utc(retrieved_at, "retrieved_at"))
     if publication_date is None:
         return "current"
-    age_days = (datetime.fromisoformat(retrieved_at) - datetime.fromisoformat(publication_date)).days
+    published = datetime.fromisoformat(_utc(publication_date, "publication_date"))
+    age_days = (retrieved - published).days
+    if age_days < -_FUTURE_TOLERANCE_DAYS:
+        raise ValueError("publication_date_in_future")
     if age_days <= 30:
         return "current"
     if age_days <= 180:
@@ -283,28 +340,41 @@ def expand_entity_relationships(candidate: EntityResolutionCandidate,
 # 4/8. CoverageGapDetector / NegativeEvidenceSearchPlan
 # ---------------------------------------------------------------------------
 
+def _gap_id_for(dimension: str) -> str:
+    return "gap_" + sha256(dimension.encode()).hexdigest()[:12]
+
+
 @dataclass(frozen=True)
 class CoverageGap:
     gap_id: str
     dimension: str
     reason: str
-    attempted: tuple[tuple[str, str], ...] = ()  # (query_family, provider) pairs already tried
+    attempted: tuple[tuple[str, str], ...] = ()  # (query_family, provider_id) pairs already tried
     state: str = "OPEN"
 
     def validate(self) -> None:
         if self.state not in GAP_STATES:
             raise ValueError("invalid_gap_state")
 
-    def record_failed_attempt(self, family: str, provider: str) -> "CoverageGap":
-        attempted = (*self.attempted, (family, provider))
-        distinct = len({pair for pair in attempted})
+    def record_failed_attempt(self, family: str, provider_id: str) -> "CoverageGap":
+        """A no-op once RESOLVED -- a covered dimension is never re-penalized for old attempts."""
+        if self.state == "RESOLVED":
+            return self
+        attempted = (*self.attempted, (family, provider_id))
+        distinct = len(set(attempted))
         state = "BLOCKED_UNKNOWN" if distinct >= _MAX_ATTEMPTS_BEFORE_BLOCKED else self.state
         return CoverageGap(self.gap_id, self.dimension, self.reason, attempted, state)
 
+    def resolve(self) -> "CoverageGap":
+        """Advance to RESOLVED, preserving full attempt history -- never deleted, only labeled."""
+        return CoverageGap(self.gap_id, self.dimension, self.reason, self.attempted, "RESOLVED")
+
 
 def detect_coverage_gaps(plan: QueryExpansionPlan, groups: Sequence[DuplicateGroup]) -> tuple[CoverageGap, ...]:
-    """A negative-evidence plan: every plan dimension (geography term) with zero matching
-    discoveries becomes an explicit, trackable gap -- never silently ignored.
+    """A snapshot of currently-uncovered plan dimensions -- every plan geography term with zero
+    matching discoveries becomes an explicit, trackable (fresh, OPEN) gap. Use
+    ``reconcile_gap_history`` to merge this snapshot into a run's persistent gap history rather
+    than calling this directly inside a loop.
     """
     covered = set()
     for group in groups:
@@ -314,11 +384,32 @@ def detect_coverage_gaps(plan: QueryExpansionPlan, groups: Sequence[DuplicateGro
     gaps = []
     for geography in plan.geography_terms:
         if normalize_entity_name(geography) not in covered:
-            gaps.append(CoverageGap(
-                gap_id="gap_" + sha256(f"geography:{geography}".encode()).hexdigest()[:12],
-                dimension=f"geography:{geography}", reason="no discovery matched this geography term",
-            ))
+            dimension = f"geography:{geography}"
+            gaps.append(CoverageGap(gap_id=_gap_id_for(dimension), dimension=dimension,
+                                    reason="no discovery matched this geography term"))
     return tuple(gaps)
+
+
+def reconcile_gap_history(existing: Mapping[str, CoverageGap], plan: QueryExpansionPlan,
+                          groups: Sequence[DuplicateGroup]) -> dict[str, CoverageGap]:
+    """Merge a fresh coverage snapshot into persistent gap history: a newly-covered dimension
+    advances an existing OPEN/BLOCKED_UNKNOWN gap to RESOLVED (never deleted, never silently
+    dropped); a still-uncovered dimension keeps its existing gap (and history) untouched, or
+    creates a fresh OPEN one if this is the first time it's been seen missing.
+    """
+    still_open_ids = {_gap_id_for(g.dimension) for g in detect_coverage_gaps(plan, groups)}
+    updated = dict(existing)
+    fresh_by_id = {g.gap_id: g for g in detect_coverage_gaps(plan, groups)}
+    for geography in plan.geography_terms:
+        dimension = f"geography:{geography}"
+        gap_id = _gap_id_for(dimension)
+        if gap_id in still_open_ids:
+            if gap_id not in updated:
+                updated[gap_id] = fresh_by_id[gap_id]
+        else:
+            if gap_id in updated and updated[gap_id].state != "RESOLVED":
+                updated[gap_id] = updated[gap_id].resolve()
+    return updated
 
 
 # ---------------------------------------------------------------------------
@@ -329,9 +420,10 @@ def generate_expansion_queries(entities: Sequence[EntityResolutionCandidate],
                                groups_by_id: Mapping[str, DuplicateGroup], gaps: Sequence[CoverageGap],
                                links: Sequence[EvidenceLink], *, search_depth: int,
                                parent_query_id: str | None) -> tuple[QueryNode, ...]:
-    """Two sources of next-round queries: (a) a targeted confirmation query for every
-    "probable" (single-source) entity, to try to reach "exact"; (b) a follow-up query for
-    every relationship-expansion hint (subsidiary/alias name) discovered this round.
+    """Three sources of next-round queries: (a) a targeted confirmation query for every
+    "probable" (single-source) entity, to try to reach "exact"; (b) a follow-up query for every
+    relationship-expansion hint (subsidiary/alias name) discovered this round; (c) an alternate
+    query for every still-OPEN coverage gap. RESOLVED and BLOCKED_UNKNOWN gaps are never re-queried.
     """
     seen_texts: set[str] = set()
     nodes: list[QueryNode] = []
@@ -355,7 +447,7 @@ def generate_expansion_queries(entities: Sequence[EntityResolutionCandidate],
                                search_depth, "relationship_expansion"))
 
     for gap in gaps:
-        if gap.state == "BLOCKED_UNKNOWN":
+        if gap.state != "OPEN":
             continue
         text = f"{gap.dimension} alternate search"
         if text in seen_texts:
@@ -411,6 +503,7 @@ class RoundOutcome:
     groups: tuple[DuplicateGroup, ...]
     entities: tuple[EntityResolutionCandidate, ...]
     new_entity_ids: tuple[str, ...]
+    provider_allocation: Mapping[str, int]
     stop: StopDecision
 
 
@@ -434,16 +527,36 @@ class RecursiveSearchOutcome:
         ))
 
 
-def run_recursive_search(plan: QueryExpansionPlan, provider_fn: Callable[[str, int], tuple[NormalizedDiscoveryResult, ...]],
-                        *, run_id: str, max_depth: int = 3, query_budget: int = 1000, results_per_query: int = 10,
-                        coverage_target: float = 0.8, verification_target: float = 0.3,
-                        marginal_yield_threshold: float = 0.02) -> RecursiveSearchOutcome:
-    """The full loop: OBJECTIVE -> lattice -> discovery -> normalize (assumed done by
-    ``provider_fn``, which must already return validated NormalizedDiscoveryResult) -> dedup ->
-    entity resolution -> evidence graph -> coverage gaps -> new queries -> next round -> ...
-    -> a measurable stop condition. Every ``provider_fn`` call is deterministic given the
-    same query text and depth; nothing here performs a live call itself.
+def _assert_in_scope(hit: NormalizedDiscoveryResult, plan: QueryExpansionPlan) -> None:
+    if hit.project_id != plan.project_id or hit.lane_id != plan.lane_id:
+        raise ValueError(
+            f"scope_mismatch:expected_project={plan.project_id!r}:expected_lane={plan.lane_id!r}"
+            f":got_project={hit.project_id!r}:got_lane={hit.lane_id!r}"
+        )
+
+
+def run_recursive_search(
+    plan: QueryExpansionPlan,
+    provider_fns: Mapping[str, Callable[[str, int], tuple[NormalizedDiscoveryResult, ...]]],
+    *, run_id: str, max_depth: int = 3, query_budget: int = 1000, results_per_query: int = 10,
+    coverage_target: float = 0.8, verification_target: float = 0.3, marginal_yield_threshold: float = 0.02,
+) -> RecursiveSearchOutcome:
+    """The full loop: OBJECTIVE -> lattice -> discovery -> normalize (assumed done by each
+    provider function, which must already return validated NormalizedDiscoveryResult) -> dedup
+    -> entity resolution -> evidence graph -> coverage gap reconciliation -> new query
+    generation -> provider-performance-routed next round -> ... -> a measurable stop condition.
+
+    ``provider_fns`` is a ``{provider_id: callable}`` mapping -- round 0 splits its query
+    budget evenly across providers (via allocate_budget with an empty tracker, which falls
+    back to an even split); every later round routes budget by observed marginal yield. Every
+    result is checked against ``plan.project_id``/``plan.lane_id`` before being incorporated
+    into any cumulative state -- a mismatch aborts the whole call. Nothing here performs a
+    live call itself.
     """
+    if not provider_fns:
+        raise ValueError("at_least_one_provider_required")
+    provider_ids = sorted(provider_fns)
+
     lattice = build_query_lattice(plan, max_queries=query_budget)
     frontier = SearchFrontier()
     for node in lattice.root_nodes:
@@ -460,25 +573,48 @@ def run_recursive_search(plan: QueryExpansionPlan, provider_fn: Callable[[str, i
     stop = StopDecision(False, None)
 
     while True:
-        pending = frontier.nodes_in_state("NEW")
+        pending = sorted(frontier.nodes_in_state("NEW"), key=lambda n: n.query_id)
         if not pending:
             stop = StopDecision(True, "no_new_evidence_from_repeated_queries")
-            rounds.append(RoundOutcome(round_index, (), 0, group_duplicates(tuple(all_results)) if all_results else (),
-                                       tuple(entities_by_id.values()), (), stop))
+            rounds.append(RoundOutcome(round_index, (), 0,
+                                       group_duplicates(tuple(all_results)) if all_results else (),
+                                       tuple(entities_by_id.values()), (), {}, stop))
             break
 
+        remaining_budget = query_budget - queries_executed
+        queries_this_round = min(len(pending), remaining_budget)
+        if queries_this_round <= 0:
+            stop = StopDecision(True, "budget_exhausted")
+            rounds.append(RoundOutcome(round_index, (), 0,
+                                       group_duplicates(tuple(all_results)) if all_results else (),
+                                       tuple(entities_by_id.values()), (), {}, stop))
+            break
+
+        allocation = allocate_budget(tracker, provider_ids, queries_this_round, min_floor=1)
+        node_queue = iter(pending[:queries_this_round])
+        assignment: list[tuple[QueryNode, str]] = []
+        for provider_id in provider_ids:
+            for _ in range(allocation.get(provider_id, 0)):
+                node = next(node_queue, None)
+                if node is None:
+                    break
+                assignment.append((node, provider_id))
+
         executed_ids: list[str] = []
+        node_hit_counts: dict[str, int] = {}
+        node_provider: dict[str, str] = {}
         round_results: list[NormalizedDiscoveryResult] = []
-        for node in pending:
-            if queries_executed >= query_budget:
-                break
+        for node, provider_id in assignment:
             frontier.set_state(node.query_id, "QUEUED")
-            hits = provider_fn(node.query_text, results_per_query)
+            hits = provider_fns[provider_id](node.query_text, results_per_query)
             for hit in hits:
                 hit.validate()
+                _assert_in_scope(hit, plan)
             round_results.extend(hits)
             frontier.set_state(node.query_id, "SEARCHED")
             executed_ids.append(node.query_id)
+            node_hit_counts[node.query_id] = len(hits)
+            node_provider[node.query_id] = provider_id
             queries_executed += 1
 
         all_results.extend(round_results)
@@ -486,7 +622,6 @@ def run_recursive_search(plan: QueryExpansionPlan, provider_fn: Callable[[str, i
         groups_by_id = {g.group_id: g for g in groups}
         entities = resolve_entities(groups)
         classifications = tuple(classify_buyer(e, groups_by_id) for e in entities)
-        classifications_by_id = {c.entity_candidate_id: c for c in classifications}
 
         new_entity_ids = tuple(sorted(e.candidate_id for e in entities if e.candidate_id not in entities_by_id))
         for entity in entities:
@@ -504,22 +639,32 @@ def run_recursive_search(plan: QueryExpansionPlan, provider_fn: Callable[[str, i
             )
             tracker.record(provider_id, round_index, contributed, total)
 
-        gaps = detect_coverage_gaps(plan, groups)
-        for gap in gaps:
-            gaps_by_id.setdefault(gap.gap_id, gap)
-        for query_node_id in executed_ids:
-            family = query_family(frontier.node(query_node_id).query_text)
+        gaps_by_id = reconcile_gap_history(gaps_by_id, plan, groups)
+
+        for query_id in executed_ids:
+            family = query_family(frontier.node(query_id).query_text)
+            assigned_provider = node_provider[query_id]
             for gap_id, gap in list(gaps_by_id.items()):
-                if gap.dimension.split(":", 1)[-1].strip().lower() in family:
-                    gaps_by_id[gap_id] = gap.record_failed_attempt(family, "synthetic")
+                dimension_value = gap.dimension.split(":", 1)[-1].strip().lower()
+                if gap.state == "OPEN" and dimension_value in family:
+                    gaps_by_id[gap_id] = gap.record_failed_attempt(family, assigned_provider)
+
+        for query_id in executed_ids:
+            node = frontier.node(query_id)
+            if node_hit_counts[query_id] == 0:
+                frontier.set_state(query_id, "EXHAUSTED")
+            elif node.origin in ("gap_expansion", "relationship_expansion"):
+                frontier.set_state(query_id, "EXPAND")
+            else:
+                frontier.set_state(query_id, "VERIFY")
 
         links: list[EvidenceLink] = []
         for entity in entities:
             links.extend(expand_entity_relationships(entity, groups_by_id))
         evidence_graph = evidence_graph.merge(tuple(links))
 
-        coverage_ratio = 1 - (len([g for g in gaps_by_id.values() if g.state == "OPEN"]) /
-                              max(len(plan.geography_terms), 1))
+        open_or_blocked = sum(1 for g in gaps_by_id.values() if g.state in ("OPEN", "BLOCKED_UNKNOWN"))
+        coverage_ratio = 1 - (open_or_blocked / max(len(plan.geography_terms), 1))
         verified_ratio = (sum(1 for e in entities if e.resolution_state == "exact") / len(entities)) if entities else 0.0
 
         stop = evaluate_stop_conditions(
@@ -530,7 +675,7 @@ def run_recursive_search(plan: QueryExpansionPlan, provider_fn: Callable[[str, i
             marginal_yield_threshold=marginal_yield_threshold,
         )
         rounds.append(RoundOutcome(round_index, tuple(executed_ids), len(round_results), groups, entities,
-                                   new_entity_ids, stop))
+                                   new_entity_ids, dict(allocation), stop))
 
         if stop.should_stop or round_index + 1 >= max_depth:
             if not stop.should_stop:

@@ -59,8 +59,12 @@ SOURCE_TYPES = frozenset({
     "trade_database", "directory", "other",
 })
 BUYER_TYPES = frozenset({
-    "producer", "trader", "distributor", "procurement_portal",
-    "industrial_consumer", "unknown",
+    # Original generic categories, kept for backward compatibility with earlier callers.
+    "producer", "trader", "distributor", "procurement_portal", "industrial_consumer", "unknown",
+    # discovery_pipeline.py's more specific classification taxonomy (BUYER_CATEGORIES) --
+    # this field accepts either, since it's a downstream persistence record, not the
+    # classification authority itself.
+    "steel_mill", "foundry", "importer", "procurement_authority", "logistics_intermediary",
 })
 VERIFICATION_STATES = frozenset({"unverified", "reviewed", "verified", "rejected"})
 REVIEW_STATES = frozenset({"pending", "queued_for_verification", "verified", "rejected", "duplicate"})
@@ -207,6 +211,12 @@ class ResearchLabStore:
         safe_stamp = re.sub(r"[^0-9A-Za-z_-]", "-", evaluated_at)
         return self.root / "benchmarks" / f"{_safe_id(provider_id, 'provider_id')}__{safe_stamp}.json"
 
+    def _entities_path(self, run_id: str) -> Path:
+        return self.root / "entities" / f"{_safe_id(run_id, 'run_id')}.json"
+
+    def _report_path(self, run_id: str) -> Path:
+        return self.root / "reports" / f"{_safe_id(run_id, 'run_id')}.json"
+
     def create_run(self, run: ResearchRun) -> Path:
         run.validate()
         path = self._run_path(run.run_id)
@@ -272,6 +282,23 @@ class ResearchLabStore:
         benchmark.validate()
         path = self._benchmark_path(benchmark.provider_id, benchmark.evaluated_at)
         _atomic_write(path, json.dumps(asdict(benchmark), ensure_ascii=False, sort_keys=True, indent=2) + "\n")
+        return path
+
+    def write_entities(self, run_id: str, entities: Sequence[dict]) -> Path:
+        """Persist a run's Entity Resolution Queue output. Takes plain dicts (not a specific
+        dataclass type) so this module stays decoupled from any particular pipeline's entity
+        schema -- the caller (e.g. discovery_pipeline.py) is responsible for serializing its
+        own EntityResolutionCandidate-like records before calling this.
+        """
+        path = self._entities_path(run_id)
+        _atomic_write(path, json.dumps(list(entities), ensure_ascii=False, sort_keys=True, indent=2) + "\n")
+        return path
+
+    def write_report(self, run_id: str, report: dict) -> Path:
+        """Persist a run's final metrics/decision-pack report -- distinct from
+        write_score_report's ranked-opportunity list."""
+        path = self._report_path(run_id)
+        _atomic_write(path, json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2) + "\n")
         return path
 
 

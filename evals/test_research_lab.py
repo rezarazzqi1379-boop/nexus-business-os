@@ -335,6 +335,14 @@ class ResearchLabStoreTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.store.write_benchmark(benchmark(decision="KEEP", coverage=0.01))
 
+    def test_write_entities_persists_a_list_of_dicts(self):
+        path = self.store.write_entities("some-run", [{"candidate_id": "ent_1", "resolution_state": "exact"}])
+        self.assertTrue(path.exists())
+
+    def test_write_report_persists_arbitrary_dict(self):
+        path = self.store.write_report("some-run", {"raw_count": 10, "unique_count": 7})
+        self.assertTrue(path.exists())
+
 
 class ResearchBenchmarkPolicyTests(unittest.TestCase):
     def test_valid_policy_passes(self):

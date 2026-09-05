@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nexus.local/schemas/public_handoff_record_v1.schema.json",
+  "title": "NEXUS Public Handoff Record v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "task_id",
+    "project_id",
+    "lane_id",
+    "state",
+    "risk_class",
+    "protected_action_required",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "nexus.public-handoff.v1"
+    },
+    "record_type": {
+      "enum": ["handoff", "ack", "status", "archive"]
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,95}$"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 96
+    },
+    "lane_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 96
+    },
+    "state": {
+      "enum": [
+        "PREPARED",
+        "SANITIZED",
+        "PUBLISHED",
+        "OBSERVED",
+        "ACKNOWLEDGED",
+        "HOLD_FOR_REVIEW",
+        "SUPERSEDED",
+        "ARCHIVED"
+      ]
+    },
+    "owner_role": {
+      "enum": ["chatgpt-nexus", "claude-code", "claude-chat", "human"]
+    },
+    "branch": {
+      "type": ["string", "null"],
+      "maxLength": 255
+    },
+    "base_sha": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "head_sha": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "review_status": {
+      "enum": ["PENDING", "VERIFIED", "STALE", "CONFLICT", "INVALID", "SUPERSEDED"]
+    },
+    "risk_class": {
+      "enum": ["LOW", "MEDIUM", "HIGH"]
+    },
+    "protected_action_required": {
+      "type": "boolean"
+    },
+    "tests_summary": {
+      "type": "string",
+      "maxLength": 512
+    },
+    "unknowns_summary": {
+      "type": "string",
+      "maxLength": 512
+    },
+    "next_safe_action": {
+      "type": "string",
+      "maxLength": 512
+    },
+    "source_record_digest": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

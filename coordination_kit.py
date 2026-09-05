@@ -43,6 +43,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Mapping, Sequence
 
+from approvals import ApprovalRequest, ApprovalStore
 from contracts import canonical_digest
 from task_handoff import HandoffConflict, OWNERS, RISK_CLASSES, SAFE_ID, SHA_HEX, STATES, _safe_id, _sha, utc_now
 
@@ -50,7 +51,10 @@ SCHEMA_VERSION = "nexus.handoff-package.v2"
 REVIEW_STATUSES = frozenset({"PENDING", "APPROVED", "REJECTED", "STALE", "SUPERSEDED"})
 VERIFICATION_STATUSES = frozenset({"VERIFIED", "STALE", "CONFLICT", "INVALID"})
 OWNERSHIP_EVENTS = frozenset({"RELEASE", "TRANSFER"})
+EVIDENCE_PROVENANCE_STATES = frozenset({"CALLER_DECLARED", "INDEPENDENTLY_CAPTURED"})
 DEFAULT_REVIEW_ROUND_BUDGET = 2
+EXTRA_REVIEW_ROUND_ACTION = "coordination_kit.extra_review_round"
+EXTRA_REVIEW_ROUND_PROJECT = "coordination_kit"
 
 
 # ---------------------------------------------------------------------------
@@ -191,6 +195,13 @@ class TestEvidenceV2:
     """Evidence must be constructed from already-structured fields the caller obtained by
     actually running the command and reading its own exit code/counts -- there is no function
     in this module that parses free-form test-runner text into trusted evidence.
+
+    ``provenance`` has no default: a caller must be explicit about which of the two it is.
+    ``CALLER_DECLARED`` means the caller asserts these fields (including head_sha) themselves --
+    this module cannot verify the command was actually run. ``INDEPENDENTLY_CAPTURED`` means
+    head_sha was derived by this module's own capture_test_evidence(), not supplied by the
+    caller -- it still trusts the caller's counts/exit_code (nothing here re-runs an arbitrary
+    command), but at least binds them to a freshly, independently observed HEAD.
     """
 
     command: str
@@ -200,6 +211,7 @@ class TestEvidenceV2:
     errors: int
     skipped: int
     head_sha: str
+    provenance: str
 
     def validate(self) -> None:
         if not self.command.strip():
@@ -208,6 +220,18 @@ class TestEvidenceV2:
             if isinstance(value, bool) or not isinstance(value, int):
                 raise ValueError("invalid_test_evidence_count")
         _sha(self.head_sha, "test_head_sha")
+        if self.provenance not in EVIDENCE_PROVENANCE_STATES:
+            raise ValueError("invalid_evidence_provenance")
+
+
+def capture_test_evidence(repo_root: Path, *, command: str, exit_code: int, passed: int, failed: int,
+                          errors: int, skipped: int, base_ref: str = "main") -> TestEvidenceV2:
+    """The only way to produce INDEPENDENTLY_CAPTURED evidence: head_sha comes from an actual
+    git query against ``repo_root`` at the moment of capture, never from the caller's say-so.
+    """
+    facts = capture_git_facts(repo_root, base_ref=base_ref)
+    return TestEvidenceV2(command=command, exit_code=exit_code, passed=passed, failed=failed, errors=errors,
+                          skipped=skipped, head_sha=facts.head_sha, provenance="INDEPENDENTLY_CAPTURED")
 
     def is_current_for(self, current_head_sha: str) -> bool:
         return self.head_sha == current_head_sha
@@ -250,7 +274,7 @@ class HandoffPackageV2:
     claims: tuple[str, ...] = ()
     evidence_refs: tuple[str, ...] = ()
     unknowns: tuple[str, ...] = ()
-    human_authorized_extra_rounds: bool = False
+    extra_round_approval_id: str | None = None
     created_at: str = field(default_factory=utc_now)
     schema_version: str = SCHEMA_VERSION
 
@@ -268,8 +292,9 @@ class HandoffPackageV2:
             raise ValueError("invalid_risk_class")
         if isinstance(self.review_round, bool) or not isinstance(self.review_round, int) or self.review_round < 1:
             raise ValueError("invalid_review_round")
-        if self.review_round > DEFAULT_REVIEW_ROUND_BUDGET and not self.human_authorized_extra_rounds:
-            raise ValueError("review_round_exceeds_budget_without_human_authorization")
+        if self.review_round > DEFAULT_REVIEW_ROUND_BUDGET:
+            if not self.extra_round_approval_id or not self.extra_round_approval_id.strip():
+                raise ValueError("review_round_exceeds_budget_without_human_authorization")
         if not isinstance(self.protected_action_required, bool):
             raise ValueError("invalid_protected_action_required")
         if not self.next_deterministic_action.strip():
@@ -311,19 +336,74 @@ class HandoffPackageV2:
         return canonical_digest(self.to_digest_payload())
 
 
+def convert_v1_cross_project_touch(v1_cross_project_touch: bool) -> tuple[str, ...]:
+    """task_handoff.TaskHandoff.cross_project_touch is a bool; HandoffPackageV2's is a list of
+    project_ids. False converts safely to (). True does NOT convert to a specific project list
+    -- a boolean carries no project identity, and inventing one would be exactly the kind of
+    guess this codebase's evidence discipline forbids. Callers with a v1 record whose
+    cross_project_touch is True must supply the real affected project_ids themselves (as their
+    own ``cross_project_touch=(...)`` argument to generate_handoff_package); this function
+    fails closed rather than silently discarding the signal or fabricating identities.
+    """
+    if not isinstance(v1_cross_project_touch, bool):
+        raise ValueError("invalid_v1_cross_project_touch")
+    if v1_cross_project_touch:
+        raise ValueError(
+            "cross_project_touch_unknown_fail_closed:v1_true_requires_explicit_project_ids"
+        )
+    return ()
+
+
+def request_extra_review_round(store: ApprovalStore, *, task_id: str, head_sha: str, review_round: int,
+                               requested_by: str) -> str:
+    """An AI (or anything) may REQUEST extra review rounds -- it can never decide its own
+    request. Returns an approval_id that stays 'pending' until something else calls
+    ``store.decide(approval_id, approved=True, decided_by="human")`` -- a call this module
+    never makes itself.
+    """
+    request = ApprovalRequest(
+        project_id=EXTRA_REVIEW_ROUND_PROJECT, action=EXTRA_REVIEW_ROUND_ACTION, target=task_id,
+        parameters={"head_sha": head_sha, "review_round": review_round}, requested_by=requested_by,
+    )
+    return store.request(request)
+
+
+def consume_extra_review_round_approval(store: ApprovalStore, *, approval_id: str, task_id: str,
+                                        head_sha: str, review_round: int) -> bool:
+    """Fails closed unless a human has already, separately, called store.decide(...,
+    approved=True, decided_by="human") for this exact (task_id, head_sha, review_round) scope.
+    Single-use: a second call for the same approval_id returns False. A fabricated/unknown
+    approval_id (ApprovalStore.consume raises KeyError for those) is treated identically to an
+    unapproved one -- both simply mean "not a valid, human-decided approval".
+    """
+    action_digest = ApprovalRequest(
+        project_id=EXTRA_REVIEW_ROUND_PROJECT, action=EXTRA_REVIEW_ROUND_ACTION, target=task_id,
+        parameters={"head_sha": head_sha, "review_round": review_round}, requested_by="",
+    ).action_digest
+    try:
+        return store.consume(approval_id, action_digest=action_digest)
+    except KeyError:
+        return False
+
+
 def generate_handoff_package(
     repo_root: Path, *, task_id: str, owner: str, state: str, risk_class: str, review_round: int,
     protected_action_required: bool, next_deterministic_action: str, project_id: str | None = None,
     lane_id: str | None = None, cross_project_touch: Sequence[str] = (), claims: Sequence[str] = (),
     evidence_refs: Sequence[str] = (), unknowns: Sequence[str] = (), tests: Sequence[TestEvidenceV2] = (),
     authority_refs: Sequence[str] = (), review_status: str = "PENDING", reviewed_head_sha: str | None = None,
-    supersedes_handoff_digest: str | None = None, human_authorized_extra_rounds: bool = False,
-    base_ref: str = "main",
+    supersedes_handoff_digest: str | None = None, extra_round_approval_id: str | None = None,
+    approval_store: ApprovalStore | None = None, base_ref: str = "main",
 ) -> HandoffPackageV2:
     """Captures real git facts, scans the real diff for secrets (refusing to proceed if any
     are found), rejects any supplied test evidence not bound to the current HEAD, and returns
     a fully validated HandoffPackageV2. Never writes anything by itself -- pass the result to
     HandoffStoreV2.claim()/.update() to persist it.
+
+    For review_round > 2: ``extra_round_approval_id`` must name an approval already granted by
+    a human via ``ApprovalStore.decide(..., decided_by="human")`` -- this function only
+    *consumes* it (single-use, exact-scope, via the same approvals.py primitive already used
+    elsewhere in this repository); it never decides its own approval.
     """
     facts = capture_git_facts(repo_root, base_ref=base_ref)
     diff_base = facts.merge_base_sha or base_ref
@@ -339,6 +419,16 @@ def generate_handoff_package(
         if test.head_sha != facts.head_sha:
             raise ValueError(f"stale_test_evidence:test_head={test.head_sha}:actual_head={facts.head_sha}")
 
+    if review_round > DEFAULT_REVIEW_ROUND_BUDGET:
+        if approval_store is None or not extra_round_approval_id:
+            raise ValueError("extra_review_round_requires_a_consumed_human_approval")
+        consumed = consume_extra_review_round_approval(
+            approval_store, approval_id=extra_round_approval_id, task_id=task_id,
+            head_sha=facts.head_sha, review_round=review_round,
+        )
+        if not consumed:
+            raise ValueError("extra_review_round_approval_invalid_or_not_human_decided")
+
     package = HandoffPackageV2(
         task_id=task_id, owner=owner, branch=facts.branch, base_sha=diff_base, head_sha=facts.head_sha,
         state=state, risk_class=risk_class, review_round=review_round,
@@ -350,7 +440,7 @@ def generate_handoff_package(
         supersedes_handoff_digest=supersedes_handoff_digest, project_id=project_id, lane_id=lane_id,
         cross_project_touch=tuple(cross_project_touch), files_changed=facts.changed_files,
         tests_run=tuple(tests), claims=tuple(claims), evidence_refs=tuple(evidence_refs),
-        unknowns=tuple(unknowns), human_authorized_extra_rounds=human_authorized_extra_rounds,
+        unknowns=tuple(unknowns), extra_round_approval_id=extra_round_approval_id,
     )
     package.validate()
     return package

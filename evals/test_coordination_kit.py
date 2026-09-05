@@ -15,10 +15,15 @@ from coordination_kit import (
     TestEvidenceV2,
     VerificationResult,
     capture_git_facts,
+    capture_test_evidence,
+    consume_extra_review_round_approval,
+    convert_v1_cross_project_touch,
     generate_handoff_package,
+    request_extra_review_round,
     scan_diff_for_secrets,
     verify_handoff_package,
 )
+from approvals import ApprovalStore
 from task_handoff import HandoffConflict
 
 SHA_ZEROS = "0" * 40
@@ -84,7 +89,8 @@ class _TempRepo:
 
 
 def evidence(head_sha: str, **changes) -> TestEvidenceV2:
-    values = dict(command="pytest -q", exit_code=0, passed=10, failed=0, errors=0, skipped=0, head_sha=head_sha)
+    values = dict(command="pytest -q", exit_code=0, passed=10, failed=0, errors=0, skipped=0, head_sha=head_sha,
+                 provenance="CALLER_DECLARED")
     values.update(changes)
     return TestEvidenceV2(**values)
 
@@ -358,6 +364,17 @@ class OwnershipSafetyTests(unittest.TestCase):
 
 
 class ReviewRoundBudgetTests(unittest.TestCase):
+    """A8: extra review rounds require a consumed, human-decided approvals.py grant --
+    a caller-set boolean is no longer sufficient authorization.
+    """
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.approval_store = ApprovalStore(Path(self.temp.name) / "approvals.db")
+
+    def tearDown(self):
+        self.temp.cleanup()
+
     def _package(self, **overrides) -> HandoffPackageV2:
         values = dict(
             task_id="task-round", owner="claude-code", branch="feat/x", base_sha="a" * 40, head_sha="b" * 40,
@@ -376,18 +393,138 @@ class ReviewRoundBudgetTests(unittest.TestCase):
     def test_round_two_is_accepted(self):
         self._package(review_round=2).validate()
 
-    def test_round_three_is_rejected_without_human_flag(self):
+    def test_round_three_is_rejected_without_approval_id(self):
         with self.assertRaisesRegex(ValueError, "review_round_exceeds_budget_without_human_authorization"):
             self._package(review_round=3).validate()
 
-    def test_round_three_is_accepted_with_explicit_human_flag(self):
-        self._package(review_round=3, human_authorized_extra_rounds=True).validate()  # must not raise
+    def test_self_asserted_approval_id_fails_at_generation_not_just_validate(self):
+        # validate() alone can only check PRESENCE of the field, not that it was truly granted --
+        # that deeper check lives in generate_handoff_package(), proven here.
+        with _TempRepo() as repo:
+            repo.new_branch("feature")
+            repo.commit_file("a.txt", "a", "add a")
+            head = repo.head()
+            fabricated_id = "apr_" + "0" * 32  # an AI just making up an id, never requested or granted
+            with self.assertRaisesRegex(ValueError, "extra_review_round_approval_invalid_or_not_human_decided"):
+                generate_handoff_package(
+                    repo.root, task_id="task-round", owner="claude-code", state="IN_PROGRESS", risk_class="LOW",
+                    review_round=3, protected_action_required=False, next_deterministic_action="continue",
+                    base_ref="main", tests=(evidence(head),), extra_round_approval_id=fabricated_id,
+                    approval_store=self.approval_store,
+                )
 
-    def test_ai_cannot_self_certify_by_only_setting_the_flag_without_intent(self):
-        # the flag exists and is respected, but it is a distinct, explicit, named field --
-        # nothing in validate()/generate_handoff_package() ever sets it to True automatically.
-        package = self._package(review_round=1)
-        self.assertFalse(package.human_authorized_extra_rounds)
+    def test_ai_requested_but_undecided_approval_fails_at_generation(self):
+        with _TempRepo() as repo:
+            repo.new_branch("feature")
+            repo.commit_file("a.txt", "a", "add a")
+            head = repo.head()
+            approval_id = request_extra_review_round(self.approval_store, task_id="task-round", head_sha=head,
+                                                      review_round=3, requested_by="claude-code")
+            with self.assertRaisesRegex(ValueError, "extra_review_round_approval_invalid_or_not_human_decided"):
+                generate_handoff_package(
+                    repo.root, task_id="task-round", owner="claude-code", state="IN_PROGRESS", risk_class="LOW",
+                    review_round=3, protected_action_required=False, next_deterministic_action="continue",
+                    base_ref="main", tests=(evidence(head),), extra_round_approval_id=approval_id,
+                    approval_store=self.approval_store,
+                )
+
+    def test_approval_decided_for_a_different_scope_does_not_transfer(self):
+        with _TempRepo() as repo:
+            repo.new_branch("feature")
+            repo.commit_file("a.txt", "a", "add a")
+            head = repo.head()
+            approval_id = request_extra_review_round(self.approval_store, task_id="task-round", head_sha=head,
+                                                      review_round=3, requested_by="claude-code")
+            self.approval_store.decide(approval_id, approved=True, decided_by="human")
+            wrong_scope_ok = consume_extra_review_round_approval(
+                self.approval_store, approval_id=approval_id, task_id="task-round", head_sha="f" * 40,
+                review_round=3,
+            )
+            self.assertFalse(wrong_scope_ok)
+
+    def test_genuinely_human_decided_approval_allows_generation(self):
+        with _TempRepo() as repo:
+            repo.new_branch("feature")
+            repo.commit_file("a.txt", "a", "add a")
+            head = repo.head()
+            approval_id = request_extra_review_round(self.approval_store, task_id="task-round", head_sha=head,
+                                                      review_round=3, requested_by="claude-code")
+            self.approval_store.decide(approval_id, approved=True, decided_by="human")
+            package = generate_handoff_package(
+                repo.root, task_id="task-round", owner="claude-code", state="IN_PROGRESS", risk_class="LOW",
+                review_round=3, protected_action_required=False, next_deterministic_action="continue",
+                base_ref="main", tests=(evidence(head),), extra_round_approval_id=approval_id,
+                approval_store=self.approval_store,
+            )
+            self.assertEqual(package.review_round, 3)
+
+    def test_approval_is_single_use(self):
+        with _TempRepo() as repo:
+            repo.new_branch("feature")
+            repo.commit_file("a.txt", "a", "add a")
+            head = repo.head()
+            approval_id = request_extra_review_round(self.approval_store, task_id="task-round", head_sha=head,
+                                                      review_round=3, requested_by="claude-code")
+            self.approval_store.decide(approval_id, approved=True, decided_by="human")
+            generate_handoff_package(
+                repo.root, task_id="task-round", owner="claude-code", state="IN_PROGRESS", risk_class="LOW",
+                review_round=3, protected_action_required=False, next_deterministic_action="continue",
+                base_ref="main", tests=(evidence(head),), extra_round_approval_id=approval_id,
+                approval_store=self.approval_store,
+            )
+            with self.assertRaises(ValueError):
+                generate_handoff_package(
+                    repo.root, task_id="task-round", owner="claude-code", state="IN_PROGRESS", risk_class="LOW",
+                    review_round=3, protected_action_required=False, next_deterministic_action="continue",
+                    base_ref="main", tests=(evidence(head),), extra_round_approval_id=approval_id,
+                    approval_store=self.approval_store,
+                )
+
+
+class CrossProjectTouchCompatibilityTests(unittest.TestCase):
+    """A9: v1's bool cross_project_touch cannot be silently converted into v2's project-id list."""
+
+    def test_v1_false_converts_to_empty_tuple(self):
+        self.assertEqual(convert_v1_cross_project_touch(False), ())
+
+    def test_v1_true_fails_closed_rather_than_guessing(self):
+        with self.assertRaisesRegex(ValueError, "cross_project_touch_unknown_fail_closed"):
+            convert_v1_cross_project_touch(True)
+
+    def test_non_bool_input_is_rejected(self):
+        with self.assertRaises(ValueError):
+            convert_v1_cross_project_touch("true")
+
+
+class TestEvidenceProvenanceTests(unittest.TestCase):
+    """A10: distinguishes evidence a caller merely asserts from evidence this module
+    independently captured the HEAD for."""
+
+    def test_caller_declared_requires_explicit_provenance(self):
+        with self.assertRaises(ValueError):
+            TestEvidenceV2(command="pytest", exit_code=0, passed=1, failed=0, errors=0, skipped=0,
+                          head_sha="a" * 40, provenance="NOT_A_REAL_PROVENANCE").validate()
+
+    def test_caller_declared_evidence_is_accepted_when_explicit(self):
+        TestEvidenceV2(command="pytest", exit_code=0, passed=1, failed=0, errors=0, skipped=0,
+                      head_sha="a" * 40, provenance="CALLER_DECLARED").validate()
+
+    def test_capture_test_evidence_stamps_independently_captured(self):
+        with _TempRepo() as repo:
+            repo.new_branch("feature")
+            head = repo.commit_file("a.txt", "a", "add a")
+            result = capture_test_evidence(repo.root, command="pytest -q", exit_code=0, passed=5, failed=0,
+                                           errors=0, skipped=0, base_ref="main")
+            self.assertEqual(result.provenance, "INDEPENDENTLY_CAPTURED")
+            self.assertEqual(result.head_sha, head)
+
+    def test_capture_test_evidence_head_sha_cannot_be_supplied_by_caller(self):
+        # the caller has no way to pass a head_sha into capture_test_evidence() at all --
+        # it is always derived from the real repo, proven by inspecting the function's own
+        # keyword-only parameters never including one.
+        import inspect
+        params = inspect.signature(capture_test_evidence).parameters
+        self.assertNotIn("head_sha", params)
 
 
 class VerificationResultTests(unittest.TestCase):

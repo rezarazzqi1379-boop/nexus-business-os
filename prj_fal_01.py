@@ -24,6 +24,15 @@ enforce that here:
 
 No live Iranian source is read anywhere in this module -- see iran_source_providers.py's
 integration report; this project's live provider state remains LIVE_PROVIDER_UNWIRED.
+
+Authority-version dispute handling: the governing external record has, more than once,
+had a higher-numbered version (e.g. a v1.6/v1.9-class label) asserted somewhere without a
+corresponding recoverable artifact, while a lower, independently verifiable version
+remained the actual current tuple. See SOURCE_VERSION_DISPUTED below for the convention
+this module uses if a future field's value ever depends on which side of such a dispute is
+correct. Nothing in this module currently needs that tag: every field here (lane
+direction, role, lexicon) is structural and holds under every version of the record
+encountered so far.
 """
 
 from __future__ import annotations
@@ -48,6 +57,13 @@ from market_intelligence import (  # noqa: E402
 
 PROJECT_ID = "PRJ-FAL-01"
 HOME_MARKET_ID = "IRAN"
+
+# Tag for any field/claim whose correct value depends on which of two conflicting external
+# authority-document versions governs. Use this literal (never a guessed value) if a
+# future field must carry a version-specific claim before that conflict is independently
+# resolved -- do not silently pick one version's claim as ground truth. Nothing exported
+# from this module currently carries this tag.
+SOURCE_VERSION_DISPUTED = "SOURCE_VERSION_DISPUTED"
 
 FAL_A_LANE_ID = "FAL-A"
 FAL_B_LANE_ID = "FAL-B"

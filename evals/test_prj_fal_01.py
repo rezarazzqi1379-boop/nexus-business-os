@@ -13,6 +13,7 @@ from prj_fal_01 import (
     FAL_B_PRODUCT_KEYWORDS,
     FAL_ROLE_RULES,
     HOME_MARKET_ID,
+    SOURCE_VERSION_DISPUTED,
     FalLaneEvidenceStore,
     classify_fal_buyer_opportunity,
     validate_lanes,
@@ -61,6 +62,11 @@ class LaneConfigurationTests(unittest.TestCase):
 
     def test_fal_a_and_fal_b_product_keywords_never_overlap(self):
         self.assertFalse(set(FAL_A_PRODUCT_KEYWORDS) & set(FAL_B_PRODUCT_KEYWORDS))
+
+    def test_source_version_disputed_tag_is_a_stable_non_empty_string(self):
+        # A convention for future use, not currently applied to any field in this module --
+        # nothing here holds a version-specific claim that would need it.
+        self.assertEqual(SOURCE_VERSION_DISPUTED, "SOURCE_VERSION_DISPUTED")
 
 
 class FalLaneEvidenceStoreTests(unittest.TestCase):

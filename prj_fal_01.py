@@ -1,16 +1,13 @@
 """PRJ-FAL-01 (Ferroalloys Trade) -- lane configuration and cross-module wiring.
 
-Canonical authority for this project lives OUTSIDE this repository: the live PRJ-FAL-01
-project record (NEXUS Command Center / NEXUS Projects, Project ID NEX-8, independently
-verified present as of this slice) and its governing master
-NEXUS_Ferroalloys_Trade_Master_v0.2. This module encodes only the STRUCTURAL scope that
-record defines -- project id, lane ids, directions, roles, the lane-isolation rule, and a
-minimal generic domain lexicon -- never a specification number, price, chemistry value, or
-counterparty/producer identity. Every one of those remains UNKNOWN or CLAIM in the
-governing external record; encoding a live, frequently-revised evidence value here would
-let it silently calcify into a stale "fact" baked into code, which is exactly what that
-record's own evidence discipline (FACT/CLAIM/MEASUREMENT/UNKNOWN, "no opportunity promoted
-without lane-specific evidence") forbids.
+This module is a working structural model derived from disputed/reconciling project
+artifacts; authority promotion pending. It encodes only the STRUCTURAL scope common to
+every version of those artifacts encountered so far -- project id, lane ids, directions,
+roles, the lane-isolation rule, and a minimal generic domain lexicon -- never a
+specification number, price, chemistry value, or counterparty/producer identity. Every one
+of those remains UNKNOWN pending independent verification and authority reconciliation;
+encoding a live, frequently-revised evidence value here would let it silently calcify into
+a stale "fact" baked into code, which this module's own discipline forbids.
 
 FAL-A (ferromanganese import into Iran) and FAL-B (Iranian ferrosilicon export) are related
 only at portfolio level: grades, prices, counterparties, origins, destinations, routes and
@@ -25,14 +22,12 @@ enforce that here:
 No live Iranian source is read anywhere in this module -- see iran_source_providers.py's
 integration report; this project's live provider state remains LIVE_PROVIDER_UNWIRED.
 
-Authority-version dispute handling: the governing external record has, more than once,
-had a higher-numbered version (e.g. a v1.6/v1.9-class label) asserted somewhere without a
-corresponding recoverable artifact, while a lower, independently verifiable version
-remained the actual current tuple. See SOURCE_VERSION_DISPUTED below for the convention
-this module uses if a future field's value ever depends on which side of such a dispute is
-correct. Nothing in this module currently needs that tag: every field here (lane
-direction, role, lexicon) is structural and holds under every version of the record
-encountered so far.
+Authority-version dispute handling: this project's authority status is
+AUTHORITY_CONFLICT / RECONCILIATION_PENDING. See SOURCE_VERSION_DISPUTED below for the
+generic convention this module uses if a future field's value ever depends on which side
+of an unresolved authority dispute is correct. Nothing in this module currently needs that
+tag: every field here (lane direction, role, lexicon) is structural and holds regardless
+of how that dispute resolves.
 """
 
 from __future__ import annotations
@@ -70,8 +65,8 @@ FAL_B_LANE_ID = "FAL-B"
 FAL_LANE_IDS = frozenset({FAL_A_LANE_ID, FAL_B_LANE_ID})
 
 # FAL-A: ferromanganese import into Iran -- Iran is the importing/end-market side, the
-# foreign market is the supply side. Every specification/price/counterparty field is
-# UNKNOWN in the governing external record; nothing beyond the structural lane shape
+# foreign market is the supply side. Every specification/price/counterparty field remains
+# UNKNOWN pending authority reconciliation; nothing beyond the structural lane shape
 # belongs here.
 FAL_A = LaneDiscoveryBinding(
     lane_id=FAL_A_LANE_ID, direction="IMPORT", home_market_id=HOME_MARKET_ID,
@@ -79,8 +74,8 @@ FAL_A = LaneDiscoveryBinding(
 )
 
 # FAL-B: Iranian ferrosilicon export -- Iran is the exporting/supply side, the foreign
-# market is the buyer side. The governing record's FAL-B chemistry values are CLAIM-only
-# and producer-unverified; they are deliberately not encoded here.
+# market is the buyer side. No specification, chemistry, or producer identity is encoded
+# here; those remain unresolved pending authority reconciliation.
 FAL_B = LaneDiscoveryBinding(
     lane_id=FAL_B_LANE_ID, direction="EXPORT", home_market_id=HOME_MARKET_ID,
     home_market_role="EXPORTER", foreign_market_role="BUYER",
@@ -98,7 +93,8 @@ def validate_lanes() -> None:
 
 # ---------------------------------------------------------------------------
 # Minimal generic product/role lexicon (English + Persian). No real company names, no
-# chemistry, no prices -- only the product/role terminology the governing scope names.
+# chemistry, no prices -- only generic product/role terminology common across the
+# disputed/reconciling project artifacts.
 # Rule order matters: logistics and tendering-body keywords are checked before buyer/
 # supplier keywords so a freight forwarder or tender notice is never misclassified as a
 # counterparty just because "buyer"-adjacent language appears nearby in the same text.
@@ -137,8 +133,8 @@ class FalLaneEvidenceStore:
     home_market_id="IRAN", so a single shared ``{market_id: MarketEvidence}`` dict would
     let FAL-A's Iran-side evidence silently collide with FAL-B's under the same key.
     Keying by (lane_id, market_id) instead makes that collision structurally impossible --
-    the enforced version of the governing record's prose rule that lane evidence must never
-    transfer between FAL-A and FAL-B.
+    the enforced version of the working rule that lane evidence must never transfer between
+    FAL-A and FAL-B.
     """
 
     by_lane: Mapping[str, Mapping[str, MarketEvidence]]
@@ -186,14 +182,11 @@ def classify_fal_buyer_opportunity(classification: BuyerClassification) -> bool:
     "logistics_intermediary" -- it treats "procurement_authority" as a buyer.
     market_intelligence.py's fuller taxonomy treats the equivalent
     GOVERNMENT_TENDERING_BODY role as *never* a buyer, because a tendering body issues a
-    demand signal but is not itself the counterparty. This project's demand signals
-    discovered so far have consistently been tender/procurement notices, and the governing
-    external record's own decision discipline never promotes a tendering body straight to
-    "buyer" -- each is retained only as a demand/recurrence signal pending a separately
-    verified, named counterparty. This function enforces that stricter rule for this
-    project rather than silently inheriting discovery_pipeline's looser cross-project
-    default. (Real counterparty names, tender identifiers and any sanctions-relevant
-    findings live only in the governing external evidence record, never in this repo.)
+    demand signal but is not itself the counterparty. This function enforces that stricter,
+    generically safer rule for this project rather than silently inheriting
+    discovery_pipeline's looser cross-project default. It only remaps a
+    BuyerClassification.category value to a role and checks is_buyer_role() -- it does not
+    reference any specific counterparty, tender, or evidence record.
     """
     classification.validate()
     role = _CATEGORY_TO_ROLE[classification.category]

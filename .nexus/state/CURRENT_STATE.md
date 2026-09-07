@@ -112,7 +112,9 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
   verified via git fetch/git show by Claude Code.
 - feat/authority-reconciliation-status-v0.1: docs/authority/
   AUTHORITY_STATUS.md, based on main, not yet merged.
-- feat/nexus-state-tracking-v0.1: THIS FILE — being created now.
+- feat/nexus-state-tracking-v0.1: MERGED to main 2026-09-07
+  (fast-forward, e1d01fa...→e07869d...). This file now lives directly
+  on main.
 - DUPLICATION UNRESOLVED: fal_vertical.py vs prj_fal_01.py — both
   real, both tested, comparison table exists (fal_vertical.py has
   better state enforcement/lexicon/isolation API; prj_fal_01.py has
@@ -144,9 +146,9 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
    vs prj_fal_01.py; resolve END_USER vs IMPORTER via semantic
    review, not just code-convention matching. Both clones must fetch
    first and use their own .venv/Scripts/python.exe.
-3. [Reza] Decide: merge docs/authority/AUTHORITY_STATUS.md and this
-   CURRENT_STATE.md to main once reconciliation completes (currently
-   deliberately held on separate branches).
+3. [Reza] Decide: merge docs/authority/AUTHORITY_STATUS.md to main
+   once reconciliation completes (currently deliberately held on a
+   separate branch).
 4. [Reza] Decide: proceed with live Iran-source integration (first
    real attempt at ONE source) or hold for legal/compliance check first.
 5. [Not started] Opportunity Suggestion Engine (Track E) — designed,

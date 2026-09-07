@@ -1,6 +1,7 @@
-"""PRJ-FAL-01 canonical vertical binding for Deep Search / market intelligence.
+"""PRJ-FAL-01 working structural model for Deep Search / market intelligence.
 
-Stable scope only, recovered from the canonical Ferroalloys Trade Master v0.2:
+Stable scope only, derived from disputed/reconciling project artifacts.
+Authority state: AUTHORITY_CONFLICT / RECONCILIATION_PENDING.
 FAL-A = ferromanganese import into Iran; FAL-B = Iranian ferrosilicon export.
 Dynamic commercial facts remain UNKNOWN until independently verified.
 """

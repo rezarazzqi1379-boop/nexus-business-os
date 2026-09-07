@@ -170,13 +170,14 @@ def classify_fal_buyer_opportunity(classification: BuyerClassification) -> bool:
     "logistics_intermediary" -- it treats "procurement_authority" as a buyer.
     market_intelligence.py's fuller taxonomy treats the equivalent
     GOVERNMENT_TENDERING_BODY role as *never* a buyer, because a tendering body issues a
-    demand signal but is not itself the counterparty. Every demand signal recovered so far
-    in the real PRJ-FAL-01 record (SALCO, Qaenat Steel/IMIDRO, Pakistan Railways, RINL GeM)
-    is a tender/procurement notice, and that record's own decision discipline never
-    promotes a tendering body straight to "buyer" -- each is retained only as a
-    demand/recurrence signal pending a separately verified, named counterparty. This
-    function enforces that stricter rule for this project rather than silently inheriting
-    discovery_pipeline's looser cross-project default.
+    demand signal but is not itself the counterparty. This project's demand signals
+    discovered so far have consistently been tender/procurement notices, and the governing
+    external record's own decision discipline never promotes a tendering body straight to
+    "buyer" -- each is retained only as a demand/recurrence signal pending a separately
+    verified, named counterparty. This function enforces that stricter rule for this
+    project rather than silently inheriting discovery_pipeline's looser cross-project
+    default. (Real counterparty names, tender identifiers and any sanctions-relevant
+    findings live only in the governing external evidence record, never in this repo.)
     """
     classification.validate()
     role = _CATEGORY_TO_ROLE[classification.category]

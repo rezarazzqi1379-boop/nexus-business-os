@@ -163,6 +163,10 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
   and snapshot; it refuses to invent a recipe while plant inputs are missing.
 - Next evidence required: one acceptable and one defective historical heat of the same
   grade/route, with chemistry, process timeline, equipment context and quality results.
+- Governed CSV/JSON/XLSX ingestion is merged to main. Raw inputs are SHA-256 vaulted;
+  normalized records remain unverified and bind back to the raw-file digest.
+- Staff launcher: `scripts/expert_foundry_intake.ps1`; default is dry-run and `-Commit`
+  is required for storage. No web UI or central production deployment exists yet.
 
 ## ROLE SPLIT (still true)
 - Claude Code: engineering executor (code/tests/branches)

@@ -10,12 +10,39 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import uuid
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from hashlib import sha256
 from pathlib import Path
-from typing import Iterable
+from typing import IO, Iterable
+
+if sys.platform == "win32":
+    import msvcrt
+    import time
+
+    def _acquire_lock(handle: IO[bytes]) -> None:
+        handle.seek(0)
+        while True:
+            try:
+                msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+                return
+            except OSError:
+                time.sleep(0.005)
+
+    def _release_lock(handle: IO[bytes]) -> None:
+        handle.seek(0)
+        msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+else:
+    import fcntl
+
+    def _acquire_lock(handle: IO[bytes]) -> None:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+
+    def _release_lock(handle: IO[bytes]) -> None:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
 
 
 SCHEMA_VERSION = "nexus.expert-foundry.v1"
@@ -297,8 +324,19 @@ class ExpertFoundryStore:
         self.root = root.resolve()
         self.events_path = self.root / "events.jsonl"
         self.snapshots_dir = self.root / "snapshots"
+        self.lock_path = self.root / ".store.lock"
         self.root.mkdir(parents=True, exist_ok=True)
         self.snapshots_dir.mkdir(parents=True, exist_ok=True)
+
+    @contextmanager
+    def _locked(self):
+        """Serialize writers across threads and processes sharing this store root."""
+        with self.lock_path.open("a+b") as handle:
+            _acquire_lock(handle)
+            try:
+                yield
+            finally:
+                _release_lock(handle)
 
     def _last_hash(self) -> str:
         if not self.events_path.exists():
@@ -306,16 +344,11 @@ class ExpertFoundryStore:
         lines = [line for line in self.events_path.read_text(encoding="utf-8").splitlines() if line]
         return json.loads(lines[-1])["event_hash"] if lines else "0" * 64
 
-    def append(self, record: KnowledgeRecord | ExperienceRecord | HypothesisRecord | ResearchTrace |
-               ConversationRecord | PromotionDecision) -> str:
-        record.validate()
-        payload = asdict(record)
+    def _write_envelope_locked(self, event_type: str, payload: dict) -> str:
+        """Caller must hold self._locked(). Appends one hash-chained event."""
         envelope = {
-            "schema_version": SCHEMA_VERSION,
-            "event_id": uuid.uuid4().hex,
-            "event_type": type(record).__name__,
-            "previous_hash": self._last_hash(),
-            "payload": payload,
+            "schema_version": SCHEMA_VERSION, "event_id": uuid.uuid4().hex,
+            "event_type": event_type, "previous_hash": self._last_hash(), "payload": payload,
         }
         envelope["event_hash"] = sha256(_canonical_json(envelope).encode("utf-8")).hexdigest()
         with self.events_path.open("a", encoding="utf-8", newline="\n") as stream:
@@ -323,6 +356,13 @@ class ExpertFoundryStore:
             stream.flush()
             os.fsync(stream.fileno())
         return envelope["event_hash"]
+
+    def append(self, record: KnowledgeRecord | ExperienceRecord | HypothesisRecord | ResearchTrace |
+               ConversationRecord | PromotionDecision) -> str:
+        record.validate()
+        payload = asdict(record)
+        with self._locked():
+            return self._write_envelope_locked(type(record).__name__, payload)
 
     def promote(self, record: KnowledgeRecord, decision: PromotionDecision) -> str:
         """Record an approved promotion; direct PROMOTED records are forbidden."""
@@ -337,19 +377,8 @@ class ExpertFoundryStore:
         promoted = asdict(record)
         promoted["maturity_state"] = "PROMOTED"
         payload = {"record": promoted, "decision": asdict(decision)}
-        return self._append_payload("PromotionEvent", payload)
-
-    def _append_payload(self, event_type: str, payload: dict) -> str:
-        envelope = {
-            "schema_version": SCHEMA_VERSION, "event_id": uuid.uuid4().hex,
-            "event_type": event_type, "previous_hash": self._last_hash(), "payload": payload,
-        }
-        envelope["event_hash"] = sha256(_canonical_json(envelope).encode("utf-8")).hexdigest()
-        with self.events_path.open("a", encoding="utf-8", newline="\n") as stream:
-            stream.write(_canonical_json(envelope) + "\n")
-            stream.flush()
-            os.fsync(stream.fileno())
-        return envelope["event_hash"]
+        with self._locked():
+            return self._write_envelope_locked("PromotionEvent", payload)
 
     def verify_chain(self) -> bool:
         previous = "0" * 64
@@ -367,17 +396,24 @@ class ExpertFoundryStore:
 
     def create_snapshot(self, snapshot_id: str) -> Path:
         _safe_id(snapshot_id, "snapshot_id")
-        if not self.verify_chain():
-            raise ValueError("cannot_snapshot_invalid_chain")
-        content = self.events_path.read_text(encoding="utf-8") if self.events_path.exists() else ""
-        digest = sha256(content.encode("utf-8")).hexdigest()
-        payload = {"schema_version": SCHEMA_VERSION, "snapshot_id": snapshot_id,
-                   "events_sha256": digest, "events": content.splitlines()}
         target = self.snapshots_dir / f"{snapshot_id}.json"
-        if target.exists():
-            raise FileExistsError("snapshot_already_exists")
-        temporary = target.with_name(f".{target.name}.{uuid.uuid4().hex}.tmp")
-        temporary.write_text(json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
-                             encoding="utf-8")
-        os.replace(temporary, target)
+        with self._locked():
+            if not self.verify_chain():
+                raise ValueError("cannot_snapshot_invalid_chain")
+            content = self.events_path.read_text(encoding="utf-8") if self.events_path.exists() else ""
+            digest = sha256(content.encode("utf-8")).hexdigest()
+            payload = {"schema_version": SCHEMA_VERSION, "snapshot_id": snapshot_id,
+                       "events_sha256": digest, "events": content.splitlines()}
+            try:
+                descriptor = os.open(target, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            except FileExistsError:
+                raise FileExistsError("snapshot_already_exists") from None
+            try:
+                with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+                    stream.write(json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2) + "\n")
+                    stream.flush()
+                    os.fsync(stream.fileno())
+            except BaseException:
+                target.unlink(missing_ok=True)
+                raise
         return target

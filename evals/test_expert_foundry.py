@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import tempfile
+import threading
 import unittest
 from dataclasses import replace
 from pathlib import Path
@@ -150,6 +151,50 @@ class StoreTests(unittest.TestCase):
             self.assertEqual(json.loads(snapshot.read_text())["snapshot_id"], "snapshot_001")
             with self.assertRaises(FileExistsError):
                 store.create_snapshot("snapshot_001")
+
+    def test_concurrent_appends_preserve_every_event_and_chain_validity(self):
+        with tempfile.TemporaryDirectory() as temp:
+            store = ExpertFoundryStore(Path(temp))
+            errors = []
+
+            def worker(i):
+                try:
+                    store.append(knowledge(record_id=f"knowledge_{i:03d}"))
+                except Exception as exc:  # pragma: no cover - failure path only
+                    errors.append(exc)
+
+            threads = [threading.Thread(target=worker, args=(i,)) for i in range(40)]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+
+            self.assertEqual(errors, [])
+            lines = [line for line in store.events_path.read_text().splitlines() if line]
+            self.assertEqual(len(lines), 40)
+            self.assertTrue(store.verify_chain())
+
+    def test_concurrent_snapshot_requests_yield_exactly_one_winner(self):
+        with tempfile.TemporaryDirectory() as temp:
+            store = ExpertFoundryStore(Path(temp))
+            store.append(knowledge())
+            successes = []
+            conflicts = []
+
+            def worker(_):
+                try:
+                    successes.append(store.create_snapshot("shared_snapshot"))
+                except FileExistsError:
+                    conflicts.append(1)
+
+            threads = [threading.Thread(target=worker, args=(i,)) for i in range(10)]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+
+            self.assertEqual(len(successes), 1)
+            self.assertEqual(len(conflicts), 9)
 
 
 if __name__ == "__main__":

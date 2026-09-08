@@ -156,9 +156,10 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
 
 ## EXPERT FOUNDRY ACTIVATION (2026-09-08)
 - Expert Foundry v0.1 merged to main as a governed research-memory scaffold.
-- First executable steel-ingot vertical proof exists and passes focused tests.
+- Phase-0 steel-ingot preflight exists and passes focused tests; it is not the
+  architecture's full acceptance proof.
 - Current runtime state: READY_FOR_FACTORY_DATA, not production/process control.
-- The proof stores sources, exact queries, gaps, a falsifiable hypothesis, hash chain
+- The preflight stores curated sources (not a claimed live search), gaps, a falsifiable hypothesis, hash chain
   and snapshot; it refuses to invent a recipe while plant inputs are missing.
 - Next evidence required: one acceptable and one defective historical heat of the same
   grade/route, with chemistry, process timeline, equipment context and quality results.

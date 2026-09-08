@@ -205,13 +205,19 @@ class ResearchTrace:
     stopping_reason: str
     project_id: str = ""
     lane_id: str | None = None
+    retrieval_mode: str = "LIVE_SEARCH"
 
     def validate(self) -> None:
         _safe_id(self.run_id, "run_id")
         _nonempty((self.objective, self.stopping_reason), "research_trace")
-        if not self.exact_queries:
+        if self.retrieval_mode not in {"LIVE_SEARCH", "STATIC_CURATED"}:
+            raise ValueError("invalid_retrieval_mode")
+        if self.retrieval_mode == "LIVE_SEARCH" and not self.exact_queries:
             raise ValueError("research_trace_requires_query")
-        _nonempty(self.exact_queries, "exact_query")
+        if self.retrieval_mode == "STATIC_CURATED" and self.exact_queries:
+            raise ValueError("static_trace_cannot_claim_queries")
+        if self.exact_queries:
+            _nonempty(self.exact_queries, "exact_query")
         _nonempty(self.provider_ids, "provider_id")
         for ref in self.source_refs + self.rejected_source_refs + self.gap_refs:
             _safe_id(ref, "research_trace_ref")

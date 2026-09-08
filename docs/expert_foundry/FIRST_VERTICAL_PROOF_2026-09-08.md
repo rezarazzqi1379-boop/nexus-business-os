@@ -1,4 +1,4 @@
-# Expert Foundry — First Vertical Proof
+# Expert Foundry — Phase-0 Preflight
 
 Date: 2026-09-08  
 Project: `steel_ingot_pilot`  
@@ -7,10 +7,14 @@ Execution boundary: retrospective/read-only; no recipe, setpoint, equipment cont
 
 ## Direct result
 
-The executable proof successfully captured two scientific sources, the exact research
-queries, current evidence gaps, a falsifiable hypothesis, a hash-chained event log and a
+This preliminary preflight captured two repository-curated scientific sources (without
+claiming that the executable performed a live search), current evidence gaps, a falsifiable hypothesis, a hash-chained event log and a
 digest-bound snapshot. It correctly refused to produce a plant recommendation because
 the factory input contract is incomplete.
+
+This is not the architecture's full acceptance proof: no real operator experience,
+contradiction, restore drill, or human-gated promotion exists yet. Those records must
+come from real evidence and must never be fabricated to satisfy an acceptance test.
 
 The first useful plant study should compare one acceptable heat and one defective heat of
 the same grade and route. It should reconstruct their timelines, validate measurement

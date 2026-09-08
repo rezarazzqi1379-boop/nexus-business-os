@@ -1,15 +1,33 @@
 {
   "project_id": "steel_ingot_pilot",
-  "product_grade": null,
-  "target_chemistry": null,
-  "furnace_type": null,
-  "furnace_capacity": null,
-  "charge_materials": null,
-  "deoxidation_practice": null,
-  "casting_method": null,
-  "mould_geometry": null,
-  "temperature_measurements": null,
-  "sampling_plan": null,
-  "observed_defects": null,
-  "quality_tests": null
+  "product": {"form": null, "grade": null, "acceptance_standard": null},
+  "production_route": {"route_id": null, "description": null},
+  "heats": [
+    {
+      "heat_id": null,
+      "outcome": "ACCEPTABLE",
+      "equipment": {},
+      "chemistry": {},
+      "charge_and_additions": [],
+      "thermal_timeline": [],
+      "casting": {},
+      "quality_results": [],
+      "maintenance_deviations": [],
+      "operator_observations": [],
+      "raw_evidence": []
+    },
+    {
+      "heat_id": null,
+      "outcome": "DEFECTIVE",
+      "equipment": {},
+      "chemistry": {},
+      "charge_and_additions": [],
+      "thermal_timeline": [],
+      "casting": {},
+      "quality_results": [],
+      "maintenance_deviations": [],
+      "operator_observations": [],
+      "raw_evidence": []
+    }
+  ]
 }

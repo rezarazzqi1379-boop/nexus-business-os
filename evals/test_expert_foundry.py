@@ -93,6 +93,13 @@ class HypothesisAndPromotionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "research_trace_requires_query"):
             item.validate()
 
+    def test_static_trace_cannot_claim_a_search_query(self):
+        item = ResearchTrace("run_1", "curated baseline", ("query",), ("static_bundle",),
+                             (), (), (), NOW, NOW, "complete", "project_fal", None,
+                             "STATIC_CURATED")
+        with self.assertRaisesRegex(ValueError, "static_trace_cannot_claim_queries"):
+            item.validate()
+
     def test_conversation_is_never_authority(self):
         item = ConversationRecord("conversation_1", "chat", ("user", "assistant"),
                                   "chat:conversation_1", NOW, (), "0" * 64,

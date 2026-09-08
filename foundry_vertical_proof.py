@@ -5,16 +5,65 @@ from __future__ import annotations
 import argparse
 import json
 from datetime import datetime, timezone
+from hashlib import sha256
 from pathlib import Path
 
 from expert_foundry import ExpertFoundryStore, HypothesisRecord, KnowledgeRecord, ResearchTrace
 
 
-REQUIRED_FACTORY_FIELDS = (
-    "product_grade", "target_chemistry", "furnace_type", "furnace_capacity",
-    "charge_materials", "deoxidation_practice", "casting_method", "mould_geometry",
-    "temperature_measurements", "sampling_plan", "observed_defects", "quality_tests",
+REQUIRED_HEAT_SECTIONS = (
+    "equipment", "chemistry", "charge_and_additions", "thermal_timeline",
+    "casting", "quality_results", "maintenance_deviations", "operator_observations",
+    "raw_evidence",
 )
+
+
+def assess_factory_input(payload: dict) -> list[str]:
+    """Return precise gaps; truthy placeholders never establish readiness."""
+    gaps: list[str] = []
+    product = payload.get("product")
+    if not isinstance(product, dict):
+        gaps.append("product")
+    else:
+        for field in ("form", "grade", "acceptance_standard"):
+            if not isinstance(product.get(field), str) or not product[field].strip():
+                gaps.append(f"product.{field}")
+    route = payload.get("production_route")
+    if not isinstance(route, dict) or not route.get("route_id"):
+        gaps.append("production_route.route_id")
+    heats = payload.get("heats")
+    if not isinstance(heats, list) or len(heats) != 2:
+        return gaps + ["heats.requires_exactly_two_historical_records"]
+    outcomes: set[str] = set()
+    seen_ids: set[str] = set()
+    for index, heat in enumerate(heats):
+        prefix = f"heats[{index}]"
+        if not isinstance(heat, dict):
+            gaps.append(prefix)
+            continue
+        heat_id = heat.get("heat_id")
+        if not isinstance(heat_id, str) or not heat_id.strip() or heat_id in seen_ids:
+            gaps.append(f"{prefix}.heat_id_unique")
+        else:
+            seen_ids.add(heat_id)
+        outcome = heat.get("outcome")
+        if outcome not in {"ACCEPTABLE", "DEFECTIVE"}:
+            gaps.append(f"{prefix}.outcome")
+        else:
+            outcomes.add(outcome)
+        for section in REQUIRED_HEAT_SECTIONS:
+            value = heat.get(section)
+            if not isinstance(value, (dict, list)) or not value:
+                gaps.append(f"{prefix}.{section}")
+        timeline = heat.get("thermal_timeline")
+        for measurement in timeline if isinstance(timeline, list) else []:
+            if not isinstance(measurement, dict) or not all(measurement.get(key) not in (None, "") for key in
+                ("value", "unit", "measured_at", "source_locator", "uncertainty")):
+                gaps.append(f"{prefix}.thermal_timeline.measurement_contract")
+                break
+    if outcomes != {"ACCEPTABLE", "DEFECTIVE"}:
+        gaps.append("heats.requires_one_acceptable_and_one_defective")
+    return gaps
 
 BASELINE_SOURCES = (
     {
@@ -44,23 +93,20 @@ def run_proof(factory_input: dict, output_root: Path, now: str | None = None) ->
             record_id=source["record_id"], record_type="SOURCE", domain="steel_ingot",
             title=source["title"], statement=source["statement"],
             source_class="PRIMARY_RESEARCH", source_locator=source["locator"],
-            captured_at=timestamp, confidence=0.85, project_id=project_id,
+            captured_at=timestamp, confidence=0.0, project_id=project_id,
         )
         store.append(record)
         source_refs.append(record.record_id)
 
-    missing = [field for field in REQUIRED_FACTORY_FIELDS if not factory_input.get(field)]
+    missing = assess_factory_input(factory_input)
     trace = ResearchTrace(
         run_id="run_ingot_baseline_001", objective="Assess readiness for a safe steel-ingot research cycle",
-        exact_queries=(
-            "steel ingot macrosegregation shrinkage porosity review",
-            "steel ingot solidification process measurement quality",
-        ),
-        provider_ids=("public_web_search",), source_refs=tuple(source_refs),
-        rejected_source_refs=(), gap_refs=tuple(f"gap_{field}" for field in missing),
+        exact_queries=(), provider_ids=("repository_curated_baseline_v0_1",), source_refs=tuple(source_refs),
+        rejected_source_refs=(),
+        gap_refs=tuple(f"gap_{sha256(field.encode('utf-8')).hexdigest()[:16]}" for field in missing),
         started_at=timestamp, stopped_at=timestamp,
         stopping_reason="Baseline established; factory-specific inference blocked until measured inputs arrive.",
-        project_id=project_id,
+        project_id=project_id, retrieval_mode="STATIC_CURATED",
     )
     store.append(trace)
 
@@ -77,7 +123,8 @@ def run_proof(factory_input: dict, output_root: Path, now: str | None = None) ->
     store.append(hypothesis)
     snapshot = store.create_snapshot("baseline_001")
     return {
-        "status": "READY_FOR_FACTORY_DATA" if missing else "READY_FOR_BOUNDED_ANALYSIS",
+        "proof_stage": "PHASE_0_PREFLIGHT",
+        "status": "READY_FOR_FACTORY_DATA" if missing else "READY_FOR_RETROSPECTIVE_ANALYSIS",
         "project_id": project_id,
         "missing_fields": missing,
         "source_refs": source_refs,

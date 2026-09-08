@@ -96,8 +96,8 @@ def _isoformat_utc(value: str, field_name: str) -> str:
     return parsed.astimezone(timezone.utc).isoformat()
 
 
-def _stamp_locator(locator: str, ingestion_timestamp: str) -> str:
-    return f"{locator}|ingested_at={ingestion_timestamp}"
+def _stamp_locator(locator: str, ingestion_timestamp: str, raw_file_sha256: str) -> str:
+    return f"{locator}|raw_sha256={raw_file_sha256}|ingested_at={ingestion_timestamp}"
 
 
 def _content_hash(*, project_id: str, heat_id: str, category: str, field_name: str,
@@ -435,14 +435,15 @@ def validate_and_normalize_row(row: dict, row_index: int, expected_project_id: s
     )
 
 
-def build_record(row: NormalizedRow, domain: str, ingestion_timestamp: str):
-    locator = _stamp_locator(row.source_locator, ingestion_timestamp)
+def build_record(row: NormalizedRow, domain: str, ingestion_timestamp: str,
+                 raw_file_sha256: str):
+    locator = _stamp_locator(row.source_locator, ingestion_timestamp, raw_file_sha256)
     title = f"{row.heat_id}:{row.field_name}"
     if row.category == "MEASUREMENT":
         return KnowledgeRecord(
             record_id=row.record_id, record_type="SOURCE", domain=domain, title=title,
             statement=row.statement, source_class="PLANT_MEASUREMENT", source_locator=locator,
-            captured_at=row.timestamp, confidence=1.0, project_id=row.project_id,
+            captured_at=row.timestamp, confidence=0.0, project_id=row.project_id,
         )
     if row.category == "OPERATOR_OBSERVATION":
         knowledge = KnowledgeRecord(
@@ -624,7 +625,7 @@ def ingest(
         vault_path = str(vault.store(raw_bytes, file_sha256, suffix))
         written_hashes = []
         for normalized in accepted:
-            record = build_record(normalized, domain, ingestion_timestamp)
+            record = build_record(normalized, domain, ingestion_timestamp, file_sha256)
             written_hashes.append(store.append(record))
         event_hashes = tuple(written_hashes)
 

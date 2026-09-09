@@ -31,6 +31,31 @@ class Gate(str, Enum):
 
 
 @dataclass(frozen=True)
+class ApprovalScope:
+    approval_id: str
+    action_type: str
+    recipient: str
+    destination: str
+    content_digest: str
+    attachments_digest: str
+    version: str
+
+    def is_complete(self) -> bool:
+        return all(
+            value.strip()
+            for value in (
+                self.approval_id,
+                self.action_type,
+                self.recipient,
+                self.destination,
+                self.content_digest,
+                self.attachments_digest,
+                self.version,
+            )
+        )
+
+
+@dataclass(frozen=True)
 class ConnectorManifest:
     connector_id: str
     system: str
@@ -110,14 +135,18 @@ class ConnectorControlPlane:
         required_connectors: Iterable[str] = (),
         now: str | None = None,
         external_action_requested: bool = False,
-        exact_approval_id: str | None = None,
+        exact_approval: ApprovalScope | None = None,
     ) -> dict[str, Any]:
         if not project_id:
             raise ValueError("project_id_required")
         observed_now = _parse_time(now or datetime.now(timezone.utc).isoformat())
-        snapshot_map = {item.connector_id: item for item in snapshots}
+        snapshot_items = list(snapshots)
+        snapshot_map = {item.connector_id: item for item in snapshot_items}
         required = sorted(set(required_connectors))
         findings: list[dict[str, Any]] = []
+
+        if len(snapshot_map) != len(snapshot_items):
+            findings.append(self._finding("DUPLICATE_CONNECTOR_SNAPSHOT", "BLOCK", "snapshots"))
 
         for connector_id in required:
             manifest = self.manifests.get(connector_id)
@@ -125,6 +154,8 @@ class ConnectorControlPlane:
             if manifest is None:
                 findings.append(self._finding("UNKNOWN_CONNECTOR", "BLOCK", connector_id))
                 continue
+            if not manifest.read_capable:
+                findings.append(self._finding("REQUIRED_CONNECTOR_NOT_READ_CAPABLE", "BLOCK", connector_id))
             if project_id not in manifest.project_scope and "*" not in manifest.project_scope:
                 findings.append(self._finding("PROJECT_SCOPE_DENIED", "BLOCK", connector_id))
             if snapshot is None or snapshot.state is ConnectorState.UNAVAILABLE:
@@ -138,14 +169,32 @@ class ConnectorControlPlane:
             elif snapshot.state is ConnectorState.DEGRADED:
                 findings.append(self._finding("CONNECTOR_DEGRADED", "REVIEW", connector_id))
 
+        evidence_items = list(evidence)
+        evidence_ids = [item.evidence_id for item in evidence_items]
+        if len(set(evidence_ids)) != len(evidence_ids):
+            findings.append(self._finding("DUPLICATE_EVIDENCE_ID", "BLOCK", "evidence"))
+
         selected: list[EvidenceEnvelope] = []
-        for item in evidence:
-            if item.connector_id not in self.manifests:
+        for item in evidence_items:
+            manifest = self.manifests.get(item.connector_id)
+            if manifest is None:
                 findings.append(self._finding("EVIDENCE_UNKNOWN_CONNECTOR", "BLOCK", item.evidence_id))
                 continue
             if item.project_id != project_id:
                 findings.append(self._finding("CROSS_PROJECT_EVIDENCE", "BLOCK", item.evidence_id))
                 continue
+            if project_id not in manifest.project_scope and "*" not in manifest.project_scope:
+                findings.append(self._finding("EVIDENCE_PROJECT_SCOPE_DENIED", "BLOCK", item.evidence_id))
+                continue
+            evidence_time = _parse_time(item.observed_at)
+            evidence_age = (observed_now - evidence_time).total_seconds()
+            if evidence_age < 0:
+                findings.append(self._finding("EVIDENCE_FROM_FUTURE", "BLOCK", item.evidence_id))
+            elif evidence_age > manifest.freshness_seconds:
+                findings.append(self._finding("STALE_EVIDENCE", "BLOCK", item.evidence_id))
+            source_snapshot = snapshot_map.get(item.connector_id)
+            if source_snapshot is None or source_snapshot.state is ConnectorState.UNAVAILABLE:
+                findings.append(self._finding("EVIDENCE_SOURCE_UNAVAILABLE", "BLOCK", item.evidence_id))
             selected.append(item)
 
         active = self._remove_superseded(selected, findings)
@@ -161,7 +210,7 @@ class ConnectorControlPlane:
                 ) else "REVIEW"
                 findings.append(self._finding("CONTRADICTORY_VALUES", severity, semantic_key))
 
-        if external_action_requested and not exact_approval_id:
+        if external_action_requested and (exact_approval is None or not exact_approval.is_complete()):
             findings.append(self._finding("EXACT_APPROVAL_REQUIRED", "BLOCK", "external_action"))
 
         gate = Gate.SAFE
@@ -176,7 +225,8 @@ class ConnectorControlPlane:
             "generated_at": observed_now.isoformat(),
             "gate": gate.value,
             "external_action_authorized": bool(
-                external_action_requested and exact_approval_id and gate is not Gate.BLOCK
+                external_action_requested and exact_approval is not None
+                and exact_approval.is_complete() and gate is not Gate.BLOCK
             ),
             "required_connectors": required,
             "evidence_count": len(active),
@@ -196,6 +246,7 @@ class ConnectorControlPlane:
         evidence: list[EvidenceEnvelope], findings: list[dict[str, Any]]
     ) -> list[EvidenceEnvelope]:
         ids = {item.evidence_id for item in evidence}
+        by_id = {item.evidence_id: item for item in evidence}
         superseded: set[str] = set()
         for item in evidence:
             for previous in item.supersedes:
@@ -203,6 +254,18 @@ class ConnectorControlPlane:
                     findings.append(ConnectorControlPlane._finding(
                         "SUPERSESSION_TARGET_MISSING", "REVIEW", previous
                     ))
+                    continue
+                target = by_id[previous]
+                if target.semantic_key != item.semantic_key:
+                    findings.append(ConnectorControlPlane._finding(
+                        "INVALID_CROSS_KEY_SUPERSESSION", "BLOCK", previous
+                    ))
+                    continue
+                if previous == item.evidence_id or item.evidence_id in target.supersedes:
+                    findings.append(ConnectorControlPlane._finding(
+                        "SUPERSESSION_CYCLE", "BLOCK", previous
+                    ))
+                    continue
                 superseded.add(previous)
         return [item for item in evidence if item.evidence_id not in superseded]
 
@@ -215,4 +278,3 @@ class ConnectorControlPlane:
             "schema_version": "nexus.connector-manifest.v1",
             "connectors": [asdict(self.manifests[key]) for key in sorted(self.manifests)],
         }
-

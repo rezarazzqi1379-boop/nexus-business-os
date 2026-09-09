@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from nexus_connector_control_plane import (
+    ApprovalScope,
     ConnectorControlPlane,
     ConnectorManifest,
     ConnectorSnapshot,
@@ -22,7 +23,7 @@ class ChatIntent:
     project_id: str
     consequential: bool = True
     external_action_requested: bool = False
-    exact_approval_id: str | None = None
+    exact_approval: ApprovalScope | None = None
 
 
 def load_manifests(path: str | Path) -> list[ConnectorManifest]:
@@ -61,7 +62,7 @@ def bootstrap_chat(
         required_connectors=required_connectors,
         now=now,
         external_action_requested=intent.external_action_requested,
-        exact_approval_id=intent.exact_approval_id,
+        exact_approval=intent.exact_approval,
     )
     available_keys = {
         item.semantic_key for item in evidence_items if item.project_id == intent.project_id
@@ -81,4 +82,3 @@ def bootstrap_chat(
         "isolate project evidence; stop on BLOCK; never treat availability as correctness."
     )
     return result
-

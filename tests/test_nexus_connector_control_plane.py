@@ -1,6 +1,7 @@
 import unittest
 
 from nexus_connector_control_plane import (
+    ApprovalScope,
     ConnectorControlPlane,
     ConnectorManifest,
     ConnectorSnapshot,
@@ -46,6 +47,8 @@ def evidence(evidence_id, value, *, project_id="PRJ-HYD-01", classification=Evid
 
 
 class ConnectorControlPlaneTests(unittest.TestCase):
+    def approval(self):
+        return ApprovalScope("approval-123", "send", "Fiona", "whatsapp:+86", "sha256:text", "sha256:none", "v1")
     def test_safe_preflight_builds_chat_bootstrap(self):
         plane = ConnectorControlPlane([manifest()])
         result = plane.preflight(
@@ -119,12 +122,64 @@ class ConnectorControlPlaneTests(unittest.TestCase):
         allowed = plane.preflight(
         project_id="PRJ-HYD-01", snapshots=[snapshot()], evidence=[],
         required_connectors=["gmail"], now=NOW, external_action_requested=True,
-        exact_approval_id="approval-123",
+        exact_approval=self.approval(),
     )
         self.assertEqual(denied["gate"], "BLOCK")
         self.assertFalse(denied["external_action_authorized"])
         self.assertEqual(allowed["gate"], "SAFE")
         self.assertTrue(allowed["external_action_authorized"])
+
+    def test_duplicate_snapshots_and_evidence_ids_block(self):
+        plane = ConnectorControlPlane([manifest()])
+        result = plane.preflight(
+            project_id="PRJ-HYD-01", snapshots=[snapshot(), snapshot()],
+            evidence=[evidence("e1", 70), evidence("e1", 70)],
+            required_connectors=["gmail"], now=NOW,
+        )
+        self.assertEqual(result["gate"], "BLOCK")
+        codes = {item["code"] for item in result["findings"]}
+        self.assertIn("DUPLICATE_CONNECTOR_SNAPSHOT", codes)
+        self.assertIn("DUPLICATE_EVIDENCE_ID", codes)
+
+    def test_stale_evidence_blocks_even_with_fresh_connector(self):
+        plane = ConnectorControlPlane([manifest()])
+        stale = EvidenceEnvelope(
+            evidence_id="e1", connector_id="gmail", project_id="PRJ-HYD-01",
+            semantic_key="commercial.price", value=70, classification=EvidenceClass.CLAIM,
+            source_locator="gmail://e1", observed_at="2026-09-09T10:00:00+00:00",
+        )
+        result = plane.preflight(
+            project_id="PRJ-HYD-01", snapshots=[snapshot()], evidence=[stale],
+            required_connectors=["gmail"], now=NOW,
+        )
+        self.assertEqual(result["gate"], "BLOCK")
+        self.assertIn("STALE_EVIDENCE", [item["code"] for item in result["findings"]])
+
+    def test_cross_key_supersession_is_rejected(self):
+        plane = ConnectorControlPlane([manifest()])
+        old = evidence("old", 70)
+        new = EvidenceEnvelope(
+            evidence_id="new", connector_id="gmail", project_id="PRJ-HYD-01",
+            semantic_key="technical.pressure", value=120, classification=EvidenceClass.CLAIM,
+            source_locator="gmail://new", observed_at=NOW, supersedes=("old",),
+        )
+        result = plane.preflight(
+            project_id="PRJ-HYD-01", snapshots=[snapshot()], evidence=[old, new],
+            required_connectors=["gmail"], now=NOW,
+        )
+        self.assertEqual(result["gate"], "BLOCK")
+        self.assertIn("INVALID_CROSS_KEY_SUPERSESSION", [item["code"] for item in result["findings"]])
+
+    def test_incomplete_approval_scope_does_not_authorize(self):
+        plane = ConnectorControlPlane([manifest()])
+        incomplete = ApprovalScope("approval-123", "send", "", "whatsapp:+86", "sha256:text", "sha256:none", "v1")
+        result = plane.preflight(
+            project_id="PRJ-HYD-01", snapshots=[snapshot()], evidence=[],
+            required_connectors=["gmail"], now=NOW, external_action_requested=True,
+            exact_approval=incomplete,
+        )
+        self.assertEqual(result["gate"], "BLOCK")
+        self.assertFalse(result["external_action_authorized"])
 
 
     def test_credentials_must_be_references_not_values(self):

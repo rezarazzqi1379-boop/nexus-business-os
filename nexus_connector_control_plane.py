@@ -31,6 +31,19 @@ class Gate(str, Enum):
 
 
 @dataclass(frozen=True)
+class ActionScope:
+    action_type: str
+    recipient: str
+    destination: str
+    content_digest: str
+    attachments_digest: str
+    version: str
+
+    def is_complete(self) -> bool:
+        return all(value.strip() for value in self.__dict__.values())
+
+
+@dataclass(frozen=True)
 class ApprovalScope:
     approval_id: str
     action_type: str
@@ -52,6 +65,23 @@ class ApprovalScope:
                 self.attachments_digest,
                 self.version,
             )
+        )
+
+    def matches(self, requested: ActionScope) -> bool:
+        return requested.is_complete() and (
+            self.action_type,
+            self.recipient,
+            self.destination,
+            self.content_digest,
+            self.attachments_digest,
+            self.version,
+        ) == (
+            requested.action_type,
+            requested.recipient,
+            requested.destination,
+            requested.content_digest,
+            requested.attachments_digest,
+            requested.version,
         )
 
 
@@ -135,6 +165,7 @@ class ConnectorControlPlane:
         required_connectors: Iterable[str] = (),
         now: str | None = None,
         external_action_requested: bool = False,
+        requested_action: ActionScope | None = None,
         exact_approval: ApprovalScope | None = None,
     ) -> dict[str, Any]:
         if not project_id:
@@ -210,8 +241,16 @@ class ConnectorControlPlane:
                 ) else "REVIEW"
                 findings.append(self._finding("CONTRADICTORY_VALUES", severity, semantic_key))
 
-        if external_action_requested and (exact_approval is None or not exact_approval.is_complete()):
-            findings.append(self._finding("EXACT_APPROVAL_REQUIRED", "BLOCK", "external_action"))
+        approval_matches = bool(
+            requested_action is not None
+            and exact_approval is not None
+            and exact_approval.is_complete()
+            and exact_approval.matches(requested_action)
+        )
+        if external_action_requested and requested_action is None:
+            findings.append(self._finding("ACTION_SCOPE_REQUIRED", "BLOCK", "external_action"))
+        elif external_action_requested and not approval_matches:
+            findings.append(self._finding("EXACT_APPROVAL_MISMATCH", "BLOCK", "external_action"))
 
         gate = Gate.SAFE
         if any(item["severity"] == "BLOCK" for item in findings):
@@ -225,8 +264,7 @@ class ConnectorControlPlane:
             "generated_at": observed_now.isoformat(),
             "gate": gate.value,
             "external_action_authorized": bool(
-                external_action_requested and exact_approval is not None
-                and exact_approval.is_complete() and gate is not Gate.BLOCK
+                external_action_requested and approval_matches and gate is not Gate.BLOCK
             ),
             "required_connectors": required,
             "evidence_count": len(active),

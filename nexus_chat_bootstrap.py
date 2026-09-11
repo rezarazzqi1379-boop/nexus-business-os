@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from nexus_connector_control_plane import (
+    ActionScope,
     ApprovalScope,
     ConnectorControlPlane,
     ConnectorManifest,
@@ -23,6 +24,7 @@ class ChatIntent:
     project_id: str
     consequential: bool = True
     external_action_requested: bool = False
+    requested_action: ActionScope | None = None
     exact_approval: ApprovalScope | None = None
 
 
@@ -62,6 +64,7 @@ def bootstrap_chat(
         required_connectors=required_connectors,
         now=now,
         external_action_requested=intent.external_action_requested,
+        requested_action=intent.requested_action,
         exact_approval=intent.exact_approval,
     )
     available_keys = {

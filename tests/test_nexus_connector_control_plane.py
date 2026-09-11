@@ -1,6 +1,7 @@
 import unittest
 
 from nexus_connector_control_plane import (
+    ActionScope,
     ApprovalScope,
     ConnectorControlPlane,
     ConnectorManifest,
@@ -47,6 +48,9 @@ def evidence(evidence_id, value, *, project_id="PRJ-HYD-01", classification=Evid
 
 
 class ConnectorControlPlaneTests(unittest.TestCase):
+    def action(self):
+        return ActionScope("send", "Fiona", "whatsapp:+86", "sha256:text", "sha256:none", "v1")
+
     def approval(self):
         return ApprovalScope("approval-123", "send", "Fiona", "whatsapp:+86", "sha256:text", "sha256:none", "v1")
     def test_safe_preflight_builds_chat_bootstrap(self):
@@ -118,10 +122,12 @@ class ConnectorControlPlaneTests(unittest.TestCase):
         denied = plane.preflight(
         project_id="PRJ-HYD-01", snapshots=[snapshot()], evidence=[],
         required_connectors=["gmail"], now=NOW, external_action_requested=True,
+        requested_action=self.action(),
     )
         allowed = plane.preflight(
         project_id="PRJ-HYD-01", snapshots=[snapshot()], evidence=[],
         required_connectors=["gmail"], now=NOW, external_action_requested=True,
+        requested_action=self.action(),
         exact_approval=self.approval(),
     )
         self.assertEqual(denied["gate"], "BLOCK")
@@ -176,10 +182,23 @@ class ConnectorControlPlaneTests(unittest.TestCase):
         result = plane.preflight(
             project_id="PRJ-HYD-01", snapshots=[snapshot()], evidence=[],
             required_connectors=["gmail"], now=NOW, external_action_requested=True,
+            requested_action=self.action(),
             exact_approval=incomplete,
         )
         self.assertEqual(result["gate"], "BLOCK")
         self.assertFalse(result["external_action_authorized"])
+
+    def test_approval_must_match_exact_action_scope(self):
+        plane = ConnectorControlPlane([manifest()])
+        changed_text = ActionScope("send", "Fiona", "whatsapp:+86", "sha256:changed", "sha256:none", "v1")
+        result = plane.preflight(
+            project_id="PRJ-HYD-01", snapshots=[snapshot()], evidence=[],
+            required_connectors=["gmail"], now=NOW, external_action_requested=True,
+            requested_action=changed_text, exact_approval=self.approval(),
+        )
+        self.assertEqual(result["gate"], "BLOCK")
+        self.assertFalse(result["external_action_authorized"])
+        self.assertIn("EXACT_APPROVAL_MISMATCH", [item["code"] for item in result["findings"]])
 
 
     def test_credentials_must_be_references_not_values(self):

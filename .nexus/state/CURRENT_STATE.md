@@ -168,6 +168,16 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
 - Staff launcher: `scripts/expert_foundry_intake.ps1`; default is dry-run and `-Commit`
   is required for storage. No web UI or central production deployment exists yet.
 
+## ROLLING MILL STUDY (2026-09-12)
+- Initial equipment description received by voice transcription and preserved as eight
+  `UNVERIFIED` claims; no units or meanings were inferred.
+- Dedicated contract: `.nexus/expert_foundry/ROLLING_MILL_ENGINEERING_INTAKE.json`.
+- Readiness gate: `rolling_mill_intake.py`. Current state is
+  `READY_FOR_ENGINEER_INTERVIEW`; calculations and operation changes are blocked.
+- Engineer questionnaire: `docs/expert_foundry/ROLLING_MILL_ENGINEER_QUESTIONNAIRE_FA.md`.
+- Target phrase "300" remains ambiguous (width vs mass/other). Motor numbers 800/125 kW/
+  1002 and speed-like value 550 require nameplate/evidence verification.
+
 ## ROLE SPLIT (still true)
 - Claude Code: engineering executor (code/tests/branches)
 - ChatGPT/NEXUS (via both a Drive/Notion-connected session AND a

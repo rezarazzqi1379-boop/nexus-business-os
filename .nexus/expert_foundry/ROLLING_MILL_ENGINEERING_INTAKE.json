@@ -1,0 +1,28 @@
+{
+  "project_id": "rolling_mill_strip_300_pilot",
+  "product": {
+    "input_billet": {"cross_section_mm": {"width": null, "height": null}, "length_mm": null, "steel_grade": null},
+    "target": {"width_mm": null, "thickness_mm": null, "standard": null}
+  },
+  "mill": {
+    "layout": [],
+    "rolls": {"working_diameter_mm": null, "barrel_length_mm": null, "groove_drawing_locator": null}
+  },
+  "drive": {
+    "motor": {"nameplate_photo_locator": null, "rated_power_kw": null, "rated_speed_rpm": null, "rated_voltage_v": null, "rated_current_a": null},
+    "gearbox": {"ratio": {"input": null, "output": null}, "rated_output_torque_nm": null, "nameplate_photo_locator": null}
+  },
+  "limits": {"maximum_roll_force_n": null, "maximum_spindle_torque_nm": null, "maximum_motor_current_a": null},
+  "process": {"reheating_temperature_degC": null, "pass_schedule": [], "historical_successful_run_locator": null},
+  "safety": {"guards_verified": false, "emergency_stops_verified": false, "loto_procedure_locator": null},
+  "initial_claims": [
+    {"claim_id": "claim_billet_150", "raw_text": "توانایی تولید شمش ۱۵۰", "meaning": null, "unit": null, "verification_state": "UNVERIFIED", "evidence_locator": "conversation:2026-09-08"},
+    {"claim_id": "claim_strip_250", "raw_text": "از شمش ۱۵۰ تسمه ۲۵۰ می‌گیرند", "meaning": null, "unit": null, "verification_state": "UNVERIFIED", "evidence_locator": "conversation:2026-09-08"},
+    {"claim_id": "claim_roll_450_480", "raw_text": "غلطکه ۴۵۰ تا ۴۸۰", "meaning": null, "unit": null, "verification_state": "UNVERIFIED", "evidence_locator": "conversation:2026-09-08"},
+    {"claim_id": "claim_length_1350", "raw_text": "طول ۱۳۵۰", "meaning": null, "unit": null, "verification_state": "UNVERIFIED", "evidence_locator": "conversation:2026-09-08"},
+    {"claim_id": "claim_same_speed_550", "raw_text": "همدور ۵۵۰", "meaning": null, "unit": null, "verification_state": "UNVERIFIED", "evidence_locator": "conversation:2026-09-08"},
+    {"claim_id": "claim_motor_800_125kw_1002", "raw_text": "موتور ۸۰۰ ۱۲۵ کیلووات ۱۰۰۲", "meaning": null, "unit": null, "verification_state": "UNVERIFIED", "evidence_locator": "conversation:2026-09-08"},
+    {"claim_id": "claim_widths_15_20_25", "raw_text": "عرض ۱۵، ۲۰، ۲۵", "meaning": null, "unit": null, "verification_state": "UNVERIFIED", "evidence_locator": "conversation:2026-09-08"},
+    {"claim_id": "claim_target_300", "raw_text": "تسمه ۳۰۰ گرمی و عرض...", "meaning": null, "unit": null, "verification_state": "UNVERIFIED", "evidence_locator": "conversation:2026-09-08"}
+  ]
+}

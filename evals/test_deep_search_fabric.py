@@ -69,6 +69,29 @@ class QueryLatticeTests(unittest.TestCase):
         self.assertNotEqual(make_query_id("q", None, 0), make_query_id("q", "parent", 1))
 
 
+class ProviderBoundaryTests(unittest.TestCase):
+    def test_provider_cannot_spoof_attribution(self):
+        def provider(query, limit):
+            return (result(provider="other", query=query),)
+        with self.assertRaisesRegex(ValueError, "provider_attribution_mismatch"):
+            run_recursive_search(plan(), {"expected": provider}, run_id="run-spoof", query_budget=1,
+                                 strict_provider_attribution=True)
+
+    def test_provider_result_limit_is_enforced(self):
+        def provider(query, limit):
+            return tuple(result(query=query, url=f"https://example.invalid/{i}") for i in range(limit + 1))
+        with self.assertRaisesRegex(ValueError, "provider_result_limit_exceeded"):
+            run_recursive_search(plan(), {"synthetic-a": provider}, run_id="run-overflow",
+                                 query_budget=1, results_per_query=1)
+
+    def test_invalid_resource_limits_fail_closed(self):
+        provider = {"synthetic-a": lambda query, limit: ()}
+        for kwargs in ({"max_depth": 0}, {"query_budget": 0}, {"results_per_query": 0},
+                       {"coverage_target": float("nan")}, {"verification_target": -0.1}):
+            with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
+                run_recursive_search(plan(), provider, run_id="run-invalid", **kwargs)
+
+
 class SearchFrontierTests(unittest.TestCase):
     def test_add_is_idempotent(self):
         frontier = SearchFrontier()

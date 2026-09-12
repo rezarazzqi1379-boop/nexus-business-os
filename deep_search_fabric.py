@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import re
 import sys
+import math
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from hashlib import sha256
@@ -540,6 +541,7 @@ def run_recursive_search(
     provider_fns: Mapping[str, Callable[[str, int], tuple[NormalizedDiscoveryResult, ...]]],
     *, run_id: str, max_depth: int = 3, query_budget: int = 1000, results_per_query: int = 10,
     coverage_target: float = 0.8, verification_target: float = 0.3, marginal_yield_threshold: float = 0.02,
+    strict_provider_attribution: bool = False,
 ) -> RecursiveSearchOutcome:
     """The full loop: OBJECTIVE -> lattice -> discovery -> normalize (assumed done by each
     provider function, which must already return validated NormalizedDiscoveryResult) -> dedup
@@ -553,6 +555,21 @@ def run_recursive_search(
     into any cumulative state -- a mismatch aborts the whole call. Nothing here performs a
     live call itself.
     """
+    if isinstance(max_depth, bool) or not isinstance(max_depth, int) or max_depth < 1:
+        raise ValueError("invalid_max_depth")
+    if isinstance(query_budget, bool) or not isinstance(query_budget, int) or query_budget < 1:
+        raise ValueError("invalid_query_budget")
+    if isinstance(results_per_query, bool) or not isinstance(results_per_query, int) or results_per_query < 1:
+        raise ValueError("invalid_results_per_query")
+    for name, value in (
+        ("coverage_target", coverage_target),
+        ("verification_target", verification_target),
+        ("marginal_yield_threshold", marginal_yield_threshold),
+    ):
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+            raise ValueError(f"invalid_{name}")
+    if not isinstance(strict_provider_attribution, bool):
+        raise ValueError("invalid_strict_provider_attribution")
     if not provider_fns:
         raise ValueError("at_least_one_provider_required")
     provider_ids = sorted(provider_fns)
@@ -607,9 +624,17 @@ def run_recursive_search(
         for node, provider_id in assignment:
             frontier.set_state(node.query_id, "QUEUED")
             hits = provider_fns[provider_id](node.query_text, results_per_query)
+            if not isinstance(hits, tuple):
+                raise TypeError(f"invalid_provider_result_type:{provider_id}")
+            if len(hits) > results_per_query:
+                raise ValueError(f"provider_result_limit_exceeded:{provider_id}")
             for hit in hits:
                 hit.validate()
                 _assert_in_scope(hit, plan)
+                if strict_provider_attribution and hit.provider != provider_id:
+                    raise ValueError(
+                        f"provider_attribution_mismatch:expected={provider_id!r}:got={hit.provider!r}"
+                    )
             round_results.extend(hits)
             frontier.set_state(node.query_id, "SEARCHED")
             executed_ids.append(node.query_id)

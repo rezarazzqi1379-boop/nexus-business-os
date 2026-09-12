@@ -6,3 +6,6 @@
 __pycache__/
 .pytest_cache/
 dist/
+data/nexus_system/backups/
+data/nexus_system/activation_status.json
+data/nexus_system/portfolio_watch.json

@@ -124,8 +124,16 @@ def test_record_human_review_approval_opens_approval_request_once_compliance_cle
     assert updated["review_status"] == "reviewed_approved"
     assert updated["approval_id"] is not None
     # The approval is still pending a SEPARATE human decision -- not auto-consumed.
-    pending_approval = approval_store.get(updated["approval_id"])
-    assert pending_approval["status"] == "pending"
+    # ApprovalStore has no read accessor by design (request/decide/consume only),
+    # so check status the same way test_compliance_audit_log_records_every_decision
+    # already does: a direct read of its own store.
+    import sqlite3
+    with sqlite3.connect(approval_store.path) as db:
+        row = db.execute(
+            "SELECT status FROM approvals WHERE approval_id=?", (updated["approval_id"],)
+        ).fetchone()
+    assert row is not None
+    assert row[0] == "pending"
 
 
 def test_record_human_review_rejection_opens_no_approval_request(queue, approval_store):

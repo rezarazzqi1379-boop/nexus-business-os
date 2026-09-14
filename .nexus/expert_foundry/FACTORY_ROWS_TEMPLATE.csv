@@ -1,0 +1,1 @@
+project_id,heat_id,category,field,value,unit,timestamp,source_locator,statement,observer_role,validation_plan,occurrence_count,safety_critical,confidence,operating_context,uncertainty,applicability_limits,proposed_mechanism,predicted_outcome,falsification_test,alternative_hypotheses,evidence_refs,experience_refs

@@ -151,8 +151,21 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
    separate branch).
 4. [Reza] Decide: proceed with live Iran-source integration (first
    real attempt at ONE source) or hold for legal/compliance check first.
-5. [Not started] Opportunity Suggestion Engine (Track E) — designed,
-   not yet built. Draft-only, never auto-sends, human approval queue.
+5. [DONE 2026-09-14] Opportunity Suggestion Engine (Track E) — built:
+   opportunity_suggestion_engine.py + evals/test_opportunity_suggestion_engine.py.
+   Draft-only queue, lane-scoped via fal_vertical.py, human review required,
+   PLUS a compliance gate (record_compliance_review) that blocks opening any
+   research ApprovalRequest until a named human clears it against sanctions/
+   export-control guidance -- added after live research surfaced EO 13871
+   ("Iron, Steel, Aluminum, and Copper Sectors of Iran") and 2026 EU
+   steel/metals reporting as plausibly relevant to FAL-A/FAL-B. Structurally
+   guaranteed no send/outreach/execute-shaped function exists in the module.
+6. [Reza] Get real sanctions/export-control legal advice for FAL-A/FAL-B --
+   the compliance gate above only records a human decision, it doesn't
+   determine legality itself.
+7. [Not started] fal_trade_economics.py exists (landed cost, margin,
+   breakeven, spec-adjusted price) but has never been run against a real
+   quote -- needs real FX/freight/duty numbers before it means anything.
 
 ## EXPERT FOUNDRY ACTIVATION (2026-09-08)
 - Expert Foundry v0.1 merged to main as a governed research-memory scaffold.
@@ -195,3 +208,39 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
 - Reza: final approval on all protected actions, tie-breaker on any
   cross-AI disagreement, sole human-in-the-loop for compliance-
   sensitive decisions
+
+## MAIN/FEAT MERGE (2026-09-14)
+- feat/unified-system-governance-v0.1 merged into main as commit 5686e14
+  (parents 98a1d44 on main, 4eb3b45 on feat). Confirms the environment
+  warning above with a concrete case, not just a risk: both clones had
+  independently rebuilt the SAME Expert Foundry rolling-mill package
+  (21 overlapping files). 14 were byte-identical (CRLF-vs-LF noise from a
+  file copy); the other 6 (rolling_mill_intake.py + its test,
+  ROLLING_MILL_ENGINEERING_INTAKE.json, this file, and the two
+  CLAUDE_ROLLING_MILL_*.md handoffs) had genuinely different content --
+  main's version won all 6 because it carried the confirmed 2026-09-14
+  dimensions (this file's own ROLLING MILL STUDY section is that content);
+  feat's copies were a stale pre-2026-09-14-confirmation draft pulled from
+  an earlier audit-ZIP reconciliation. fal_vertical.py -- a load-bearing
+  dependency of the new FAL modules below -- existed only as an uncommitted
+  working-tree file on neither branch and is now committed via this merge.
+- New on main from this merge: opportunity_suggestion_engine.py,
+  fal_trade_economics.py, nexus_status_brief.py, market_price_snapshot.py,
+  rolling_mill_mechanics.py (retrospective hot-rolling geometry/force
+  envelope, Sims-style, no material-property assumptions), plus this
+  branch's earlier (pre-2026-09-14) governance-layer work (collaboration
+  growth, continuous research, owner-decision runtime, portfolio watchdog,
+  project control plane, self-improvement runtime, unified data
+  environment, external account orchestrator, learning media pipeline) --
+  none of that governance-layer work has been read/audited as part of this
+  merge; it was carried through unchanged because it never conflicted.
+- NOT pushed to origin yet -- pending Reza's go-ahead, since the remote is
+  what the Codex/ChatGPT clone reads from next.
+- Sandbox note for whichever AI touches this repo via a device-bridge-style
+  sandboxed shell next: that environment could not unlink files under the
+  mounted repo folder (git status/commit/merge all left stale
+  index.lock/HEAD.lock/objects/*/tmp_obj_* debris behind, harmless but
+  noisy -- `mv` the stale lock aside, don't try to `rm` it). A real
+  worktree-based merge failed for the same reason; the fix used here was
+  git plumbing (read-tree -m + commit-tree) with a scratch index file
+  outside the mounted folder.

@@ -1,0 +1,47 @@
+{
+  "schema_version": "nexus.delegated-research-cycle.v1",
+  "cycle_id": "owner-delegation-20260912",
+  "retrieved_at": "2026-09-12T12:45:00+03:30",
+  "provider": "web-search",
+  "authority": "UNVERIFIED_CLAIMS_PENDING_CANONICAL_REVIEW",
+  "external_actions_performed": false,
+  "projects": [
+    {
+      "project_id": "hydrostatic_tester",
+      "lane_id": "technical-evidence",
+      "query": "official API 5CT hydrostatic test pressure pipe manufacturer specification 120 MPa hydrostatic tester",
+      "finding": "API confirms Specification 5CT and Technical Report 5C3 are the governing standards family; the project must derive test pressure from product/grade/end configuration rather than treating 120 MPa machine capacity as the universal acceptance pressure.",
+      "sources": ["https://www.api.org/products-and-services/standards/important-standards-announcements/standard-5ct"],
+      "coverage_gap": "Licensed standard clauses and the exact pipe grade, dimensions, end configuration and purchaser agreement remain required."
+    },
+    {
+      "project_id": "can_forming",
+      "lane_id": "technical-benchmark",
+      "query": "official can necking machine cans per minute manufacturer necker specifications",
+      "finding": "Official manufacturer pages show that necker throughput spans materially different equipment classes: approximately 120 CPM for some general can machines, 600-800 CPM for welded food-can machines, and 2400-3600 CPM for high-speed two-piece lines. Quotations are not comparable until can type, diameter/height, necking stages and auxiliary scope are normalized.",
+      "sources": [
+        "https://cmbe.com/products/cmbe-die-necker/",
+        "https://www.belvac.com/machine/the-belvac-necker/",
+        "https://www.slacamericas.com/Products-And-Solutions/post/necker-forming-system",
+        "https://www.germannfrei.ch/en/food-cans/single-machines-food-cans/die-necker-dnv-600/"
+      ],
+      "coverage_gap": "The target can geometry, material, operations and FAT sustained-rate definition must be bound to each quotation."
+    },
+    {
+      "project_id": "tinplate_pi",
+      "lane_id": "document-completeness",
+      "query": "site:trade.gov pro forma invoice required information official export documentation",
+      "finding": "The International Trade Administration lists seller and buyer identity, item description, unit and total prices, weights/dimensions, Incoterm and delivery point, payment terms, estimated shipping date and validity date as core pro-forma fields.",
+      "sources": ["https://www.trade.gov/pro-forma-invoice"],
+      "coverage_gap": "The actual seller identity, quantities, prices and agreed commercial terms are transaction evidence and cannot be invented."
+    },
+    {
+      "project_id": "kcl_mop",
+      "lane_id": "regulatory-evidence",
+      "query": "site:irica.gov.ir potassium chloride import tariff Iran official; site:ntsw.ir کلرید پتاسیم واردات",
+      "finding": "No usable authoritative result was retrieved in this cycle.",
+      "sources": [],
+      "coverage_gap": "Official current HS classification, import rule, registration path and tariff remain unresolved; do not infer them from commercial sources."
+    }
+  ]
+}

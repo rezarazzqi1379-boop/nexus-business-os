@@ -1,0 +1,58 @@
+{
+  "schema_version": "nexus.continuous-research-seed.v1",
+  "observed_at": "2026-09-12T00:00:00+00:00",
+  "window": {
+    "from": "2026-03-12",
+    "to": "2026-09-12"
+  },
+  "provider": "exa",
+  "workstreams": 3,
+  "sources_reviewed": 24,
+  "sources_fetched": 6,
+  "verification_state": "unverified_claims_pending_experiment",
+  "sources": [
+    {
+      "url": "https://cloud.google.com/blog/products/ai-machine-learning/how-to-build-ai-agents-with-google-managed-mcp-servers",
+      "published_at": "2026-03-27",
+      "tier": "official",
+      "topic": "managed MCP security and observability"
+    },
+    {
+      "url": "https://developers.googleblog.com/en/developers-guide-to-ai-agent-protocols/",
+      "published_at": "2026-03-18",
+      "tier": "official",
+      "topic": "protocol boundaries for MCP and A2A"
+    },
+    {
+      "url": "https://developer.microsoft.com/blog/securing-mcp-a-control-plane-for-agent-tool-execution/",
+      "published_at": "2026-04-22",
+      "tier": "official",
+      "topic": "deterministic policy enforcement around tool calls"
+    },
+    {
+      "url": "https://arxiv.org/abs/2609.02217",
+      "published_at": "2026-09-02",
+      "tier": "primary",
+      "topic": "procedural-family skill consolidation and commit gates"
+    },
+    {
+      "url": "https://arxiv.org/abs/2608.18852",
+      "published_at": "2026-08-19",
+      "tier": "primary",
+      "topic": "behavior-aligned skill selection"
+    },
+    {
+      "url": "https://arxiv.org/abs/2603.12056",
+      "published_at": "2026-03-13",
+      "tier": "primary",
+      "topic": "dual experience and skill memory"
+    }
+  ],
+  "candidate_findings": [
+    "Tool protocols require a deterministic governance layer between discovery and execution.",
+    "Continual improvement should externalize auditable skills and experiences instead of silently changing model behavior.",
+    "Skill changes should be consolidated by procedural family and admitted only after execution-based regression gates.",
+    "Skill routing quality should be evaluated separately from downstream execution success."
+  ],
+  "promotion_policy": "experiment_only_no_auto_apply"
+}

@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+from contextlib import closing
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Protocol
@@ -124,12 +125,13 @@ class LeadDecisionStore:
     def __init__(self, path: Path) -> None:
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with sqlite3.connect(self.path) as db:
-            db.execute(
-                "CREATE TABLE IF NOT EXISTS lead_decisions ("
-                "lead_id TEXT PRIMARY KEY, candidate_sha256 TEXT NOT NULL, decision TEXT NOT NULL, "
-                "reviewer TEXT NOT NULL, decided_at TEXT NOT NULL)"
-            )
+        with closing(sqlite3.connect(self.path)) as db:
+            with db:
+                db.execute(
+                    "CREATE TABLE IF NOT EXISTS lead_decisions ("
+                    "lead_id TEXT PRIMARY KEY, candidate_sha256 TEXT NOT NULL, decision TEXT NOT NULL, "
+                    "reviewer TEXT NOT NULL, decided_at TEXT NOT NULL)"
+                )
 
     def decide(self, candidate: LeadCandidate, decision: str, reviewer: str, decided_at: str) -> None:
         validate_candidate(candidate)
@@ -137,19 +139,20 @@ class LeadDecisionStore:
             raise ValueError("invalid_lead_decision")
         if not reviewer.strip() or not decided_at.strip():
             raise ValueError("review_metadata_required")
-        with sqlite3.connect(self.path) as db:
-            row = db.execute(
-                "SELECT candidate_sha256, decision FROM lead_decisions WHERE lead_id=?", (candidate.lead_id,)
-            ).fetchone()
-            if row and row != (candidate.digest, decision):
-                raise ValueError("decision_conflict")
-            db.execute(
-                "INSERT OR IGNORE INTO lead_decisions VALUES (?, ?, ?, ?, ?)",
-                (candidate.lead_id, candidate.digest, decision, reviewer, decided_at),
-            )
+        with closing(sqlite3.connect(self.path)) as db:
+            with db:
+                row = db.execute(
+                    "SELECT candidate_sha256, decision FROM lead_decisions WHERE lead_id=?", (candidate.lead_id,)
+                ).fetchone()
+                if row and row != (candidate.digest, decision):
+                    raise ValueError("decision_conflict")
+                db.execute(
+                    "INSERT OR IGNORE INTO lead_decisions VALUES (?, ?, ?, ?, ?)",
+                    (candidate.lead_id, candidate.digest, decision, reviewer, decided_at),
+                )
 
     def get(self, lead_id: str) -> tuple[str, str] | None:
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db:
             row = db.execute(
                 "SELECT candidate_sha256, decision FROM lead_decisions WHERE lead_id=?", (lead_id,)
             ).fetchone()

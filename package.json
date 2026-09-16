@@ -1,0 +1,12 @@
+{
+  "name": "nexus-business-os-tooling",
+  "private": true,
+  "description": "Pinned Claude Code tooling dependency only -- this project's actual application is Python (see pyproject.toml). Exists solely to lock ruflo/@claude-flow/cli to a reviewed, exact version instead of letting .claude/helpers/*.cjs and .mcp.json fall back to an unpinned npx <pkg>@latest, which re-resolves to whatever is newest on npm (this maintainer publishes multiple releases per day) with no review step, against this business's compliance-sensitive codebase.",
+  "dependencies": {
+    "ruflo": "3.42.0"
+  },
+  "overrides": {
+    "@claude-flow/cli": "3.42.0",
+    "toml": "4.2.0"
+  }
+}

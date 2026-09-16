@@ -168,15 +168,33 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
 - Staff launcher: `scripts/expert_foundry_intake.ps1`; default is dry-run and `-Commit`
   is required for storage. No web UI or central production deployment exists yet.
 
-## ROLLING MILL STUDY (2026-09-12)
+## ROLLING MILL STUDY (2026-09-12, updated 2026-09-16)
 - Initial equipment description received by voice transcription and preserved as eight
   `UNVERIFIED` claims; no units or meanings were inferred.
 - Dedicated contract: `.nexus/expert_foundry/ROLLING_MILL_ENGINEERING_INTAKE.json`.
-- Readiness gate: `rolling_mill_intake.py`. Current state is
-  `READY_FOR_ENGINEER_INTERVIEW`; calculations and operation changes are blocked.
+- Readiness gate: `rolling_mill_intake.py`. Current state is still
+  `READY_FOR_ENGINEER_INTERVIEW`; calculations and operation changes remain blocked.
 - Engineer questionnaire: `docs/expert_foundry/ROLLING_MILL_ENGINEER_QUESTIONNAIRE_FA.md`.
-- Target phrase "300" remains ambiguous (width vs mass/other). Motor numbers 800/125 kW/
-  1002 and speed-like value 550 require nameplate/evidence verification.
+- **2026-09-16: engineer (Sanami) answered 8 of 34 questionnaire items via WhatsApp** +
+  a handwritten ST1-ST4 stand sketch + a CAD drawing for ST1 (roll dia. 518mm) + an
+  unlabeled ST1-ST4/P1-P10 number table (units not stated -- NOT treated as pass-schedule
+  data). Evidence archived under `docs/expert_foundry/evidence/2026-09-16-engineer-answers/`;
+  recorded as an `EXPERT_INTERVIEW`-sourced CLAIM in the Expert Foundry ledger
+  (`claim-rolling-mill-engineer-answers-20260916`).
+  - Resolved: billet 150x150mm square / 3150mm max length / St37 grade; target width
+    300mm (separate from a 8-10-12-15-20-25mm thickness set, min 8 max 25); the
+    800/125kW/1002 reading turned out to be TWO motors (ST1=1250kW/999rpm/420V/2300A AC
+    w/ starting resistor, ST2=800kW only); the 15/20/25 figures are thickness options,
+    not widths.
+  - Still open / genuinely unresolved (not papered over): safety (guards/E-stop/LOTO)
+    entirely unaddressed; no torque/force limits; no actual nameplate photos (numbers
+    were typed, not photographed); no reheating temp, pass-schedule, or target
+    standard; 4 of 8 original ambiguous claims remain unresolved -- notably barrel
+    length was given as 1280mm (matches the CAD drawing) which does NOT match the
+    previously-logged 1350mm claim, and the original "450" in "roll 450 to 480" is
+    still unaccounted for (480 turned out to be ST2's diameter, not a range on one
+    roll). Full per-stand detail (ST1-ST4 motor/gearbox/roll) lives in the intake
+    JSON's `mill_stands_detail` key since the schema's flat fields only fit one stand.
 
 ## ROLE SPLIT (still true)
 - Claude Code: engineering executor (code/tests/branches)

@@ -126,3 +126,65 @@ the questionnaire's remaining nameplate/limits items come back.
   https://doi.org/10.1016/S0924-0136(98)00391-4
 - Wang et al. (2019). Data-driven roll force/torque parameter families.
   https://doi.org/10.2355/isijinternational.ISIJINT-2018-846
+
+## 6. Terminology precision (added 2026-09-17, grounded via literature/industry-reference check)
+
+These distinctions matter directly for resolving this project's open ambiguous claims
+(barrel length "1350" vs the confirmed 1280mm ST1 barrel; "450 to 480" roll diameter):
+
+- **Roll barrel (body)**: the cylindrical working section of the roll that actually
+  contacts the strip/billet. Barrel length and barrel diameter are the two dimensions
+  most often quoted informally as "the roll size" — but informally quoted numbers do
+  not specify which of the two, or which stand, unless stated.
+- **Roll neck / journal**: the reduced-diameter section at each end of the roll that
+  sits in the bearing/housing — a different (usually much smaller) diameter than the
+  barrel, and never to be confused with it when a bare number like "450" is given.
+- **Overall roll (shaft) length**: barrel length **plus** both necks — a larger number
+  than barrel length alone. If a claimed length doesn't match a confirmed barrel
+  length, checking whether it's actually the overall shaft length is the first thing
+  to ask, before assuming a transcription error or a different stand.
+- **Gearbox ratio vs. rated output torque**: these are two independent nameplate
+  fields. A ratio (e.g. "1:9.8") says nothing about how much torque the gearbox can
+  safely deliver — that is a separate, explicitly stated rating, usually in Nm or
+  kNm, and must be read off the nameplate/catalog directly, never inferred from the
+  ratio alone.
+- **This line's actual scale**: worth noting explicitly so nothing here gets
+  miscalibrated against the wrong reference class — general rolling-mill literature
+  (e.g. large slab-mill roughing trains) often quotes roll diameters "near 1000 mm."
+  This project's mill is a much smaller merchant-bar/billet-to-strip line (150mm
+  square billet in, roll diameters in the 450-520mm range) — that scale is entirely
+  ordinary for a small mill and should not be treated as implausible just because it
+  differs from large-slab-mill figures; the two are different equipment classes.
+
+## 7. Nameplate/document reading checklist (added 2026-09-17)
+
+For requesting or interpreting future evidence from this line, the complete field
+lists worth asking for (not just "send a photo of the plate"):
+
+**Motor nameplate**: rated power (kW/HP), rated speed (rpm), voltage (V), full-load
+current (A), frequency (Hz), service factor, insulation class, duty rating, frame/NEMA
+design (if present).
+
+**Gearbox nameplate**: manufacturer, model/serial number, gear ratio, input speed,
+output speed, **rated (continuous) output torque with its unit** (Nm/kNm — this is a
+distinct field from the ratio and is very often the missing piece in informally
+relayed equipment descriptions), service factor, approved mounting position,
+lubricant spec.
+
+## 8. Additional citation
+
+- A New Model for Predicting Width Spread in a Roughing Mill (2014), J. Soc. Naval
+  Architects/journal reference — an additional data-driven spread-model reference
+  alongside Sims/El-Kalay/Wusatowski in §3, useful once real pass data exists to fit
+  against.
+
+## Sources (additions)
+
+- VFDs.com, "How to Read a Motor Nameplate": https://vfds.com/blog/how-to-read-a-motor-nameplate/
+- WorldWide Electric, "Electric Motors: How to Read the Nameplate":
+  https://worldwideelectric.com/articles/electric-motors-how-to-read-the-nameplate/
+- Industrial Gearbox Solutions, "How to Read a Gearbox Nameplate":
+  https://industrialgearboxsolutions.com/how-to-read-a-gearbox-nameplate/
+- ScienceDirect Topics, "Roughing Mill": https://www.sciencedirect.com/topics/engineering/roughing-mill
+- steelnumber.com, St37-2 / EN 10025 equivalence table:
+  http://www.steelnumber.com/en/equivalent_steel_iron_eu.php?zname_id=161

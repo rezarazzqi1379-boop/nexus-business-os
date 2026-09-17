@@ -27,6 +27,11 @@
             "type": "command",
             "command": "sh -c 'D=\"${CLAUDE_PROJECT_DIR:-.}\"; [ -f \"$D/.claude/helpers/hook-handler.cjs\" ] || D=\"${HOME}\"; exec node \"$D/.claude/helpers/hook-handler.cjs\" pre-bash'",
             "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "sh -c 'D=\"${CLAUDE_PROJECT_DIR:-.}\"; [ -f \"$D/.claude/helpers/branch-integrity-guard.cjs\" ] || D=\"${HOME}\"; exec node \"$D/.claude/helpers/branch-integrity-guard.cjs\"'",
+            "timeout": 8000
           }
         ]
       },

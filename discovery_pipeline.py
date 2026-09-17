@@ -182,6 +182,12 @@ class NormalizedDiscoveryResult:
     """One discovery hit immediately after normalization -- before entity extraction/resolution.
     evidence_class/verification_state are structurally locked to CLAIM/unverified: this stage
     has performed no verification, so it cannot claim otherwise.
+
+    source_is_multi_entity_listing defaults to False (a URL is assumed to describe one entity,
+    the historical assumption). Set it True only when the URL is known to be a directory/listing
+    page that legitimately names several distinct entities (a customs importer list, a B2B buyer
+    directory, a marketplace search-results page) -- see group_duplicates() for how this changes
+    dedup behavior for that URL.
     """
 
     provider: str
@@ -196,6 +202,7 @@ class NormalizedDiscoveryResult:
     entity_name_hint: str | None
     country_hint: str | None
     buyer_type_hint: str | None
+    source_is_multi_entity_listing: bool = False
     evidence_class: EvidenceClass = EvidenceClass.CLAIM
     verification_state: str = "unverified"
 
@@ -276,8 +283,17 @@ class DuplicateGroup:
 def group_duplicates(results: Sequence[NormalizedDiscoveryResult]) -> tuple[DuplicateGroup, ...]:
     """Two-signal dedup, never losing a provenance record:
 
-    1. Records sharing the exact same canonicalized URL become one group,
-       category "exact_duplicate" (or "unique" if it's the only member).
+    1. Records sharing the exact same canonicalized URL become one group, category
+       "exact_duplicate" (or "unique" if it's the only member) -- UNLESS the URL is explicitly
+       flagged by the caller as a multi-entity listing (source_is_multi_entity_listing=True on
+       at least one member) AND its members carry more than one distinct normalized
+       entity_name_hint. In that case the URL bucket is split into one group per distinct name
+       (plus one singleton group per member with no name at all), because a shared listing or
+       directory URL does not mean the records describe the same entity. Without that explicit
+       flag, conflicting name hints under one shared URL are never guessed at -- they stay one
+       group and fall through to (2)/resolve_entities' "ambiguous" handling, exactly as before,
+       because from the data alone a same-URL name conflict could just as easily be a data-entry
+       mismatch about a single entity as a real multi-entity listing.
     2. Across *different* URL groups, a shared normalized entity_name_hint links them as
        "probable_duplicate" -- unless their country_hint values disagree, in which case both
        become "ambiguous" instead. A group already "exact_duplicate" keeps that label; URL
@@ -296,11 +312,34 @@ def group_duplicates(results: Sequence[NormalizedDiscoveryResult]) -> tuple[Dupl
             url_order.append(key)
         url_buckets[key].append(result)
 
-    groups = [
-        {"key": key, "members": tuple(url_buckets[key]),
-         "category": "exact_duplicate" if len(url_buckets[key]) > 1 else "unique", "related": set()}
-        for key in url_order
-    ]
+    groups: list[dict] = []
+    for key in url_order:
+        members = url_buckets[key]
+        distinct_names = {
+            normalize_entity_name(m.entity_name_hint) for m in members
+            if m.entity_name_hint and normalize_entity_name(m.entity_name_hint)
+        }
+        is_flagged_listing = any(m.source_is_multi_entity_listing for m in members)
+        if is_flagged_listing and len(distinct_names) > 1:
+            by_name: dict[str, list[NormalizedDiscoveryResult]] = {}
+            unnamed: list[NormalizedDiscoveryResult] = []
+            for m in members:
+                name = normalize_entity_name(m.entity_name_hint) if m.entity_name_hint else ""
+                if name:
+                    by_name.setdefault(name, []).append(m)
+                else:
+                    unnamed.append(m)
+            for name in sorted(by_name):
+                named_members = by_name[name]
+                groups.append({"key": key, "members": tuple(named_members),
+                               "category": "exact_duplicate" if len(named_members) > 1 else "unique",
+                               "related": set()})
+            for m in unnamed:
+                groups.append({"key": key, "members": (m,), "category": "unique", "related": set()})
+        else:
+            groups.append({"key": key, "members": tuple(members),
+                           "category": "exact_duplicate" if len(members) > 1 else "unique",
+                           "related": set()})
 
     name_to_group_indices: dict[str, list[int]] = {}
     for index, group in enumerate(groups):
@@ -704,6 +743,7 @@ def ingest_external_discoveries(path: Path, *, project_id: str | None,
             entity_name_hint=(str(raw["entity_name_hint"]) if raw.get("entity_name_hint") else None),
             country_hint=(str(raw["country_hint"]) if raw.get("country_hint") else None),
             buyer_type_hint=(str(raw["buyer_type_hint"]) if raw.get("buyer_type_hint") else None),
+            source_is_multi_entity_listing=bool(raw.get("source_is_multi_entity_listing", False)),
         )
         try:
             result.validate()

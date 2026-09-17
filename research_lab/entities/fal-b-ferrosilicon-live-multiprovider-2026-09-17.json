@@ -11,7 +11,22 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_eb48208d8c13d4d2"
+      "dupgrp_e7cb6940d8aeab8b"
+    ]
+  },
+  {
+    "candidate_id": "ent_5a3e03ce24caa738",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_5a3e03ce24caa738"
+    },
+    "normalized_name": "answer co ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_d5080dae1ee2dbb5"
     ]
   },
   {
@@ -26,7 +41,7 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_517d2700d4f2dfdd"
+      "dupgrp_c328d6f91703d5be"
     ]
   },
   {
@@ -41,7 +56,7 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_a4799e7751a7f954"
+      "dupgrp_03eb9c186ca92f84"
     ]
   },
   {
@@ -56,7 +71,7 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_78b31f663d6cc728"
+      "dupgrp_e5fc431d0576a1fd"
     ]
   },
   {
@@ -71,7 +86,7 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_ce7dedb351a4a243"
+      "dupgrp_cb52a7432d1c5e5e"
     ]
   },
   {
@@ -86,7 +101,82 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_e8775d15aba47db3"
+      "dupgrp_8723472cbca21105"
+    ]
+  },
+  {
+    "candidate_id": "ent_47226eb03e20e168",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_47226eb03e20e168"
+    },
+    "normalized_name": "castec vina co ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_adf00e6c3a315fa1"
+    ]
+  },
+  {
+    "candidate_id": "ent_c48b93de0622d464",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_c48b93de0622d464"
+    },
+    "normalized_name": "citizen machinery vietnam company limited",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_edd8a9e119b9f263"
+    ]
+  },
+  {
+    "candidate_id": "ent_2ae6a1af30db873d",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_2ae6a1af30db873d"
+    },
+    "normalized_name": "dieu long trading construction co ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_54163183b1dbd105"
+    ]
+  },
+  {
+    "candidate_id": "ent_cf35efd027766325",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_cf35efd027766325"
+    },
+    "normalized_name": "douwa enterprise ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_b424b76e9966be4e"
+    ]
+  },
+  {
+    "candidate_id": "ent_06e258a6f95e11c2",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_06e258a6f95e11c2"
+    },
+    "normalized_name": "dsc corporation",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_f9845a90f421ed8a"
     ]
   },
   {
@@ -116,7 +206,7 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_4bc741bc4f8e0e0c"
+      "dupgrp_c41ab340f4eb48b3"
     ]
   },
   {
@@ -131,7 +221,7 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_026ed115a9e8670c"
+      "dupgrp_db1bbfd45f9c98ec"
     ]
   },
   {
@@ -146,7 +236,22 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_398335c9fc6e5c29"
+      "dupgrp_8d7f6a3165bd18fa"
+    ]
+  },
+  {
+    "candidate_id": "ent_e999fd70ceb80425",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_e999fd70ceb80425"
+    },
+    "normalized_name": "eregli demir ve celik fabrikalari t a s",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_427ccdfd1cc8de73"
     ]
   },
   {
@@ -161,7 +266,37 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_590c3bb4de44a3b4"
+      "dupgrp_7843197d96d641e8"
+    ]
+  },
+  {
+    "candidate_id": "ent_8312cd7df7d82476",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_8312cd7df7d82476"
+    },
+    "normalized_name": "foosung co ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_a4c6311f8bf52098"
+    ]
+  },
+  {
+    "candidate_id": "ent_1ff1199224161c94",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_1ff1199224161c94"
+    },
+    "normalized_name": "foosung corporation co ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_3717789d2642c12c"
     ]
   },
   {
@@ -191,7 +326,67 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_824b76eee921fc94"
+      "dupgrp_e883e75082f242e7"
+    ]
+  },
+  {
+    "candidate_id": "ent_de252cf2b4d8c6b4",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_de252cf2b4d8c6b4"
+    },
+    "normalized_name": "iskenderun demir ve celik a s",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_a9b21c7de59170e4"
+    ]
+  },
+  {
+    "candidate_id": "ent_ca78d86d5b08e104",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_ca78d86d5b08e104"
+    },
+    "normalized_name": "j poonamchand and sons",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_b9a1e13b3a5e0d79"
+    ]
+  },
+  {
+    "candidate_id": "ent_1814f23666c5df52",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "trader",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_1814f23666c5df52"
+    },
+    "normalized_name": "jfe shoji trade corporation south korea",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_b33903edcf6a0bae"
+    ]
+  },
+  {
+    "candidate_id": "ent_5ebfbe6bd65679b9",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_5ebfbe6bd65679b9"
+    },
+    "normalized_name": "jsw steel limited",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_a01b3764554f5377"
     ]
   },
   {
@@ -206,7 +401,37 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_5fd371fd6a537a0f"
+      "dupgrp_b27fbe60481b63d6"
+    ]
+  },
+  {
+    "candidate_id": "ent_4ff2f6e508c0e81d",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_4ff2f6e508c0e81d"
+    },
+    "normalized_name": "ktl co ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_1d7d624827d5e481"
+    ]
+  },
+  {
+    "candidate_id": "ent_7d6e7c5157ea4063",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_7d6e7c5157ea4063"
+    },
+    "normalized_name": "le vy refractory material company limited",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_2976ea7a6e11879a"
     ]
   },
   {
@@ -221,7 +446,7 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_71033286121b4e71"
+      "dupgrp_6d4fa0f5089575b3"
     ]
   },
   {
@@ -236,7 +461,52 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_ffc585a15146fad1"
+      "dupgrp_56bc5d6192d85897"
+    ]
+  },
+  {
+    "candidate_id": "ent_1678bf3375c58796",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_1678bf3375c58796"
+    },
+    "normalized_name": "nhat tri thanh company limited",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_5b19d40334516f0d"
+    ]
+  },
+  {
+    "candidate_id": "ent_20679b57fd3e24f8",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_20679b57fd3e24f8"
+    },
+    "normalized_name": "posco",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_b0463c359f856c57"
+    ]
+  },
+  {
+    "candidate_id": "ent_84d4b14c69c22fa5",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_84d4b14c69c22fa5"
+    },
+    "normalized_name": "posco international corporation",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_c6ea6782c3c3eb7f"
     ]
   },
   {
@@ -251,7 +521,7 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_8f597478cb5a8889"
+      "dupgrp_868c776b862ea995"
     ]
   },
   {
@@ -266,7 +536,7 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_6d235e72f5196b4f"
+      "dupgrp_0bb57eead2565572"
     ]
   },
   {
@@ -281,7 +551,7 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_261f31e11795463d"
+      "dupgrp_4f2834ef3e978ec1"
     ]
   },
   {
@@ -296,7 +566,37 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_5bf86143861d9998"
+      "dupgrp_8e8a4c8c27ed94a7"
+    ]
+  },
+  {
+    "candidate_id": "ent_a10bbf0670dd724c",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_a10bbf0670dd724c"
+    },
+    "normalized_name": "seojin viet nam limited company",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_281af5082e8b39c7"
+    ]
+  },
+  {
+    "candidate_id": "ent_ef805109b283747e",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_ef805109b283747e"
+    },
+    "normalized_name": "shinwon castech vietnam co ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_6b8af5380eb419e1"
     ]
   },
   {
@@ -311,7 +611,7 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_66f7424a57e0c1dc"
+      "dupgrp_34f8d4c17759ba68"
     ]
   },
   {
@@ -345,6 +645,36 @@
     ]
   },
   {
+    "candidate_id": "ent_fbbc6beff92d68cb",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_fbbc6beff92d68cb"
+    },
+    "normalized_name": "vietnam bright international company limited",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_7663213e35652a0c"
+    ]
+  },
+  {
+    "candidate_id": "ent_f7d6d52c6af46458",
+    "classification": {
+      "basis": "keyword match in title/snippet: foundry",
+      "category": "foundry",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_f7d6d52c6af46458"
+    },
+    "normalized_name": "vina ito co ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_deeab2e9d7dc92c3"
+    ]
+  },
+  {
     "candidate_id": "ent_f3464296b7d9c8d0",
     "classification": {
       "basis": "keyword match in title/snippet: importer",
@@ -371,67 +701,7 @@
     "reason": "1 duplicate group(s) independently share this normalized name",
     "resolution_state": "probable",
     "supporting_group_ids": [
-      "dupgrp_760ff8f2f58f1e6b"
-    ]
-  },
-  {
-    "candidate_id": "ent_041d2fe402dc2b4c",
-    "classification": {
-      "basis": "keyword match in title/snippet: importer",
-      "category": "importer",
-      "confidence": 0.6,
-      "entity_candidate_id": "ent_041d2fe402dc2b4c"
-    },
-    "normalized_name": "eregli demir ve celik fabrikalari t a s|iskenderun demir ve celik a s",
-    "reason": "conflicting entity hints within one duplicate group: ['eregli demir ve celik fabrikalari t a s', 'iskenderun demir ve celik a s']",
-    "resolution_state": "ambiguous",
-    "supporting_group_ids": [
-      "dupgrp_1a6e89ff32e138ee"
-    ]
-  },
-  {
-    "candidate_id": "ent_98db93c6023a39ac",
-    "classification": {
-      "basis": "keyword match in title/snippet: foundry",
-      "category": "foundry",
-      "confidence": 0.6,
-      "entity_candidate_id": "ent_98db93c6023a39ac"
-    },
-    "normalized_name": "castec vina co ltd|citizen machinery vietnam company limited|dieu long trading construction co ltd|le vy refractory material company limited|nhat tri thanh company limited|seojin viet nam limited company|shinwon castech vietnam co ltd|vietnam bright international company limited|vina ito co ltd",
-    "reason": "conflicting entity hints within one duplicate group: ['castec vina co ltd', 'citizen machinery vietnam company limited', 'dieu long trading construction co ltd', 'le vy refractory material company limited', 'nhat tri thanh company limited', 'seojin viet nam limited company', 'shinwon castech vietnam co ltd', 'vietnam bright international company limited', 'vina ito co ltd']",
-    "resolution_state": "ambiguous",
-    "supporting_group_ids": [
-      "dupgrp_b0fd9f22a2bb0295"
-    ]
-  },
-  {
-    "candidate_id": "ent_f4723217e5a6da47",
-    "classification": {
-      "basis": "keyword match in title/snippet: importer",
-      "category": "importer",
-      "confidence": 0.6,
-      "entity_candidate_id": "ent_f4723217e5a6da47"
-    },
-    "normalized_name": "j poonamchand and sons|jsw steel limited",
-    "reason": "conflicting entity hints within one duplicate group: ['j poonamchand and sons', 'jsw steel limited']",
-    "resolution_state": "ambiguous",
-    "supporting_group_ids": [
-      "dupgrp_b9a1e13b3a5e0d79"
-    ]
-  },
-  {
-    "candidate_id": "ent_139b63535ded2ccd",
-    "classification": {
-      "basis": "keyword match in title/snippet: importer",
-      "category": "importer",
-      "confidence": 0.6,
-      "entity_candidate_id": "ent_139b63535ded2ccd"
-    },
-    "normalized_name": "answer co ltd|douwa enterprise ltd|dsc corporation|foosung co ltd|foosung corporation co ltd|jfe shoji trade corporation south korea|ktl co ltd|posco|posco international corporation",
-    "reason": "conflicting entity hints within one duplicate group: ['answer co ltd', 'douwa enterprise ltd', 'dsc corporation', 'foosung co ltd', 'foosung corporation co ltd', 'jfe shoji trade corporation south korea', 'ktl co ltd', 'posco', 'posco international corporation']",
-    "resolution_state": "ambiguous",
-    "supporting_group_ids": [
-      "dupgrp_e439d291187333d7"
+      "dupgrp_8186d15564d6128b"
     ]
   }
 ]

@@ -22,6 +22,7 @@ from discovery_pipeline import (
     default_discovery_adapters,
     group_duplicates,
     ingest_external_discoveries,
+    normalize_entity_name,
     process_discovery_batch,
     resolve_entities,
     score_entity,
@@ -160,6 +161,60 @@ class DedupCategoryTests(unittest.TestCase):
             result(url="https://example.invalid/2", entity_name_hint="Example Co", country_hint="Otherland"),
         ))
         self.assertEqual({g.dedup_category for g in groups}, {"ambiguous"})
+
+    def test_same_url_conflicting_names_without_listing_flag_stays_ambiguous(self):
+        # Same scenario shape as a multi-entity listing (one URL, two different names), but
+        # WITHOUT the explicit flag -- must keep the historical fail-closed behavior exactly,
+        # since without the flag we cannot tell a real listing page from a data-entry mismatch.
+        groups = group_duplicates((
+            result(entity_name_hint="Example Company A"),
+            result(entity_name_hint="Totally Different Company B"),
+        ))
+        self.assertEqual(len(groups), 1)
+        candidates = resolve_entities(groups)
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0].resolution_state, "ambiguous")
+
+    def test_multi_entity_listing_url_splits_by_name_instead_of_going_ambiguous(self):
+        # Same URL, flagged as a multi-entity listing, two genuinely distinct named companies:
+        # must NOT be forced into one group/one ambiguous entity -- each name resolves on its own.
+        groups = group_duplicates((
+            result(entity_name_hint="Company One", source_is_multi_entity_listing=True),
+            result(entity_name_hint="Company Two", source_is_multi_entity_listing=True),
+        ))
+        self.assertEqual(len(groups), 2)
+        self.assertEqual({g.dedup_category for g in groups}, {"unique"})
+        candidates = resolve_entities(groups)
+        self.assertEqual(len(candidates), 2)
+        self.assertEqual({c.resolution_state for c in candidates}, {"probable"})
+        self.assertEqual({c.normalized_name for c in candidates},
+                          {normalize_entity_name("Company One"), normalize_entity_name("Company Two")})
+
+    def test_multi_entity_listing_url_unnamed_member_becomes_its_own_singleton(self):
+        # A listing-flagged URL where one row has no entity_name_hint at all -- it can't be
+        # attributed to any of the named entities on that page, so it must stand alone rather
+        # than silently join one of the named groups or get dropped.
+        groups = group_duplicates((
+            result(entity_name_hint="Company One", source_is_multi_entity_listing=True),
+            result(entity_name_hint="Company Two", source_is_multi_entity_listing=True),
+            result(entity_name_hint=None, source_is_multi_entity_listing=True, title="Unattributed row"),
+        ))
+        self.assertEqual(len(groups), 3)
+        unnamed_groups = [g for g in groups if len(g.members) == 1 and g.members[0].entity_name_hint is None]
+        self.assertEqual(len(unnamed_groups), 1)
+        self.assertEqual(unnamed_groups[0].dedup_category, "unique")
+
+    def test_multi_entity_listing_flag_does_not_change_single_name_url(self):
+        # The flag only matters when there ARE multiple distinct names under the URL. A single
+        # real duplicate hit (same name, same URL) with the flag set must still collapse into
+        # one exact_duplicate group exactly as an unflagged one would.
+        groups = group_duplicates((
+            result(entity_name_hint="Example Company A", source_is_multi_entity_listing=True),
+            result(entity_name_hint="Example Company A", source_is_multi_entity_listing=True),
+        ))
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].dedup_category, "exact_duplicate")
+        self.assertEqual(groups[0].source_count, 2)
 
     def test_no_provenance_is_lost(self):
         a, b = result(title="First"), result(title="Second")

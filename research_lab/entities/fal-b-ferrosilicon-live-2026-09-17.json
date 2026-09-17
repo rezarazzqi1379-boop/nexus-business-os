@@ -1,0 +1,77 @@
+[
+  {
+    "candidate_id": "ent_163e0767e5f018c0",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_163e0767e5f018c0"
+    },
+    "normalized_name": "ec21 ferro silicon buyers directory",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_82108b29f693f910"
+    ]
+  },
+  {
+    "candidate_id": "ent_62d683796bf4095c",
+    "classification": {
+      "basis": "keyword match in title/snippet: foundry",
+      "category": "foundry",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_62d683796bf4095c"
+    },
+    "normalized_name": "gulf metal foundry",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_5268353f373a12ef"
+    ]
+  },
+  {
+    "candidate_id": "ent_41406e4e2d87ef5a",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_41406e4e2d87ef5a"
+    },
+    "normalized_name": "tradeford uae ferro silicon buyers directory",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_3ceb03ebaf4d58d5"
+    ]
+  },
+  {
+    "candidate_id": "ent_3140403464924573",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_3140403464924573"
+    },
+    "normalized_name": "tradekey ferro silicon importers directory",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_280af8efd1994515"
+    ]
+  },
+  {
+    "candidate_id": "ent_f3464296b7d9c8d0",
+    "classification": {
+      "basis": "keyword match in title/snippet: importer",
+      "category": "importer",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_f3464296b7d9c8d0"
+    },
+    "normalized_name": "volza uae ferro silico manganese buyers directory",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_c5033fe099fdf7b5"
+    ]
+  }
+]

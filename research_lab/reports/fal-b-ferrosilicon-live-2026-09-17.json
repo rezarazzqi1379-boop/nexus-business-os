@@ -1,0 +1,16 @@
+{
+  "duplicate_rate": 0.0,
+  "false_positive_rate": null,
+  "plausible_buyer_count": 4,
+  "processing_time": 0.0006216539995875792,
+  "raw_count": 5,
+  "run_id": "fal-b-ferrosilicon-live-2026-09-17",
+  "schema_version": "nexus.discovery-pipeline.v2",
+  "source_diversity": {
+    "distinct_providers": 1,
+    "total_raw_results": 5
+  },
+  "stale_result_rate": 0.0,
+  "unique_count": 5,
+  "verified_buyer_count": 0
+}

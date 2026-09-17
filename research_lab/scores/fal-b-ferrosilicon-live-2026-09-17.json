@@ -1,0 +1,30 @@
+{
+  "ranked": [
+    {
+      "entity_candidate_id": "ent_f3464296b7d9c8d0",
+      "reason": "ranked in top 20 by opportunity score (0.380)",
+      "requirement": "secondary_source_required",
+      "score": 0.38
+    },
+    {
+      "entity_candidate_id": "ent_62d683796bf4095c",
+      "reason": "ranked in top 20 by opportunity score (0.347)",
+      "requirement": "secondary_source_required",
+      "score": 0.3466666666666667
+    },
+    {
+      "entity_candidate_id": "ent_163e0767e5f018c0",
+      "reason": "ranked in top 20 by opportunity score (0.313)",
+      "requirement": "secondary_source_required",
+      "score": 0.31333333333333335
+    },
+    {
+      "entity_candidate_id": "ent_3140403464924573",
+      "reason": "ranked in top 20 by opportunity score (0.313)",
+      "requirement": "secondary_source_required",
+      "score": 0.31333333333333335
+    }
+  ],
+  "run_id": "fal-b-ferrosilicon-live-2026-09-17",
+  "schema_version": "nexus.discovery-pipeline.v2"
+}

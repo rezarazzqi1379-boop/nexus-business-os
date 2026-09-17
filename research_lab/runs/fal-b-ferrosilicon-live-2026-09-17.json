@@ -1,0 +1,8 @@
+{
+  "created_at": "2026-09-17T07:49:00.617743+00:00",
+  "lane_id": "FAL-B",
+  "objective": "Identify candidate foreign BUYER entities (foundries, steel mills, importers, traders) for ferrosilicon export (FAL-B) across Gulf/UAE and global B2B directories, via live public web search.",
+  "project_id": "PRJ-FAL-01",
+  "query_set_version": "claude-manual-v1",
+  "run_id": "fal-b-ferrosilicon-live-2026-09-17"
+}

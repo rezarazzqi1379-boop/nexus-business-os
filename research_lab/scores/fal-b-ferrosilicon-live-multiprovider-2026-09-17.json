@@ -1,0 +1,126 @@
+{
+  "ranked": [
+    {
+      "entity_candidate_id": "ent_5d0dcd482f95a70e",
+      "reason": "ranked in top 20 by opportunity score (0.412)",
+      "requirement": "secondary_source_required",
+      "score": 0.41233333333333333
+    },
+    {
+      "entity_candidate_id": "ent_f3464296b7d9c8d0",
+      "reason": "ranked in top 20 by opportunity score (0.380)",
+      "requirement": "secondary_source_required",
+      "score": 0.38
+    },
+    {
+      "entity_candidate_id": "ent_98db93c6023a39ac",
+      "reason": "ranked in top 20 by opportunity score (0.370)",
+      "requirement": "secondary_source_required",
+      "score": 0.37033333333333335
+    },
+    {
+      "entity_candidate_id": "ent_62d683796bf4095c",
+      "reason": "ranked in top 20 by opportunity score (0.347)",
+      "requirement": "secondary_source_required",
+      "score": 0.3466666666666667
+    },
+    {
+      "entity_candidate_id": "ent_74ddc8b300b8e692",
+      "reason": "ranked in top 20 by opportunity score (0.342)",
+      "requirement": "secondary_source_required",
+      "score": 0.3423333333333334
+    },
+    {
+      "entity_candidate_id": "ent_0813aa959b61870a",
+      "reason": "ranked in top 20 by opportunity score (0.337)",
+      "requirement": "secondary_source_required",
+      "score": 0.3373333333333333
+    },
+    {
+      "entity_candidate_id": "ent_5f8a6c248ad48e09",
+      "reason": "ranked in top 20 by opportunity score (0.337)",
+      "requirement": "secondary_source_required",
+      "score": 0.3373333333333333
+    },
+    {
+      "entity_candidate_id": "ent_7031db2938598fc6",
+      "reason": "ranked in top 20 by opportunity score (0.337)",
+      "requirement": "secondary_source_required",
+      "score": 0.3373333333333333
+    },
+    {
+      "entity_candidate_id": "ent_09aa19eb08c207eb",
+      "reason": "ranked in top 20 by opportunity score (0.334)",
+      "requirement": "secondary_source_required",
+      "score": 0.33433333333333337
+    },
+    {
+      "entity_candidate_id": "ent_b8776287e54a65c6",
+      "reason": "ranked in top 20 by opportunity score (0.334)",
+      "requirement": "secondary_source_required",
+      "score": 0.33433333333333337
+    },
+    {
+      "entity_candidate_id": "ent_595d2208c394f71e",
+      "reason": "ranked in top 20 by opportunity score (0.329)",
+      "requirement": "secondary_source_required",
+      "score": 0.32933333333333337
+    },
+    {
+      "entity_candidate_id": "ent_d73baf7226798920",
+      "reason": "ranked in top 20 by opportunity score (0.329)",
+      "requirement": "secondary_source_required",
+      "score": 0.32933333333333337
+    },
+    {
+      "entity_candidate_id": "ent_05e2a7145ae11541",
+      "reason": "ranked in top 20 by opportunity score (0.321)",
+      "requirement": "secondary_source_required",
+      "score": 0.32133333333333336
+    },
+    {
+      "entity_candidate_id": "ent_8128142732311b7f",
+      "reason": "ranked in top 20 by opportunity score (0.321)",
+      "requirement": "secondary_source_required",
+      "score": 0.32133333333333336
+    },
+    {
+      "entity_candidate_id": "ent_821f46123d88eb62",
+      "reason": "ranked in top 20 by opportunity score (0.321)",
+      "requirement": "secondary_source_required",
+      "score": 0.32133333333333336
+    },
+    {
+      "entity_candidate_id": "ent_139b63535ded2ccd",
+      "reason": "ranked in top 20 by opportunity score (0.316)",
+      "requirement": "secondary_source_required",
+      "score": 0.31633333333333336
+    },
+    {
+      "entity_candidate_id": "ent_163e0767e5f018c0",
+      "reason": "ranked in top 20 by opportunity score (0.313)",
+      "requirement": "secondary_source_required",
+      "score": 0.31333333333333335
+    },
+    {
+      "entity_candidate_id": "ent_3140403464924573",
+      "reason": "ranked in top 20 by opportunity score (0.313)",
+      "requirement": "secondary_source_required",
+      "score": 0.31333333333333335
+    },
+    {
+      "entity_candidate_id": "ent_f4723217e5a6da47",
+      "reason": "ranked in top 20 by opportunity score (0.300)",
+      "requirement": "secondary_source_required",
+      "score": 0.30033333333333334
+    },
+    {
+      "entity_candidate_id": "ent_041d2fe402dc2b4c",
+      "reason": "ranked in top 20 by opportunity score (0.292)",
+      "requirement": "secondary_source_required",
+      "score": 0.29233333333333333
+    }
+  ],
+  "run_id": "fal-b-ferrosilicon-live-multiprovider-2026-09-17",
+  "schema_version": "nexus.discovery-pipeline.v2"
+}

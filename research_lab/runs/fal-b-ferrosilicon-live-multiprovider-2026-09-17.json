@@ -1,0 +1,8 @@
+{
+  "created_at": "2026-09-17T09:28:51.349582+00:00",
+  "lane_id": "FAL-B",
+  "objective": "Identify candidate foreign BUYER entities for ferrosilicon export (FAL-B) combining an initial manual web-search pass (mostly directory listings) with a genuinely independent exa-agent-run pass covering India/Turkey/Vietnam/Indonesia/Egypt/Brazil/South Korea, to bring real multi-provider source diversity to FAL-B for the first time (FAL-A already achieved this on 2026-09-17).",
+  "project_id": "PRJ-FAL-01",
+  "query_set_version": "claude-manual-v1+exa-agent-run-v1",
+  "run_id": "fal-b-ferrosilicon-live-multiprovider-2026-09-17"
+}

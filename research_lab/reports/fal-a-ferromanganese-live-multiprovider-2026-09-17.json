@@ -1,0 +1,16 @@
+{
+  "duplicate_rate": 0.0,
+  "false_positive_rate": null,
+  "plausible_buyer_count": 1,
+  "processing_time": 0.001236590000189608,
+  "raw_count": 28,
+  "run_id": "fal-a-ferromanganese-live-multiprovider-2026-09-17",
+  "schema_version": "nexus.discovery-pipeline.v2",
+  "source_diversity": {
+    "distinct_providers": 2,
+    "total_raw_results": 28
+  },
+  "stale_result_rate": 0.0,
+  "unique_count": 28,
+  "verified_buyer_count": 0
+}

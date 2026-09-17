@@ -1,0 +1,12 @@
+{
+  "ranked": [
+    {
+      "entity_candidate_id": "ent_8f53d28405de01fe",
+      "reason": "ranked in top 20 by opportunity score (0.447)",
+      "requirement": "secondary_source_required",
+      "score": 0.44666666666666666
+    }
+  ],
+  "run_id": "fal-a-ferromanganese-live-multiprovider-2026-09-17",
+  "schema_version": "nexus.discovery-pipeline.v2"
+}

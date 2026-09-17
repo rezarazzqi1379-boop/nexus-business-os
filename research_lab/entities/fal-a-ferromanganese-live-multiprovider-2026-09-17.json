@@ -1,0 +1,422 @@
+[
+  {
+    "candidate_id": "ent_4ad27e80ee0fcf1c",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_4ad27e80ee0fcf1c"
+    },
+    "normalized_name": "anyang hongshun industrial co ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_e9f9dfeb7679748e"
+    ]
+  },
+  {
+    "candidate_id": "ent_1a8a8fea83961d0f",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_1a8a8fea83961d0f"
+    },
+    "normalized_name": "anyang jingfengyuan ferroalloy co ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_0c85b701aab1de87"
+    ]
+  },
+  {
+    "candidate_id": "ent_7bde7dd12816a7dc",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_7bde7dd12816a7dc"
+    },
+    "normalized_name": "anyang zhenxin metallurgical materials co ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_718dd01847a0da63"
+    ]
+  },
+  {
+    "candidate_id": "ent_c59c9ebf06657afa",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_c59c9ebf06657afa"
+    },
+    "normalized_name": "assmang proprietary limited",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_065d34b6fa3d8770"
+    ]
+  },
+  {
+    "candidate_id": "ent_6a048fe0b5939250",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_6a048fe0b5939250"
+    },
+    "normalized_name": "astha ferro alloys",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_0fe727a9ee21cf03"
+    ]
+  },
+  {
+    "candidate_id": "ent_8f53d28405de01fe",
+    "classification": {
+      "basis": "keyword match in title/snippet: foundry",
+      "category": "foundry",
+      "confidence": 0.6,
+      "entity_candidate_id": "ent_8f53d28405de01fe"
+    },
+    "normalized_name": "bihar foundry castings limited bfcl",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_173a6107a928be02"
+    ]
+  },
+  {
+    "candidate_id": "ent_ea57e6987ff0da89",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_ea57e6987ff0da89"
+    },
+    "normalized_name": "chiatur manganum",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_471efb9dc6c04e62"
+    ]
+  },
+  {
+    "candidate_id": "ent_7bd885c3e0997c3e",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_7bd885c3e0997c3e"
+    },
+    "normalized_name": "eramet norway",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_c4d4cebd211224e4"
+    ]
+  },
+  {
+    "candidate_id": "ent_67d74ecdf6975b38",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_67d74ecdf6975b38"
+    },
+    "normalized_name": "feng erda",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_c51a221ca8d11d4a"
+    ]
+  },
+  {
+    "candidate_id": "ent_f3b69a4992141166",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_f3b69a4992141166"
+    },
+    "normalized_name": "ferro alloys corporation",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_ac354bc78fbc1696"
+    ]
+  },
+  {
+    "candidate_id": "ent_4ed350c304e9e81f",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_4ed350c304e9e81f"
+    },
+    "normalized_name": "ferroalloynet uae directory",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_f9949b690bbac265"
+    ]
+  },
+  {
+    "candidate_id": "ent_3ae80f84ddaf0fff",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_3ae80f84ddaf0fff"
+    },
+    "normalized_name": "ferroglobe mangan norge as",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_ae6aa9db39be246f"
+    ]
+  },
+  {
+    "candidate_id": "ent_2f3b32d369c6eba2",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_2f3b32d369c6eba2"
+    },
+    "normalized_name": "georgian manganese",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_7b71b03936b79e9e"
+    ]
+  },
+  {
+    "candidate_id": "ent_6a9ff72d76011cd0",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_6a9ff72d76011cd0"
+    },
+    "normalized_name": "hira ferro alloys ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_e0b8264d22110354"
+    ]
+  },
+  {
+    "candidate_id": "ent_8087d81070c37060",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_8087d81070c37060"
+    },
+    "normalized_name": "inner mongolia chayouqianqi mengfa ferroalloy co ltd mengfa ferroalloy",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_e180101bf7eeaea1"
+    ]
+  },
+  {
+    "candidate_id": "ent_5d1ae85abc95c09d",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_5d1ae85abc95c09d"
+    },
+    "normalized_name": "inner mongolia xinda industrial co ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_95b4cb669ecad38f"
+    ]
+  },
+  {
+    "candidate_id": "ent_3062dfc27c6263fb",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_3062dfc27c6263fb"
+    },
+    "normalized_name": "inner mongolia xinxin silicon industry co ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_bc11f81d0f9315c4"
+    ]
+  },
+  {
+    "candidate_id": "ent_79a6d6c3c9e5b427",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_79a6d6c3c9e5b427"
+    },
+    "normalized_name": "istanbul mineral and metals exporters association",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_ec9a3384f1ed98b1"
+    ]
+  },
+  {
+    "candidate_id": "ent_6ce1d728c3d3cad0",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_6ce1d728c3d3cad0"
+    },
+    "normalized_name": "jajoo group",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_e227f841fcf8a15d"
+    ]
+  },
+  {
+    "candidate_id": "ent_55bb62ec256de18d",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_55bb62ec256de18d"
+    },
+    "normalized_name": "kazferrogroup",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_2b1c2542e30b0832"
+    ]
+  },
+  {
+    "candidate_id": "ent_179062e5589dd983",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_179062e5589dd983"
+    },
+    "normalized_name": "mortex group",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_f915a692834258b5"
+    ]
+  },
+  {
+    "candidate_id": "ent_1dc3474b37832e34",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_1dc3474b37832e34"
+    },
+    "normalized_name": "pertama ferroalloys sdn bhd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_9914afe0590867f5"
+    ]
+  },
+  {
+    "candidate_id": "ent_4e564a91302d7e15",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_4e564a91302d7e15"
+    },
+    "normalized_name": "qvc exports ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_374d8a9ab3dd4ad5"
+    ]
+  },
+  {
+    "candidate_id": "ent_9b9c841d22ab8af3",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_9b9c841d22ab8af3"
+    },
+    "normalized_name": "sakura ferroalloys sdn bhd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_d03c18e5e5c05f1a"
+    ]
+  },
+  {
+    "candidate_id": "ent_6c616c83a455f80a",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_6c616c83a455f80a"
+    },
+    "normalized_name": "sarda metals alloys ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_c3d8b7605396f781"
+    ]
+  },
+  {
+    "candidate_id": "ent_7af28ba64eaaf598",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_7af28ba64eaaf598"
+    },
+    "normalized_name": "transalloys pty ltd",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_88189b27efba55b3"
+    ]
+  },
+  {
+    "candidate_id": "ent_2340de692fd36b00",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_2340de692fd36b00"
+    },
+    "normalized_name": "turkish exporter ferro alloys directory",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_f208452e1df1751a"
+    ]
+  },
+  {
+    "candidate_id": "ent_8e06ad136d6bb913",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_8e06ad136d6bb913"
+    },
+    "normalized_name": "zaporizhzhia ferroalloy plant",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_07b667de6bf6aead"
+    ]
+  }
+]

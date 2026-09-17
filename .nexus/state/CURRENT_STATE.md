@@ -1,5 +1,5 @@
 # NEXUS CURRENT STATE
-Last updated: 2026-09-07 by Claude Chat (via Reza)
+Last updated: 2026-09-17 by Claude Code (via Reza) -- corrected item 5 only, rest unchanged
 RULE: Read this file FIRST in any new session before doing anything
 else. Overwrite stale sections when updating — do not just append.
 
@@ -151,8 +151,29 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
    separate branch).
 4. [Reza] Decide: proceed with live Iran-source integration (first
    real attempt at ONE source) or hold for legal/compliance check first.
-5. [Not started] Opportunity Suggestion Engine (Track E) — designed,
-   not yet built. Draft-only, never auto-sends, human approval queue.
+5. [DONE, 2026-09-14, commit 7e7c96f, on main — corrected 2026-09-17]
+   Opportunity Suggestion Engine (Track E) is BUILT, not just designed:
+   opportunity_suggestion_engine.py (251 lines) + evals/test_opportunity_suggestion_engine.py
+   (16/16 tests passing, verified 2026-09-17). Draft-only queue, human
+   review required, compliance gate (UNREVIEWED/CLEARED/BLOCKED) blocks
+   any next-step ApprovalRequest until a named human clears sanctions/
+   export-control review — no send/execute/outreach method exists in
+   the module. Surfaced via nexus_status_brief.py's pending-opportunity
+   count. This line was stale for 3 days (built the same week it was
+   still listed here as "not yet built") — a reminder to check the
+   actual file/git history before trusting this section, not just the
+   prose.
+   REMAINING GAP (not done): no real signal has ever been submitted to
+   it — no opportunity_drafts.db exists anywhere in the repo, only
+   test runs against tmp paths. submit() currently validates lane scope
+   via fal_vertical.assert_lane_scope(), i.e. FAL-A/FAL-B only; it has
+   not been checked against/generalized for other verticals (e.g. the
+   real evidence-graded Hydrotester data in
+   data/entry_map_baku_eastpipes_2026-08-21.json, which is a different
+   vertical, currently paused per project priorities above). Next real
+   step, if wanted: get one genuine FAL-A/FAL-B signal and run it
+   through OpportunityQueue.submit() end-to-end — not fabricated test
+   data standing in for a real signal.
 
 ## EXPERT FOUNDRY ACTIVATION (2026-09-08)
 - Expert Foundry v0.1 merged to main as a governed research-memory scaffold.

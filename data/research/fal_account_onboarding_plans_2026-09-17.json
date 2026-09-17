@@ -1,0 +1,74 @@
+[
+  {
+    "plan_id": "acct_94c8f7e3d467e8b0",
+    "target": {
+      "target_id": "comtradeplus_free",
+      "service_name": "UN Comtrade / ComtradePlus (free API registration)",
+      "signup_url": "https://comtradeplus.un.org/",
+      "purpose": "Programmatic access to official UN bulk trade statistics (ferroalloys HS 7202) for FAL-A/FAL-B market-level research.",
+      "jurisdiction": "UN (international body, not a single national jurisdiction)",
+      "account_owner": "Reza",
+      "expected_cost": 0.0,
+      "requires_kyc": false,
+      "requires_payment": false
+    },
+    "stage": "READY_FOR_REVIEW",
+    "public_fields": {
+      "account_owner_name": "Reza",
+      "purpose": "Programmatic access to official UN bulk trade statistics (ferroalloys HS 7202) for FAL-A/FAL-B market-level research."
+    },
+    "missing_owner_inputs": [],
+    "terms_url": null,
+    "privacy_url": null,
+    "risk_flags": [
+      "terms_not_reviewed"
+    ],
+    "allowed_automatic_steps": [
+      "research_service",
+      "compare_plans",
+      "check_eligibility",
+      "prepare_public_fields",
+      "navigate_to_signup"
+    ],
+    "approval_required_actions": [
+      "create_account",
+      "accept_terms"
+    ]
+  },
+  {
+    "plan_id": "acct_a065db8440ad1878",
+    "target": {
+      "target_id": "trademap_free",
+      "service_name": "ITC Trade Map (free registration)",
+      "signup_url": "https://www.trademap.org/",
+      "purpose": "Bilateral trade flow and market-access detail for ferroalloys, complementing Comtrade for FAL-A/FAL-B research.",
+      "jurisdiction": "ITC / UN-WTO joint agency",
+      "account_owner": "Reza",
+      "expected_cost": 0.0,
+      "requires_kyc": false,
+      "requires_payment": false
+    },
+    "stage": "READY_FOR_REVIEW",
+    "public_fields": {
+      "account_owner_name": "Reza",
+      "purpose": "Bilateral trade flow and market-access detail for ferroalloys, complementing Comtrade for FAL-A/FAL-B research."
+    },
+    "missing_owner_inputs": [],
+    "terms_url": null,
+    "privacy_url": null,
+    "risk_flags": [
+      "terms_not_reviewed"
+    ],
+    "allowed_automatic_steps": [
+      "research_service",
+      "compare_plans",
+      "check_eligibility",
+      "prepare_public_fields",
+      "navigate_to_signup"
+    ],
+    "approval_required_actions": [
+      "create_account",
+      "accept_terms"
+    ]
+  }
+]

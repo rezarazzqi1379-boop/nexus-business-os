@@ -1,0 +1,107 @@
+[
+  {
+    "candidate_id": "ent_ea57e6987ff0da89",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_ea57e6987ff0da89"
+    },
+    "normalized_name": "chiatur manganum",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_471efb9dc6c04e62"
+    ]
+  },
+  {
+    "candidate_id": "ent_f3b69a4992141166",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_f3b69a4992141166"
+    },
+    "normalized_name": "ferro alloys corporation",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_ac354bc78fbc1696"
+    ]
+  },
+  {
+    "candidate_id": "ent_4ed350c304e9e81f",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_4ed350c304e9e81f"
+    },
+    "normalized_name": "ferroalloynet uae directory",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_f9949b690bbac265"
+    ]
+  },
+  {
+    "candidate_id": "ent_2f3b32d369c6eba2",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_2f3b32d369c6eba2"
+    },
+    "normalized_name": "georgian manganese",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_7b71b03936b79e9e"
+    ]
+  },
+  {
+    "candidate_id": "ent_79a6d6c3c9e5b427",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_79a6d6c3c9e5b427"
+    },
+    "normalized_name": "istanbul mineral and metals exporters association",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_ec9a3384f1ed98b1"
+    ]
+  },
+  {
+    "candidate_id": "ent_2340de692fd36b00",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_2340de692fd36b00"
+    },
+    "normalized_name": "turkish exporter ferro alloys directory",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_f208452e1df1751a"
+    ]
+  },
+  {
+    "candidate_id": "ent_8e06ad136d6bb913",
+    "classification": {
+      "basis": "single consistent buyer_type_hint",
+      "category": "unknown",
+      "confidence": 0.3,
+      "entity_candidate_id": "ent_8e06ad136d6bb913"
+    },
+    "normalized_name": "zaporizhzhia ferroalloy plant",
+    "reason": "1 duplicate group(s) independently share this normalized name",
+    "resolution_state": "probable",
+    "supporting_group_ids": [
+      "dupgrp_07b667de6bf6aead"
+    ]
+  }
+]

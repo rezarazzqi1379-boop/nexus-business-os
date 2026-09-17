@@ -1,0 +1,8 @@
+{
+  "created_at": "2026-09-17T06:06:53.251867+00:00",
+  "lane_id": "FAL-A",
+  "objective": "Identify candidate foreign SUPPLIER entities for ferromanganese import (FAL-A) across China/Turkey/CIS(Georgia,Kazakhstan)/Gulf, via live public web search.",
+  "project_id": "PRJ-FAL-01",
+  "query_set_version": "claude-manual-v1",
+  "run_id": "fal-a-ferromanganese-live-2026-09-17"
+}

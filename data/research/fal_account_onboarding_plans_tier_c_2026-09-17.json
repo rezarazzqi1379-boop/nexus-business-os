@@ -1,0 +1,165 @@
+[
+  {
+    "plan_id": "acct_a912e4519565bd15",
+    "target": {
+      "target_id": "volza_trial",
+      "service_name": "Volza (global shipment-level trade data, free-trial tier)",
+      "signup_url": "https://www.volza.com/",
+      "purpose": "Shipment-level import/export records for ferromanganese/ferrosilicon counterparties across ~200 countries, for FAL-A/FAL-B research.",
+      "jurisdiction": "India (Volza's stated HQ)",
+      "account_owner": "Reza",
+      "expected_cost": 0.0,
+      "requires_kyc": false,
+      "requires_payment": true
+    },
+    "stage": "IDENTITY_REQUIRED",
+    "public_fields": {
+      "account_owner_name": "Reza",
+      "purpose": "Shipment-level import/export records for ferromanganese/ferrosilicon counterparties across ~200 countries, for FAL-A/FAL-B research."
+    },
+    "missing_owner_inputs": [
+      "owner_supplied_payment_in_browser"
+    ],
+    "terms_url": null,
+    "privacy_url": null,
+    "risk_flags": [
+      "financial_commitment",
+      "terms_not_reviewed"
+    ],
+    "allowed_automatic_steps": [
+      "research_service",
+      "compare_plans",
+      "check_eligibility",
+      "prepare_public_fields",
+      "navigate_to_signup"
+    ],
+    "approval_required_actions": [
+      "create_account",
+      "accept_terms",
+      "link_payment"
+    ]
+  },
+  {
+    "plan_id": "acct_80b4ed1db4e4ca04",
+    "target": {
+      "target_id": "importgenius_paid",
+      "service_name": "ImportGenius (customs/shipment trade intelligence)",
+      "signup_url": "https://www.importgenius.com/",
+      "purpose": "Customs/shipment-level trade intelligence searchable by company/product, for FAL-A/FAL-B counterparty discovery.",
+      "jurisdiction": "United States",
+      "account_owner": "Reza",
+      "expected_cost": 0.0,
+      "requires_kyc": false,
+      "requires_payment": true
+    },
+    "stage": "IDENTITY_REQUIRED",
+    "public_fields": {
+      "account_owner_name": "Reza",
+      "purpose": "Customs/shipment-level trade intelligence searchable by company/product, for FAL-A/FAL-B counterparty discovery."
+    },
+    "missing_owner_inputs": [
+      "owner_supplied_payment_in_browser"
+    ],
+    "terms_url": null,
+    "privacy_url": null,
+    "risk_flags": [
+      "financial_commitment",
+      "terms_not_reviewed"
+    ],
+    "allowed_automatic_steps": [
+      "research_service",
+      "compare_plans",
+      "check_eligibility",
+      "prepare_public_fields",
+      "navigate_to_signup"
+    ],
+    "approval_required_actions": [
+      "create_account",
+      "accept_terms",
+      "link_payment"
+    ]
+  },
+  {
+    "plan_id": "acct_cc27158ed6e9d1fe",
+    "target": {
+      "target_id": "panjiva_paid",
+      "service_name": "Panjiva (S&P Global) enterprise trade/supply-chain intelligence",
+      "signup_url": "https://panjiva.com/",
+      "purpose": "Enterprise-grade shipment/supply-chain mapping for ferroalloys counterparties -- highest compliance-caution item in this catalog given S&P Global's own regulatory posture as a US financial-data company.",
+      "jurisdiction": "United States (S&P Global)",
+      "account_owner": "Reza",
+      "expected_cost": 0.0,
+      "requires_kyc": true,
+      "requires_payment": true
+    },
+    "stage": "IDENTITY_REQUIRED",
+    "public_fields": {
+      "account_owner_name": "Reza",
+      "purpose": "Enterprise-grade shipment/supply-chain mapping for ferroalloys counterparties -- highest compliance-caution item in this catalog given S&P Global's own regulatory posture as a US financial-data company."
+    },
+    "missing_owner_inputs": [
+      "owner_supplied_kyc_in_browser",
+      "owner_supplied_payment_in_browser"
+    ],
+    "terms_url": null,
+    "privacy_url": null,
+    "risk_flags": [
+      "identity_verification_required",
+      "financial_commitment",
+      "terms_not_reviewed"
+    ],
+    "allowed_automatic_steps": [
+      "research_service",
+      "compare_plans",
+      "check_eligibility",
+      "prepare_public_fields",
+      "navigate_to_signup"
+    ],
+    "approval_required_actions": [
+      "create_account",
+      "accept_terms",
+      "submit_kyc",
+      "link_payment"
+    ]
+  },
+  {
+    "plan_id": "acct_09c8bf3b58039824",
+    "target": {
+      "target_id": "tendata_paid",
+      "service_name": "Tendata (trade data platform)",
+      "signup_url": "https://www.tendata.com/",
+      "purpose": "Comparable shipment/trade-data platform to Volza/ImportGenius, for cross-checking FAL-A/FAL-B counterparty candidates against a second provider.",
+      "jurisdiction": "China (Tendata's stated HQ)",
+      "account_owner": "Reza",
+      "expected_cost": 0.0,
+      "requires_kyc": false,
+      "requires_payment": true
+    },
+    "stage": "IDENTITY_REQUIRED",
+    "public_fields": {
+      "account_owner_name": "Reza",
+      "purpose": "Comparable shipment/trade-data platform to Volza/ImportGenius, for cross-checking FAL-A/FAL-B counterparty candidates against a second provider."
+    },
+    "missing_owner_inputs": [
+      "owner_supplied_payment_in_browser"
+    ],
+    "terms_url": null,
+    "privacy_url": null,
+    "risk_flags": [
+      "financial_commitment",
+      "terms_not_reviewed"
+    ],
+    "allowed_automatic_steps": [
+      "research_service",
+      "compare_plans",
+      "check_eligibility",
+      "prepare_public_fields",
+      "navigate_to_signup"
+    ],
+    "approval_required_actions": [
+      "create_account",
+      "accept_terms",
+      "link_payment"
+    ]
+  }
+]

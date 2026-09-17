@@ -217,6 +217,38 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
     roll). Full per-stand detail (ST1-ST4 motor/gearbox/roll) lives in the intake
     JSON's `mill_stands_detail` key since the schema's flat fields only fit one stand.
 
+## DEEP SEARCH / FAL-A LIVE RESEARCH (2026-09-17, new)
+
+- Fixed a real cross-branch integrity gap found while doing this: this branch
+  (feat/unified-system-governance-v0.1) never actually had fal_vertical.py in its
+  own git history, even though opportunity_suggestion_engine.py (already committed
+  here as 7e7c96f) hard-depends on it. It "worked" only because an untracked,
+  uncommitted copy happened to sit in the working directory, content-identical to
+  main's already-committed version. Fixed by committing that same file here too
+  (commit e34c62b) -- a clean clone of this branch before that fix would have
+  failed to import opportunity_suggestion_engine.py.
+- First real (non-synthetic) discovery run for FAL-A (ferromanganese import,
+  foreign SUPPLIER role): 7 candidate entities gathered via live public web search
+  (Georgia/CIS, Turkey, Gulf directories/companies -- China search returned no
+  in-corridor hits worth including) and run through the existing
+  discovery_pipeline.py machinery (ingest_external_discoveries + process_discovery_batch),
+  persisted under research_lab/. Driver: scripts/run_fal_a_discovery.py. Raw data:
+  data/research/fal_a_ferromanganese_discoveries_2026-09-17.jsonl.
+- Result: plausible_buyer_count=0, verified_buyer_count=0 -- correctly declined
+  to promote any single-source, unclassified-category hit. This is the scoring
+  working as designed, not a failure. Next real step to get a non-zero result:
+  either find a second independent source per candidate entity, or manually
+  classify each entity's category (steel_mill/trader/distributor/etc.) rather
+  than leaving all seven as "unknown".
+- Explicitly NOT done and not automatable: contacting any of these entities,
+  creating an account anywhere, or any outreach. outreach_authorized stays
+  hardcoded False in need_radar.py; nothing here reaches OpportunityQueue
+  without further corroboration, and nothing in OpportunityQueue can reach a
+  human-approved next step without a separate, explicit compliance_status=CLEARED
+  review (see opportunity_suggestion_engine.py's compliance gate, and the
+  project-priorities section above on Iran-related sourcing needing real legal
+  advice before live outreach).
+
 ## ROLE SPLIT (still true)
 - Claude Code: engineering executor (code/tests/branches)
 - ChatGPT/NEXUS (via both a Drive/Notion-connected session AND a

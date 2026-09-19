@@ -47,6 +47,12 @@ PROJECTS: dict[str, ProjectPolicy] = {
         "portfolio_platform", "separate_workstream", 30, "Deliver a credible public portfolio product",
         ("repository_state", "deployment_owner", "acceptance_test"),
     ),
+    "PRJ-FAL-01": ProjectPolicy(
+        "PRJ-FAL-01", "research", 55,
+        "Reconcile FAL-A/FAL-B structural models without promoting disputed commercial authority",
+        ("dual_role_schema", "legacy_api_compatibility", "lane_isolation", "authority_reconciliation"),
+        ("canonical_promotion", "cross_lane_evidence_transfer", "live_provider_activation"),
+    ),
 }
 
 

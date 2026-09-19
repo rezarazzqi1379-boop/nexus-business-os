@@ -186,3 +186,42 @@ explicit plays and a review inbox, but NEXUS keeps research approval separate
 from outreach authorization and avoids credit-consuming automation until a
 measured pipeline need exists. NEXUS keeps a single focused agent until evidence
 shows that a multi-agent team materially improves outcomes.
+
+Version 1.10 adds a Ruflo (claude-flow) orchestration layer for Claude Code
+sessions working in this repository. Twenty-six plugins are declared in
+`.claude/settings.json` (`enabledPlugins`): core, swarm, autopilot, workflows,
+hybrid vector+graph memory (agentdb, rag-memory, knowledge-graph, rvf),
+architecture record-keeping (adr, ddd), security (aidefence, security-audit),
+cost-tracker, observability, migrations, testgen, docs, sparc, metaharness,
+jujutsu, goals, daa, graph-intelligence, plugin-creator, intelligence, and
+cross-installation agent federation (federation). The `ruflo` marketplace
+(`ruvnet/ruflo`) is declared at project scope, so `claude plugin install`
+resolves it without extra configuration on any machine that clones this repo.
+`ruflo doctor --fix` reports 18 passed checks and 10 non-blocking warnings, no
+failures; the vector memory database (`.swarm/memory.db`) was rebuilt under
+the native storage driver and verified (6/6 checks).
+
+The MCP server declared in `.mcp.json` is not yet live in any session:
+activation requires running `claude` interactively in this directory at least
+once so it can register the server and load the plugin set. The background
+daemon (`ruflo daemon start`) is deliberately not started — it spawns headless
+Claude sessions on a schedule and consumes tokens continuously, so starting it
+is left as an explicit operator decision, not a default.
+
+`ruflo-federation` publishes swarm-coordination events to a third-party relay
+(`relay.ruv.io`) outside this project's own infrastructure. As of this version,
+no NEXUS business data (leads, evidence, approvals, canonical sources) is
+routed through that layer — only Claude Code coordination events, and only if
+and when multi-agent swarm workflows or the daemon are actually activated.
+`ruflo-aidefence` is enabled for PII/prompt-injection scanning but its
+underlying package (`@claude-flow/aidefence`) is not yet installed locally
+(`ruflo doctor` flags this as optional); its MCP tools will fail silently
+until `npm install --save @claude-flow/aidefence` is run in a directory ruflo
+resolves it from.
+
+Two more plugins were added after the initial Version 1.10 pass:
+`ruflo-loop-workers` (recurring-task substrate; declares the scheduling
+workers but starts nothing on its own) and `ruflo-business-pods` (ADR-164
+Phase 2, v0.1.0-alpha — a sales-pod template and dry-run-only pod runner;
+`--live` execution is explicitly reserved for a future phase and is not wired
+up here). The plugin count is now 28.

@@ -359,6 +359,16 @@ class CoreTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "event_id_payload_mismatch"):
                 store.begin(EventRecord("e-collision", "kcl_mop", "email", {"value": 2}))
 
+    def test_event_store_releases_sqlite_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "state.db"
+            store = EventStore(path)
+            store.begin(EventRecord("e-cleanup", "kcl_mop", "email", {"value": 1}))
+            store.get_status("e-cleanup")
+            store.set_status("e-cleanup", "completed")
+            path.unlink()
+            self.assertFalse(path.exists())
+
     def test_heat_treatment_stays_on_hold(self):
         result = evaluate_event("heat_treatment", {"requested_action": "research"})
         self.assertEqual(result.disposition, "hold_project")
@@ -406,6 +416,18 @@ class CoreTests(unittest.TestCase):
             store = AutonomyStore(Path(directory) / "runtime.db")
             self.assertEqual(store.record_capability_failure("gmail", threshold=2), "closed")
             self.assertEqual(store.record_capability_failure("gmail", threshold=2), "open")
+
+    def test_autonomy_store_releases_sqlite_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "runtime.db"
+            store = AutonomyStore(path)
+            store.enqueue(WorkItem("w-cleanup", "kcl_mop", "research", {}))
+            store.claim_next("worker-cleanup")
+            store.complete("w-cleanup", "worker-cleanup")
+            store.record_usage("u-cleanup", "kcl_mop", 0.0)
+            store.record_capability_failure("cleanup", threshold=1)
+            path.unlink()
+            self.assertFalse(path.exists())
 
     def test_cost_forecast_uses_configurable_pricing(self):
         result = forecast_cost(runs_per_day=24, days=30, input_tokens_per_run=2000,

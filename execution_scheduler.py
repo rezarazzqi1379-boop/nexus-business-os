@@ -25,7 +25,7 @@ class ExecutionSchedule:
 
 
 _STATES = frozenset({"ready", "waiting", "blocked", "done"})
-_LANES = frozenset({"recovery", "research", "engineering", "build", "commercial", "learning", "infrastructure"})
+_LANES = frozenset({"recovery", "research", "engineering", "build", "commercial", "learning", "infrastructure", "sandbox"})
 
 
 def _validate(item: ExecutionLane) -> None:

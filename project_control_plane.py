@@ -20,6 +20,8 @@ from conversation_control import (
 
 Risk = Literal["read", "local_write", "external"]
 CONTROL_PLANE_VERSION = "nexus.project-control-plane.v1"
+_EXECUTION_READY_LIFECYCLES = frozenset({"PILOT", "ADOPTED_ADAPTER"})
+_SANDBOX_ONLY_LIFECYCLES = frozenset({"SANDBOX_READY", "EXPERIMENT"})
 
 
 @dataclass(frozen=True)
@@ -84,8 +86,17 @@ def _select_agent(request: WorkRequest, catalog: tuple[AgentCatalogEntry, ...]) 
         for item in candidates_for_problem(catalog, tag):
             candidates[item.catalog_id] = item
     required = set(request.required_capabilities)
+    eligible = {
+        catalog_id: item for catalog_id, item in candidates.items()
+        if item.lifecycle in _EXECUTION_READY_LIFECYCLES
+        or (
+            item.lifecycle in _SANDBOX_ONLY_LIFECYCLES
+            and request.lane == "sandbox"
+            and request.risk != "external"
+        )
+    }
     ranked = sorted(
-        candidates.values(),
+        eligible.values(),
         key=lambda item: (-len(required.intersection(item.capabilities)), item.catalog_id),
     )
     if not ranked:

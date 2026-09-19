@@ -119,3 +119,85 @@ def test_stand_kinematics_match_nameplate():
     assert st1.surface_speed_m_min == pytest.approx(math.pi * 0.518 * 999 / 9.8)
     assert st1.rated_motor_torque_nm == pytest.approx(11947, abs=50)
     assert st1.rated_roll_torque_nm(0.96) == pytest.approx(112396, abs=500)
+
+
+# ---------------------------------------------------------------------------
+# Grade-dependent behaviour
+# ---------------------------------------------------------------------------
+
+from rolling_line_concept import (
+    A283C, CK45, GRADES, ST37, ST52, Grade,
+    analyse_pass_for_grade, build_grade_pass_schedule, deformation_energy_kwh_per_tonne,
+)
+
+def _st1():
+    return Stand("ST1", 1250, 999, 9.8, 518)
+
+def _speed():
+    return math.pi * 0.518 * (999 / 9.8)
+
+def test_st37_is_the_unit_baseline():
+    assert ST37.flow_stress_multiplier == 1.0
+
+def test_grades_are_ordered_by_hot_strength():
+    assert ST37.flow_stress_multiplier < A283C.flow_stress_multiplier
+    assert A283C.flow_stress_multiplier < ST52.flow_stress_multiplier
+    assert ST52.flow_stress_multiplier < CK45.flow_stress_multiplier
+
+def test_every_grade_documents_its_basis():
+    assert all(g.basis.strip() for g in GRADES)
+
+def test_grade_scales_force_and_power_but_not_geometry():
+    plain = analyse_pass(1, 150, 130, 150, SCENARIO_A, BASE, _speed(), 1150)
+    alloy = analyse_pass_for_grade(1, 150, 130, 150, SCENARIO_A, BASE, _speed(), 1150, ST52)
+    assert alloy.force_n == pytest.approx(plain.force_n * ST52.flow_stress_multiplier)
+    assert alloy.power_kw == pytest.approx(plain.power_kw * ST52.flow_stress_multiplier)
+    # geometry is unchanged by chemistry
+    assert alloy.contact_len == pytest.approx(plain.contact_len)
+    assert alloy.bite_angle_deg == pytest.approx(plain.bite_angle_deg)
+    assert alloy.exit_b == pytest.approx(plain.exit_b)
+
+def test_grade_schedule_never_exceeds_the_drive_limit():
+    tq = _st1().rated_roll_torque_nm(BASE.gearbox_efficiency)
+    for grade in GRADES:
+        ps, _ = build_grade_pass_schedule(Billet(), 25.0, SCENARIO_A, BASE, _speed(), 1250.0, tq, grade)
+        assert ps, f"{grade.name} produced no feasible schedule"
+        assert all(p.power_kw <= 1250.0 + 1e-6 for p in ps), f"{grade.name} exceeded motor power"
+        assert all(p.torque_nm <= tq + 1e-6 for p in ps), f"{grade.name} exceeded drive torque"
+
+def test_harder_grade_needs_at_least_as_many_passes():
+    tq = _st1().rated_roll_torque_nm(BASE.gearbox_efficiency)
+    soft, _ = build_grade_pass_schedule(Billet(), 25.0, SCENARIO_A, BASE, _speed(), 1250.0, tq, ST37)
+    hard, _ = build_grade_pass_schedule(Billet(), 25.0, SCENARIO_A, BASE, _speed(), 1250.0, tq, CK45)
+    assert len(hard) >= len(soft)
+
+def test_thick_product_needs_fewer_passes_than_thin():
+    """The core spec-driven finding: thick gauge is cheaper to make, and that is
+    exactly where the ST52 price premium sits."""
+    tq = _st1().rated_roll_torque_nm(BASE.gearbox_efficiency)
+    thin, _ = build_grade_pass_schedule(Billet(), 8.0, SCENARIO_A, BASE, _speed(), 1250.0, tq, ST52)
+    thick, _ = build_grade_pass_schedule(Billet(), 25.0, SCENARIO_A, BASE, _speed(), 1250.0, tq, ST52)
+    assert len(thick) < len(thin)
+
+def test_thin_product_costs_far_more_energy_per_tonne():
+    tq = _st1().rated_roll_torque_nm(BASE.gearbox_efficiency)
+    thin, _ = build_grade_pass_schedule(Billet(), 8.0, SCENARIO_A, BASE, _speed(), 1250.0, tq, ST37)
+    thick, _ = build_grade_pass_schedule(Billet(), 25.0, SCENARIO_A, BASE, _speed(), 1250.0, tq, ST37)
+    e_thin = deformation_energy_kwh_per_tonne(thin)
+    e_thick = deformation_energy_kwh_per_tonne(thick)
+    assert e_thin > 1.7 * e_thick
+
+def test_st52_at_25mm_costs_almost_no_capacity_versus_st37():
+    """ST52 at thick gauge fits inside the existing drive envelope - the whole
+    basis of the specification-driven recommendation."""
+    tq = _st1().rated_roll_torque_nm(BASE.gearbox_efficiency)
+    a, _ = build_grade_pass_schedule(Billet(), 25.0, SCENARIO_A, BASE, _speed(), 1250.0, tq, ST37)
+    b, _ = build_grade_pass_schedule(Billet(), 25.0, SCENARIO_A, BASE, _speed(), 1250.0, tq, ST52)
+    assert len(b) == len(a)
+
+def test_a_grade_too_hard_to_roll_fails_closed_rather_than_looping():
+    tq = _st1().rated_roll_torque_nm(BASE.gearbox_efficiency)
+    absurd = Grade("unrollable", 12.0, 0.9, 2.0, "deliberately beyond the drive envelope")
+    ps, reasons = build_grade_pass_schedule(Billet(), 25.0, SCENARIO_A, BASE, _speed(),
+                                            1250.0, tq, absurd, max_passes=15)
+    assert "STALLED" in reasons or len(ps) <= 15

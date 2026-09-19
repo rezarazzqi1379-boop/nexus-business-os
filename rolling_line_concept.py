@@ -381,3 +381,89 @@ def deformation_energy_kwh_per_tonne(passes, mill_efficiency=0.40):
         total += p.flow_stress * 1e6 * math.log(p.entry_h / p.exit_h)   # J/m3
     j_per_kg = total / 7850.0
     return j_per_kg * 1000.0 / 3.6e6 / mill_efficiency
+
+
+# ---------------------------------------------------------------------------
+# Grade-dependent hot deformation resistance
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class Grade:
+    """Hot flow-stress multiplier relative to ST37/S235JR at the same T and strain rate.
+
+    ESTIMATE. Basis: in the austenitic hot-working range, deformation resistance
+    rises mainly with Mn and alloy content; ~6% per 1% Mn is a literature-typical
+    slope, with smaller contributions from C and Si. These multipliers must be
+    replaced by a hot compression test series before any fabrication decision.
+    """
+    name: str
+    flow_stress_multiplier: float
+    nominal_carbon: float
+    nominal_manganese: float
+    basis: str
+
+
+ST37 = Grade("ST37 / S235JR", 1.00, 0.17, 0.60, "baseline - the mill's current grade")
+ST52 = Grade("ST52 / S355J2", 1.15, 0.20, 1.50,
+             "Mn +0.9% over ST37 at ~6%/%Mn => ~+5.4%, plus C and Si; range 1.08-1.25")
+A283C = Grade("A283 Gr C", 1.08, 0.24, 0.90, "pressure-vessel carbon, modest Mn increase")
+CK45 = Grade("CK45 / 1.1191", 1.25, 0.45, 0.65, "medium carbon, markedly higher hot strength")
+GRADES = (ST37, ST52, A283C, CK45)
+
+
+def analyse_pass_for_grade(index, entry_h, exit_h, entry_b, scenario, case,
+                           roll_surface_speed_m_min, temperature_c, grade):
+    """Same physics as analyse_pass, scaled by the grade's flow-stress multiplier."""
+    p = analyse_pass(index, entry_h, exit_h, entry_b, scenario, case,
+                     roll_surface_speed_m_min, temperature_c)
+    k = grade.flow_stress_multiplier
+    return PassResult(p.index, p.entry_h, p.exit_h, p.entry_b, p.exit_b, p.draft,
+                      p.contact_len, p.temperature_c, p.strain_rate,
+                      p.flow_stress * k, p.geometry_q, p.force_n * k,
+                      p.torque_nm * k, p.power_kw * k, p.bite_ok, p.bite_angle_deg)
+
+
+def build_grade_pass_schedule(billet, target_thickness, scenario, case,
+                              roll_surface_speed_m_min, power_limit_kw,
+                              torque_limit_nm, grade, max_passes=60,
+                              draft_utilisation=0.85):
+    """Concept pass schedule for a specific steel grade, respecting bite and drive limits."""
+    r = scenario.barrel_diameter_mm / 2.0
+    bite_cap = max_draft_for_bite_mm(case.friction_coefficient, r) * draft_utilisation
+    passes, reasons = [], []
+    h, b, temp = billet.thickness_mm, billet.width_mm, case.entry_temperature_c
+    idx = 0
+    while h > target_thickness + 1e-6 and idx < max_passes:
+        idx += 1
+        geom_cap = min(bite_cap, h - target_thickness, 0.45 * h)
+
+        def feasible(draft):
+            if draft <= 0:
+                return True
+            p = analyse_pass_for_grade(0, h, h - draft, b, scenario, case,
+                                       roll_surface_speed_m_min, temp, grade)
+            return p.power_kw <= power_limit_kw and p.torque_nm <= torque_limit_nm
+
+        lo, hi = 0.0, geom_cap
+        if not feasible(hi):
+            while hi - lo > 0.01:
+                mid = (lo + hi) / 2.0
+                if feasible(mid):
+                    lo = mid
+                else:
+                    hi = mid
+            draft = lo
+            reason = "drive power/torque"
+        else:
+            draft = geom_cap
+            reason = "bite/geometry"
+        if draft < 0.05:
+            reasons.append("STALLED")
+            break
+        reasons.append(reason)
+        p = analyse_pass_for_grade(idx, h, h - draft, b, scenario, case,
+                                   roll_surface_speed_m_min, temp, grade)
+        passes.append(p)
+        h, b = p.exit_h, p.exit_b
+        temp -= case.temperature_drop_per_pass_c
+    return passes, reasons

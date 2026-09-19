@@ -29,6 +29,17 @@ def auth_config_valid() -> bool:
     return (not auth_required()) or len(configured_token()) >= 32
 
 
+def basic_challenge_enabled() -> bool:
+    """Whether 401 responses advertise HTTP Basic authentication.
+
+    Basic credentials remain accepted proactively by _authorized(). The challenge is
+    disabled by default because browsers may turn a JSON 401 into a native username /
+    password dialog, which looks like a login loop when a session cookie is missing.
+    Legacy clients that genuinely need a challenge may opt in explicitly.
+    """
+    return os.getenv("NEXUS_BASIC_CHALLENGE", "0").strip() == "1"
+
+
 def session_ttl_seconds() -> int:
     raw = os.getenv("NEXUS_SESSION_TTL_SECONDS", str(DEFAULT_SESSION_TTL_SECONDS))
     try:
@@ -112,7 +123,8 @@ class SecurityMiddleware(BaseHTTPMiddleware):
                 if request.method == "GET" and accepts_html:
                     next_path = quote(request.url.path, safe="/")
                     return self._secure(RedirectResponse(f"/login?next={next_path}", status_code=303))
+                challenge = {"WWW-Authenticate": 'Basic realm="NEXUS"'} if basic_challenge_enabled() else None
                 return self._secure(JSONResponse({"detail": "authentication_required"}, status_code=401,
-                                                 headers={"WWW-Authenticate": 'Basic realm="NEXUS"'}))
+                                                 headers=challenge))
         response = await call_next(request)
         return self._secure(response)

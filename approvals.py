@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sqlite3
 import uuid
+from contextlib import closing
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -30,13 +31,19 @@ class ApprovalRequest:
 
 
 class ApprovalStore:
-    """Single-use, exact-scope approvals. Approval never implies connector authority."""
+    """Single-use exact-scope approvals.
+
+    ``decided_by`` is caller-claimed audit metadata.  This store does not
+    authenticate actors, so values such as ``"human"`` are not identity proof.
+    Approval never implies connector authority.
+    """
 
     def __init__(self, path: Path) -> None:
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self._connect() as db:
-            db.execute("""
+        with closing(self._connect()) as db:
+            with db:
+                db.execute("""
                 CREATE TABLE IF NOT EXISTS approvals (
                     approval_id TEXT PRIMARY KEY, project_id TEXT NOT NULL, action TEXT NOT NULL,
                     target TEXT NOT NULL, parameters_json TEXT NOT NULL, action_digest TEXT NOT NULL,
@@ -58,13 +65,14 @@ class ApprovalStore:
             raise ValueError("invalid_approval_ttl")
         current = now or utc_now()
         approval_id = "apr_" + uuid.uuid4().hex
-        with self._connect() as db:
-            db.execute("INSERT INTO approvals VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", (
+        with closing(self._connect()) as db:
+            with db:
+                db.execute("INSERT INTO approvals VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", (
                 approval_id, item.project_id, item.action, item.target,
                 json.dumps(item.parameters, sort_keys=True, separators=(",", ":")), item.action_digest,
                 item.requested_by, "pending", current.isoformat(),
                 (current + timedelta(seconds=item.ttl_seconds)).isoformat(), None, None, None,
-            ))
+                ))
         return approval_id
 
     def decide(self, approval_id: str, *, approved: bool, decided_by: str,
@@ -72,7 +80,7 @@ class ApprovalStore:
         if not decided_by.strip():
             raise ValueError("invalid_decider")
         current = now or utc_now()
-        with self._connect() as db:
+        with closing(self._connect()) as db:
             db.execute("BEGIN IMMEDIATE")
             row = db.execute("SELECT status, expires_at FROM approvals WHERE approval_id=?", (approval_id,)).fetchone()
             if row is None:
@@ -95,7 +103,7 @@ class ApprovalStore:
 
     def consume(self, approval_id: str, *, action_digest: str, now: datetime | None = None) -> bool:
         current = now or utc_now()
-        with self._connect() as db:
+        with closing(self._connect()) as db:
             db.execute("BEGIN IMMEDIATE")
             row = db.execute("SELECT status, action_digest, expires_at FROM approvals WHERE approval_id=?", (approval_id,)).fetchone()
             if row is None:
@@ -111,3 +119,9 @@ class ApprovalStore:
                                  (current.isoformat(), approval_id)).rowcount
             db.commit()
             return changed == 1
+
+    def get(self, approval_id: str) -> dict | None:
+        """Return an isolated read-only snapshot without changing approval state."""
+        with closing(self._connect()) as db:
+            row = db.execute("SELECT * FROM approvals WHERE approval_id=?", (approval_id,)).fetchone()
+            return dict(row) if row is not None else None

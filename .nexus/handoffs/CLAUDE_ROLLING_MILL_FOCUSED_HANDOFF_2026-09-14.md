@@ -7,32 +7,35 @@ Decision boundary: retrospective engineering study only; no operating change aut
 
 ## User objective
 
-Help determine whether and how the existing rolling line could produce the intended
-"300" strip product from the existing "150" billet, using current machinery if feasible.
+Help determine whether the existing rolling line could feasibly roll a user-declared
+220 x 220 x 3000 mm billet into 300, 400 or 600 mm-wide product at 8--20 mm thickness,
+using current machinery if feasible.
 The system must combine literature, machine constraints, historical production data and
 operator experience, but must not invent machine meanings, units or production settings.
 
-## Raw user statement
+## Latest typed user statement
 
-The following is voice-transcribed conversation evidence and remains `UNVERIFIED`:
+The following is conversation evidence confirmed by the user. It is `USER_CONFIRMED`,
+not independently `VERIFIED` against drawings, nameplates or production records:
 
-> دستگاه نورد یا رافینگ. توانایی تولید شمش ۱۵۰. از شمش ۱۵۰ تسمه ۲۵۰ می‌گیرند.
-> غلطکه ۴۵۰ تا ۴۸۰. طول ۱۳۵۰. گیربکس ۱ به ۱۰. همدور ۵۵۰. موتور ۸۰۰
-> ۱۲۵ کیلووات ۱۰۰۲. رافینگ: استند ۳ غلطکه، ۲ غلطکه، فینیش ۲ غلطکه.
-> تولید، ضخامت از ۶ تا ۲۰. عرض ۱۵، ۲۰، ۲۵. ... چجوری از طریق اینها تسمه
-> ۳۰۰ گرمی بگیریم و عرض...
+> بیلت ۲۲۰ × ۲۲۰ میلی‌متر و طول ۳ متر است. عرض‌های مورد بررسی ۳۰، ۴۰ و
+> ۶۰ سانتی‌متر و ضخامت ۸ تا ۲۰ میلی‌متر است. استند رافینگ موجود سه‌غلتکه،
+> «قطر دور» ۵۵۰ سانتی‌متر و طول بشکه ۱۳۵۰ سانتی‌متر است. گیربکس «۱۵ تن»
+> با نسبت ۱ به ۱۰ توصیف شده است. گرید ST37 اعلام شده است. برای حالت سه‌غلتکه
+> و گزینه دوغلتکه باید قطر و طول غلتک، گیربکس و موتور بررسی شود.
 
-Do not silently normalize these numbers. In particular:
+Interpretation boundary:
 
-- `150` may be a 150×150 mm billet, but that is not verified.
-- `250` may be strip width in mm, but that is not verified.
-- `300` may be target width, mass per length, or another quantity.
-- `450–480` may be working roll diameter, new-to-worn diameter, or another dimension.
-- `1350` may be roll barrel length or another length.
-- `550` may be motor/input/output/roll RPM or something else.
-- `800`, `125 kW`, and `1002` may be separate nameplate fields; only 125 kW has an
-  apparent unit, and none is verified from a photo.
-- `15/20/25` may mean 150/200/250 mm widths or literal 15/20/25 mm values.
+- Treat 220 x 220 x 3000 mm, widths 300/400/600 mm, thickness 8--20 mm,
+  three-high roughing, reported "diameter around" 550 cm, barrel length 1350 cm,
+  nominal ratio 10:1 and grade label ST37 as user-confirmed claims.
+- The existing 150 x 150 production description remains partially ambiguous.
+- "15 ton" is not a sufficient gearbox engineering rating; output torque, service
+  factor, speed, thermal capacity and nameplate/drawing evidence remain unknown.
+- The engineering referent of "diameter around" is unknown. The exact grade
+  standard/certificate, motor data, usable roll face, roll necks,
+  bearings, housing, groove geometry, temperatures, pass history and equipment limits
+  remain unknown. Do not infer them.
 
 ## What the repository already provides
 
@@ -57,7 +60,7 @@ the repository's evidence discipline:
 2. Maintain a question-to-evidence ledger and never overwrite raw inputs.
 3. Identify the meaning and unit of every current number before calculation.
 4. Ask for the smallest missing evidence batch, starting with motor/gearbox nameplates,
-   roll/groove drawing, and a successful historical 250 pass table.
+   stand/roll/groove drawings, and one successful comparable historical pass table.
 5. Once the intake gate passes, calculate only a retrospective feasibility envelope:
    area/volume consistency, speed ratio, roll bite, reduction, spread, force, torque,
    power and equipment utilization—with assumptions, uncertainty and model applicability.

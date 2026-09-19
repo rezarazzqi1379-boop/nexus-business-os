@@ -1,5 +1,5 @@
 # NEXUS CURRENT STATE
-Last updated: 2026-09-17 by Claude Code (via Reza) -- corrected item 5 only, rest unchanged
+Last updated: 2026-09-19 by Claude Code (via Reza) -- reconciled the second main/feat divergence (see MAIN/FEAT MERGE #2 section at the end); rest unchanged
 RULE: Read this file FIRST in any new session before doing anything
 else. Overwrite stale sections when updating — do not just append.
 
@@ -175,6 +175,13 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
    through OpportunityQueue.submit() end-to-end — not fabricated test
    data standing in for a real signal.
 
+6. [Reza] Get real sanctions/export-control legal advice for FAL-A/FAL-B --
+   the compliance gate above only records a human decision, it doesn't
+   determine legality itself.
+7. [Not started] fal_trade_economics.py exists (landed cost, margin,
+   breakeven, spec-adjusted price) but has never been run against a real
+   quote -- needs real FX/freight/duty numbers before it means anything.
+
 ## EXPERT FOUNDRY ACTIVATION (2026-09-08)
 - Expert Foundry v0.1 merged to main as a governed research-memory scaffold.
 - Phase-0 steel-ingot preflight exists and passes focused tests; it is not the
@@ -260,3 +267,106 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
 - Reza: final approval on all protected actions, tie-breaker on any
   cross-AI disagreement, sole human-in-the-loop for compliance-
   sensitive decisions
+
+## MAIN/FEAT MERGE (2026-09-14)
+- feat/unified-system-governance-v0.1 merged into main as commit 5686e14
+  (parents 98a1d44 on main, 4eb3b45 on feat). Confirms the environment
+  warning above with a concrete case, not just a risk: both clones had
+  independently rebuilt the SAME Expert Foundry rolling-mill package
+  (21 overlapping files). 14 were byte-identical (CRLF-vs-LF noise from a
+  file copy); the other 6 (rolling_mill_intake.py + its test,
+  ROLLING_MILL_ENGINEERING_INTAKE.json, this file, and the two
+  CLAUDE_ROLLING_MILL_*.md handoffs) had genuinely different content --
+  main's version won all 6 because it carried the confirmed 2026-09-14
+  dimensions (this file's own ROLLING MILL STUDY section is that content);
+  feat's copies were a stale pre-2026-09-14-confirmation draft pulled from
+  an earlier audit-ZIP reconciliation. fal_vertical.py -- a load-bearing
+  dependency of the new FAL modules below -- existed only as an uncommitted
+  working-tree file on neither branch and is now committed via this merge.
+- New on main from this merge: opportunity_suggestion_engine.py,
+  fal_trade_economics.py, nexus_status_brief.py, market_price_snapshot.py,
+  rolling_mill_mechanics.py (retrospective hot-rolling geometry/force
+  envelope, Sims-style, no material-property assumptions), plus this
+  branch's earlier (pre-2026-09-14) governance-layer work (collaboration
+  growth, continuous research, owner-decision runtime, portfolio watchdog,
+  project control plane, self-improvement runtime, unified data
+  environment, external account orchestrator, learning media pipeline) --
+  none of that governance-layer work has been read/audited as part of this
+  merge; it was carried through unchanged because it never conflicted.
+- NOT pushed to origin yet -- pending Reza's go-ahead, since the remote is
+  what the Codex/ChatGPT clone reads from next.
+- Sandbox note for whichever AI touches this repo via a device-bridge-style
+  sandboxed shell next: that environment could not unlink files under the
+  mounted repo folder (git status/commit/merge all left stale
+  index.lock/HEAD.lock/objects/*/tmp_obj_* debris behind, harmless but
+  noisy -- `mv` the stale lock aside, don't try to `rm` it). A real
+  worktree-based merge failed for the same reason; the fix used here was
+  git plumbing (read-tree -m + commit-tree) with a scratch index file
+  outside the mounted folder.
+
+## MAIN/FEAT MERGE #2 (2026-09-19)
+- Since the first merge (5686e14, above), main and feat/unified-system-governance-v0.1
+  diverged again. Surveyed with `git merge-tree` against their merge-base (4eb3b45):
+  of the files that differ, the huge majority (13 new modules/tests, including
+  self_improvement_runtime.py and unified_data_environment.py) are BYTE-IDENTICAL on
+  both sides -- another instance of the two clones independently rebuilding the same
+  content from a shared source, not a real conflict. Checked by content hash before
+  trusting the file list, per the CRLF-lesson above.
+- 2 of 3 real conflicts resolved by evidence recency (not by which clone produced
+  them), same principle as the first merge; the 3rd is FLAGGED, not resolved:
+  1. `.nexus/expert_foundry/ROLLING_MILL_ENGINEERING_INTAKE.json`, `rolling_mill_intake.py`,
+     `evals/test_rolling_mill_intake.py`, and this file's ROLLING MILL STUDY section --
+     NOT a confident "feat wins." Main rewrote the intake code, its test, and the JSON
+     contract to a different physical schema (220x220x3000mm billet,
+     width_options_mm [300,400,600], thickness_range_mm, reported_diameter_around /
+     barrel_length, dated "conversation:2026-09-14", explicitly USER_CONFIRMED but not
+     independently verified) than feat's (150x150mm billet, target width 300mm,
+     resolved ST1-ST4 per-stand motor/gearbox/roll specs from real engineer (Sanami)
+     WhatsApp answers on 2026-09-16, with specific remaining gaps -- safety evidence,
+     torque/force limits, 4 of 8 original claims -- spelled out rather than glossed
+     over). These may be two different questions (the mill's existing physical
+     capability vs. a separately-discussed proposed 220x220mm new product capacity --
+     Reza described 220x220mm/300-400mm-width as "the real billet" in an earlier,
+     apparently distinct conversation) rather than one superseding the other. Per this
+     project's own rolling-mill evidence-discipline rules, two independently
+     transcribed claims are never silently reconciled just because a merge tool can
+     auto-pick one side. To avoid compounding this open question with a worse,
+     purely accidental failure mode (main's rewritten code/test paired with feat's
+     JSON -- a schema mismatch nobody actually decided), all three files were kept as
+     feat's self-consistent version in the merge commit (8b73a77). main's schema is
+     NOT discarded, only not merged in yet. This needs Reza's explicit call -- separate
+     questions to be tracked side by side, or a real supersession -- before either
+     side is finalized.
+  2. `.nexus/runtime/expert_foundry/events.jsonl` (append-only, hash-chained ledger)
+     -- feat's copy is a strict superset (one additional CORROBORATED claim record
+     for the same 2026-09-16 engineer answers, appended after 3 records both sides
+     already shared identically). Took feat's full file.
+  3. This file (CURRENT_STATE.md) -- manually synthesized rather than picking one
+     side: kept feat's corrected Track E (Opportunity Suggestion Engine) item 5 and
+     its DEEP SEARCH / FAL-A LIVE RESEARCH and ROLLING MILL STUDY sections (newer,
+     more accurate), added main's items 6-7 (real, non-conflicting facts feat's
+     numbered list didn't have), and kept main's MAIN/FEAT MERGE (2026-09-14)
+     section immediately above this one as unmodified history.
+- Also new on feat since the first merge (not previously on main, no conflict,
+  carried through as-is): FAL-B (ferrosilicon export) live discovery + a second,
+  genuinely multi-provider (claude-web-search-manual + exa-agent-run) pass on both
+  FAL-A and FAL-B; a fix to discovery_pipeline.group_duplicates() so a shared
+  listing/directory-page URL no longer forces distinct named companies into one
+  false "ambiguous" entity (opt-in `source_is_multi_entity_listing` flag, default
+  False, existing fail-closed behavior for an unflagged URL is unchanged and still
+  tested); a reconciled `docs/authority/AUTHORITY_STATUS.md` promoting Master
+  Context v1.4 + Source Registry v1.1 as canonical (the newer v1.6-v2.1 draft
+  lineage stays unpromoted -- still internally self-contradictory); a factual,
+  sourced EO 13871 / Iran-sanctions brief and a 3-tier action-risk policy Reza
+  dictated on 2026-09-17 (`docs/compliance/`) governing which actions run
+  automatically vs. need his approval vs. stop outright for this project going
+  forward; new subagents (branch-integrity-auditor, fal-discovery-batch-runner,
+  rolling-mill-evidence-reviewer).
+- Full evals/ suite run against feat's tip (af20da5) before this merge: 1 unrelated
+  pre-existing failure (test_rolling_mill_intake.py::test_current_voice_claims_fail_closed,
+  no import dependency on anything touched here) -- left untouched, out of scope.
+- Merge commit 8b73a77 (parents bb2acae + origin/main's 258be46) built via git
+  plumbing and verified against a materialized scratch worktree: 904 passed, 1 known
+  pre-existing unrelated failure (test_current_voice_claims_fail_closed -- same as
+  feat's own baseline). NOT pushed to origin yet -- pending Reza's decision on the
+  rolling-mill schema question above, and his go-ahead to push.

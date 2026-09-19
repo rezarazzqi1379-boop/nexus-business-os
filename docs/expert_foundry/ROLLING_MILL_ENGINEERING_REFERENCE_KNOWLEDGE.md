@@ -188,3 +188,48 @@ lubricant spec.
 - ScienceDirect Topics, "Roughing Mill": https://www.sciencedirect.com/topics/engineering/roughing-mill
 - steelnumber.com, St37-2 / EN 10025 equivalence table:
   http://www.steelnumber.com/en/equivalent_steel_iron_eu.php?zname_id=161
+
+## 9. Confirmed equipment kinematics from nameplate data (added 2026-09-19)
+
+Unlike everything above (generic literature, `HYPOTHESIS`-level until calibrated),
+this section is a `FACT` about this specific mill's confirmed equipment, not a guess
+or a literature import: it is exact arithmetic (`v = pi * D * output_rpm / 60`) on
+already-`VERIFIED` nameplate/CAD data (motor rated rpm, gearbox ratio, roll
+diameter), now implemented as `stand_output_shaft_rpm()` and
+`roll_surface_speed_mm_s()` in `rolling_mill_mechanics.py`. It reports what speed the
+equipment runs at when the motor turns at its rated nameplate speed — never a
+recommendation, and it says nothing about what gap or thickness the mill should run.
+
+| Stand | Motor rpm | Gearbox ratio | Roll shaft rpm | Roll surface speed |
+|---|---|---|---|---|
+| ST1 (roughing, 3-high) | 999 | 1:9.8 | 101.9 rpm | 165.9 m/min |
+| ST2 | not confirmed | 1:7.8 | — (blocked on ST2 motor rpm, round-5 questionnaire item 2) | — |
+| ST3 | 1000 | 1:8.6 | 116.3 rpm | 219.2 m/min |
+| ST4 (finishing) | 1000 | 1:5.6 | 178.6 rpm | 336.6 m/min |
+
+**One real, useful observation from this table**: surface speed rises from ST1 to
+ST3 to ST4 (165.9 -> 219.2 -> 336.6 m/min) at the equipment's rated nameplate speeds.
+That ordering (roughing slowest, finishing fastest) is the expected shape for a
+continuous multi-stand mill under mass-flow continuity (`v*h*w` must stay
+constant stand-to-stand as thickness drops and speed rises) — a modest,
+directionally-consistent sanity signal about the line's own design, not a
+confirmation of any particular pass schedule (we still have no gap/thickness data
+per pass to actually check continuity numerically; see
+`mass_flow_mismatch_ratio()`, added alongside these two functions for exactly that
+check once real per-pass thickness/width/speed data exists).
+
+**Why ST1's drive type matters more than its number**: ST1's motor is described as
+"AC with starting resistor" (rotor-resistance-starter language), which in industrial
+practice most often names a slip-ring/wound-rotor induction motor — a design that
+runs close to one fixed synchronous-slip speed, not a continuously variable one. If
+that reading is correct, the 165.9 m/min figure above for ST1 is close to the *only*
+speed that stand can run at, not a floor of a range — which is exactly why round-5's
+question 11 (drive-control type per stand: resistor-start vs VFD vs DC) is the
+single highest-leverage open question for any "increase speed/capacity" goal: it
+determines whether speed is even an adjustable variable on this equipment before any
+force/torque/gap question is worth asking.
+
+This table will need to be corrected the moment ST2's motor rpm is confirmed, and
+extended with actual (not rated-nameplate) running speed once a real historical run
+is available — nameplate rated speed and actual running speed are not guaranteed to
+be the same, especially for a resistor-started slip-ring motor under load.

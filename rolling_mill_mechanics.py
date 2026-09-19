@@ -107,6 +107,82 @@ def biting_condition_ok(bite_angle_radians: float, friction_coefficient: float) 
 
 
 # ---------------------------------------------------------------------------
+# Equipment kinematics (nameplate-level only: motor speed, gearbox ratio, roll
+# diameter). No process/material assumption is involved, so this needs no
+# RollingReadiness gate -- it is exact arithmetic on equipment data, exactly
+# like the geometry functions above. It answers "what speed does this
+# equipment run at, as built", never "what speed it should run at".
+# ---------------------------------------------------------------------------
+
+def stand_output_shaft_rpm(motor_rated_rpm: float, gearbox_ratio_input: float, gearbox_ratio_output: float) -> float:
+    """Gearbox output shaft speed from motor nameplate rpm and reduction ratio.
+
+    A gearbox ratio quoted as "1 : 9.8" (gearbox_ratio_input=1,
+    gearbox_ratio_output=9.8) means the output turns 9.8x slower than the
+    input for every 1 input turn -- i.e. output_rpm = motor_rpm * (input/output).
+    """
+    _positive("motor_rated_rpm", motor_rated_rpm)
+    _positive("gearbox_ratio_input", gearbox_ratio_input)
+    _positive("gearbox_ratio_output", gearbox_ratio_output)
+    return motor_rated_rpm * gearbox_ratio_input / gearbox_ratio_output
+
+
+def roll_surface_speed_mm_s(
+    motor_rated_rpm: float,
+    gearbox_ratio_input: float,
+    gearbox_ratio_output: float,
+    roll_radius_mm: float,
+) -> float:
+    """Roll peripheral (surface) speed implied by nameplate motor speed, gearbox
+    reduction, and roll radius: v = pi * D * output_rpm / 60, in mm/s.
+
+    This is the speed the roll barrel surface moves at when the motor runs at
+    its RATED nameplate speed -- not necessarily the speed it runs at during
+    any given pass (a slip-ring/wound-rotor AC motor with a rotor-resistance
+    starter, as ST1 here is described, is typically run near one fixed speed
+    rather than continuously variable; a VFD or DC drive would allow a range
+    below this figure). Reports a fact about the equipment, not a setpoint.
+    """
+    output_rpm = stand_output_shaft_rpm(motor_rated_rpm, gearbox_ratio_input, gearbox_ratio_output)
+    _positive("roll_radius_mm", roll_radius_mm)
+    diameter_mm = 2.0 * roll_radius_mm
+    surface_speed_mm_per_min = math.pi * diameter_mm * output_rpm
+    return surface_speed_mm_per_min / 60.0
+
+
+def mass_flow_mismatch_ratio(
+    upstream_speed_mm_s: float,
+    upstream_thickness_mm: float,
+    upstream_width_mm: float,
+    downstream_speed_mm_s: float,
+    downstream_thickness_mm: float,
+    downstream_width_mm: float,
+) -> float:
+    """Ratio of downstream to upstream volumetric flow (v * h * w) between two
+    consecutive stands, assuming steady-state, no slip and constant density.
+
+    Continuous hot-strip mills must satisfy mass-flow continuity between
+    stands (v0*h0*w0 = v1*h1*w1); a ratio far from 1.0 signals either a loop
+    /tension-control mechanism the caller hasn't modelled, or a geometry/speed
+    combination that is not actually self-consistent as entered. This is a
+    consistency CHECK on data you already have (or are testing), not a speed
+    or gap recommendation.
+    """
+    for name, value in (
+        ("upstream_speed_mm_s", upstream_speed_mm_s),
+        ("upstream_thickness_mm", upstream_thickness_mm),
+        ("upstream_width_mm", upstream_width_mm),
+        ("downstream_speed_mm_s", downstream_speed_mm_s),
+        ("downstream_thickness_mm", downstream_thickness_mm),
+        ("downstream_width_mm", downstream_width_mm),
+    ):
+        _positive(name, value)
+    upstream_flow = upstream_speed_mm_s * upstream_thickness_mm * upstream_width_mm
+    downstream_flow = downstream_speed_mm_s * downstream_thickness_mm * downstream_width_mm
+    return downstream_flow / upstream_flow
+
+
+# ---------------------------------------------------------------------------
 # Material- and friction-dependent quantities: caller-supplied models only.
 # No fabricated "typical steel" constant is embedded here.
 # ---------------------------------------------------------------------------

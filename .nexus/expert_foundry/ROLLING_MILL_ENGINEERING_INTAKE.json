@@ -1,33 +1,482 @@
 {
   "project_id": "rolling_mill_strip_300_pilot",
   "product": {
-    "input_billet": {"cross_section_mm": {"width": 220, "height": 220}, "length_mm": 3000, "steel_grade": "ST37_USER_DECLARED"},
-    "target": {"width_options_mm": [300, 400, 600], "thickness_range_mm": {"min": 8, "max": 20}, "standard": null}
+    "input_billet": {
+      "cross_section_mm": {
+        "width": 150,
+        "height": 150
+      },
+      "length_mm": 3150,
+      "steel_grade": "St37 (engineer-stated DIN designation; NO chemistry or mill certificate attached - unverified)"
+    },
+    "target": {
+      "width_options_mm": [
+        300
+      ],
+      "thickness_range_mm": {
+        "min": 8,
+        "max": 25
+      },
+      "standard": null
+    }
   },
   "mill": {
-    "layout": ["roughing_three_high_user_declared"],
+    "layout": [
+      "ST1 (roughing, 3-high, per engineer 2026-09-16)",
+      "ST2",
+      "ST3",
+      "ST4 (finishing, per engineer's own label)"
+    ],
     "rolls": {
-      "reported_diameter_around": {"value": 550, "unit": "cm", "engineering_meaning": "UNKNOWN"},
-      "barrel_length": {"value": 1350, "unit": "cm"},
-      "groove_drawing_locator": null
+      "reported_diameter_around": {
+        "value": 518,
+        "unit": "mm",
+        "engineering_meaning": "ST1 roll body (barrel) working diameter",
+        "evidence_class": "MEASUREMENT",
+        "source": "docs/expert_foundry/evidence/2026-09-16-engineer-answers/raffing-rollers-w250-section-cc-dd.pdf",
+        "note": "Read directly off the drawing's Section D-D, which labels the roll body diameter as 518 three times (once per roll). Supersedes the verbally reported 520 and 550. Both superseded readings are kept in open_contradictions."
+      },
+      "barrel_length": {
+        "value": 1280,
+        "unit": "mm",
+        "evidence_class": "CLAIM",
+        "source": "whatsapp:sanami-engineer:2026-09-15+16 (relayed by Reza 2026-09-16)",
+        "note": "Engineer-stated. The competing 1350 reading is kept in open_contradictions."
+      },
+      "groove_drawing_locator": "docs/expert_foundry/evidence/2026-09-16-engineer-answers/raffing-rollers-w250-section-cc-dd.pdf",
+      "roll_neck_diameter_mm": {
+        "value": 260,
+        "unit": "mm",
+        "evidence_class": "CLAIM",
+        "source": "whatsapp:sanami-engineer:2026-09-15+16 (relayed by Reza 2026-09-16)"
+      },
+      "roll_material": null
     }
   },
   "drive": {
-    "motor": {"nameplate_photo_locator": null, "rated_power_kw": null, "rated_speed_rpm": null, "rated_voltage_v": null, "rated_current_a": null},
-    "gearbox": {"ratio": {"input": 10, "output": 1}, "rated_output_torque_nm": null, "nameplate_photo_locator": null, "user_description": "15 ton"}
+    "motor": {
+      "nameplate_photo_locator": null,
+      "rated_power_kw": 1250,
+      "rated_speed_rpm": 999,
+      "rated_voltage_v": 420,
+      "rated_current_a": 2300,
+      "motor_type": "AC with starting resistor (engineer text item 4); possibly slip-ring - UNCONFIRMED",
+      "evidence_class": "CLAIM",
+      "source": "whatsapp:sanami-engineer:2026-09-15+16 (relayed by Reza 2026-09-16)",
+      "_caveat": "420V with 1250kW and 2300A has NOT been checked for internal consistency."
+    },
+    "gearbox": {
+      "ratio": {
+        "input": 1,
+        "output": 9.8
+      },
+      "rated_output_torque_nm": null,
+      "nameplate_photo_locator": null,
+      "user_description": "15 ton",
+      "_user_description_caveat": "'15 ton' was the owner's 2026-09-14 description. Whether it denotes gearbox mass, rated output torque, or something else remains UNKNOWN. Preserved, not interpreted."
+    }
   },
-  "limits": {"maximum_roll_force_n": null, "maximum_spindle_torque_nm": null, "maximum_motor_current_a": null},
-  "process": {"reheating_temperature_degC": null, "pass_schedule": [], "historical_successful_run_locator": null},
-  "safety": {"guards_verified": false, "emergency_stops_verified": false, "loto_procedure_locator": null},
+  "limits": {
+    "maximum_roll_force_n": null,
+    "maximum_spindle_torque_nm": null,
+    "maximum_motor_current_a": null
+  },
+  "process": {
+    "reheating_temperature_degC": null,
+    "pass_schedule": [],
+    "historical_successful_run_locator": null
+  },
+  "safety": {
+    "guards_verified": false,
+    "emergency_stops_verified": false,
+    "loto_procedure_locator": null
+  },
   "initial_claims": [
-    {"claim_id": "claim_billet_220x220x3000", "raw_text": "از ۲۲۰ × ۲۲۰ میلی‌متر، به طول ۳ متر", "meaning": "input billet cross-section and length", "unit": "mm", "verification_state": "USER_CONFIRMED", "evidence_locator": "conversation:2026-09-14"},
-    {"claim_id": "claim_target_widths_300_400_600", "raw_text": "ورق‌های ۳۰، ۴۰ و ۶۰", "meaning": "candidate finished widths", "unit": "cm", "verification_state": "USER_CONFIRMED", "evidence_locator": "conversation:2026-09-14"},
-    {"claim_id": "claim_target_thickness_8_20", "raw_text": "از ضخامت ۸ تا ۲۰ میلی‌متر", "meaning": "candidate finished thickness range", "unit": "mm", "verification_state": "USER_CONFIRMED", "evidence_locator": "conversation:2026-09-14"},
-    {"claim_id": "claim_roughing_three_high", "raw_text": "استند رافینگ داریم و سه‌غلتکه است", "meaning": "existing roughing stand is three-high", "unit": "n/a", "verification_state": "USER_CONFIRMED", "evidence_locator": "conversation:2026-09-14"},
-    {"claim_id": "claim_roll_diameter_550", "raw_text": "قطر دور: ۵۵۰ سانتی‌متر", "meaning": "user term: diameter around; exact engineering referent remains unknown", "unit": "cm", "verification_state": "USER_CONFIRMED", "evidence_locator": "conversation:2026-09-14"},
-    {"claim_id": "claim_barrel_length_1350", "raw_text": "طول بشکه: ۱۳۵۰ سانتی‌متر", "meaning": "reported barrel length", "unit": "cm", "verification_state": "USER_CONFIRMED", "evidence_locator": "conversation:2026-09-14"},
-    {"claim_id": "claim_gearbox_15ton_ratio_10to1", "raw_text": "گیربکس ۱۵ تن با نسبت ۱ به ۱۰", "meaning": "gearbox described as 15 ton with nominal reduction ratio 10:1", "unit": "mixed", "verification_state": "USER_CONFIRMED", "evidence_locator": "conversation:2026-09-14"},
-    {"claim_id": "claim_existing_150x150_products", "raw_text": "در تسمه ۱۵۰ × ۱۵۰، از ۸ تا ۲۰ ... با عرض ۱۵ تا ۲۵", "meaning": "existing 150x150 billet product range; exact wording remains partly ambiguous", "unit": "mm_and_cm_user_declared", "verification_state": "USER_CONFIRMED_PARTIAL", "evidence_locator": "conversation:2026-09-14"},
-    {"claim_id": "claim_grade_st37", "raw_text": "گرید ST37", "meaning": "user-declared steel grade", "unit": "n/a", "verification_state": "USER_CONFIRMED", "evidence_locator": "conversation:2026-09-14"}
-  ]
+    {
+      "claim_id": "claim_billet_220x220x3000",
+      "raw_text": "از ۲۲۰ × ۲۲۰ میلی‌متر، به طول ۳ متر",
+      "meaning": "input billet cross-section and length",
+      "unit": "mm",
+      "verification_state": "SUPERSEDED",
+      "evidence_locator": "conversation:2026-09-14",
+      "_batch": "2026-09-14 pre-engineer intake",
+      "_status_note": "Engineer 2026-09-16 stated 150x150x3150. The 220x220x3000 figure was a pre-engineer relayed estimate."
+    },
+    {
+      "claim_id": "claim_target_widths_300_400_600",
+      "raw_text": "ورق‌های ۳۰، ۴۰ و ۶۰",
+      "meaning": "candidate finished widths",
+      "unit": "cm",
+      "verification_state": "NARROWED",
+      "evidence_locator": "conversation:2026-09-14",
+      "_batch": "2026-09-14 pre-engineer intake",
+      "_status_note": "Owner confirmed a single target width of 300mm; 400 and 600 are no longer pursued."
+    },
+    {
+      "claim_id": "claim_target_thickness_8_20",
+      "raw_text": "از ضخامت ۸ تا ۲۰ میلی‌متر",
+      "meaning": "candidate finished thickness range",
+      "unit": "mm",
+      "verification_state": "SUPERSEDED",
+      "evidence_locator": "conversation:2026-09-14",
+      "_batch": "2026-09-14 pre-engineer intake",
+      "_status_note": "Owner directive 2026-09-19 states 8/10/12/15/20/25mm."
+    },
+    {
+      "claim_id": "claim_roughing_three_high",
+      "raw_text": "استند رافینگ داریم و سه‌غلتکه است",
+      "meaning": "existing roughing stand is three-high",
+      "unit": "n/a",
+      "verification_state": "CORROBORATED_VERBAL_ONLY",
+      "evidence_locator": "conversation:2026-09-14",
+      "_batch": "2026-09-14 pre-engineer intake",
+      "_status_note": "Engineer independently confirmed ST1 is three-high. Still two verbal sources, no drawing or photo - deliberately NOT marked VERIFIED."
+    },
+    {
+      "claim_id": "claim_roll_diameter_550",
+      "raw_text": "قطر دور: ۵۵۰ سانتی‌متر",
+      "meaning": "user term: diameter around; exact engineering referent remains unknown",
+      "unit": "cm",
+      "verification_state": "CONTRADICTED",
+      "evidence_locator": "conversation:2026-09-14",
+      "_batch": "2026-09-14 pre-engineer intake",
+      "_status_note": "CAD Section D-D measures 518mm. Also recorded here with unit 'cm', which is physically impossible for this mill. Reading preserved, not deleted."
+    },
+    {
+      "claim_id": "claim_barrel_length_1350",
+      "raw_text": "طول بشکه: ۱۳۵۰ سانتی‌متر",
+      "meaning": "reported barrel length",
+      "unit": "cm",
+      "verification_state": "CONTRADICTED",
+      "evidence_locator": "conversation:2026-09-14",
+      "_batch": "2026-09-14 pre-engineer intake",
+      "_status_note": "Engineer stated 1280mm. Reading preserved, not deleted."
+    },
+    {
+      "claim_id": "claim_gearbox_15ton_ratio_10to1",
+      "raw_text": "گیربکس ۱۵ تن با نسبت ۱ به ۱۰",
+      "meaning": "gearbox described as 15 ton with nominal reduction ratio 10:1",
+      "unit": "mixed",
+      "verification_state": "PARTIALLY_SUPERSEDED",
+      "evidence_locator": "conversation:2026-09-14",
+      "_batch": "2026-09-14 pre-engineer intake",
+      "_status_note": "Ratio corrected to 1:9.8 by the engineer. The '15 ton' descriptor is retained under drive.gearbox.user_description; its meaning is still UNKNOWN."
+    },
+    {
+      "claim_id": "claim_existing_150x150_products",
+      "raw_text": "در تسمه ۱۵۰ × ۱۵۰، از ۸ تا ۲۰ ... با عرض ۱۵ تا ۲۵",
+      "meaning": "existing 150x150 billet product range; exact wording remains partly ambiguous",
+      "unit": "mm_and_cm_user_declared",
+      "verification_state": "CORROBORATED",
+      "evidence_locator": "conversation:2026-09-14",
+      "_batch": "2026-09-14 pre-engineer intake",
+      "_status_note": "This 2026-09-14 claim correctly anticipated the 150x150 billet and a 150-250mm product width band later confirmed by the engineer (25mm x 250mm). It is the earliest evidence that 220x220 was wrong."
+    },
+    {
+      "claim_id": "claim_grade_st37",
+      "raw_text": "گرید ST37",
+      "meaning": "user-declared steel grade",
+      "unit": "n/a",
+      "verification_state": "UNVERIFIED_NO_CERTIFICATE",
+      "evidence_locator": "conversation:2026-09-14",
+      "_batch": "2026-09-14 pre-engineer intake",
+      "_status_note": "No chemistry, mill certificate or test report has ever been attached."
+    },
+    {
+      "claim_id": "claim_billet_150",
+      "raw_text": "توانایی تولید شمش ۱۵۰",
+      "meaning": "Billet charge cross-section = 150x150mm (square), max charge length = 3150mm (3m15cm). Tolerance and per-billet weight still not given.",
+      "unit": "mm",
+      "verification_state": "VERIFIED",
+      "evidence_locator": "whatsapp:sanami-engineer:2026-09-15+16 (relayed by Reza 2026-09-16)",
+      "_batch": "2026-09-16 engineer answers"
+    },
+    {
+      "claim_id": "claim_strip_250",
+      "raw_text": "از شمش ۱۵۰ تسمه ۲۵۰ می‌گیرند",
+      "meaning": "Not addressed in this round of engineer answers -- still open. CLOSED 2026-09-19 by Reza's explicit instruction: the existing engineer-answer material is all the information that exists; no further engineer input is expected. This number remains genuinely unexplained -- not assumed, not guessed -- and stays UNKNOWN going forward rather than pending.",
+      "unit": null,
+      "verification_state": "UNKNOWN_CLOSED",
+      "evidence_locator": "conversation:2026-09-08",
+      "_batch": "2026-09-16 engineer answers"
+    },
+    {
+      "claim_id": "claim_roll_450_480",
+      "raw_text": "غلطکه ۴۵۰ تا ۴۸۰",
+      "meaning": "Partially clarified: ST1 current working diameter = 518mm (corrected 2026-09-19 from an earlier 520mm approximation, by re-reading the cited CAD drawing's own Ø518 label directly), ST2 current working diameter = 480mm (two DIFFERENT stands, not a wear-range on one roll as the raw text could have implied). The specific figure '450' from the original claim is still unaccounted for -- not confirmed as a wear limit, a different stand, or a misreading. Left UNVERIFIED pending that clarification. CLOSED 2026-09-19 by Reza's explicit instruction: the existing engineer-answer material is all the information that exists; no further engineer input is expected. This number remains genuinely unexplained -- not assumed, not guessed -- and stays UNKNOWN going forward rather than pending.",
+      "unit": null,
+      "verification_state": "UNKNOWN_CLOSED",
+      "evidence_locator": "conversation:2026-09-08",
+      "_batch": "2026-09-16 engineer answers"
+    },
+    {
+      "claim_id": "claim_length_1350",
+      "raw_text": "طول ۱۳۵۰",
+      "meaning": "Does not match: engineer gives ST1 barrel length = 1280mm (matches the attached CAD drawing's own 1280 dimension exactly). The original '1350' figure is unexplained -- possibly a different measurement point (overall length vs. barrel-only) or a different stand. Left UNVERIFIED. CLOSED 2026-09-19 by Reza's explicit instruction: the existing engineer-answer material is all the information that exists; no further engineer input is expected. This number remains genuinely unexplained -- not assumed, not guessed -- and stays UNKNOWN going forward rather than pending.",
+      "unit": null,
+      "verification_state": "UNKNOWN_CLOSED",
+      "evidence_locator": "conversation:2026-09-08",
+      "_batch": "2026-09-16 engineer answers"
+    },
+    {
+      "claim_id": "claim_same_speed_550",
+      "raw_text": "همدور ۵۵۰",
+      "meaning": "Does not match: engineer's 'سنتر همدور 480' (480mm) appears to be a roll center-distance/pitch dimension for the 3-high stack, not a shaft rpm as Q6 asked about, and the number itself (480) differs from the original claim's 550. Genuinely still unresolved -- likely a different concept entirely, not just a different number for the same thing. CLOSED 2026-09-19 by Reza's explicit instruction: the existing engineer-answer material is all the information that exists; no further engineer input is expected. This number remains genuinely unexplained -- not assumed, not guessed -- and stays UNKNOWN going forward rather than pending.",
+      "unit": null,
+      "verification_state": "UNKNOWN_CLOSED",
+      "evidence_locator": "conversation:2026-09-08",
+      "_batch": "2026-09-16 engineer answers"
+    },
+    {
+      "claim_id": "claim_motor_800_125kw_1002",
+      "raw_text": "موتور ۸۰۰ ۱۲۵ کیلووات ۱۰۰۲",
+      "meaning": "Originally-ambiguous reading was actually TWO separate motors, not one motor read twice: ST1 motor = 1250kW / 999rpm / 420V / 2300A / AC with starting resistor (text-relayed, nameplate photo still not provided); ST2 motor = 800kW only (rpm/voltage/current for ST2 not given). The original '125kW' and '1002' readings were very likely truncated/misread versions of ST1's real 1250kW / ~1000rpm.",
+      "unit": "kW / rpm / V / A (mixed, across two different motors)",
+      "verification_state": "VERIFIED",
+      "evidence_locator": "whatsapp:sanami-engineer:2026-09-15+16 (relayed by Reza 2026-09-16)",
+      "_batch": "2026-09-16 engineer answers"
+    },
+    {
+      "claim_id": "claim_widths_15_20_25",
+      "raw_text": "عرض ۱۵، ۲۰، ۲۵",
+      "meaning": "The 15/20/25 figures refer to target THICKNESS options in mm (part of the set 8-10-12-15-20-25mm), NOT width values as the original claim was ambiguous about. Width is the separate, single value 300mm.",
+      "unit": "mm",
+      "verification_state": "VERIFIED",
+      "evidence_locator": "whatsapp:sanami-engineer:2026-09-15+16 (relayed by Reza 2026-09-16)",
+      "_batch": "2026-09-16 engineer answers"
+    },
+    {
+      "claim_id": "claim_target_300",
+      "raw_text": "تسمه ۳۰۰ گرمی و عرض...",
+      "meaning": "Target product WIDTH = 300mm (not weight or another metric). Thickness is a separate range: min 8mm, max 25mm, discrete set 8/10/12/15/20/25mm.",
+      "unit": "mm",
+      "verification_state": "VERIFIED",
+      "evidence_locator": "whatsapp:sanami-engineer:2026-09-15+16 (relayed by Reza 2026-09-16)",
+      "_batch": "2026-09-16 engineer answers"
+    }
+  ],
+  "project_aliases": [
+    "PRJ-STEEL-ROLLING-LINE-01"
+  ],
+  "_reconciliation_note": "2026-09-19 reconciliation of the main/branch intake fork. Schema is main's (rolling_mill_intake.py REQUIRED_PATHS is written against it and must keep working). Values are the better-sourced ones previously held only on branch feat/unified-system-governance-v0.1, which derive from the engineer's 2026-09-16 answers and the CAD drawing, both of which post-date and supersede the 2026-09-14 pre-engineer estimates that main still carried. Resolution basis is EVIDENCE QUALITY (direct drawing measurement and engineer answers beat relayed pre-engineer estimates), NOT recency. No original claim was deleted: all nine 2026-09-14 claims are retained below with honest superseded/contradicted states, and every contradictory reading is preserved in open_contradictions per the owner's explicit instruction not to delete either side of the 520/550 and 1280/1350 forks.",
+  "mill_stands_detail": {
+    "_note": "Raw transcription of engineer's 2026-09-16 answers + handwritten sketch. Not yet independently verified against nameplate photos. Kept separate from the flat schema fields above because REQUIRED_PATHS assumes one stand's worth of drive/roll data; this project actually has 4 stands with different values.",
+    "ST1": {
+      "motor_kw": 1250,
+      "motor_rpm": 999,
+      "motor_voltage_v": 420,
+      "motor_current_a": 2300,
+      "motor_type": "AC with starting resistor (per WhatsApp text item 4)",
+      "gearbox_ratio_input_output": [
+        1,
+        9.8
+      ],
+      "roll_working_diameter_mm": 518,
+      "roll_barrel_length_mm": 1280,
+      "roll_neck_mm": 260,
+      "stand_type": "3-high (per engineer: \"سه غلطکه\")",
+      "evidence_locator": [
+        "whatsapp:sanami-engineer:2026-09-15+16 (relayed by Reza 2026-09-16)",
+        "docs/expert_foundry/evidence/2026-09-16-engineer-answers/raffing-rollers-w250-section-cc-dd.pdf",
+        "docs/expert_foundry/evidence/2026-09-16-engineer-answers/stand-mechanical-specs-ST1-ST4.jpg"
+      ]
+    },
+    "ST2": {
+      "motor_kw": 800,
+      "motor_rpm": null,
+      "motor_voltage_v": null,
+      "motor_current_a": null,
+      "motor_type": "unclear from handwriting (sketch shows possible 'DC' -- unconfirmed, need engineer to re-state)",
+      "gearbox_ratio_input_output": [
+        1,
+        7.8
+      ],
+      "roll_working_diameter_mm": 480,
+      "roll_barrel_length_mm": 1200,
+      "roll_neck_mm": 220,
+      "stand_type": null,
+      "evidence_locator": [
+        "docs/expert_foundry/evidence/2026-09-16-engineer-answers/stand-mechanical-specs-ST1-ST4.jpg"
+      ],
+      "_caveat": "rpm/voltage/current for ST2's motor not given anywhere; power (800kW) is the only confirmed figure"
+    },
+    "ST3": {
+      "motor_kw": 1250,
+      "motor_rpm": 1000,
+      "motor_voltage_v": null,
+      "motor_current_a": null,
+      "motor_type": "AC (per sketch)",
+      "gearbox_ratio_input_output": [
+        1,
+        8.6
+      ],
+      "roll_working_diameter_mm": 600,
+      "roll_barrel_length_mm": 1000,
+      "roll_neck_mm": 240,
+      "stand_type": null,
+      "evidence_locator": [
+        "docs/expert_foundry/evidence/2026-09-16-engineer-answers/stand-mechanical-specs-ST1-ST4.jpg"
+      ]
+    },
+    "ST4": {
+      "motor_kw": 1250,
+      "motor_rpm": 1000,
+      "motor_voltage_v": null,
+      "motor_current_a": null,
+      "motor_type": "AC (per sketch, labeled 'Finish')",
+      "gearbox_ratio_input_output": [
+        1,
+        5.6
+      ],
+      "roll_working_diameter_mm": 600,
+      "roll_barrel_length_mm": 800,
+      "roll_neck_mm": 240,
+      "stand_type": null,
+      "evidence_locator": [
+        "docs/expert_foundry/evidence/2026-09-16-engineer-answers/stand-mechanical-specs-ST1-ST4.jpg"
+      ]
+    },
+    "unexplained_handwritten_note": "top of handwritten sheet reads roughly '250 تن' (250 tons?) plus a second illegible line -- not transcribed with confidence, needs the engineer to confirm in writing.",
+    "P1_P10_table": {
+      "_caveat": "Handwritten table groups numbers under ST1/ST2/ST3/ST4 and P1-P10 labels (e.g. ST1/P1=2160, P2=1400, P3=2100... ST3/P8=1780, P9=1860, ST4/P10=1700). UNITS AND MEANING NOT STATED by the engineer -- could be roll force, motor current, or something else. NOT used to populate process.pass_schedule or any numeric field until the engineer confirms what these numbers are.",
+      "evidence_locator": "docs/expert_foundry/evidence/2026-09-16-engineer-answers/stand-production-table-P1-P10.jpg"
+    }
+  },
+  "open_contradictions": [
+    {
+      "id": "C-01",
+      "parameter": "ST1 roll barrel diameter",
+      "readings": [
+        {
+          "value": 518,
+          "unit": "mm",
+          "evidence_class": "MEASUREMENT",
+          "source": "docs/expert_foundry/evidence/2026-09-16-engineer-answers/raffing-rollers-w250-section-cc-dd.pdf"
+        },
+        {
+          "value": 520,
+          "unit": "mm",
+          "evidence_class": "CLAIM",
+          "source": "whatsapp:sanami-engineer:2026-09-15+16 (relayed by Reza 2026-09-16)"
+        },
+        {
+          "value": 550,
+          "unit": "cm",
+          "evidence_class": "CLAIM",
+          "source": "conversation:2026-09-14",
+          "note": "unit as recorded; physically impossible"
+        }
+      ],
+      "recorded_value": 518,
+      "blocks_concept_design": false,
+      "must_resolve_before": "fabrication",
+      "resolution_method": "Tape/caliper around the cold barrel at three points (both ends and centre); also yields crown and wear."
+    },
+    {
+      "id": "C-02",
+      "parameter": "ST1 roll barrel length",
+      "readings": [
+        {
+          "value": 1280,
+          "unit": "mm",
+          "evidence_class": "CLAIM",
+          "source": "whatsapp:sanami-engineer:2026-09-15+16 (relayed by Reza 2026-09-16)"
+        },
+        {
+          "value": 1350,
+          "unit": "cm",
+          "evidence_class": "CLAIM",
+          "source": "conversation:2026-09-14",
+          "note": "unit as recorded"
+        }
+      ],
+      "recorded_value": 1280,
+      "blocks_concept_design": false,
+      "must_resolve_before": "fabrication",
+      "resolution_method": "Measure between barrel shoulders."
+    },
+    {
+      "id": "C-03",
+      "parameter": "'450 to 480' roll reference",
+      "readings": [
+        {
+          "raw": "غلطکه ۴۵۰ تا ۴۸۰",
+          "evidence_class": "CLAIM",
+          "source": "conversation:2026-09-14"
+        }
+      ],
+      "recorded_value": null,
+      "blocks_concept_design": false,
+      "must_resolve_before": "detailed_design",
+      "resolution_method": "Measure all four stands' rolls and record which are new vs worn."
+    },
+    {
+      "id": "C-04",
+      "parameter": "'same speed 550' numeric collision",
+      "readings": [
+        {
+          "raw": "سنتر همدور ۴۸۰ / هم‌دور ۵۵۰",
+          "evidence_class": "CLAIM",
+          "source": "conversation:2026-09-14"
+        }
+      ],
+      "recorded_value": null,
+      "blocks_concept_design": false,
+      "must_resolve_before": "detailed_design",
+      "resolution_method": "Engineer to restate the original sentence verbatim, without our paraphrase.",
+      "note": "550 appears both as a diameter and inside this phrase - transcription error suspected."
+    },
+    {
+      "id": "C-05",
+      "parameter": "ST2 motor rated speed",
+      "readings": [
+        {
+          "value": null,
+          "evidence_class": "UNKNOWN"
+        }
+      ],
+      "recorded_value": null,
+      "blocks_concept_design": false,
+      "must_resolve_before": "detailed_design",
+      "hypothesis": "700-800 rpm. At 1:7.8 a 1000 rpm motor would give 241.7 m/min, faster than ST3's 219.2 m/min, which is impossible in a tandem arrangement.",
+      "resolution_method": "One photo of the ST2 motor nameplate."
+    },
+    {
+      "id": "C-06",
+      "parameter": "roll material and hardness",
+      "readings": [
+        {
+          "value": null,
+          "evidence_class": "UNKNOWN"
+        }
+      ],
+      "recorded_value": null,
+      "blocks_concept_design": false,
+      "must_resolve_before": "fabrication",
+      "note": "Decisive for any widening decision: computed neck bending stress at 300mm width is ~159 MPa, acceptable for a forged steel roll but out of range for cast iron.",
+      "resolution_method": "Roll certificate, or a hardness test on the barrel."
+    }
+  ],
+  "evidence_log": [
+    {
+      "date": "2026-09-19",
+      "event": "Reza re-sent the 2 handwritten-note photos (ST1-ST4 stand specs, P1-P10 table) and the Raffing-Rollers-W250 CAD drawing (as 2 PDF exports). Confirmed against existing evidence: photos are exact duplicates (unchanged); first PDF is byte-identical (sha256 match) to the file already on disk; second PDF is a different export of the same drawing (same title block, same section views, identical dimension set). No new information -- prompted the ST1 roll-diameter correction above via direct re-read of the drawing.",
+      "instruction": "Reza: apply what was just given, do not pursue the other open items further right now (video content, the 3 unrelated warehouse product photos, round-3 questionnaire follow-up)."
+    },
+    {
+      "date": "2026-09-19",
+      "event": "Reza confirmed explicitly that the engineer-answer material already on file (2026-09-16 batch, re-sent unchanged today) is the complete and only information available -- nothing further is coming. Instructed to proceed using only this confirmed data.",
+      "action": "Reclassified the 4 still-open claims (claim_strip_250, claim_roll_450_480 residual '450' figure, claim_length_1350, claim_same_speed_550) from UNVERIFIED (implying pending clarification) to UNKNOWN_CLOSED (no further input expected; these numbers remain unexplained on the record). No values were guessed or filled in to close them out."
+    },
+    {
+      "date": "2026-09-19",
+      "actor": "Claude (Claude Code session, at owner's instruction)",
+      "action": "Reconciled the main/branch intake fork onto main.",
+      "basis": "Evidence quality, not recency: the engineer's 2026-09-16 answers and the CAD drawing post-date and supersede the 2026-09-14 pre-engineer estimates.",
+      "schema_decision": "Kept main's schema so rolling_mill_intake.py's REQUIRED_PATHS and MEASUREMENT_PATHS keep working; the branch's competing schema would have silently broken the gate.",
+      "preservation": "All nine 2026-09-14 claims retained under superseded_claims_2026_09_14; every contradictory reading retained under open_contradictions. Nothing deleted.",
+      "gate_effect": "No claim was marked VERIFIED. The retrospective-calculation gate therefore remains CLOSED, which is correct - furnace data, process temperature, equipment limits, safety verification and a historical run are all still missing."
+    }
+  ],
+  "_claims_note": "Single append-only claim register. The 2026-09-14 batch and the 2026-09-16 batch are both here, distinguished by _batch, because rolling_mill_intake.py resolves AMBIGUOUS_CLAIM_IDS against this array alone - holding a superseded batch in a separate key would make those claims permanently unresolvable by the gate. Superseded and contradicted claims keep their original raw_text verbatim and are never deleted."
 }

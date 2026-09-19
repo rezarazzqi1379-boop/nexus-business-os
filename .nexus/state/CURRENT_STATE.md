@@ -360,3 +360,90 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
   plumbing, verified (904 passed, 1 known pre-existing unrelated failure), and pushed
   to origin main by Reza on 2026-09-19. The rolling-mill flag above was resolved and
   applied in a follow-up commit on the same day, also pushed to main.
+
+## SESSION SUMMARY (2026-09-19): approvals fix, connector control plane, PRJ-HYD-01 consolidation
+
+Full "check everything, troubleshoot, upgrade" pass requested by Reza after a
+2-day gap. In order:
+
+1. **approvals.py fix** (bb2acae, feat branch) -- see MERGE #2 above.
+2. **feat+main reconciliation** (13c7760 -> e7922b2, main) -- see MERGE #2 above.
+   Reza's call: the rolling-mill 220x220 vs 150x150 schema question was one
+   topic, not two; main's 220x220 schema is authoritative. Confirmed after the
+   fact by the JSON's own claim_existing_150x150_products entry, which already
+   references the 150x150 line as background inside the same 2026-09-14
+   conversation main's schema was built from -- not a separate untracked topic.
+3. **Full branch survey**: all 124 non-main/feat remote branches checked by
+   ancestry. 19 fully merged into main already (prune candidates). Of the
+   remaining 105, 18 are content-identical to what main already has under
+   different history (also prune candidates). The other ~87 were reviewed for
+   scope/overlap; two led to real merges (below); the rest are either small
+   single-purpose commits with no clear gap to fill, or superseded in concept
+   by what main already ships (e.g. `experiment/altari-public-patterns-v0-1`'s
+   workforce/project-fabric orchestration vs. main's `project_control_plane.py`;
+   the `src/nexus_evals/*` eval-harness/audit-event-envelope lineage vs. main's
+   `adoption_gate.py` + `evaluation_suite.py`/`evaluation_constitution.py`).
+4. **Connector control plane merged** (fcbb6b1, main), from the orphaned
+   `feat/connector-control-plane-v0.1` (last commit 2026-09-11, never merged
+   anywhere). Adds `nexus_connector_control_plane.py` (bounded per-connector
+   manifests, freshness/health snapshots, project-scoped evidence envelopes;
+   blocks stale sources, cross-project evidence leakage, fact-vs-fact
+   contradictions, duplicate snapshots, and external actions without
+   exact-scope approval; credentials stored as locators only), plus
+   `nexus_event_preflight.py`, `nexus_chat_bootstrap.py`, and
+   `config/connectors.json` (first adapter set: Gmail + PRJ-HYD-01 canonical
+   sources). 18 tests. Only conflict was `AGENTS.md` -- both sides had
+   independently written a new one from scratch; merged by hand, keeping
+   main's fuller "NEXUS Project Operating Contract" as the base and adding
+   this branch's "Mandatory chat preflight" as its own section, cross-
+   referenced rather than duplicated against the existing approval-gating item.
+5. **PRJ-HYD-01 (hydrotester) vertical consolidated** (1e6d5d5, main). Ten
+   independent branches (2026-08-19 to 2026-09-03) had attempted this vertical;
+   main had only the source reference document, no code. All ten read in full;
+   none is an ancestor of any other (independent attempts, not a chain). Kept
+   the two highest-quality, most evidence-disciplined, most real-data-grounded:
+   - `feature/hydrotester-registry-v0-1` (supplier registry, superset form
+     including the SupplierTR/AKPAYA channel added later by
+     `hydrotester-qualification-matrix-v0-1`) plus its `supplier_identity.py`
+     dependency (present on ~40 old branches from a shared ancestor, absent
+     from main -- pulled in as a self-contained, stdlib-only module).
+   - `fix/hydrotester-rev1-2-authority` for the readiness engine
+     (`src/nexus_verticals/hydrotester_readiness.py`) and qualification matrix
+     (v0.2). Best of 4 sibling attempts at the same file: fixes a real
+     fail-open bug (an unrecognized field status used to silently count as
+     "usable"; now only an explicit allowlist counts), and explicitly tracks
+     buyer revision supersession (rev1.2 vs. stale v0.1 dimensions) instead of
+     silently overwriting old values. 11 tests, real supplier cases (Marley,
+     Yaxing, GH).
+   - `feat/prj-hyd-01-engineering-review-v0.1` -- the only one of the ten
+     actually built against main's live `canonical_sources.py`. Extends the
+     `HYD_HOLD_POINT_RULES` already there (same real numbers: 120 MPa, 60
+     pipes/hour) with explicit contradiction-detection (numeric value match or
+     explicit-negation keyword), and adds `engineering_review.py`, which
+     classifies supplier evidence as CONFIRMED/CONTRADICTED/SILENT against
+     those buyer hold-points. Supplier evidence is evidence, never authority;
+     this module never writes to the canonical store.
+   Not merged: `temporal-evidence-opportunity-radar-v0-1` and
+   `vertical-acceptance-observability-v0-1` (broader generic
+   opportunity/observability frameworks; their `hydrotester_vertical.py`
+   hardcodes per-parameter string matching against one specific vendor
+   transcript rather than being data-driven -- a real quality gap versus the
+   matrix-based approach kept here); `nexus-vnext-hydrotester-vertical`
+   (generic claim-supersession store, redundant with the supersession handling
+   already in the kept qualification matrix); `requirement-readiness-shadow`
+   (a simpler, generic readiness assessor without the real procurement data
+   behind the kept version).
+6. **Rolling-mill engineer questionnaire prepared** (not yet sent -- task #10):
+   ran `rolling_mill_intake.assess()` against the now-adopted 220x220 schema.
+   Status `READY_FOR_ENGINEER_INTERVIEW`, all 9 claims still unresolved,
+   `calculation_allowed: False`. Two values flagged as likely
+   transcription/unit errors and prioritized first: roll diameter "550 cm"
+   (5.5 m -- implausible for this mill) and barrel length "1350 cm" (13.5 m --
+   same issue); both are almost certainly meant to be mm.
+
+**End of day state**: `main` at 1e6d5d5, `feat/unified-system-governance-v0.1`
+at bb2acae. Full suite (`evals/` + `tests/`, `PYTHONPATH=src` needed for
+`tests/`): 972 passed, 0 failed, run twice for determinism. Nothing pending
+except the engineer's answers to the rolling-mill questionnaire (external,
+task #10) and Reza's own call on any of the ~85 remaining small/superseded
+branches he wants a second look at.

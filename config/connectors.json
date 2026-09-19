@@ -1,0 +1,75 @@
+{
+  "schema_version": "nexus.connector-config.v1",
+  "connectors": [
+    {
+      "connector_id": "gmail",
+      "system": "Gmail",
+      "authority_scope": ["dynamic_email", "attachments", "thread_state"],
+      "project_scope": ["*"],
+      "read_capable": true,
+      "write_capable": true,
+      "freshness_seconds": 604800,
+      "credential_locator": "connector://gmail"
+    },
+    {
+      "connector_id": "google_drive",
+      "system": "Google Drive",
+      "authority_scope": ["documents", "canonical_candidate"],
+      "project_scope": ["*"],
+      "read_capable": true,
+      "write_capable": true,
+      "freshness_seconds": 2592000,
+      "credential_locator": "connector://google-drive"
+    },
+    {
+      "connector_id": "github",
+      "system": "GitHub",
+      "authority_scope": ["code", "tests", "versioned_state"],
+      "project_scope": ["*"],
+      "read_capable": true,
+      "write_capable": true,
+      "freshness_seconds": 86400,
+      "credential_locator": "connector://github"
+    },
+    {
+      "connector_id": "notion",
+      "system": "Notion",
+      "authority_scope": ["workspace_notes", "handoff_history"],
+      "project_scope": ["*"],
+      "read_capable": true,
+      "write_capable": true,
+      "freshness_seconds": 2592000,
+      "credential_locator": "connector://notion"
+    },
+    {
+      "connector_id": "supabase",
+      "system": "Supabase",
+      "authority_scope": ["database_state", "migrations"],
+      "project_scope": ["*"],
+      "read_capable": true,
+      "write_capable": true,
+      "freshness_seconds": 86400,
+      "credential_locator": "connector://supabase"
+    },
+    {
+      "connector_id": "vercel",
+      "system": "Vercel",
+      "authority_scope": ["deployment_state"],
+      "project_scope": ["*"],
+      "read_capable": true,
+      "write_capable": true,
+      "freshness_seconds": 3600,
+      "credential_locator": "connector://vercel"
+    },
+    {
+      "connector_id": "railway",
+      "system": "Railway",
+      "authority_scope": ["deployment_state", "runtime_health"],
+      "project_scope": ["*"],
+      "read_capable": true,
+      "write_capable": true,
+      "freshness_seconds": 3600,
+      "credential_locator": "connector://railway"
+    }
+  ]
+}

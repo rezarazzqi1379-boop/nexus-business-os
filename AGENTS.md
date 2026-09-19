@@ -13,6 +13,31 @@ This repository is operated as one governed system. For every substantial task:
 9. If a capability is missing, record it as blocked or propose a sandboxed experiment; never fabricate availability.
 10. Finish with evidence: changed files, tests run, remaining blockers, and any approval required.
 
+## Mandatory chat preflight (connector control plane)
+
+Connector data reaches this system through a metadata federation control plane, not a
+central copy of every plugin's raw data and credentials. Each connector adapter supplies
+a bounded manifest, a freshness/health snapshot, and project-scoped evidence envelopes.
+For every consequential task that draws on connector data:
+
+1. Resolve one exact `project_id` before using project data.
+2. Recover the current Source Registry and the project master.
+3. Refresh every required dynamic connector and record its observation time.
+4. Normalize only the evidence required for the task into project-scoped envelopes.
+5. Run `nexus_chat_bootstrap.bootstrap_chat` before drafting the consequential result. A
+   system prompt alone is not evidence that the check ran; the generated preflight record
+   and its evidence digests are the audit proof.
+6. Stop when the gate is `BLOCK`; expose the conflict or missing authority.
+7. Treat `REVIEW` as unresolved and do not promote claims to facts.
+8. This preflight verifies the evidence behind a decision; it does not relax item 7 above
+   — send, publish, payment, signature, deployment, permission change, or deletion still
+   require their own exact-scope human approval regardless of what the preflight reports.
+
+Never place credentials or full OAuth tokens in manifests, evidence, prompts, logs, or
+commits — store a credential locator only, never the value. Connector availability proves
+access only; it does not prove data correctness or authority. This preflight applies to
+every agent and chat entry point that operates through this repository.
+
 ## Conversation and token governance
 
 - Treat all project chats as observations feeding one portfolio, not as independent authorities.

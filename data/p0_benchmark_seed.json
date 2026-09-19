@@ -1,0 +1,42 @@
+{
+  "maturity": "RESEARCHED",
+  "note": "Seed only. These records encode known real failure modes and must not be counted as measured business outcomes until reviewed against project evidence.",
+  "benchmarks": [
+    {
+      "project_id": "hydrotester",
+      "case_type": "hydrotester",
+      "failure_mode": "cross-project engineering parameter contamination",
+      "known_example": "Heat Treatment length/thickness values appeared in Hydrotester proposal context",
+      "metric": "cross_project_contamination_events",
+      "target": 0,
+      "status": "requires_replay"
+    },
+    {
+      "project_id": "hydrotester",
+      "case_type": "hydrotester",
+      "failure_mode": "premature supplier qualification",
+      "known_example": "120 MPa target must not be represented as FAT-verified without project-specific proof",
+      "metric": "unsupported_verified_supplier_claims",
+      "target": 0,
+      "status": "partially_covered_by_merged_pr_22"
+    },
+    {
+      "project_id": "can-forming",
+      "case_type": "can_forming",
+      "failure_mode": "scope mismatch",
+      "known_example": "full production line quote must not be normalized as equivalent to retrofit/necking-only scope",
+      "metric": "scope_collapsing_errors",
+      "target": 0,
+      "status": "requires_replay"
+    },
+    {
+      "project_id": "can-forming",
+      "case_type": "can_forming",
+      "failure_mode": "throughput context loss",
+      "known_example": "supplier CPM must be compared to the required/current line context rather than treated as standalone adequacy",
+      "metric": "unsupported_throughput_equivalence_claims",
+      "target": 0,
+      "status": "requires_replay"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "as_of": "2026-08-21",
+  "maturity": "REPLAY_TESTED",
+  "warning": "This snapshot measures deterministic replay/control behavior only. It is not a business ROI, time-saved, or human-acceptance measurement.",
+  "hydrotester": {
+    "source_refs": [
+      "data/procurement/hydrotester_qualification_matrix_v0_1.json",
+      "tests/test_hydrotester_qualification_matrix.py"
+    ],
+    "hazards_tested": 3,
+    "hazards_detected": 3,
+    "hazards": [
+      "cross-project engineering-parameter contamination",
+      "unsupported 120 MPa verified/compliant representation",
+      "premature supplier selection while buyer blockers remain unresolved"
+    ],
+    "unsafe_equivalence_or_selection_blocked": 2,
+    "buyer_unknown_blockers_preserved": 3,
+    "buyer_engineering_updates_applied": [
+      "approximately 60 pipes/hour throughput",
+      "pressure varies by pipe size/configuration under API 5CT",
+      "up to 120 MPa is an upper required capability for relevant duty points rather than a blanket all-size requirement"
+    ],
+    "selected_supplier": null,
+    "human_corrections": null,
+    "elapsed_minutes_to_decision": null,
+    "commercial_value_usd": null
+  },
+  "can_forming": {
+    "source_refs": [
+      "data/procurement/can_forming_replay_v0_1.json",
+      "tests/test_can_forming_replay.py"
+    ],
+    "hazards_tested": 3,
+    "hazards_detected": 3,
+    "hazards": [
+      "full-production-line quote collapsed into requested retrofit/machine-only scope",
+      "supplier-stated CPM treated as verified throughput equivalence",
+      "duplicate clarification follow-up despite an already-sent corrective request"
+    ],
+    "unsafe_equivalence_or_selection_blocked": 3,
+    "unresolved_decision_blockers": 3,
+    "current_decision": "WAITING_FOR_REVISED_EVIDENCE",
+    "human_corrections": null,
+    "elapsed_minutes_to_decision": null,
+    "commercial_value_usd": null
+  },
+  "combined": {
+    "replay_hazards_tested": 6,
+    "replay_hazards_detected": 6,
+    "replay_detection_rate": 1.0,
+    "operational_metrics_available": false,
+    "commercial_roi_available": false
+  }
+}

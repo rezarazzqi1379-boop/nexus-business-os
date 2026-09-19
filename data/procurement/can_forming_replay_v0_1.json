@@ -1,0 +1,74 @@
+{
+  "project_id": "can-forming",
+  "maturity": "RESEARCHED",
+  "sources": {
+    "buyer_scope": "ASAK_Can_Line_Engineering_Data_English_Letterhead_2026-08-17.pdf",
+    "supplier_quote_summary": "NEXUS_Claude_Independent_Review_Work_Order_2026-08-21.docx",
+    "supplier_catalog": "Golden_Eagle_Relevant_Can_Making_Machines_Catalog.pdf"
+  },
+  "requirements": [
+    {
+      "requirement_id": "CAN-D73-NECK",
+      "diameter_mm": 73,
+      "requested_scope": "necking_only",
+      "existing_line_cpm": 600,
+      "evidence_class": "fact"
+    },
+    {
+      "requirement_id": "CAN-D73-FULL",
+      "diameter_mm": 73,
+      "requested_scope": "full_forming",
+      "existing_line_cpm": 600,
+      "evidence_class": "fact"
+    },
+    {
+      "requirement_id": "CAN-D99-NECK",
+      "diameter_mm": 99,
+      "requested_scope": "necking_only",
+      "existing_line_cpm": 650,
+      "evidence_class": "fact"
+    },
+    {
+      "requirement_id": "CAN-D99-FULL",
+      "diameter_mm": 99,
+      "requested_scope": "full_forming",
+      "existing_line_cpm": 650,
+      "evidence_class": "fact"
+    }
+  ],
+  "quotes": [
+    {
+      "quote_id": "GE-D73-2026-08-20",
+      "supplier": "Zhejiang Golden Eagle Food Machinery Co., Ltd.",
+      "diameter_mm": 73,
+      "quoted_scope": "full_production_line",
+      "price_usd": 628200,
+      "incoterm": "FOB Ningbo",
+      "max_cpm": 500,
+      "stable_cpm": 400,
+      "speed_evidence_class": "claim",
+      "clarification_already_sent": true
+    },
+    {
+      "quote_id": "GE-D99-2026-08-20",
+      "supplier": "Zhejiang Golden Eagle Food Machinery Co., Ltd.",
+      "diameter_mm": 99,
+      "quoted_scope": "full_production_line",
+      "price_usd": 636200,
+      "incoterm": "FOB Ningbo",
+      "max_cpm": 500,
+      "stable_cpm": 400,
+      "speed_evidence_class": "claim",
+      "clarification_already_sent": true
+    }
+  ],
+  "expected_replay_findings": {
+    "scope_equivalence": false,
+    "duplicate_followup_should_be_blocked": true,
+    "supplier_speed_may_be_treated_as_verified": false,
+    "d73_stable_gap_vs_existing_line_cpm": 200,
+    "d99_stable_gap_vs_existing_line_cpm": 250,
+    "commercial_decision": "WAITING_FOR_REVISED_EVIDENCE"
+  },
+  "note": "Existing-line CPM is context, not automatically the required continuous acceptance speed. The gap must trigger clarification rather than automatic rejection. Quote prices are not comparable to the requested machine-only scopes until Golden Eagle supplies narrowed configurations."
+}

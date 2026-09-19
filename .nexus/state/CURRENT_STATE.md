@@ -316,27 +316,18 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
   them), same principle as the first merge; the 3rd is FLAGGED, not resolved:
   1. `.nexus/expert_foundry/ROLLING_MILL_ENGINEERING_INTAKE.json`, `rolling_mill_intake.py`,
      `evals/test_rolling_mill_intake.py`, and this file's ROLLING MILL STUDY section --
-     NOT a confident "feat wins." Main rewrote the intake code, its test, and the JSON
-     contract to a different physical schema (220x220x3000mm billet,
-     width_options_mm [300,400,600], thickness_range_mm, reported_diameter_around /
-     barrel_length, dated "conversation:2026-09-14", explicitly USER_CONFIRMED but not
-     independently verified) than feat's (150x150mm billet, target width 300mm,
-     resolved ST1-ST4 per-stand motor/gearbox/roll specs from real engineer (Sanami)
-     WhatsApp answers on 2026-09-16, with specific remaining gaps -- safety evidence,
-     torque/force limits, 4 of 8 original claims -- spelled out rather than glossed
-     over). These may be two different questions (the mill's existing physical
-     capability vs. a separately-discussed proposed 220x220mm new product capacity --
-     Reza described 220x220mm/300-400mm-width as "the real billet" in an earlier,
-     apparently distinct conversation) rather than one superseding the other. Per this
-     project's own rolling-mill evidence-discipline rules, two independently
-     transcribed claims are never silently reconciled just because a merge tool can
-     auto-pick one side. To avoid compounding this open question with a worse,
-     purely accidental failure mode (main's rewritten code/test paired with feat's
-     JSON -- a schema mismatch nobody actually decided), all three files were kept as
-     feat's self-consistent version in the merge commit (8b73a77). main's schema is
-     NOT discarded, only not merged in yet. This needs Reza's explicit call -- separate
-     questions to be tracked side by side, or a real supersession -- before either
-     side is finalized.
+     RESOLVED by Reza on 2026-09-19 (explicit, not inferred): the mill's existing
+     physical-capability study and the 220x220mm question are the same topic, not two
+     separate ones. main's schema wins (220x220x3000mm billet, width_options_mm
+     [300,400,600], thickness_range_mm, reported_diameter_around / barrel_length,
+     dated "conversation:2026-09-14"). feat's 150x150mm / ST1-ST4 draft (from the
+     2026-09-16 engineer (Sanami) WhatsApp answers) is superseded for this contract --
+     not deleted from git history, just no longer the live schema. Applied in a
+     follow-up commit on top of the pushed merge (13c7760) rather than amending it,
+     so the record of the original open question and how it got closed stays intact.
+     This is the kind of factual/schema call this project's evidence-discipline rules
+     say Claude must never make silently -- it was made by Reza, on request, which is
+     exactly the required human tie-breaker.
   2. `.nexus/runtime/expert_foundry/events.jsonl` (append-only, hash-chained ledger)
      -- feat's copy is a strict superset (one additional CORROBORATED claim record
      for the same 2026-09-16 engineer answers, appended after 3 records both sides
@@ -365,8 +356,7 @@ Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
 - Full evals/ suite run against feat's tip (af20da5) before this merge: 1 unrelated
   pre-existing failure (test_rolling_mill_intake.py::test_current_voice_claims_fail_closed,
   no import dependency on anything touched here) -- left untouched, out of scope.
-- Merge commit 8b73a77 (parents bb2acae + origin/main's 258be46) built via git
-  plumbing and verified against a materialized scratch worktree: 904 passed, 1 known
-  pre-existing unrelated failure (test_current_voice_claims_fail_closed -- same as
-  feat's own baseline). NOT pushed to origin yet -- pending Reza's decision on the
-  rolling-mill schema question above, and his go-ahead to push.
+- Merge commit 13c7760 (parents bb2acae + origin/main's 258be46) built via git
+  plumbing, verified (904 passed, 1 known pre-existing unrelated failure), and pushed
+  to origin main by Reza on 2026-09-19. The rolling-mill flag above was resolved and
+  applied in a follow-up commit on the same day, also pushed to main.

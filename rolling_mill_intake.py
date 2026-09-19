@@ -17,12 +17,12 @@ REQUIRED_PATHS = (
     "product.input_billet.cross_section_mm",
     "product.input_billet.length_mm",
     "product.input_billet.steel_grade",
-    "product.target.width_mm",
-    "product.target.thickness_mm",
+    "product.target.width_options_mm",
+    "product.target.thickness_range_mm",
     "product.target.standard",
     "mill.layout",
-    "mill.rolls.working_diameter_mm",
-    "mill.rolls.barrel_length_mm",
+    "mill.rolls.reported_diameter_around",
+    "mill.rolls.barrel_length",
     "mill.rolls.groove_drawing_locator",
     "drive.motor.nameplate_photo_locator",
     "drive.motor.rated_power_kw",
@@ -44,26 +44,26 @@ REQUIRED_PATHS = (
 )
 
 AMBIGUOUS_CLAIM_IDS = (
-    "claim_billet_150",
-    "claim_strip_250",
-    "claim_roll_450_480",
-    "claim_length_1350",
-    "claim_same_speed_550",
-    "claim_motor_800_125kw_1002",
-    "claim_widths_15_20_25",
-    "claim_target_300",
+    "claim_billet_220x220x3000",
+    "claim_target_widths_300_400_600",
+    "claim_target_thickness_8_20",
+    "claim_roughing_three_high",
+    "claim_roll_diameter_550",
+    "claim_barrel_length_1350",
+    "claim_gearbox_15ton_ratio_10to1",
+    "claim_existing_150x150_products",
+    "claim_grade_st37",
 )
 
 POSITIVE_NUMERIC_PATHS = frozenset({
-    "product.input_billet.length_mm", "product.target.width_mm",
-    "product.target.thickness_mm", "mill.rolls.working_diameter_mm",
-    "mill.rolls.barrel_length_mm", "drive.motor.rated_power_kw",
+    "product.input_billet.length_mm", "drive.motor.rated_power_kw",
     "drive.motor.rated_speed_rpm", "drive.motor.rated_voltage_v",
     "drive.motor.rated_current_a", "drive.gearbox.rated_output_torque_nm",
     "limits.maximum_roll_force_n", "limits.maximum_spindle_torque_nm",
     "limits.maximum_motor_current_a", "process.reheating_temperature_degC",
 })
 TRUE_PATHS = frozenset({"safety.guards_verified", "safety.emergency_stops_verified"})
+MEASUREMENT_PATHS = frozenset({"mill.rolls.reported_diameter_around", "mill.rolls.barrel_length"})
 
 
 def _at(payload: dict, path: str):
@@ -107,6 +107,14 @@ def assess(payload: dict) -> RollingReadiness:
             missing_list.append(f"{path}:positive_number_required")
         elif path in TRUE_PATHS and value is not True:
             missing_list.append(f"{path}:explicit_true_required")
+        elif path in MEASUREMENT_PATHS and (
+            not isinstance(value, dict)
+            or isinstance(value.get("value"), bool)
+            or not isinstance(value.get("value"), (int, float))
+            or value["value"] <= 0
+            or value.get("unit") not in {"mm", "cm", "m"}
+        ):
+            missing_list.append(f"{path}:positive_value_and_metric_unit_required")
     section = _at(payload, "product.input_billet.cross_section_mm")
     if _meaningful(section) and (
         not isinstance(section, dict)
@@ -121,6 +129,20 @@ def assess(payload: dict) -> RollingReadiness:
                or ratio[side] <= 0 for side in ("input", "output"))
     ):
         missing_list.append("drive.gearbox.ratio:input_output_required")
+    widths = _at(payload, "product.target.width_options_mm")
+    if _meaningful(widths) and (
+        not isinstance(widths, list) or not widths
+        or any(isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0 for value in widths)
+    ):
+        missing_list.append("product.target.width_options_mm:positive_number_list_required")
+    thickness = _at(payload, "product.target.thickness_range_mm")
+    if _meaningful(thickness) and (
+        not isinstance(thickness, dict)
+        or any(isinstance(thickness.get(bound), bool) or not isinstance(thickness.get(bound), (int, float))
+               or thickness[bound] <= 0 for bound in ("min", "max"))
+        or thickness["min"] > thickness["max"]
+    ):
+        missing_list.append("product.target.thickness_range_mm:min_max_required")
     missing = tuple(dict.fromkeys(missing_list))
     claims = payload.get("initial_claims", [])
     resolved = {

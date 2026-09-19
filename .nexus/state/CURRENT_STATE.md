@@ -447,3 +447,143 @@ at bb2acae. Full suite (`evals/` + `tests/`, `PYTHONPATH=src` needed for
 except the engineer's answers to the rolling-mill questionnaire (external,
 task #10) and Reza's own call on any of the ~85 remaining small/superseded
 branches he wants a second look at.
+
+## BRANCH ARCHAEOLOGY, ROUND 2 (2026-09-19, continued)
+
+After the morning's merges (approvals.py fix, connector control plane,
+PRJ-HYD-01 consolidation), surveyed the remaining ~85 unmerged branches via 4
+parallel read-only agents plus direct review. Findings and actions:
+
+**Merged to main today (7 more commits, all built via git-plumbing 3-way
+comparison against the actual merge-base, tested twice on a fresh worktree
+before push):**
+- `4810411` -- security fix: `security.py` unconditionally sent
+  `WWW-Authenticate: Basic` on every 401, which can trigger a native
+  browser Basic-auth dialog that loops without a session cookie. Added
+  `NEXUS_BASIC_CHALLENGE` env gate (default off). From
+  `feat/external-access-broker-v0-1` (only `security.py` + `ui/login.html` +
+  its test -- that branch's broker/mesh/bootstrap scaffolding was left out
+  as unused speculative work).
+- `341a9ac` -- `capability_governor.py` + `agent_lab.py` (fault-aware
+  capability gating + trial evaluation), from
+  `feat/capability-governor-implementation`.
+- `032bade` -- OmniRoute evaluation module + 2026-08-28 research findings,
+  from `reconcile/omniroute-evaluation-v0-1`.
+- `e5a030a` -- Supabase least-privilege hardening SQL (apply/audit/verify
+  scripts, operator-run, not imported by app code -- still needs Reza to
+  actually run them against the Supabase project), from
+  `hardening/supabase-data-api-v0-1`.
+- `b4cdad4` -- research_data_mesh / evidence_authority / constraint_registry /
+  capabilities / policy / state_audit / state_promotion under
+  `src/nexus_core/`, from `experiment/research-data-mesh-v0-1` (excluded that
+  branch's own CI-workflow and `__init__.py` changes -- main's CI has since
+  been independently overhauled to a newer superset, and `src/nexus_core`
+  has always worked fine as an implicit namespace package).
+- `aefe320` -- `access_authority_registry.py` (connector capability is never
+  execution authority; consequential actions always need exact human
+  approval) + `autonomy_adapter.py` / `delegated_operator.py` /
+  `settlement_executor.py` / `worker_lifecycle.py`, from
+  `feature/access-authority-registry-v0-1`. Also removed a dead, unused
+  `approval_inbox` table from `autonomy.py` (approval authority lives solely
+  in the canonical `ApprovalStore`) and added `AutonomyStore.defer()`.
+- `765d687` -- expanded `NEXUS_MCP_BASELINE` from 6 to 12 read-only,
+  disabled-by-default MCP candidates (google_drive, apollo, zotero, canva,
+  figma, supabase) with project_scopes/cost_class/health_probe/fallback
+  metadata and `activation_waves()` rollout ordering, from
+  `feat/nexus-capability-portfolio` (see ADR-004).
+- `4c26e7a` -- `coding_sandbox_benchmark.py` (a decision rubric only --
+  REJECT/CANDIDATE_WINS/etc. from externally-supplied metrics; it does not
+  execute anything or provide isolation itself) + `idea_forge.py`, from
+  `experiment/coding-sandbox-benchmark-v0-1`.
+
+Full suite run twice after each push: 974 -> 1071 -> 1140 passed, 0 failed
+throughout (test count grows as each branch's own tests land).
+
+**Also committed on `feat/unified-system-governance-v0.1`** (`2451722`,
+confirmed by Reza as his own in-progress work, not touched otherwise):
+`contextlib.closing()` hardening on every sqlite3 connection across
+`api.py`/`audit.py`/`autonomy.py`/`canonical_sources.py`/`ops.py`/`state.py`;
+a sandbox-only lifecycle gate in `project_control_plane.py` (SANDBOX_READY/
+EXPERIMENT agents can only run in the new "sandbox" lane, never on
+external-risk work); `PRJ-FAL-01` project policy + a "Cross-agent handoff
+and FAL reconciliation" section in AGENTS.md; `system_capability_registry.py`
+as a capability-activation read model; a Tavily EXPERIMENT_ONLY research
+topic; and README.md documentation of the Ruflo/claude-flow orchestration
+layer now installed in this repo for Claude Code sessions (26->28 plugins,
+`.mcp.json`, `.swarm/` vector memory, a `ruflo-federation` plugin that can
+publish swarm-coordination events to an external relay `relay.ruv.io` --
+currently no business data routed through it, daemon not started). The
+`.claude/*`, `.mcp.json`, `.swarm/`, and root `CLAUDE.md` scaffolding files
+themselves remain untracked/uncommitted pending a separate decision.
+
+**`c7e5c36` investigated (the Aug 25 "release: deploy NEXUS Autopilot
+v2.0.0rc2 cloud hardened" commit that deleted `src/nexus_brain/*` graph-
+execution engine and `src/nexus_control_plane/*`):** confirmed single-parent,
+explicit release message, immediately following completed shadow-execution
+feature work (PRs #50/#51). Current main's own docs (AGENTS.md, roadmap)
+describe only the new flat architecture and explicitly say "do not create
+parallel control planes" with zero living reference to the deleted
+`nexus_brain`/`nexus_control_plane` package. Reza confirmed treating this as
+a deliberate, accepted pivot.
+
+**Branches explicitly abandoned by Reza's decision today (left unmerged,
+not deleted from origin):**
+- Old `nexus_brain` graph-engine cluster: `feature/nexus-brain-v0-1`,
+  `-v0-2`, `-v0-3-live-snapshot`, `-v0-4-command-live`,
+  `feature/nexus-brain-plo-contract-v0-5`, `feature/durable-shadow-queue-v0-1`,
+  `feature/postgres-shadow-queue-v0-1`, `feature/execution-shadow-bridge-v0-1`,
+  `feature/shadow-worker-v0-1` -- all import files `c7e5c36` deleted from
+  main and no longer exist anywhere on main; confirms the pivot was final.
+- Doc-only branches describing the dead architecture:
+  `docs/nexus-brain-v0-2-state-sync`, `docs/readme-brain-v0-2`,
+  `docs/plo-consolidation-review-v0-1`.
+- Already superseded: `feature/ai-router-v0-5-public-shadow-probe` and
+  `fix/redact-public-shadow-probe-secrets-v0-1` -- target main's *current*
+  (unrelated, same-named) `src/nexus_brain/public_shadow_probe.py`, but the
+  secret-redaction fix they carry is already on main via a different PR;
+  byte-for-byte diff against main is empty.
+- `feature/evidence-classification` -- patches `src/nexus_verticals/
+  procurement.py`, which `c7e5c36` deleted; the epistemic-classification idea
+  may be worth reapplying later but would need to be rewritten from scratch
+  against `hydrotester_readiness.py`, not merged as-is.
+- `feature/nexus-forge-loop-v0-1` -- a full alternate control-plane
+  (`src/nexus_control_plane/forge.py`, `workforce_orchestrator.py`,
+  `recursive_evolution.py`, `contradiction_graph.py`, `outcome_gate.py`,
+  ~7400 lines) built entirely on the architecture `c7e5c36` abandoned; kept
+  only as a design-idea reference (contradiction-graph, recursive-evolution
+  loop), not a merge candidate.
+- `experiment/opencode-shadow-adapter-v0-1` -- fully subsumed by
+  `experiment/model-runner-arena-v0-1` (strict git ancestor of it);
+  redundant.
+
+**Still open, needs Reza's call (not yet actioned):**
+- Needs manual rebase, not a clean merge: `feature/p0-benchmark-pair-v0-1`
+  (good A0-A8 evidence-authority framework for Hydrotester/Can-Forming, but
+  conflicts with the `hydrotester_readiness.py` refactor); `hardening/
+  external-ingress-guard-v0-2` (real, still-open gap -- unvalidated inbound
+  external messages + ungated auto-replies -- but duplicates logic that
+  already exists in `ApprovalStore`/`nexus_core.policy` instead of reusing
+  it).
+- Product decision, not a technical blocker: `plo-v0.2-linux-runtime`
+  (65 commits, fully standalone Postgres-backed queue/worker infra, clean
+  technically -- does Reza still want this concept?); `feature/
+  decision-learning-v0-1` (decision->outcome->evaluation loop, 14 tests,
+  clean, but nothing calls it yet); `feature/engineering-proposal-delta-
+  v0-1` (automated supplier-proposal-vs-spec deviation detection, clean,
+  5 tests); `experiment/model-runner-arena-v0-1` ("sandbox" here means a
+  path-prefix policy check only, not real isolation -- conflicts with
+  main's independently-merged `HERDR` runner block, resolvable); `feat/
+  posthog-observability-v0-1` (external SaaS, needs a new API key + a PII
+  policy decision before ever enabling; currently inert/unwired).
+- Needs deeper comparison before a call: `feature/requirement-readiness-
+  shadow` vs. current `hydrotester_readiness.py`; `feature/evaluation-
+  harness-v0-1-shadow-adapters` and `integration/shadow-pr1-pr2-pr4-pr7-pr8`
+  vs. current `evaluation_suite.py`/`evaluation_constitution.py`.
+
+**End of round-2 state**: `main` at `4c26e7a`, `feat/unified-system-
+governance-v0.1` at `2451722`. Full suite: 1140 passed, 0 failed, run twice.
+Leftover local worktree metadata from the review agents
+(`.worktrees/merge-governance-v0.1`, and two under `/tmp`) could not be
+cleaned up via the device bridge (unlink permission denied on the
+bind-mounted folder) -- harmless, but Reza should run `git worktree prune`
+locally when convenient.

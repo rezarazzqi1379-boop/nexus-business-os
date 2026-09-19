@@ -104,3 +104,12 @@ def test_gh_quotation_is_recorded_as_non_final_scope():
     gh = next(item for item in data["candidates"] if item["supplier_id"] == "gh-petro")
     assert gh["fields"]["price"]["value"] == "USD 542800"
     assert gh["fields"]["price"]["status"] == "quoted_non_final_subject_to_final_specification"
+
+
+def test_boyu_is_parked_and_cannot_be_silently_reactivated():
+    data = load(MATRIX_PATH)
+    parked = {item["supplier_id"]: item for item in data["excluded_or_parked"]}
+    assert parked["boyu-petro"]["status"] == "parked_no_further_action"
+    assert parked["boyu-petro"]["reactivation_rule"] == "only on explicit buyer instruction"
+    assert "boyu-petro" not in data["current_decision"]["conditional"]
+    assert data["current_decision"]["selected_supplier"] is None

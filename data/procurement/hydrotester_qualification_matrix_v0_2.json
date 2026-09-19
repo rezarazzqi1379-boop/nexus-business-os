@@ -6,124 +6,421 @@
   "supersedes": {
     "matrix_version": "0.1",
     "reason": "Buyer engineering superseded preliminary dimensions and confirmed throughput/inspection requirements.",
-    "stale_values": ["wall thickness 5-12 mm", "pipe length 6-12 m"],
-    "controlling_values": ["wall thickness 6-20 mm", "pipe length 9-12 m", "throughput 60 pipes/hour"]
+    "stale_values": [
+      "wall thickness 5-12 mm",
+      "pipe length 6-12 m"
+    ],
+    "controlling_values": [
+      "wall thickness 6-20 mm",
+      "pipe length 9-12 m",
+      "throughput 60 pipes/hour"
+    ]
   },
   "buyer_baseline": {
-    "od_mm": {"min": 89, "max": 180, "status": "confirmed"},
-    "wall_thickness_mm": {"min": 6, "max": 20, "status": "confirmed"},
-    "pipe_length_m": {"min": 9, "max": 12, "status": "confirmed"},
-    "hold_time_s": {"min": 5, "max": 10, "status": "confirmed"},
-    "required_throughput": {"value": 60, "unit": "pipes/hour", "status": "confirmed", "blocking": false},
-    "governing_product_standard": {"value": "API 5CT", "status": "confirmed_exact_contract_edition_pending", "blocking": false},
-    "maximum_machine_design_rating_mpa": {"value": 120, "status": "confirmed_machine_capability_target", "blocking": false},
-    "required_test_pressure_envelope": {"status": "buyer_product_schedule_not_fully_enumerated", "blocking": true},
-    "pipe_end_geometry_and_sealing_interface": {"status": "buyer_engineering_not_yet_confirmed", "blocking": true},
-    "manufacturing_itp_tpi": {"value": "Buyer or approved TPI under approved ITP; TPI may include SGS", "status": "confirmed", "blocking": false},
-    "ndt": {"value": "PT/MT/UT as applicable under approved ITP", "status": "confirmed", "blocking": false},
-    "packing_and_seal_vendor_approval": {"value": "Buyer approval required", "status": "confirmed", "blocking": false},
-    "pre_shipment_testing": {"value": "Performance and supplementary tests per approved FAT/ITP before shipment", "status": "confirmed", "blocking": false}
+    "od_mm": {
+      "min": 89,
+      "max": 180,
+      "status": "confirmed"
+    },
+    "wall_thickness_mm": {
+      "min": 6,
+      "max": 20,
+      "status": "confirmed"
+    },
+    "pipe_length_m": {
+      "min": 9,
+      "max": 12,
+      "status": "confirmed"
+    },
+    "hold_time_s": {
+      "min": 5,
+      "max": 10,
+      "status": "confirmed"
+    },
+    "required_throughput": {
+      "value": 60,
+      "unit": "pipes/hour",
+      "status": "confirmed",
+      "blocking": false
+    },
+    "governing_product_standard": {
+      "value": "API 5CT",
+      "status": "confirmed_exact_contract_edition_pending",
+      "blocking": false
+    },
+    "maximum_machine_design_rating_mpa": {
+      "value": 120,
+      "status": "confirmed_machine_capability_target",
+      "blocking": false
+    },
+    "required_test_pressure_envelope": {
+      "status": "buyer_product_schedule_not_fully_enumerated",
+      "blocking": true
+    },
+    "pipe_end_geometry_and_sealing_interface": {
+      "status": "buyer_engineering_not_yet_confirmed",
+      "blocking": true
+    },
+    "manufacturing_itp_tpi": {
+      "value": "Buyer or approved TPI under approved ITP; TPI may include SGS",
+      "status": "confirmed",
+      "blocking": false
+    },
+    "ndt": {
+      "value": "PT/MT/UT as applicable under approved ITP",
+      "status": "confirmed",
+      "blocking": false
+    },
+    "packing_and_seal_vendor_approval": {
+      "value": "Buyer approval required",
+      "status": "confirmed",
+      "blocking": false
+    },
+    "pre_shipment_testing": {
+      "value": "Performance and supplementary tests per approved FAT/ITP before shipment",
+      "status": "confirmed",
+      "blocking": false
+    }
   },
   "qualification_fields": [
-    "od_range", "wall_thickness_range", "length_range", "pressure_capability",
-    "pressure_envelope_vs_geometry", "hold_time", "axial_restraint", "sealing_method",
-    "cycle_time_or_throughput", "automation", "pressure_recording", "fat_and_reference_machine",
-    "power_and_utilities", "price", "incoterm", "lead_time", "payment_terms", "warranty",
-    "installation_training", "iran_supply_support"
+    "od_range",
+    "wall_thickness_range",
+    "length_range",
+    "pressure_capability",
+    "pressure_envelope_vs_geometry",
+    "hold_time",
+    "axial_restraint",
+    "sealing_method",
+    "cycle_time_or_throughput",
+    "automation",
+    "pressure_recording",
+    "fat_and_reference_machine",
+    "power_and_utilities",
+    "price",
+    "incoterm",
+    "lead_time",
+    "payment_terms",
+    "warranty",
+    "installation_training",
+    "iran_supply_support"
   ],
   "candidates": [
     {
       "supplier_id": "marley-wuxi",
       "qualification_state": "proposal_received_requires_rev1_2_reconfirmation",
-      "evidence_refs": ["1a0231062d088821", "Iran 120Mpa steel pipe hydraulic press.pdf", "1a027ffec081fc68"],
+      "evidence_refs": [
+        "1a0231062d088821",
+        "Iran 120Mpa steel pipe hydraulic press.pdf",
+        "1a027ffec081fc68"
+      ],
       "fields": {
-        "od_range": {"value": "89-180 mm", "status": "supplier_stated_match"},
-        "wall_thickness_range": {"value": "5-12 mm in superseded proposal", "status": "superseded_by_buyer_revision"},
-        "length_range": {"value": "6-12 m in superseded proposal", "status": "superseded_by_buyer_revision"},
-        "pressure_capability": {"value": "0-120 MPa long-term operating / design pressure 120 MPa", "status": "supplier_stated_not_fat_verified"},
-        "pressure_envelope_vs_geometry": {"value": null, "status": "missing_blocker"},
-        "hold_time": {"value": "5-30 s adjustable", "status": "supplier_stated_match"},
-        "axial_restraint": {"value": "500 t equipment tensile load", "status": "supplier_stated_needs_engineering_basis"},
-        "sealing_method": {"value": "end-face / radial low-clearance sealing", "status": "supplier_stated_needs_interface_confirmation"},
-        "cycle_time_or_throughput": {"value": "60 pipes/hour requested in Rev.1.2; supplier reconfirmation pending", "status": "buyer_request_pending_supplier_reconfirmation"},
-        "automation": {"value": "automatic loading/unloading; one-touch auto/manual", "status": "supplier_stated"},
-        "pressure_recording": {"value": "dual pressure monitoring, real-time curve, historical records, printing, end cameras", "status": "supplier_stated"},
-        "fat_and_reference_machine": {"value": null, "status": "missing_blocker"},
-        "power_and_utilities": {"value": "document states both 260 kVA and 30 kW; 400 V; water medium", "status": "internal_document_inconsistency_requires_clarification"},
-        "price": {"value": "USD 238461.55 equipment + USD 23077 installation/training", "status": "quoted_superseded_scope_pending_requote"},
-        "incoterm": {"value": "EXW", "status": "quoted"},
-        "lead_time": {"value": "90 days manufacturing", "status": "quoted"},
-        "payment_terms": {"value": "50% deposit / 50% before shipment", "status": "quoted"},
-        "warranty": {"value": "2 years; free replacement parts, buyer pays freight", "status": "quoted"},
-        "installation_training": {"value": "USD 23077 including airfare, meals and accommodation", "status": "quoted"},
-        "iran_supply_support": {"value": null, "status": "not_explicitly_confirmed"}
+        "od_range": {
+          "value": "89-180 mm",
+          "status": "supplier_stated_match"
+        },
+        "wall_thickness_range": {
+          "value": "5-12 mm in superseded proposal",
+          "status": "superseded_by_buyer_revision"
+        },
+        "length_range": {
+          "value": "6-12 m in superseded proposal",
+          "status": "superseded_by_buyer_revision"
+        },
+        "pressure_capability": {
+          "value": "0-120 MPa long-term operating / design pressure 120 MPa",
+          "status": "supplier_stated_not_fat_verified"
+        },
+        "pressure_envelope_vs_geometry": {
+          "value": null,
+          "status": "missing_blocker"
+        },
+        "hold_time": {
+          "value": "5-30 s adjustable",
+          "status": "supplier_stated_match"
+        },
+        "axial_restraint": {
+          "value": "500 t equipment tensile load",
+          "status": "supplier_stated_needs_engineering_basis"
+        },
+        "sealing_method": {
+          "value": "end-face / radial low-clearance sealing",
+          "status": "supplier_stated_needs_interface_confirmation"
+        },
+        "cycle_time_or_throughput": {
+          "value": "60 pipes/hour requested in Rev.1.2; supplier reconfirmation pending",
+          "status": "buyer_request_pending_supplier_reconfirmation"
+        },
+        "automation": {
+          "value": "automatic loading/unloading; one-touch auto/manual",
+          "status": "supplier_stated"
+        },
+        "pressure_recording": {
+          "value": "dual pressure monitoring, real-time curve, historical records, printing, end cameras",
+          "status": "supplier_stated"
+        },
+        "fat_and_reference_machine": {
+          "value": null,
+          "status": "missing_blocker"
+        },
+        "power_and_utilities": {
+          "value": "document states both 260 kVA and 30 kW; 400 V; water medium",
+          "status": "internal_document_inconsistency_requires_clarification"
+        },
+        "price": {
+          "value": "USD 238461.55 equipment + USD 23077 installation/training",
+          "status": "quoted_superseded_scope_pending_requote"
+        },
+        "incoterm": {
+          "value": "EXW",
+          "status": "quoted"
+        },
+        "lead_time": {
+          "value": "90 days manufacturing",
+          "status": "quoted"
+        },
+        "payment_terms": {
+          "value": "50% deposit / 50% before shipment",
+          "status": "quoted"
+        },
+        "warranty": {
+          "value": "2 years; free replacement parts, buyer pays freight",
+          "status": "quoted"
+        },
+        "installation_training": {
+          "value": "USD 23077 including airfare, meals and accommodation",
+          "status": "quoted"
+        },
+        "iran_supply_support": {
+          "value": null,
+          "status": "not_explicitly_confirmed"
+        }
       }
     },
     {
       "supplier_id": "yaxing-dezhou",
       "qualification_state": "budgetary_quote_received_requires_rev1_2_engineering_proposal",
-      "evidence_refs": ["1a023fec9e15fbac", "1a028001c4a64c14"],
+      "evidence_refs": [
+        "1a023fec9e15fbac",
+        "1a028001c4a64c14"
+      ],
       "fields": {
-        "od_range": {"value": "project discussion 89-180 mm", "status": "buyer_request_not_supplier_guarantee"},
-        "wall_thickness_range": {"value": null, "status": "missing_blocker"},
-        "length_range": {"value": null, "status": "missing_blocker"},
-        "pressure_capability": {"value": "custom machine discussed around 120 MPa target", "status": "budgetary_not_engineering_verified"},
-        "pressure_envelope_vs_geometry": {"value": null, "status": "missing_blocker"},
-        "hold_time": {"value": null, "status": "missing"},
-        "axial_restraint": {"value": null, "status": "missing_blocker"},
-        "sealing_method": {"value": null, "status": "missing"},
-        "cycle_time_or_throughput": {"value": "1 pc/min", "status": "supplier_stated_budgetary"},
-        "automation": {"value": null, "status": "missing"},
-        "pressure_recording": {"value": null, "status": "missing"},
-        "fat_and_reference_machine": {"value": null, "status": "missing_blocker"},
-        "power_and_utilities": {"value": null, "status": "missing"},
-        "price": {"value": "CNY 3400000", "status": "budgetary"},
-        "incoterm": {"value": "FOB Tianjin", "status": "budgetary"},
-        "lead_time": {"value": null, "status": "missing"},
-        "payment_terms": {"value": null, "status": "missing"},
-        "warranty": {"value": null, "status": "missing"},
-        "installation_training": {"value": null, "status": "missing"},
-        "iran_supply_support": {"value": null, "status": "missing"}
+        "od_range": {
+          "value": "project discussion 89-180 mm",
+          "status": "buyer_request_not_supplier_guarantee"
+        },
+        "wall_thickness_range": {
+          "value": null,
+          "status": "missing_blocker"
+        },
+        "length_range": {
+          "value": null,
+          "status": "missing_blocker"
+        },
+        "pressure_capability": {
+          "value": "custom machine discussed around 120 MPa target",
+          "status": "budgetary_not_engineering_verified"
+        },
+        "pressure_envelope_vs_geometry": {
+          "value": null,
+          "status": "missing_blocker"
+        },
+        "hold_time": {
+          "value": null,
+          "status": "missing"
+        },
+        "axial_restraint": {
+          "value": null,
+          "status": "missing_blocker"
+        },
+        "sealing_method": {
+          "value": null,
+          "status": "missing"
+        },
+        "cycle_time_or_throughput": {
+          "value": "1 pc/min",
+          "status": "supplier_stated_budgetary"
+        },
+        "automation": {
+          "value": null,
+          "status": "missing"
+        },
+        "pressure_recording": {
+          "value": null,
+          "status": "missing"
+        },
+        "fat_and_reference_machine": {
+          "value": null,
+          "status": "missing_blocker"
+        },
+        "power_and_utilities": {
+          "value": null,
+          "status": "missing"
+        },
+        "price": {
+          "value": "CNY 3400000",
+          "status": "budgetary"
+        },
+        "incoterm": {
+          "value": "FOB Tianjin",
+          "status": "budgetary"
+        },
+        "lead_time": {
+          "value": null,
+          "status": "missing"
+        },
+        "payment_terms": {
+          "value": null,
+          "status": "missing"
+        },
+        "warranty": {
+          "value": null,
+          "status": "missing"
+        },
+        "installation_training": {
+          "value": null,
+          "status": "missing"
+        },
+        "iran_supply_support": {
+          "value": null,
+          "status": "missing"
+        }
       }
     },
     {
       "supplier_id": "gh-petro",
       "qualification_state": "quotation_received_requires_rev1_2_compliance",
-      "evidence_refs": ["1a0154f33233ec08", "Quotation for HPG-180 Hydrostatic Testing Machine", "1a027fe3df0fb2ab"],
+      "evidence_refs": [
+        "1a0154f33233ec08",
+        "Quotation for HPG-180 Hydrostatic Testing Machine",
+        "1a027fe3df0fb2ab"
+      ],
       "fields": {
-        "od_range": {"value": "89-180 mm", "status": "quoted"},
-        "wall_thickness_range": {"value": null, "status": "missing_blocker"},
-        "length_range": {"value": null, "status": "missing_blocker"},
-        "pressure_capability": {"value": "HPG-180 maximum 120 MPa", "status": "quoted_not_engineering_verified"},
-        "pressure_envelope_vs_geometry": {"value": null, "status": "missing_blocker"},
-        "hold_time": {"value": null, "status": "missing"},
-        "axial_restraint": {"value": null, "status": "missing_blocker"},
-        "sealing_method": {"value": null, "status": "missing"},
-        "cycle_time_or_throughput": {"value": "60 pipes/hour requested in Rev.1.2; supplier confirmation pending", "status": "buyer_request_pending_supplier_reconfirmation"},
-        "automation": {"value": null, "status": "missing"},
-        "pressure_recording": {"value": null, "status": "missing"},
-        "fat_and_reference_machine": {"value": null, "status": "missing_blocker"},
-        "power_and_utilities": {"value": null, "status": "missing"},
-        "price": {"value": "USD 542800", "status": "quoted_non_final_subject_to_final_specification"},
-        "incoterm": {"value": "FOB Dalian", "status": "quoted"},
-        "lead_time": {"value": "120 days", "status": "quoted"},
-        "payment_terms": {"value": "30% T/T advance; 70% T/T before shipment", "status": "quoted"},
-        "warranty": {"value": null, "status": "pending"},
-        "installation_training": {"value": "quotation note states on-site installation and commissioning fees included", "status": "quoted_scope_needs_clarification"},
-        "iran_supply_support": {"value": "supplier stated confidence supplying Iran with after-sales support", "status": "supplier_stated"}
+        "od_range": {
+          "value": "89-180 mm",
+          "status": "quoted"
+        },
+        "wall_thickness_range": {
+          "value": null,
+          "status": "missing_blocker"
+        },
+        "length_range": {
+          "value": null,
+          "status": "missing_blocker"
+        },
+        "pressure_capability": {
+          "value": "HPG-180 maximum 120 MPa",
+          "status": "quoted_not_engineering_verified"
+        },
+        "pressure_envelope_vs_geometry": {
+          "value": null,
+          "status": "missing_blocker"
+        },
+        "hold_time": {
+          "value": null,
+          "status": "missing"
+        },
+        "axial_restraint": {
+          "value": null,
+          "status": "missing_blocker"
+        },
+        "sealing_method": {
+          "value": null,
+          "status": "missing"
+        },
+        "cycle_time_or_throughput": {
+          "value": "60 pipes/hour requested in Rev.1.2; supplier confirmation pending",
+          "status": "buyer_request_pending_supplier_reconfirmation"
+        },
+        "automation": {
+          "value": null,
+          "status": "missing"
+        },
+        "pressure_recording": {
+          "value": null,
+          "status": "missing"
+        },
+        "fat_and_reference_machine": {
+          "value": null,
+          "status": "missing_blocker"
+        },
+        "power_and_utilities": {
+          "value": null,
+          "status": "missing"
+        },
+        "price": {
+          "value": "USD 542800",
+          "status": "quoted_non_final_subject_to_final_specification"
+        },
+        "incoterm": {
+          "value": "FOB Dalian",
+          "status": "quoted"
+        },
+        "lead_time": {
+          "value": "120 days",
+          "status": "quoted"
+        },
+        "payment_terms": {
+          "value": "30% T/T advance; 70% T/T before shipment",
+          "status": "quoted"
+        },
+        "warranty": {
+          "value": null,
+          "status": "pending"
+        },
+        "installation_training": {
+          "value": "quotation note states on-site installation and commissioning fees included",
+          "status": "quoted_scope_needs_clarification"
+        },
+        "iran_supply_support": {
+          "value": "supplier stated confidence supplying Iran with after-sales support",
+          "status": "supplier_stated"
+        }
       }
     }
   ],
   "intermediary_routes": [
-    {"channel_id": "suppliertr-yakup", "status": "identity_gate_hold", "action": "Evaluate Rev.1.2 proposal while preventing duplicate OEM contact; underlying OEM identity remains unresolved.", "evidence_ref": "1a0280075ccbe042"},
-    {"channel_id": "yedi-mavi-ali", "status": "identity_gate_hold_collision_signal", "action": "Do not expand Turkish outreach until channel/OEM overlap is clarified.", "evidence_ref": "1a024073bfa91b65"},
-    {"channel_id": "anz-global", "status": "identity_gate_hold", "action": "Use Rev.1.2; require OEM identity before duplicate outreach. Pipe-end condition remains buyer-open.", "evidence_ref": "1a02800565002064"},
-    {"channel_id": "sinoqat", "status": "identity_gate_hold", "action": "Require OEM identity before distribution.", "evidence_ref": "1a01ffb633f08224"}
+    {
+      "channel_id": "suppliertr-yakup",
+      "status": "identity_gate_hold",
+      "action": "Evaluate Rev.1.2 proposal while preventing duplicate OEM contact; underlying OEM identity remains unresolved.",
+      "evidence_ref": "1a0280075ccbe042"
+    },
+    {
+      "channel_id": "yedi-mavi-ali",
+      "status": "identity_gate_hold_collision_signal",
+      "action": "Do not expand Turkish outreach until channel/OEM overlap is clarified.",
+      "evidence_ref": "1a024073bfa91b65"
+    },
+    {
+      "channel_id": "anz-global",
+      "status": "identity_gate_hold",
+      "action": "Use Rev.1.2; require OEM identity before duplicate outreach. Pipe-end condition remains buyer-open.",
+      "evidence_ref": "1a02800565002064"
+    },
+    {
+      "channel_id": "sinoqat",
+      "status": "identity_gate_hold",
+      "action": "Require OEM identity before distribution.",
+      "evidence_ref": "1a01ffb633f08224"
+    }
   ],
   "current_decision": {
     "shortlist": [],
-    "conditional": ["marley-wuxi", "yaxing-dezhou", "gh-petro"],
+    "conditional": [
+      "marley-wuxi",
+      "yaxing-dezhou",
+      "gh-petro"
+    ],
     "selected_supplier": null,
     "reason": "Rev.1.2 supersedes prior dimensional basis. No candidate is technically qualified until it reconfirms the final 6-20 mm wall thickness, 9-12 m length, 60 pipes/hour basis and provides the required geometry-pressure envelope and engineering evidence."
-  }
+  },
+  "excluded_or_parked": [
+    {
+      "supplier_id": "boyu-petro",
+      "status": "parked_no_further_action",
+      "reason": "buyer explicitly instructed no further Boyu pursuit for now",
+      "reactivation_rule": "only on explicit buyer instruction",
+      "_ported_from": "feature/p0-benchmark-pair-v0-1's v0_1 matrix, 2026-09-19, per Reza's explicit confirmation this status still holds"
+    }
+  ]
 }

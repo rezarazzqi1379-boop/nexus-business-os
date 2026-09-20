@@ -77,11 +77,17 @@ class SupervisorTests(unittest.TestCase):
         self.assertEqual(self.t.phase, Phase.RUNNING)
         self.assertEqual(self.t.cost_units, 4)
 
-    def test_human_approval_cannot_be_skipped(self):
+    def test_human_approval_contract_fails_closed_without_exact_consumer(self):
         self.t = TaskRecord("hydro-002", contract(requires_human_approval=True))
         self.produced()
         self.assertEqual(self.s.verify(self.t, claim()), Phase.REJECTED)
-        self.assertIn("human_approval_missing", self.t.reasons)
+        self.assertIn("exact_human_approval_consumer_not_implemented", self.t.reasons)
+
+    def test_truthy_boolean_cannot_impersonate_exact_approval(self):
+        self.t = TaskRecord("hydro-003", contract(requires_human_approval=True))
+        self.produced()
+        self.assertEqual(self.s.verify(self.t, claim(human_approved=True)), Phase.REJECTED)
+        self.assertIn("exact_human_approval_consumer_not_implemented", self.t.reasons)
 
 
 if __name__ == "__main__":

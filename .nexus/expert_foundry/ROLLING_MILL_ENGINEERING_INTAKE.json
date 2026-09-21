@@ -11,13 +11,33 @@
     },
     "target": {
       "width_options_mm": [
-        300
+        300,
+        400
       ],
       "thickness_range_mm": {
         "min": 8,
+        "max": 30
+      },
+      "standard": {
+        "named_by_engineer": "EN 10058",
+        "applicability": "REFUTED_FOR_THIS_WIDTH",
+        "finding": "EN 10058:2018 max nominal width is 200 mm. 300/400/600 mm are outside its scope.",
+        "candidate_applicable": "DIN 59200:2001-05 (t>=4 mm, 150<b<=1250 mm); EN 10029:2010 at w>=600 mm; EN 10163-2 for surface condition",
+        "status": "NOT_YET_PURCHASED - no official tolerance table obtained"
+      },
+      "_previous_width_options_mm": [
+        300
+      ],
+      "_previous_thickness_range_mm": {
+        "min": 8,
         "max": 25
       },
-      "standard": null
+      "future_width_options_mm": [
+        600
+      ],
+      "surface_condition": "black / as-rolled (CLAIM; not a defined term in EN 10163)",
+      "weldability": "good (CLAIM; no grade, no CEV, no test named)",
+      "_change_note": "2026-09-21: extended by the engineer's requirement note. Previous values preserved in the _previous_* keys. Nothing overwritten silently."
     }
   },
   "mill": {
@@ -253,6 +273,139 @@
       "verification_state": "VERIFIED",
       "evidence_locator": "whatsapp:sanami-engineer:2026-09-15+16 (relayed by Reza 2026-09-16)",
       "_batch": "2026-09-16 engineer answers"
+    },
+    {
+      "claim_id": "claim_width_400",
+      "raw_text": "عرض ۳۰۰ و ۴۰۰ میلی‌متر",
+      "meaning": "Target product width set EXTENDED to {300, 400} mm. 400 mm is entirely new; the previously recorded set was [300].",
+      "unit": "mm",
+      "verification_state": "CLAIM",
+      "evidence_locator": "engineer requirement note, relayed by owner 2026-09-21",
+      "_batch": "2026-09-21 engineer requirement note",
+      "contradiction_id": "C-07",
+      "note": "EXTENSION, not correction. The previous value [300] is retained. Wusatowski free spread from a 150 mm billet tops out at 186 mm (ratio 1.24); 400 mm demands ratio 2.67. Not reachable from the current feedstock - see ENGINEER_REQUIREMENT_ANALYSIS_2026-09-21.md section 5."
+    },
+    {
+      "claim_id": "claim_thickness_30",
+      "raw_text": "ضخامت ۸ تا ۳۰ میلی‌متر",
+      "meaning": "Target thickness range EXTENDED to 8-30 mm. Previously recorded max was 25 mm.",
+      "unit": "mm",
+      "verification_state": "CLAIM",
+      "evidence_locator": "engineer requirement note, relayed by owner 2026-09-21",
+      "_batch": "2026-09-21 engineer requirement note",
+      "contradiction_id": "C-08",
+      "note": "EXTENSION, not correction. Previous {8,25} retained."
+    },
+    {
+      "claim_id": "claim_width_600_future",
+      "raw_text": "توسعه‌ی آینده به عرض ۶۰۰",
+      "meaning": "Future expansion target: 600 mm width. No date, no commitment level stated.",
+      "unit": "mm",
+      "verification_state": "CLAIM",
+      "evidence_locator": "engineer requirement note, relayed by owner 2026-09-21",
+      "_batch": "2026-09-21 engineer requirement note",
+      "note": "Reduction ratio from the current 150x150 billet to 600x30 is only 1.25. Metallurgically inadequate from as-cast feed."
+    },
+    {
+      "claim_id": "claim_standard_en10058",
+      "raw_text": "تلرانس ابعادی مطابق EN 10058",
+      "meaning": "Engineer names EN 10058 as the dimensional tolerance standard.",
+      "unit": null,
+      "verification_state": "CLAIM_REFUTED_IN_PART",
+      "evidence_locator": "engineer requirement note, relayed by owner 2026-09-21",
+      "_batch": "2026-09-21 engineer requirement note",
+      "note": "RESEARCH FINDING 2026-09-21: EN 10058:2018 covers flat bars 10-150 mm wide and wide flats 160/170/180/200 mm only. Maximum nominal width anywhere in the document is 200 mm. 300/400/600 mm are OUTSIDE its scope. DIN 59200:2001-05 (t>=4 mm, 150<b<=1250 mm) is the only standard found covering the full target range. EN 10029 applies only at w>=600 mm. Surface condition is governed by EN 10163-2 (plate and wide flats, 3<=t<=400 mm)."
+    },
+    {
+      "claim_id": "claim_surface_black",
+      "raw_text": "سطح سیاه / as-rolled",
+      "meaning": "Surface condition required: black / as-rolled.",
+      "unit": null,
+      "verification_state": "CLAIM",
+      "evidence_locator": "engineer requirement note, relayed by owner 2026-09-21",
+      "_batch": "2026-09-21 engineer requirement note",
+      "note": "'Black' is NOT a defined term in EN 10163. EN 10163-2 governs discontinuities and repairs, defaulting to Class A / subclass 1 unless the order says otherwise."
+    },
+    {
+      "claim_id": "claim_weldability",
+      "raw_text": "جوش‌پذیری خوب",
+      "meaning": "Good weldability required.",
+      "unit": null,
+      "verification_state": "CLAIM",
+      "evidence_locator": "engineer requirement note, relayed by owner 2026-09-21",
+      "_batch": "2026-09-21 engineer requirement note",
+      "note": "No grade, no CEV, no test method stated. Interacts with reduction ratio: low reduction from as-cast feed carries centreline segregation into the product."
+    },
+    {
+      "claim_id": "claim_temperature_profile",
+      "raw_text": "۱۲۵۰ خروج کوره / ۱۲۰۰ رافینگ / ۱۰۵۰ میانی / ۹۵۰ فینیش / ۸۰۰ خروج",
+      "meaning": "Five-point temperature profile DECLARED BY THE ENGINEER as targets.",
+      "unit": "C",
+      "verification_state": "CLAIM_TARGET_NOT_MEASUREMENT",
+      "evidence_locator": "engineer requirement note, relayed by owner 2026-09-21",
+      "_batch": "2026-09-21 engineer requirement note",
+      "note": "DOES NOT CLOSE the open unknown 'process_temperature', which asks what the steel actually is today. No pyrometer reading of this line exists. Modelling 2026-09-21: the declared 1250->1200 drop over 12 m is reachable only at ~0.27 m/s transfer; at 1 m/s physics gives 15 K. Billet Biot number is 0.28, so surface and mean are different numbers and a pyrometer reads the surface."
+    },
+    {
+      "claim_id": "claim_furnace_20tph",
+      "raw_text": "ظرفیت کوره ۲۰ تن بر ساعت، نوع pusher",
+      "meaning": "Furnace: 20 t/h capacity, pusher type. First furnace datum of any kind on record.",
+      "unit": "t/h",
+      "verification_state": "CLAIM",
+      "evidence_locator": "engineer requirement note, relayed by owner 2026-09-21",
+      "_batch": "2026-09-21 engineer requirement note",
+      "note": "NOT the line capacity. Mill cycle computes 34-42 t/h on thick product (furnace-limited) and 15 t/h on 8 mm product (mill-limited). The bottleneck identity inverts if handling time is 12 s/pass rather than the assumed 6 s/pass - which has never been measured."
+    },
+    {
+      "claim_id": "claim_furnace_walking_beam_pref",
+      "raw_text": "ترجیح walking beam",
+      "meaning": "Engineer PREFERS a walking beam furnace over the existing pusher.",
+      "unit": null,
+      "verification_state": "CLAIM_PREFERENCE",
+      "evidence_locator": "engineer requirement note, relayed by owner 2026-09-21",
+      "_batch": "2026-09-21 engineer requirement note",
+      "note": "Preference, not requirement. Analysis 2026-09-21 supports it, but on grounds the engineer did not state: charge-length flexibility. The 8-30 mm x 300-600 mm product envelope needs billet lengths from 1.3 m to 10 m for a 12 m bar; a pusher is a continuous train of equal pieces."
+    },
+    {
+      "claim_id": "claim_layout_12m_21m",
+      "raw_text": "کوره تا رافینگ ۱۲ متر، رافینگ تا استند دوم ۲۱ متر",
+      "meaning": "Layout distances: furnace to roughing 12 m; roughing to second stand 21 m.",
+      "unit": "m",
+      "verification_state": "CLAIM",
+      "evidence_locator": "engineer requirement note, relayed by owner 2026-09-21",
+      "_batch": "2026-09-21 engineer requirement note",
+      "note": "Entirely new data. At 300x8 mm the product is 29.5 m long - longer than the 21 m gap. Geometric constraint on the thin end of the product envelope."
+    },
+    {
+      "claim_id": "claim_roll_500_ambiguous",
+      "raw_text": "دور غلتک می‌تواند ۵۰۰ باشد",
+      "meaning": "AMBIGUOUS. 'dowr' in Persian may mean rotational speed, circumference, or (loosely) diameter. Probable reading: roll diameter 500 mm - NOT CONFIRMED.",
+      "unit": "mm?",
+      "verification_state": "AMBIGUOUS_UNRESOLVED",
+      "evidence_locator": "engineer requirement note, relayed by owner 2026-09-21",
+      "_batch": "2026-09-21 engineer requirement note",
+      "contradiction_id": "C-09",
+      "note": "Collides with the CAD-measured 518 mm MEASUREMENT on record, and with C-01 (518/520/550) and C-04 ('same speed 550'). Per the kernel rule a CLAIM may not displace a MEASUREMENT: 518 remains the ACTIVE value. Owner decides. Seven calculations are STALE until resolved."
+    },
+    {
+      "claim_id": "claim_expansion_roll_650_700",
+      "raw_text": "برای ۶۰۰، قطر ۶۵۰–۷۰۰ مناسب‌تر است",
+      "meaning": "Engineer OPINION: for 600 mm product a roll diameter of 650-700 mm is more suitable. Recorded against a hypothetical FUTURE_STAND, not against the installed roll.",
+      "unit": "mm",
+      "verification_state": "CLAIM_OPINION",
+      "evidence_locator": "engineer requirement note, relayed by owner 2026-09-21",
+      "_batch": "2026-09-21 engineer requirement note",
+      "note": "CALCULATED 2026-09-21: going 518 -> 700 mm raises roll force 24%, torque 44%, power 44% and neck stress 24% at the same pass. A larger diameter does NOT make 600 mm easier - it shifts the mechanical limit. What it does buy is bite capacity: max draft rises 23.3 -> 31.5 mm, i.e. fewer passes. The instinct is right; the stated reason is not."
+    },
+    {
+      "claim_id": "claim_expansion_barrel_800",
+      "raw_text": "بشکه ۸۰۰ برای ۶۰۰",
+      "meaning": "Engineer OPINION: an 800 mm barrel is more suitable for 600 mm product. Note this is SHORTER than the installed 1280 mm barrel.",
+      "unit": "mm",
+      "verification_state": "CLAIM_OPINION_SUPPORTED",
+      "evidence_locator": "engineer requirement note, relayed by owner 2026-09-21",
+      "_batch": "2026-09-21 engineer requirement note",
+      "note": "CALCULATED 2026-09-21: at 600 mm width, barrel deflection is 0.333 mm with the 1280 mm barrel and 0.100 mm with an 800 mm barrel - 3.3x better. The shortening IS the point: a 1280 mm barrel carrying a 600 mm strip has 340 mm of unloaded overhang each side. This is the strongest engineering judgement in the requirement. It implies a DEDICATED stand, not a modification."
     }
   ],
   "project_aliases": [
@@ -455,6 +608,100 @@
       "must_resolve_before": "fabrication",
       "note": "Decisive for any widening decision: computed neck bending stress at 300mm width is ~159 MPa, acceptable for a forged steel roll but out of range for cast iron.",
       "resolution_method": "Roll certificate, or a hardness test on the barrel."
+    },
+    {
+      "id": "C-07",
+      "parameter": "target product width set",
+      "readings": [
+        {
+          "value": [
+            300
+          ],
+          "evidence_class": "CLAIM",
+          "source": "engineer 2026-09-16"
+        },
+        {
+          "value": [
+            300,
+            400
+          ],
+          "evidence_class": "CLAIM",
+          "source": "engineer 2026-09-21"
+        }
+      ],
+      "recorded_value": [
+        300,
+        400
+      ],
+      "blocks_concept_design": false,
+      "must_resolve_before": "fabrication",
+      "note": "EXTENSION rather than conflict, but recorded as a contradiction because dependent calculations were built on [300] alone and are now STALE.",
+      "resolution_method": "Owner confirms the target set; then re-run the width-capability and caliber analysis."
+    },
+    {
+      "id": "C-08",
+      "parameter": "target thickness range",
+      "readings": [
+        {
+          "value": {
+            "min": 8,
+            "max": 25
+          },
+          "evidence_class": "CLAIM",
+          "source": "engineer 2026-09-16"
+        },
+        {
+          "value": {
+            "min": 8,
+            "max": 30
+          },
+          "evidence_class": "CLAIM",
+          "source": "engineer 2026-09-21"
+        }
+      ],
+      "recorded_value": {
+        "min": 8,
+        "max": 30
+      },
+      "blocks_concept_design": false,
+      "must_resolve_before": "fabrication",
+      "note": "Max extended 25 -> 30 mm. Energy, pass-count and grade comparisons computed at a 25 mm ceiling are STALE.",
+      "resolution_method": "Owner confirms; re-run the pass-schedule and energy tables."
+    },
+    {
+      "id": "C-09",
+      "parameter": "roll barrel diameter (fourth reading)",
+      "readings": [
+        {
+          "value": 518,
+          "unit": "mm",
+          "evidence_class": "MEASUREMENT",
+          "source": "CAD drawing"
+        },
+        {
+          "value": 520,
+          "unit": "mm",
+          "evidence_class": "CLAIM",
+          "source": "engineer verbal"
+        },
+        {
+          "value": 550,
+          "unit": "mm",
+          "evidence_class": "CLAIM",
+          "source": "engineer verbal"
+        },
+        {
+          "value": 500,
+          "unit": "mm?",
+          "evidence_class": "CLAIM_AMBIGUOUS",
+          "source": "engineer requirement note 2026-09-21"
+        }
+      ],
+      "recorded_value": 518,
+      "blocks_concept_design": false,
+      "must_resolve_before": "fabrication",
+      "note": "Fourth value for one diameter. The Persian phrase 'dowr-e ghaltak mitavanad 500 bashad' does not unambiguously mean diameter. Per the kernel rule a CLAIM may not displace a MEASUREMENT, so 518 remains ACTIVE. STALE: contact_length, bite_limit, surface_speed, roll_force, torque, power, barrel_deflection.",
+      "resolution_method": "Ask the engineer what 'dowr' meant; independently put a caliper on the roll."
     }
   ],
   "evidence_log": [
@@ -476,7 +723,56 @@
       "schema_decision": "Kept main's schema so rolling_mill_intake.py's REQUIRED_PATHS and MEASUREMENT_PATHS keep working; the branch's competing schema would have silently broken the gate.",
       "preservation": "All nine 2026-09-14 claims retained under superseded_claims_2026_09_14; every contradictory reading retained under open_contradictions. Nothing deleted.",
       "gate_effect": "No claim was marked VERIFIED. The retrospective-calculation gate therefore remains CLOSED, which is correct - furnace data, process temperature, equipment limits, safety verification and a historical run are all still missing."
+    },
+    {
+      "date": "2026-09-21",
+      "actor": "Claude (Cowork session, at owner's instruction)",
+      "action": "Ingested the engineer's 2026-09-21 requirement note as 13 new CLAIMs; opened contradictions C-07, C-08, C-09; extended the product target without overwriting; recorded the first furnace, layout and declared-temperature records.",
+      "basis": "steel_kernel.ingest_new_evidence via steel_intake_runner.ingest_batch: 14 accepted, 0 rejected, 3 contradictions, 7 calculations STALE, 1 unknown (furnace) closed, 11 still open.",
+      "outcome": "No gate opened. concept_calculation_allowed remains True; fabrication_release_allowed remains False. Analysis written to docs/expert_foundry/ENGINEER_REQUIREMENT_ANALYSIS_2026-09-21.md.",
+      "key_finding": "EN 10058 does not cover 300/400/600 mm width - its maximum is 200 mm."
     }
   ],
-  "_claims_note": "Single append-only claim register. The 2026-09-14 batch and the 2026-09-16 batch are both here, distinguished by _batch, because rolling_mill_intake.py resolves AMBIGUOUS_CLAIM_IDS against this array alone - holding a superseded batch in a separate key would make those claims permanently unresolvable by the gate. Superseded and contradicted claims keep their original raw_text verbatim and are never deleted."
+  "_claims_note": "Single append-only claim register. The 2026-09-14 batch and the 2026-09-16 batch are both here, distinguished by _batch, because rolling_mill_intake.py resolves AMBIGUOUS_CLAIM_IDS against this array alone - holding a superseded batch in a separate key would make those claims permanently unresolvable by the gate. Superseded and contradicted claims keep their original raw_text verbatim and are never deleted.",
+  "layout": {
+    "furnace_to_roughing_m": {
+      "value": 12,
+      "evidence_class": "CLAIM",
+      "source": "engineer requirement note, relayed by owner 2026-09-21"
+    },
+    "roughing_to_stand2_m": {
+      "value": 21,
+      "evidence_class": "CLAIM",
+      "source": "engineer requirement note, relayed by owner 2026-09-21"
+    },
+    "_note": "New in 2026-09-21. At 300x8 mm the product is 29.5 m - longer than the 21 m gap."
+  },
+  "furnace": {
+    "type": {
+      "value": "pusher",
+      "evidence_class": "CLAIM",
+      "source": "engineer requirement note, relayed by owner 2026-09-21"
+    },
+    "rated_capacity_t_per_h": {
+      "value": 20,
+      "evidence_class": "CLAIM",
+      "source": "engineer requirement note, relayed by owner 2026-09-21",
+      "warning": "This is an EQUIPMENT rating, not the line capacity. Never quote it as the line's real capacity."
+    },
+    "engineer_preference": {
+      "value": "walking beam",
+      "evidence_class": "CLAIM_PREFERENCE",
+      "source": "engineer requirement note, relayed by owner 2026-09-21"
+    }
+  },
+  "declared_temperature_profile": {
+    "furnace_exit_c": 1250,
+    "roughing_entry_c": 1200,
+    "intermediate_stand_c": 1050,
+    "finish_entry_c": 950,
+    "line_exit_c": 800,
+    "evidence_class": "CLAIM_TARGET",
+    "source": "engineer requirement note, relayed by owner 2026-09-21",
+    "_note": "TARGETS declared by the engineer. Does NOT close the open unknown 'process_temperature'. No pyrometer reading of this line exists."
+  }
 }

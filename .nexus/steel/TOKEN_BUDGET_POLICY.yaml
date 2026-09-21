@@ -1,0 +1,33 @@
+# سیاست بودجه‌ی توکن
+version: 0.1
+
+classes:
+  T1:
+    scope: یک مقدار ثبت‌شده یا یک وضعیت
+    reads: [CHECKPOINT, intake رکوردهای مستقیم]
+    agents: 0
+    live_research: false
+  T2:
+    scope: تحلیل فنی یا تغییر کد
+    reads: [CHECKPOINT, project state, ماژول مرتبط]
+    agents: حداکثر ۱
+    live_research: false
+  T3:
+    scope: تصمیم مهم یا پژوهش پیچیده
+    reads: [منابع مرتبط به‌طور کامل]
+    agents: حداکثر ۳ نقش مستقل
+    live_research: true
+
+reduction_rules:
+  - کل چت دوباره خوانده نمی‌شود.
+  - اول index و خلاصه؛ سپس بخش مرتبط با locator دقیق.
+  - خروجی agent به ساختار فشرده تبدیل می‌شود، نه ذخیره‌ی خام در context.
+  - محاسبه‌ی عددی با کد انجام می‌شود، نه استدلال متنی طولانی.
+  - وقتی شواهد کافی شد، جست‌وجو متوقف می‌شود.
+  - تعداد agent معیار کیفیت نیست.
+
+observed_costs_2026_09:
+  market_research_agent: ~180k توکن هر اجرا
+  prior_art_benchmark_agent: ~233k
+  independent_reviewer: ~63k
+  note: بازبین مستقل ارزان‌ترین و پربازده‌ترین بود — دو بار طرح را رد کرد.

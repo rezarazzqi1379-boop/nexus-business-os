@@ -1,0 +1,61 @@
+# Context Router — کدام درخواست چه چیزی را فعال می‌کند
+# پیاده‌سازی قطعی در steel_kernel.ROUTES ؛ این فایل همان را خوانا می‌کند.
+version: 0.1
+project_id: rolling_mill_strip_300_pilot
+
+routes:
+  lookup:
+    token_class: T1
+    capabilities: [checkpoint, intake]
+    live_research: false
+    independent_review: false
+    action_gate: none
+    note: یک مقدار ثبت‌شده. بدون agent، بدون پژوهش.
+
+  calculation:
+    token_class: T2
+    capabilities: [intake, steel_action_gates, rolling_line_concept]
+    live_research: false
+    independent_review: false
+    action_gate: concept_calculation_allowed
+    note: کد را اجرا کن. استدلال عددی طولانی در متن ممنوع.
+
+  major_decision:
+    token_class: T3
+    capabilities: [intake, steel_action_gates, rolling_line_concept, independent_reviewer]
+    live_research: true
+    independent_review: true
+    action_gate: fabrication_release_allowed
+    note: بازبینی مستقل اجباری است.
+
+  market:
+    token_class: T3
+    capabilities: [market_register, steel_intelligence_agent]
+    live_research: true
+    independent_review: false
+    action_gate: none
+    note: پیش از هر تصمیم اقتصادی تازه‌سازی کن. هیچ‌چیز ارسال نمی‌شود.
+
+  invention:
+    token_class: T3
+    capabilities: [failure_memory, prior_art_register, steel_intelligence_agent, independent_reviewer]
+    live_research: true
+    independent_review: true
+    action_gate: none
+    note: prior art پیش از نامیدن هر چیز به‌عنوان اختراع.
+
+  new_engineer_data:
+    token_class: T2
+    capabilities: [intake, steel_action_gates]
+    live_research: false
+    independent_review: false
+    action_gate: none
+    note: ingest_new_evidence را اجرا کن. هرگز بی‌صدا overwrite نکن.
+
+  code:
+    token_class: T2
+    capabilities: [git_fetch, tests]
+    live_research: false
+    independent_review: false
+    action_gate: merge_to_protected_branch
+    note: اول fetch. فقط branch. بدون merge.

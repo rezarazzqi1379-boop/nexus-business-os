@@ -1,0 +1,23 @@
+# سیاست تازگی — TTL بر حسب روز. پیاده‌سازی در steel_kernel.TTL_DAYS
+version: 0.1
+
+stable_no_ttl:   # اینها منقضی نمی‌شوند
+  [drawing, measurement, physics, nameplate, geometry, chemistry]
+
+dynamic_ttl_days:
+  price: 14                 # پیش از هر تصمیم اقتصادی
+  market: 30
+  supplier: 60
+  technology: 120
+  patent: 180
+  standard: 365             # پیش از طراحی نهایی کنترل شود
+  git_state: 0              # همیشه پیش از هر عملیات کد fetch
+  production_rate: 30
+  deployment_state: 1
+
+classes: [STABLE, FRESH, AGING, STALE]
+rules:
+  - داده‌ی منقضی حذف نمی‌شود؛ برچسب STALE می‌گیرد.
+  - داده‌ی STALE در تصمیم مهم استفاده‌ی قطعی نمی‌شود.
+  - مسیرهایی که live_research می‌خواهند، روی داده‌ی STALE مسدود می‌شوند.
+  - موضوع بدون سیاست TTL، fail loud می‌کند؛ FRESH فرض نمی‌شود.

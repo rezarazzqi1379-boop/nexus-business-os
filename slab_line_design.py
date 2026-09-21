@@ -622,3 +622,145 @@ def gearbox_centre_distance_mm(ratio: float, module_mm: float, pinion_teeth: int
         raise ValueError("ratio, module and tooth count must be positive")
     z2 = ratio * pinion_teeth
     return module_mm * (pinion_teeth + z2) / 2.0
+
+
+# ---------------------------------------------------------------------------
+# 9. CORRECTIONS ADDED 2026-09-21 AFTER EXTERNAL REVIEW
+# ---------------------------------------------------------------------------
+# Three of the review's points were reproduced against the model and confirmed
+# as errors in the first issue of this study. They are fixed here rather than
+# patched in prose, and each carries a regression test.
+
+MILL_MODULUS_MN_PER_MM = (3.0, 8.0)
+# ASSUMPTION - plausible range for a two-high stand of this size. The mill
+# modulus is the WHOLE stand: housing stretch, screws and nuts, chock
+# clearance, bearing oil film and Hertzian flattening at the roll contact.
+# It is measured by closing the rolls on themselves and reading the screw
+# position against load - a half-day test. Until it is measured it is UNKNOWN.
+
+
+def stand_stretch_mm(force_n: float, mill_modulus_mn_per_mm: float) -> float:
+    """Total stand deflection under roll separating force. This is the number
+    that governs thickness control, NOT the barrel bending."""
+    if mill_modulus_mn_per_mm <= 0:
+        raise ValueError("mill modulus must be positive")
+    return force_n / 1e6 / mill_modulus_mn_per_mm
+
+
+def roll_centre_distance_mm(exit_thickness_mm: float,
+                            diameter_mm: float = ROLL_DIAMETER_MM) -> float:
+    """Centre distance of the two work rolls during a pass = D + gap, and the
+    gap is that pass's EXIT thickness."""
+    if exit_thickness_mm < 0:
+        raise ValueError("thickness must be non-negative")
+    return diameter_mm + exit_thickness_mm
+
+
+def roll_centre_range_mm(passes: list[Pass], diameter_mm: float = ROLL_DIAMETER_MM,
+                         include_entry: bool = True) -> tuple[float, float]:
+    """The FULL range across a schedule, first pass included.
+
+    The first issue of this study tabulated only the finishing gaps (6-30 mm)
+    and concluded the spindle angle stayed under 1 degree. The roughing passes,
+    where the gap is 80-125 mm, were omitted, and there the angle reaches 1.6-2
+    degrees. Caught by external review.
+    """
+    gaps = [p.exit_h for p in passes]
+    if include_entry:
+        gaps.append(passes[0].entry_h)
+    return diameter_mm + min(gaps), diameter_mm + max(gaps)
+
+
+def optimal_pinion_centre_mm(passes: list[Pass], diameter_new_mm: float = ROLL_DIAMETER_MM,
+                             diameter_worn_mm: float | None = None) -> dict:
+    """Minimise the WORST spindle offset across the whole operating range.
+
+    For a symmetric penalty the optimum is the midpoint of the range, because
+    the offset is |centre - pinion_centre| and the max of that over an interval
+    is minimised at its midpoint.
+    """
+    lo, hi = roll_centre_range_mm(passes, diameter_new_mm)
+    if diameter_worn_mm:
+        lo2, hi2 = roll_centre_range_mm(passes, diameter_worn_mm)
+        lo, hi = min(lo, lo2), max(hi, hi2)
+    mid = (lo + hi) / 2.0
+    return {"range_low_mm": lo, "range_high_mm": hi,
+            "optimal_centre_mm": mid, "max_offset_mm": (hi - lo) / 2.0}
+
+
+def inertia_at_motor_kgm2(gear_ratio: float, n_rolls: int = 2,
+                          motor_rotor_j: float = 400.0,
+                          drivetrain_j: float = 50.0,
+                          diameter_mm: float = ROLL_DIAMETER_MM,
+                          barrel_mm: float = BARREL_LENGTH_MM,
+                          neck_allowance: float = 1.20) -> float:
+    """J referred to the motor shaft. motor_rotor_j is an ASSUMPTION for a
+    ~1600 kW / 400 rpm DC mill machine (GD^2/4); the nameplate replaces it."""
+    r = diameter_mm / 2000.0
+    mass = math.pi * r ** 2 * (barrel_mm / 1000.0) * RHO * neck_allowance
+    j_roll = 0.5 * mass * r ** 2
+    return motor_rotor_j + drivetrain_j + n_rolls * j_roll / gear_ratio ** 2
+
+
+@dataclass(frozen=True)
+class MotorDuty:
+    rolling_rms_nm: float
+    accel_torque_nm: float
+    worst_simultaneous_nm: float
+    thermal_rms_nm: float
+    base_torque_nm: float
+    thermal_utilisation: float
+    peak_utilisation: float
+    reversals_per_hour: float
+    verdict: str
+
+
+def motor_duty(passes: list[Pass], rated_kw: float, base_rpm: float,
+               gear_ratio: float, cycle_seconds: float,
+               slabs_per_hour: float, accel_time_s: float = 2.0,
+               max_rpm: float | None = None,
+               motor_rotor_j: float = 400.0) -> MotorDuty:
+    """The check the first issue of this study did NOT do.
+
+    Feasibility was tested pass by pass on torque alone. A reversing mill also
+    has to be checked THERMALLY over the whole cycle, and the acceleration of
+    the rotating masses has to be counted - at 100-190 reversals an hour it is
+    not a rounding error.
+    """
+    eta = ETA_GEARBOX * ETA_PINION * ETA_SPINDLE
+    w_base = 2 * math.pi * base_rpm / 60.0
+    t_base = rated_kw * 1000.0 / w_base
+    n_max = max_rpm or base_rpm * 3.0
+
+    motor_torques = [p.torque_roll_nm / (gear_ratio * eta) for p in passes]
+    times = [p.rolling_time_s for p in passes]
+
+    j = inertia_at_motor_kgm2(gear_ratio, motor_rotor_j=motor_rotor_j)
+    alpha = (2 * math.pi * n_max / 60.0) / accel_time_s
+    t_acc = j * alpha
+
+    # every pass is preceded by an acceleration and followed by a deceleration
+    n_events = 2 * len(passes)
+    accel_time_total = n_events * accel_time_s
+
+    sum_sq = sum(t ** 2 * dt for t, dt in zip(motor_torques, times))
+    sum_sq += t_acc ** 2 * accel_time_total
+    idle = max(cycle_seconds - sum(times) - accel_time_total, 0.0)
+    thermal_rms = math.sqrt(sum_sq / (sum(times) + accel_time_total + idle))
+
+    rolling_rms = math.sqrt(sum_sq_r / sum(times)) if (sum_sq_r := sum(
+        t ** 2 * dt for t, dt in zip(motor_torques, times))) else 0.0
+    worst_sim = max(motor_torques) + t_acc
+
+    util_th = thermal_rms / t_base
+    util_pk = worst_sim / t_base
+    if util_th > 1.0:
+        verdict = "THERMALLY OVERLOADED - the machine will overheat"
+    elif util_pk > 2.0:
+        verdict = "PEAK EXCEEDS 200 % OVERLOAD - commutation limit likely breached"
+    elif util_th > 0.85:
+        verdict = "thermally tight - confirm duty class with the maker"
+    else:
+        verdict = "acceptable on both thermal and peak criteria"
+    return MotorDuty(rolling_rms, t_acc, worst_sim, thermal_rms, t_base,
+                     util_th, util_pk, slabs_per_hour * n_events, verdict)

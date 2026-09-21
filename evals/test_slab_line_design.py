@@ -336,3 +336,136 @@ def test_hold_points_are_declared():
     joined = " ".join(HOLD_POINTS)
     for must in ("bearing", "housing", "reversing", "grade", "bay length"):
         assert must in joined
+
+
+# ===========================================================================
+# REGRESSION TESTS FOR THE THREE ERRORS FOUND BY EXTERNAL REVIEW, 2026-09-21
+# ===========================================================================
+from slab_line_design import (
+    stand_stretch_mm, roll_centre_distance_mm, roll_centre_range_mm,
+    optimal_pinion_centre_mm, inertia_at_motor_kgm2, motor_duty,
+    MILL_MODULUS_MN_PER_MM, mass_balance as _mb,
+)
+
+
+def test_stand_stretch_dwarfs_barrel_bending():
+    """ERROR 1. The first issue called this stand 'unusually stiff' on the
+    strength of 0.09 mm barrel bending alone. The whole stand - housing,
+    screws, chocks, bearings, Hertzian flattening - deflects an order of
+    magnitude more, and that is what governs thickness control."""
+    F = 5.12e6
+    bending = barrel_deflection_mm(F)
+    for M in MILL_MODULUS_MN_PER_MM:
+        assert stand_stretch_mm(F, M) > 5 * bending
+    assert stand_stretch_mm(F, 4.0) == pytest.approx(1.28, abs=0.01)
+
+
+def test_mill_modulus_must_be_positive():
+    with pytest.raises(ValueError):
+        stand_stretch_mm(1e6, 0.0)
+
+
+def test_roll_centre_range_includes_the_roughing_passes():
+    """ERROR 2. The first issue tabulated only the finishing gaps (6-30 mm)
+    and concluded the spindle angle stayed below 1 degree. The roughing gaps
+    of 80-125 mm were omitted, and there it reaches 1.6-2 degrees."""
+    s = build_schedule(12.0, "balanced")
+    lo, hi = roll_centre_range_mm(s)
+    assert hi > 700.0, "the first pass must be inside the range"
+    assert spindle_angle_deg(618.0, hi, 1500.0) > 1.5
+
+
+def test_618_is_not_the_optimal_pinion_centre():
+    """The optimum minimises the WORST offset, which puts it near the midpoint
+    of the full range - not near the finishing end of it."""
+    s = build_schedule(12.0, "balanced")
+    r = optimal_pinion_centre_mm(s)
+    assert r["optimal_centre_mm"] > 640.0
+    worst_at_618 = max(spindle_angle_deg(618.0, c, 1500.0)
+                       for c in (r["range_low_mm"], r["range_high_mm"]))
+    worst_at_opt = max(spindle_angle_deg(r["optimal_centre_mm"], c, 1500.0)
+                       for c in (r["range_low_mm"], r["range_high_mm"]))
+    assert worst_at_opt < worst_at_618
+
+
+def test_roll_wear_widens_the_centre_range_and_moves_the_optimum():
+    s = build_schedule(12.0, "balanced")
+    new_only = optimal_pinion_centre_mm(s)
+    with_wear = optimal_pinion_centre_mm(s, diameter_worn_mm=560.0)
+    assert with_wear["max_offset_mm"] > new_only["max_offset_mm"]
+    assert with_wear["optimal_centre_mm"] < new_only["optimal_centre_mm"]
+
+
+def test_roll_centre_distance_is_diameter_plus_gap():
+    assert roll_centre_distance_mm(12.0) == pytest.approx(612.0)
+    with pytest.raises(ValueError):
+        roll_centre_distance_mm(-1.0)
+
+
+def test_acceleration_torque_is_comparable_to_rolling_torque():
+    """ERROR 3. The first issue checked the motor pass by pass on torque only.
+    At 200+ reversals an hour the acceleration of the rotating masses is not a
+    rounding error - it turns out to be the LARGER of the two terms."""
+    s = build_schedule(12.0, "balanced", grade="S355JR")
+    d = motor_duty(s, 1600.0, 400.0, 12.5, cycle_summary(s)["cycle_s"],
+                   _mb().slabs_per_hour, max_rpm=1200.0)
+    peak_rolling_at_motor = max(p.torque_roll_nm for p in s) / (12.5 * 0.97 * 0.98 * 0.99)
+    assert d.accel_torque_nm > peak_rolling_at_motor
+
+
+def test_motor_duty_is_reported_on_both_thermal_and_peak_criteria():
+    s = build_schedule(20.0, "balanced", grade="S355JR")
+    d = motor_duty(s, 1600.0, 400.0, 12.5, cycle_summary(s)["cycle_s"],
+                   _mb().slabs_per_hour, max_rpm=1200.0)
+    assert 0.0 < d.thermal_utilisation < 1.0
+    assert d.peak_utilisation > d.thermal_utilisation
+    assert "acceptable" in d.verdict
+
+
+def test_a_smaller_motor_is_peak_limited_not_thermally_limited():
+    """1250 kW passes thermally with room to spare but sits near the 200 %
+    commutation ceiling - which is the criterion that actually decides."""
+    s = build_schedule(20.0, "balanced", grade="S355JR")
+    small = motor_duty(s, 1250.0, 450.0, 11.2, cycle_summary(s)["cycle_s"],
+                       _mb().slabs_per_hour, max_rpm=1125.0)
+    big = motor_duty(s, 1600.0, 400.0, 12.5, cycle_summary(s)["cycle_s"],
+                     _mb().slabs_per_hour, max_rpm=1200.0)
+    assert small.thermal_utilisation < 0.75
+    assert small.peak_utilisation > big.peak_utilisation
+
+
+def test_faster_acceleration_drives_the_peak_toward_the_overload_ceiling():
+    s = build_schedule(12.0, "balanced", grade="S355JR")
+    c = cycle_summary(s)["cycle_s"]
+    fast = motor_duty(s, 1600.0, 400.0, 12.5, c, _mb().slabs_per_hour,
+                      accel_time_s=1.0, max_rpm=1200.0)
+    slow = motor_duty(s, 1600.0, 400.0, 12.5, c, _mb().slabs_per_hour,
+                      accel_time_s=3.0, max_rpm=1200.0)
+    assert fast.peak_utilisation > 1.8 > slow.peak_utilisation
+
+
+def test_rotor_inertia_is_the_dominant_unknown_in_the_peak():
+    s = build_schedule(12.0, "balanced", grade="S355JR")
+    c = cycle_summary(s)["cycle_s"]
+    lo = motor_duty(s, 1600.0, 400.0, 12.5, c, _mb().slabs_per_hour,
+                    motor_rotor_j=200.0, max_rpm=1200.0)
+    hi = motor_duty(s, 1600.0, 400.0, 12.5, c, _mb().slabs_per_hour,
+                    motor_rotor_j=700.0, max_rpm=1200.0)
+    assert hi.peak_utilisation > 1.5 * lo.peak_utilisation
+
+
+def test_inertia_referred_to_motor_falls_with_the_square_of_the_ratio():
+    a = inertia_at_motor_kgm2(6.25, motor_rotor_j=0.0, drivetrain_j=0.0)
+    b = inertia_at_motor_kgm2(12.5, motor_rotor_j=0.0, drivetrain_j=0.0)
+    assert a / b == pytest.approx(4.0)
+
+
+def test_single_stage_12_5_to_1_would_need_an_absurd_wheel():
+    """ERROR 4 (consistency). The first issue specified a SINGLE-STAGE 12.5:1
+    gearbox and, separately, estimated its weight at 8-16 t. A single stage at
+    that ratio needs a 4 m wheel; the two statements cannot both be true."""
+    z1, module = 18, 18.0
+    wheel_pitch_dia = module * 12.5 * z1
+    assert wheel_pitch_dia > 4000.0
+    two_stage = gearbox_centre_distance_mm(3.55, 12.0, 22)
+    assert two_stage < gearbox_centre_distance_mm(12.5, 18.0, 18) / 2.0

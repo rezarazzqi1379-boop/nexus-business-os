@@ -469,3 +469,85 @@ def test_single_stage_12_5_to_1_would_need_an_absurd_wheel():
     assert wheel_pitch_dia > 4000.0
     two_stage = gearbox_centre_distance_mm(3.55, 12.0, 22)
     assert two_stage < gearbox_centre_distance_mm(12.5, 18.0, 18) / 2.0
+
+
+# ===========================================================================
+# OWNER REVIEW 2026-09-21 - unit discipline and traceability
+# ===========================================================================
+from slab_line_design import (
+    braking_per_stop, braking_hourly_average_kw, reversals_per_slab,
+    gearbox_rating_trace, motor_at_operating_point,
+)
+
+
+def test_braking_energy_and_power_are_separate_quantities():
+    """A previous issue wrote 'each reversal returns 284-945 kW of energy'.
+    kW is power. Energy per stop, instantaneous power and hourly average power
+    are three different numbers in three different units."""
+    b = braking_per_stop(450.0, 678.0, 3.0)
+    assert b["energy_per_stop_mj"] == pytest.approx(1.134, abs=0.01)
+    assert b["energy_per_stop_kwh"] == pytest.approx(b["energy_per_stop_mj"] / 3.6, rel=1e-9)
+    assert b["instantaneous_power_kw"] == pytest.approx(
+        b["energy_per_stop_mj"] * 1e6 / 3.0 / 1000.0, rel=1e-9)
+
+
+def test_hourly_average_braking_is_far_below_the_instantaneous_peak():
+    inst = braking_per_stop(450.0, 678.0, 3.0)["instantaneous_power_kw"]
+    avg = braking_hourly_average_kw(450.0, 678.0, 136.0)
+    assert avg < inst / 5
+
+
+def test_reversal_count_differs_by_thickness():
+    """Not one common number: 5 at 30 mm, 10 at 6 mm."""
+    thick = reversals_per_slab(build_schedule(30.0, "balanced"))
+    thin = reversals_per_slab(build_schedule(6.0, "balanced"))
+    assert thin > thick
+    assert thick == 5 and thin == 10
+
+
+def test_gearbox_rating_is_traceable_to_the_computed_torque():
+    s = build_schedule(30.0, "balanced", grade="S355JR")
+    tr = gearbox_rating_trace(s, 7.1, cycle_summary(s)["cycle_s"])
+    assert tr["governing_criterion"].startswith("B")
+    assert tr["criterion_b_peak_nm"] == pytest.approx(tr["bite_shock_3x_nm"] / 2.0)
+    assert tr["rated_requirement_nm"] == pytest.approx(
+        max(tr["criterion_a_fatigue_nm"], tr["criterion_b_peak_nm"]))
+    assert tr["rated_recommendation_nm"] > tr["rated_requirement_nm"]
+
+
+def test_the_s355_basis_gives_a_higher_gearbox_requirement_than_s235():
+    """The 285 kN.m figure in the previous issue came from the S235JR case.
+    With S355JR as the stated design basis the requirement is higher, and the
+    package must not carry the S235 number under an S355 basis."""
+    c235 = build_schedule(30.0, "balanced", grade="S235JR")
+    c355 = build_schedule(30.0, "balanced", grade="S355JR")
+    r235 = gearbox_rating_trace(c235, 7.1, cycle_summary(c235)["cycle_s"])
+    r355 = gearbox_rating_trace(c355, 7.1, cycle_summary(c355)["cycle_s"])
+    assert r235["rated_requirement_nm"] == pytest.approx(284.7e3, rel=0.02)
+    assert r355["rated_requirement_nm"] == pytest.approx(327.4e3, rel=0.02)
+    assert r355["rated_requirement_nm"] > r235["rated_requirement_nm"]
+
+
+def test_1600kw_needs_short_time_overload_at_the_peak_power_pass():
+    """The package must say plainly whether the motor covers the peak on its
+    continuous rating or only with overload. 1600 kW does not; 2000 kW does."""
+    best = None
+    for t in THICKNESS_TARGETS_MM:
+        s = build_schedule(t, "balanced", grade="S355JR")
+        p = worst_cases(s)["max_power"]
+        if best is None or p.power_kw > best.power_kw:
+            best = p
+    small = motor_at_operating_point(best, 1600.0, 350.0, 7.1)
+    big = motor_at_operating_point(best, 2000.0, 350.0, 7.1)
+    assert small["needs_overload"] is True
+    assert small["fraction_of_continuous"] > 1.2
+    assert big["fraction_of_continuous"] < 1.10
+    for m in (small, big):
+        assert m["fraction_of_envelope"] < 1.0
+
+
+def test_motor_shaft_power_follows_the_stated_overall_efficiency():
+    s = build_schedule(30.0, "balanced", grade="S355JR")
+    p = worst_cases(s)["max_power"]
+    m = motor_at_operating_point(p, 1600.0, 350.0, 7.1, eta_overall=0.899)
+    assert m["motor_shaft_power_kw"] == pytest.approx(p.power_kw / 0.899, rel=1e-9)

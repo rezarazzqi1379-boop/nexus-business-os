@@ -894,3 +894,96 @@ def commutation_check(passes: list[Pass], rated_kw: float, base_rpm: float,
             "reversal_utilisation": accel_util,
             "rolling_ok": ok, "reversal_ok": accel_util <= 1.0,
             "envelope_at_top_speed": commutation_overload_limit(n_top, base_rpm)}
+
+
+# ---------------------------------------------------------------------------
+# 11. TRACEABILITY AND UNIT DISCIPLINE (added 2026-09-21 after owner review)
+# ---------------------------------------------------------------------------
+def braking_per_stop(inertia_kgm2: float, motor_rpm: float, decel_s: float) -> dict:
+    """ENERGY and POWER reported separately and in their own units.
+
+    A previous issue of this package wrote "each reversal returns 284-945 kW of
+    energy". kW is power, not energy. The two are reported here as distinct
+    quantities with distinct units, plus the hourly AVERAGE power, which is a
+    third quantity again.
+    """
+    e_j = braking_energy_j(inertia_kgm2, motor_rpm)
+    return {
+        "energy_per_stop_mj": e_j / 1e6,
+        "energy_per_stop_kwh": e_j / 3.6e6,
+        "instantaneous_power_kw": e_j / decel_s / 1000.0,
+        "decel_s": decel_s,
+    }
+
+
+def braking_hourly_average_kw(inertia_kgm2: float, motor_rpm: float,
+                              reversals_per_hour: float) -> float:
+    """Average regenerated power over an hour - a different number again from
+    the instantaneous peak, and the one the substation sees as a load."""
+    if reversals_per_hour < 0:
+        raise ValueError("reversals per hour must be non-negative")
+    return braking_energy_j(inertia_kgm2, motor_rpm) * reversals_per_hour / 3.6e6
+
+
+def reversals_per_slab(passes: list[Pass]) -> int:
+    """One reversal between consecutive passes. NOT a single number shared by
+    every thickness - it runs 5 at 30 mm to 10 at 6 mm."""
+    return max(len(passes) - 1, 0)
+
+
+def gearbox_rating_trace(passes: list[Pass], gear_ratio: float,
+                         cycle_seconds: float,
+                         peak_allowance: float = GEARBOX_PEAK_ALLOWANCE,
+                         headroom: float = 1.23) -> dict:
+    """Every gearbox number traced back to the computed rolling torque.
+
+    Returns each step so the reader can see which figure is a REQUIREMENT
+    (derived from a computed load plus a stated factor), which is a
+    RECOMMENDATION (a requirement plus headroom) and which is an EXPANSION
+    OPTION (priced separately, not needed for phase one).
+    """
+    ch = torque_chain(passes, gear_ratio, cycle_seconds)
+    crit_a = ch.rms_roll_nm * ch.service_factor
+    crit_b = ch.bite_shock_high_nm / peak_allowance
+    governing = max(crit_a, crit_b)
+    return {
+        "computed_peak_roll_nm": ch.peak_rolling_roll_nm,
+        "at_gearbox_output_nm": ch.peak_rolling_roll_nm / (
+            ETA_SPINDLE * ETA_COUPLING * ETA_PINION * ETA_COUPLING),
+        "rms_roll_nm": ch.rms_roll_nm,
+        "service_factor": ch.service_factor,
+        "criterion_a_fatigue_nm": crit_a,
+        "bite_shock_2x_nm": ch.bite_shock_low_nm,
+        "bite_shock_3x_nm": ch.bite_shock_high_nm,
+        "criterion_b_peak_nm": crit_b,
+        "governing_criterion": "B (bite shock)" if crit_b > crit_a else "A (fatigue)",
+        "rated_requirement_nm": governing,
+        "rated_recommendation_nm": governing * headroom,
+        "guaranteed_peak_requirement_nm": ch.bite_shock_high_nm,
+        "expansion_option_peak_nm": ch.bite_shock_high_nm * headroom,
+        "headroom_factor": headroom,
+    }
+
+
+def motor_at_operating_point(pass_: Pass, rated_kw: float, base_rpm: float,
+                             gear_ratio: float, eta_overall: float = 0.899) -> dict:
+    """Is this motor adequate at THIS pass on its continuous rating, or only
+    with short-time overload? The package must state which."""
+    n_motor = pass_.roll_rpm * gear_ratio
+    w_base = 2 * math.pi * base_rpm / 60.0
+    t_base = rated_kw * 1000.0 / w_base
+    t_continuous = t_base if n_motor <= base_rpm else t_base * base_rpm / n_motor
+    t_needed = pass_.torque_roll_nm / gear_ratio / eta_overall
+    envelope = commutation_overload_limit(n_motor, base_rpm)
+    return {
+        "motor_rpm": n_motor,
+        "roll_power_kw": pass_.power_kw,
+        "motor_shaft_power_kw": pass_.power_kw / eta_overall,
+        "torque_needed_nm": t_needed,
+        "torque_continuous_nm": t_continuous,
+        "fraction_of_continuous": t_needed / t_continuous,
+        "commutation_envelope": envelope,
+        "fraction_of_envelope": t_needed / (t_continuous * envelope),
+        "needs_overload": t_needed > t_continuous,
+        "duration_s": pass_.rolling_time_s,
+    }

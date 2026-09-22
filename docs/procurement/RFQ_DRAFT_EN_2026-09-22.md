@@ -9,6 +9,8 @@
 
 We are evaluating suppliers for the following equipment for a hot rolling mill upgrade project. Please provide your best formal quotation with the information requested below. This is a request for information and pricing only; it does not constitute a purchase commitment.
 
+> **Supplier identity declaration (required):** Please state on the first page of your quotation your full legal company name (in both English and Chinese), unified social credit code, registered address, legal representative, manufacturing plant address, and the name of the exporting entity. If the quoting party, the payment-receiving party, the manufacturer, and the exporting entity are not all the same legal entity, please explain the relationship between them and provide supporting documentation.
+
 ## Item 1 — Walking Beam Reheating Furnace
 - Approximate target: width ≈3 m, length ≈25 m (please advise if you need our billet/bloom/slab cross-section and grade to size this precisely — we can provide on request)
 - Please quote for: NEW build, and separately, any suitable USED/refurbished unit you may have access to

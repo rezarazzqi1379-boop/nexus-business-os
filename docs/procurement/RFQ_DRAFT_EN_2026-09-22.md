@@ -1,3 +1,5 @@
+> **SUPERSEDED (2026-09-22, v4) — DO NOT SEND.** This combined 4-item document has been replaced by 4 separate, recipient-specific Pre-RFQ/RFI documents (`RFQ-FURNACE`, `RFQ-DC-MOTOR-DRIVE`, `RFQ-REVERSING-STAND`, `RFQ-MAIN-GEARBOX`, each EN+ZH), which also fix an English/Chinese content-parity gap this version had. Retained here only for audit-trail purposes — see `DIFF_v3_to_v4_2026-09-22.md`. Do not send this file to anyone.
+>
 > **DRAFT ONLY — NOT SENT.** Prepared 2026-09-22 for internal review. Do not transmit to any vendor without explicit owner approval. Recipient placeholders are suggestions from the sourcing study, not confirmed contacts.
 
 # Request for Quotation — Hot Rolling Mill Equipment

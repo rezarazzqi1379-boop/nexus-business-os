@@ -10,7 +10,7 @@ This one sheet replaces three v4 files: `RFQ_BILINGUAL_PARITY_MATRIX_2026-09-22.
 
 | Item | Vendor-facing files (v5) | Candidate recipients | Legal identity verified? | Owner approval to send | Sent |
 |---|---|---|---|---|---|
-| Furnace | `RFQ-FURNACE_EN_v5_2026-09-23.md` · `RFQ-FURNACE_ZH_v5_2026-09-23.md` | 南京年达炉业科技有限公司 (Nianda): PARTIAL; sister company 年达智能装备 exists, so confirm which entity signs — **only remaining furnace candidate.** A second furnace maker needs to be found | No (public-web check only; gsxt blocked) | No | No |
+| Furnace | `RFQ-FURNACE_EN_v5_2026-09-23.md` · `RFQ-FURNACE_ZH_v5_2026-09-23.md` | 南京年达炉业科技有限公司 (Nianda): PARTIAL; sister company 年达智能装备 exists, so confirm which entity signs — ⚠ a clone site (ywyjy.com) copies Nianda's pages, trademark and model number: send only via the contact on the official site ndly.com.cn · **南京净环热冶金工程有限公司 (Jinghuanre, nj-jhr.com): proposed second candidate**; identity signals FACT (founded 2006, legal representative 杨锡红, ICP record); 30 t/h walking furnace built (CLAIM) · Fallback: 江苏凤谷节能科技 (walking hearth). Excluded: 淄博力杰 (lists a North Korean customer, sanctions exposure) | No (public-web check only; gsxt blocked) | No | No |
 | DC motor and drive | `RFQ-DC-MOTOR-DRIVE_EN_v5_2026-09-23.md` · `…_ZH_v5_…` | 杭州新恒力电机制造有限公司: PARTIAL; near-identical name 杭州恒力电机制造有限公司 exists · 江苏航天动力机电有限公司: PARTIAL, strongest; 51% subsidiary of listed 600343 (FACT); catalogue up to 2200 kW | No (public-web check only) | No | No |
 | Reversing stand | `RFQ-REVERSING-STAND_EN_v5_2026-09-23.md` · `…_ZH_v5_…` | Candidates, not yet checked: 无锡市伟盛机械有限公司 (φ650 two-high reversing, 800 t, built for copper strip) · Wuxi Lixing Metallurgy Machinery (Φ650×600 two-high hot reversible, DC; Chinese name UNKNOWN). Rejected: 无锡兴祥 (300 t at Φ500–600). | Not checked | No | No |
 | Main gearbox | `RFQ-MAIN-GEARBOX_EN_v5_2026-09-23.md` · `…_ZH_v5_…` | Candidates, not yet checked: 南京高速齿轮 NGC (hot-mill gearboxes to 4200 kN·m; patent for combined reducer and pinion stand) · 重庆齿轮箱 (hot-mill main reducers and pinion stands) · optional: 宁波东力 (reversing plate-mill gearbox, but catalogue i ≤5.95) | Not checked | No | No |
@@ -27,7 +27,7 @@ This one sheet replaces three v4 files: `RFQ_BILINGUAL_PARITY_MATRIX_2026-09-22.
 - [ ] Owner (Reza) gives explicit written approval for this file to this recipient
 - [ ] `[Recipient full legal name]`, `From`, `Date` and `Ref` placeholders filled in (the `[NN]` sequence number assigned)
 - [ ] The first line, `[DRAFT v5 — NOT APPROVED FOR RELEASE…]` / `[草稿第5版…]`, is deleted from the outgoing copy, and only from the outgoing copy
-- [ ] Outgoing copy grepped for these strings, with zero hits required: `伟盛` `Lixing` `NGC` `南高齿` `重齿` `东力` `上海东方电气` `南京年达` `无锡宇顺` `上海臻工` `杭州新恒力` `江苏航天` `Nianda` `Yushun` `isunsteel` `Prime Metallurgy` `Hengli` `Fortune` `Aerospace` `Package A` `broker` `QA_LOG` `INTERNAL` `internal` `Suggested recipient` `建议收件人` `DRAFT` `草稿` `superseded` `取代`
+- [ ] Outgoing copy grepped for these strings, with zero hits required: `净环热` `Jinghuanre` `凤谷` `力杰` `伟盛` `Lixing` `NGC` `南高齿` `重齿` `东力` `上海东方电气` `南京年达` `无锡宇顺` `上海臻工` `杭州新恒力` `江苏航天` `Nianda` `Yushun` `isunsteel` `Prime Metallurgy` `Hengli` `Fortune` `Aerospace` `Package A` `broker` `QA_LOG` `INTERNAL` `internal` `Suggested recipient` `建议收件人` `DRAFT` `草稿` `superseded` `取代`
 - [ ] EN and ZH copies sent together, or the recipient's language chosen deliberately
 - [ ] "Sent" logged in this sheet with date, channel and exact file hash
 

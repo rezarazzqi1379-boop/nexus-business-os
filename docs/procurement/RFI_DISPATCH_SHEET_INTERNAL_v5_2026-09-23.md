@@ -10,10 +10,10 @@ This one sheet replaces three v4 files: `RFQ_BILINGUAL_PARITY_MATRIX_2026-09-22.
 
 | Item | Vendor-facing files (v5) | Candidate recipients | Legal identity verified? | Owner approval to send | Sent |
 |---|---|---|---|---|---|
-| Furnace | `RFQ-FURNACE_EN_v5_2026-09-23.md` · `RFQ-FURNACE_ZH_v5_2026-09-23.md` | Nanjing Nianda Furnace Science and Technology Co., Ltd. · Wuxi Yushun Metallurgical Technology Co., Ltd. (isunsteel) · Shanghai Prime Metallurgy Technology Co., Ltd. | No (none of them) | No | No |
-| DC motor and drive | `RFQ-DC-MOTOR-DRIVE_EN_v5_2026-09-23.md` · `…_ZH_v5_…` | Hangzhou New Hengli Electric Machine MFG. Co., Ltd. · Shanghai Fortune Electric Co., Ltd. / China Electric (Shanghai) Co., Ltd. (name-confusion risk: see `QA_LOG_INTERNAL_ONLY_2026-09-22.md`) · 江苏航天动力机电有限公司 (Chinese name appears in the source; still unverified) | No | No | No |
-| Reversing stand | `RFQ-REVERSING-STAND_EN_v5_2026-09-23.md` · `…_ZH_v5_…` | **None identified.** A targeted search or a trusted intermediary is needed first. | — | No | No |
-| Main gearbox | `RFQ-MAIN-GEARBOX_EN_v5_2026-09-23.md` · `…_ZH_v5_…` | **None identified.** A targeted search or a trusted intermediary is needed first. | — | No | No |
+| Furnace | `RFQ-FURNACE_EN_v5_2026-09-23.md` · `RFQ-FURNACE_ZH_v5_2026-09-23.md` | 南京年达炉业科技有限公司 (Nianda): PARTIAL; sister company 年达智能装备 exists, so confirm which entity signs · Wuxi Yushun (isunsteel): **RED FLAG**, no legal name found, main products EAF/LRF · Shanghai Prime Metallurgy: **RED FLAG**, self-declared trading company, conflicting founding years | No (public-web check only; gsxt blocked) | No | No |
+| DC motor and drive | `RFQ-DC-MOTOR-DRIVE_EN_v5_2026-09-23.md` · `…_ZH_v5_…` | 杭州新恒力电机制造有限公司: PARTIAL; near-identical name 杭州恒力电机制造有限公司 exists · Shanghai Fortune / China Electric (Shanghai): **RED FLAG**, three company names on one site, HK-style suffix, one source says Beijing (see `QA_LOG_INTERNAL_ONLY_2026-09-22.md`) · 江苏航天动力机电有限公司: PARTIAL, strongest; 51% subsidiary of listed 600343 (FACT); catalogue up to 2200 kW | No (public-web check only) | No | No |
+| Reversing stand | `RFQ-REVERSING-STAND_EN_v5_2026-09-23.md` · `…_ZH_v5_…` | Candidates, not yet checked: 无锡市伟盛机械有限公司 (φ650 two-high reversing, 800 t, built for copper strip) · Wuxi Lixing Metallurgy Machinery (Φ650×600 two-high hot reversible, DC; Chinese name UNKNOWN). Rejected: 无锡兴祥 (300 t at Φ500–600). | Not checked | No | No |
+| Main gearbox | `RFQ-MAIN-GEARBOX_EN_v5_2026-09-23.md` · `…_ZH_v5_…` | Candidates, not yet checked: 南京高速齿轮 NGC (hot-mill gearboxes to 4200 kN·m; patent for combined reducer and pinion stand) · 重庆齿轮箱 (hot-mill main reducers and pinion stands) · optional: 宁波东力 (reversing plate-mill gearbox, but catalogue i ≤5.95) | Not checked | No | No |
 
 **Open scope question before the stand RFI is sent at all (owner decision):** is the Ø600 two-high stand in the 2026-09-21 design basis existing plant equipment, or the stand the broker is offering? If it is existing plant equipment, a new stand may not be needed and this RFI may be dropped. Status: UNKNOWN.
 
@@ -25,7 +25,7 @@ This one sheet replaces three v4 files: `RFQ_BILINGUAL_PARITY_MATRIX_2026-09-22.
 - [ ] Owner (Reza) gives explicit written approval for this file to this recipient
 - [ ] `[Recipient full legal name]`, `From`, `Date` and `Ref` placeholders filled in (the `[NN]` sequence number assigned)
 - [ ] The first line, `[DRAFT v5 — NOT APPROVED FOR RELEASE…]` / `[草稿第5版…]`, is deleted from the outgoing copy, and only from the outgoing copy
-- [ ] Outgoing copy grepped for these strings, with zero hits required: `上海东方电气` `南京年达` `无锡宇顺` `上海臻工` `杭州新恒力` `江苏航天` `Nianda` `Yushun` `isunsteel` `Prime Metallurgy` `Hengli` `Fortune` `Aerospace` `Package A` `broker` `QA_LOG` `INTERNAL` `internal` `Suggested recipient` `建议收件人` `DRAFT` `草稿` `superseded` `取代`
+- [ ] Outgoing copy grepped for these strings, with zero hits required: `伟盛` `Lixing` `NGC` `南高齿` `重齿` `东力` `上海东方电气` `南京年达` `无锡宇顺` `上海臻工` `杭州新恒力` `江苏航天` `Nianda` `Yushun` `isunsteel` `Prime Metallurgy` `Hengli` `Fortune` `Aerospace` `Package A` `broker` `QA_LOG` `INTERNAL` `internal` `Suggested recipient` `建议收件人` `DRAFT` `草稿` `superseded` `取代`
 - [ ] EN and ZH copies sent together, or the recipient's language chosen deliberately
 - [ ] "Sent" logged in this sheet with date, channel and exact file hash
 

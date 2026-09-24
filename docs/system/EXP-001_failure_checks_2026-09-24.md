@@ -1,6 +1,6 @@
 # EXP-001 — Do failure-derived checks catch the real errors, without noise?
 
-**Date:** 2026-09-24 · **Status:** IMPLEMENTED · TESTED (14 unit tests, also run on the owner's laptop: Python 3.10.12, pytest 9.1.1) · COMMITTED on a branch — not merged, not in CI.
+**Date:** 2026-09-24 · **Status:** IMPLEMENTED · TESTED (14 unit tests, also run on the owner's laptop: Python 3.10.12, pytest 9.1.1) · COMMITTED and PUSHED on a branch; CI step added — not merged.
 
 ## Hypothesis
 Checks derived from recorded failures (FM-005 … FM-008) would have caught the procurement-document defects that three human/AI review rounds missed, without flagging correct internal documents.
@@ -22,7 +22,7 @@ Ran `python -m nexus_checks` unchanged over real historical files. Nothing was r
 
 ## Result
 - Every real defect in the four datasets was caught; zero false positives after one iteration.
-- Promoted to: `CLAUDE.md` §5 (run before vendor release). Not yet in CI (`.github/workflows/test.yml`) — separate owner decision because it touches the shared pipeline.
+- Promoted to: `CLAUDE.md` §5 (run before vendor release) and, by owner decision on 2026-09-24, to CI: a dedicated step in `.github/workflows/test.yml`. A dedicated step is needed because the existing `python -m unittest discover -s evals` collects 0 of these pytest-style tests (verified) and the pytest step only covers `tests/`. The document check runs only when `docs/procurement/` exists, i.e. after the procurement branch is merged; archived v4 RFQs are excluded by name.
 
 ## Limits (stated, not hidden)
 - The checks catch leaks, one-sided edits, reused superseded numbers and git hazards: 4 of the ~20 round-4 finding classes. They do **not** catch meaning errors (the "650 mm is smaller" direction error, the 2000 kW mischaracterisation, FM-009 unstated basis). Those still need an independent reviewer.

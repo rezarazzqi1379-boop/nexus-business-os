@@ -52,7 +52,7 @@ RULES: list[Rule] = [
          current=_r(r"\b646\b")),
     Rule("SV-gbx-weight-8-16", _r(r"\b8\s*(?:–|-|to|تا)\s*16\s*(?:t\b|ton|تن)"),
          "no weight declared; vendor scope", "Package A §4.3"),
-    Rule("SV-reversals-238", _r(r"\b238\b"),
+    Rule("SV-reversals-238", _r(r"\b238\b(?![- ]?(?:line|lines|سطر|行)\b)"),  # "238-line file" is a length, not duty
          "85-170 reversals/h by thickness (238 = accelerations+brakings)", "Package A §8.4, T-3",
          exempt=_r(r"accel|brak|شتاب|ترمز|加速|制动")),
     Rule("SV-regen-1000kW", _r(r"(?:regenerat|بازگشت|回馈)[^\n]{0,40}1000\s*kW|1000\s*kW[^\n]{0,20}(?:regenerat|回馈)"),

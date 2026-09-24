@@ -135,3 +135,11 @@ def test_cli_exclude_skips_archived_files(tmp_path, capsys):
     _w(tmp_path, "RFQ-NEW_EN_v5.md", "## 1\nclean\n")
     assert main([str(tmp_path)]) == 1
     assert main([str(tmp_path), "--exclude", "*_2026-09-22.md"]) == 0
+
+
+def test_reversal_238_ignores_line_counts(tmp_path):
+    # FP found 2026-09-24 in BRANCH_TRIAGE: "238-line test file" is a file length.
+    ok = _w(tmp_path, "c.md", "Single 238-line pure-addition test file; 238 lines added\n")
+    bad = _w(tmp_path, "d.md", "238-line rolling duty: 238 reversals per hour\n")
+    assert superseded_values.check_file(ok) == []
+    assert [f.rule for f in superseded_values.check_file(bad)] == ["SV-reversals-238"]

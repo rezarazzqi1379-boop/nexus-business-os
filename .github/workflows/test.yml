@@ -39,6 +39,14 @@ jobs:
       - name: Run canonical unittest suite
         run: python -m unittest discover -s evals -v
 
+      - name: Run NEXUS failure-derived checks (FM-005..FM-008)
+        # pytest-style tests: `unittest discover -s evals` does not collect them.
+        run: |
+          pytest -q -p no:cacheprovider evals/test_nexus_checks.py
+          if [ -d docs/procurement ]; then
+            python -m nexus_checks docs/procurement --exclude '*_2026-09-22.md'
+          fi
+
       - name: Run pytest regression suite
         env:
           PYTHONPATH: src

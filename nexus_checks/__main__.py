@@ -11,7 +11,8 @@ import fnmatch
 import sys
 from pathlib import Path
 
-from . import bilingual_parity, git_health, state_freshness, superseded_values, vendor_hygiene
+from . import (bilingual_parity, git_health, state_freshness, superseded_values,
+               transmission, vendor_hygiene)
 
 
 def _collect(items: list[str]) -> list[Path]:
@@ -34,7 +35,10 @@ def main(argv: list[str] | None = None) -> int:
                     help="glob on file name to skip (e.g. superseded archives); repeatable")
     ap.add_argument("--state", action="store_true",
                     help="check governed state/kernel file freshness and broken path "
-                         "references (.nexus/state/STATE_GOVERNANCE.json); needs --repo")
+                         "references (.nexus/state/STATE_GOVERNANCE.json); repo = --repo or .")
+    ap.add_argument("--transmission", action="store_true",
+                    help="check docs/procurement RFI numbers against slab_line_design "
+                         "(nexus_checks/transmission.py); repo = --repo or .")
     a = ap.parse_args(argv)
 
     files = [f for f in _collect(a.paths)
@@ -48,6 +52,8 @@ def main(argv: list[str] | None = None) -> int:
         findings += git_health.check_repo(Path(a.repo))
     if a.state:
         findings += state_freshness.check_repo(Path(a.repo or "."))
+    if a.transmission:
+        findings += transmission.check_repo(Path(a.repo or "."))
 
     for f in findings:
         print(f.fmt())

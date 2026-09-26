@@ -4,6 +4,7 @@ import hashlib
 import re
 import sqlite3
 import zipfile
+from contextlib import closing
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -123,13 +124,14 @@ class CanonicalStore:
     def __init__(self, path: Path):
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self._connect() as db:
-            db.execute("PRAGMA journal_mode=WAL")
-            db.execute("""CREATE TABLE IF NOT EXISTS canonical_sources (
+        with closing(self._connect()) as db:
+            with db:
+                db.execute("PRAGMA journal_mode=WAL")
+                db.execute("""CREATE TABLE IF NOT EXISTS canonical_sources (
                 source_id TEXT PRIMARY KEY, project_id TEXT, title TEXT NOT NULL, version TEXT,
                 status TEXT NOT NULL, effective_date TEXT, sha256 TEXT NOT NULL UNIQUE,
                 content TEXT NOT NULL, ingested_at TEXT NOT NULL)""")
-            db.execute("""CREATE TABLE IF NOT EXISTS canonical_source_versions (
+                db.execute("""CREATE TABLE IF NOT EXISTS canonical_source_versions (
                 source_id TEXT NOT NULL,
                 version_key TEXT NOT NULL,
                 project_id TEXT,
@@ -141,19 +143,19 @@ class CanonicalStore:
                 content TEXT NOT NULL,
                 ingested_at TEXT NOT NULL,
                 PRIMARY KEY (source_id, version_key))""")
-            legacy = db.execute(
-                "SELECT source_id,project_id,title,version,status,effective_date,sha256,content,ingested_at "
-                "FROM canonical_sources"
-            ).fetchall()
-            for row in legacy:
-                db.execute(
-                    "INSERT OR IGNORE INTO canonical_source_versions "
-                    "(source_id,version_key,project_id,title,version,status,effective_date,sha256,content,ingested_at) "
-                    "VALUES (?,?,?,?,?,?,?,?,?,?)",
-                    (row["source_id"], _version_storage_key(row["version"]), row["project_id"], row["title"],
-                     row["version"], row["status"], row["effective_date"], row["sha256"], row["content"],
-                     row["ingested_at"]),
-                )
+                legacy = db.execute(
+                    "SELECT source_id,project_id,title,version,status,effective_date,sha256,content,ingested_at "
+                    "FROM canonical_sources"
+                ).fetchall()
+                for row in legacy:
+                    db.execute(
+                        "INSERT OR IGNORE INTO canonical_source_versions "
+                        "(source_id,version_key,project_id,title,version,status,effective_date,sha256,content,ingested_at) "
+                        "VALUES (?,?,?,?,?,?,?,?,?,?)",
+                        (row["source_id"], _version_storage_key(row["version"]), row["project_id"], row["title"],
+                         row["version"], row["status"], row["effective_date"], row["sha256"], row["content"],
+                         row["ingested_at"]),
+                    )
 
     def _connect(self) -> sqlite3.Connection:
         db = sqlite3.connect(self.path, timeout=10)
@@ -164,23 +166,24 @@ class CanonicalStore:
     def ingest(self, path: Path) -> tuple[CanonicalSource, bool]:
         source = parse_source(path.resolve())
         version_key = _version_storage_key(source.version)
-        with self._connect() as db:
-            db.execute("BEGIN IMMEDIATE")
-            existing = db.execute(
-                "SELECT sha256 FROM canonical_source_versions WHERE source_id=? AND version_key=?",
-                (source.source_id, version_key),
-            ).fetchone()
-            if existing:
-                if existing["sha256"] != source.sha256:
-                    raise ValueError("canonical_source_version_collision")
-                return source, False
-            inserted = db.execute(
-                "INSERT INTO canonical_source_versions "
-                "(source_id,version_key,project_id,title,version,status,effective_date,sha256,content,ingested_at) "
-                "VALUES (?,?,?,?,?,?,?,?,?,?)",
-                (source.source_id, version_key, source.project_id, source.title, source.version, source.status,
-                 source.effective_date, source.sha256, source.content, datetime.now(timezone.utc).isoformat()),
-            ).rowcount == 1
+        with closing(self._connect()) as db:
+            with db:
+                db.execute("BEGIN IMMEDIATE")
+                existing = db.execute(
+                    "SELECT sha256 FROM canonical_source_versions WHERE source_id=? AND version_key=?",
+                    (source.source_id, version_key),
+                ).fetchone()
+                if existing:
+                    if existing["sha256"] != source.sha256:
+                        raise ValueError("canonical_source_version_collision")
+                    return source, False
+                inserted = db.execute(
+                    "INSERT INTO canonical_source_versions "
+                    "(source_id,version_key,project_id,title,version,status,effective_date,sha256,content,ingested_at) "
+                    "VALUES (?,?,?,?,?,?,?,?,?,?)",
+                    (source.source_id, version_key, source.project_id, source.title, source.version, source.status,
+                     source.effective_date, source.sha256, source.content, datetime.now(timezone.utc).isoformat()),
+                ).rowcount == 1
         return source, inserted
 
     def ingest_directory(self, directory: Path) -> list[dict]:
@@ -193,7 +196,7 @@ class CanonicalStore:
         return result
 
     def _all_rows(self) -> list[sqlite3.Row]:
-        with self._connect() as db:
+        with closing(self._connect()) as db:
             return db.execute(
                 "SELECT source_id,project_id,title,version,status,effective_date,sha256,content,ingested_at "
                 "FROM canonical_source_versions"

@@ -50,6 +50,9 @@ jobs:
           if [ -d docs/procurement ]; then
             python -m nexus_checks docs/procurement --exclude '*_2026-09-22.md'
           fi
+          # FM-010: vendor RFI numbers must equal the model; FM-011: no broken pointers in
+          # the state/kernel files (freshness needs full history; the weekly health run checks it).
+          python -m nexus_checks --transmission --state
 
       - name: Run pytest regression suite
         env:

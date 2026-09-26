@@ -1,5 +1,5 @@
 # NEXUS CURRENT STATE
-Last updated: 2026-09-26 by Claude Code (branch `feat/state-freshness-v0.1`, worktree off
+Last updated: 2026-09-26 by Claude Code (branch `feat/project-memory-and-checks-v0.1`, built on
 `integ/2026-09-26`) -- full rewrite (RULE below: overwrite stale sections, don't just append).
 Previous version (2026-09-19) is in git history at this same path if any old wording is needed.
 
@@ -109,6 +109,14 @@ promotion decision):
   wrong numbers in the vendor-facing procurement RFIs found by the 2026-09-26 transmission audit
   (`docs/system/TRANSMISSION_AUDIT_STEEL_2026-09-26.md`) plus the same red-team review's
   corrections (FM-012's writeup, ENG-10 in the control doc).
+- **Next PR, `feat/project-memory-and-checks-v0.1`** (built on #99 + #100, merge after them). It adds:
+  - `nexus_checks --state`: state-file freshness and broken pointers (FM-011);
+  - `nexus_checks --transmission`: 15 RFI numbers recomputed from `slab_line_design` (FM-010);
+  - both checks in CI;
+  - the CLAUDE.md session-boot memory check, measured token yields and FM-012 discipline;
+  - `docs/system/MODEL_LITERATURE_VALIDATION_2026-09-26.md` (ENG-11).
+- **Separate batch, `chore/merge-candidates-batch-v0.1`**: 3 safe branches (supplier-collision tests,
+  trace envelope, security docs). 5 more touch approval, credentials or network and are owner-review only.
 - **Neither PR is merged to `origin/main` yet.** This session's base, local branch
   `integ/2026-09-26` (`68f8d89`), is main + both PRs merged locally for testing -- both merge
   cleanly in either order and both produce the same tree (`REDTEAM_PR99_PR100_2026-09-26.md`,

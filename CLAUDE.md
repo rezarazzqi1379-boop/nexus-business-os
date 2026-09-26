@@ -21,6 +21,9 @@ existed under another name).
 
 ## 2. Session boot (cheap first)
 
+0. Memory check, first: `python -m nexus_checks --state --repo .`. A STALE state file or a
+   broken pointer means the written memory is behind the repo: fix the state file before
+   relying on it (`.nexus/state/STATE_GOVERNANCE.json` says which file governs what).
 1. Identify the project. Steel rolling line: read `.nexus/steel/KERNEL.md` and
    `.nexus/steel/CHECKPOINT.md`, then `docs/expert_foundry/PROJECT_CONTROL_PRJ-STEEL-ROLLING-LINE-01.md`.
    Procurement: `docs/procurement/README.md`. Repo-wide state: `.nexus/state/CURRENT_STATE.md`.
@@ -51,10 +54,22 @@ existed under another name).
   resolution, novel engineering and independent red-team review. Measured: research
   agents cost ~70k–230k tokens per run; the independent reviewer (~63k) was the cheapest
   and highest-yield role (`.nexus/steel/TOKEN_BUDGET_POLICY.yaml`).
+- Measured 2026-09-24/26 (subagent tokens → yield):
+  - red-team PR review 177k → 2 blocking defects: a PR without its code, and a stale record;
+  - transmission audit 367k → 4 wrong numbers in vendor RFIs;
+  - sonnet builders on a precise spec (state check 240k, transmission check 219k,
+    merge batch 146k) → done first time, verified;
+  - literature check 226k → no constant out of range, 5 unsourced;
+  - branch inventory and triage 228k + 197k.
+
+  Rules drawn from these runs:
+  - Before any merge or vendor release, spend on one independent reviewer that did not
+    write the work. It has been the best value every time.
+  - Hand well-specified building to `sonnet`.
+  - Never let the author verify their own claim.
 - Numbers are computed with code, never with long prose reasoning.
 - Parallelise independent research in one message; stop searching when marginal yield is low.
-- Unused MCP connectors cost tokens through cache invalidation (`docs/system/SYSTEM_AUDIT_2026-09-22.md`,
-  on branch `feat/steel-recovery-v0.1`, not yet on main).
+- Unused MCP connectors cost tokens through cache invalidation (`docs/system/SYSTEM_AUDIT_2026-09-22.md`).
 
 ## 5. Failure memory is executable
 
@@ -66,12 +81,23 @@ Run before releasing any vendor-facing document, and after any batch of document
 ```
 python -m nexus_checks docs/procurement --repo . --exclude '*_2026-09-22.md'   # drafts (v4 archives excluded)
 python -m nexus_checks --release <outgoing copies>          # release gate (banner must be gone)
-pytest -q evals/test_nexus_checks.py
+python -m nexus_checks --transmission --state   # RFI numbers == model; state files current
+pytest -q evals
 ```
 
-Checks: vendor-facing hygiene (FM-005), EN/ZH structural parity (FM-006), superseded
-values in documents (FM-007; complements `steel_action_gates.detect_obsolete_values`
-which guards the intake JSON), git health (FM-008).
+Checks:
+- vendor-facing hygiene (FM-005);
+- EN/ZH structural parity (FM-006);
+- superseded values in documents (FM-007; complements `steel_action_gates.detect_obsolete_values`,
+  which guards the intake JSON);
+- git health (FM-008);
+- **transmission** (FM-010): every checked RFI number is recomputed from `slab_line_design`
+  on its stated basis. A model change that moves a vendor-facing number turns CI red;
+- **state freshness and broken pointers** (FM-011): the written memory must keep up with the repo.
+
+Verification discipline (FM-012): report test counts only from a fresh worktree of the
+committed SHA, and compare `git show --stat` with the commit message. Never use `git stash`
+to set work aside.
 
 ## 6. Git on the bridged Windows mount
 
@@ -94,5 +120,7 @@ documents, CAPTCHA.
 
 ## 8. End of a work cycle
 
-Report only: what now works (with test evidence), discoveries, failures converted to
+A cycle is not finished until the memory is written: update `.nexus/state/CURRENT_STATE.md`
+and the project's checkpoint and control doc, then make `python -m nexus_checks --state --repo .`
+pass. Report only: what now works (with test evidence), discoveries, failures converted to
 checks, open decisions for the owner, next safe action, exact approval required.

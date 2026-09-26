@@ -49,6 +49,7 @@
     }
   ],
   "broken_reference_scan": [
+    "CLAUDE.md",
     ".nexus/state/CURRENT_STATE.md",
     ".nexus/steel/KERNEL.md",
     ".nexus/steel/CHECKPOINT.md",

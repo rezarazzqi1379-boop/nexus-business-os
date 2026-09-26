@@ -131,7 +131,11 @@ def test_cli_transmission_flag_passes_on_real_repo(capsys):
     assert rc == 0
 
 
-def test_cli_transmission_requires_repo():
+def test_cli_transmission_defaults_repo_to_cwd(monkeypatch):
+    # Contract changed at integration: --transmission (like --state) uses --repo or ".",
+    # so CI can run it without --repo (which would also trigger git_health on a
+    # detached, shallow checkout).
+    from pathlib import Path
     from nexus_checks.__main__ import main
-    with pytest.raises(SystemExit):
-        main(["--transmission"])
+    monkeypatch.chdir(Path(__file__).resolve().parents[1])
+    assert main(["--transmission"]) == 0

@@ -66,11 +66,11 @@ Every field that was in v4 is still present in v5. After the independent review,
 | 5.12 MN (6 mm case; phase-1 max 3.48 MN); ≥6 MN stand capacity | Package A T-A; Exec Summary | ESTIMATE [RDR], S355JR |
 | 218.3 / 120.1 kN·m | Package A T-A, §4.4 | ESTIMATE [RDR] |
 | 1600 / 2000 kW; 350 / 700 rpm; ≥1.5× for 30 s; S6/S9; 12-pulse regenerative | Package A §3.7 | [RDR] |
-| Reversals 85–170/h by thickness (238/h = accelerations plus brakings) | Package A §8.4, T-3 (corrects the 238 in §3.7 and §4.1) | calculated |
-| Peak regenerative power ≥650 kW | Package A §8.1 (corrects the 1000 kW in §3.7) | calculated |
+| Reversals 85–170/h by thickness; accelerations plus brakings 204–374/h over the same range (v5.1: 238 was the 20 mm case only) | Package A §8.4, T-3; `slab_line_design`: 2 × passes × 16.99 slabs/h (transmission audit 2026-09-26, M1) | calculated |
+| Peak regenerative power ≥680 kW at 3 s ramp (≈1,010 kW at 2 s) (v5.1: 650 omitted drive-train inertia) | `braking_per_stop(inertia_at_motor_kgm2(7.1, rotor 750), 678 rpm, 3 s)` = 675 kW (audit M3); Package A §8.1 used rotor inertia only | calculated |
 | Reversing vs one-way | Package A §1.1, row 8 | UNKNOWN (RFIs say "reversing assumed") |
 | 34 kN·m peak at motor shaft; 2040 kW at 647 rpm for 2.9 s | Package A §3.7, T-2 | calculated |
-| Ratio ≈7.1, range 6.3–8.0; ≥330 / 405 / ≥655 / 805 kN·m; SF 2.21; ISO 6336/281; L10h 100,000 h | Package A §4.1, §8.2; Exec Summary (T-4 says 325/400/810: a rounding inconsistency inside the source) | [RDR] / ASSUMPTION |
+| Ratio ≈7.1, range 6.3–8.0; ≥345 / ≈420 / ≥685 / 840 kN·m at the gearbox OUTPUT (v5.1: 330/405/655/805 were roll-referred; ÷0.9605 = 341/419/682/839, rounded up to 5; audit M2); SF 2.21; ISO 6336/281; L10h 100,000 h | Package A §4.1, §8.2; Exec Summary (T-4 says 325/400/810: a rounding inconsistency inside the source) | [RDR] / ASSUMPTION |
 | Two-stage preferred | Package A §8.5, T-5 | [RDR] |
 | Duty spectrum | Package A §4.2 | calculated |
 | Pinion centre ≈646 mm | Package A §4.4, T-I | [RDR], subject to GA |

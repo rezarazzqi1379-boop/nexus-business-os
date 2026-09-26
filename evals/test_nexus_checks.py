@@ -135,3 +135,27 @@ def test_cli_exclude_skips_archived_files(tmp_path, capsys):
     _w(tmp_path, "RFQ-NEW_EN_v5.md", "## 1\nclean\n")
     assert main([str(tmp_path)]) == 1
     assert main([str(tmp_path), "--exclude", "*_2026-09-22.md"]) == 0
+
+
+def test_reversal_238_ignores_line_counts(tmp_path):
+    # FP found 2026-09-24 in BRANCH_TRIAGE: "238-line test file" is a file length.
+    ok = _w(tmp_path, "c.md", "Single 238-line pure-addition test file; 238 lines added; 238行\n")
+    assert superseded_values.check_file(ok) == []
+
+
+def test_reversal_238_still_caught_in_rates_and_cjk(tmp_path):
+    # Red-team 2026-09-26: a rate after "lines" and CJK text must still be flagged.
+    for text in ("up to 238 reversals per hour", "238 lines/h", "可逆 238次/小时", "۲۳۸ معکوس در ساعت"):
+        f = _w(tmp_path, "e.md", text + "\n")
+        assert [x.rule for x in superseded_values.check_file(f)] == ["SV-reversals-238"], text
+
+
+def test_v51_superseded_gearbox_and_regen_values(tmp_path):
+    # Transmission audit 2026-09-26: v5 RFIs carried roll-referred gearbox torques and a
+    # regen figure without drive-train inertia.
+    bad = _w(tmp_path, "g.md", "| Guaranteed peak output torque | >=655 kN·m |\n| Drive | regenerative power >=650 kW |\n")
+    assert sorted(f.rule for f in superseded_values.check_file(bad)) == ["SV-gbx-roll-referred", "SV-regen-650kW"]
+    ok = _w(tmp_path, "h.md", "| Guaranteed peak output torque | >=685 kN·m |\n| Drive | regenerative power >=680 kW |\n"
+                              "v5.1: 655 kN·m was roll-referred; now 685 kN·m at the output\n")
+    assert superseded_values.check_file(ok) == []
+

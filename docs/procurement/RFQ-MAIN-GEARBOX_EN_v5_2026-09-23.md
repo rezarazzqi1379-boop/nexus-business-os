@@ -31,13 +31,13 @@ These are our own engineering estimates, based on S355JR. They are not a purchas
 |---|---|
 | Motor input | DC, 1600 kW or 2000 kW continuous; 350–700 rpm |
 | Output speed | ≈49–99 rpm at option (B) |
-| Rated output torque | ≥330 kN·m (≈405 kN·m preferred) |
-| Guaranteed peak output torque | ≥655 kN·m. Please state your guaranteed peak capacity formally. |
-| Expansion option | Peak 805 kN·m, priced separately |
+| Rated output torque | ≥345 kN·m (≈420 kN·m preferred) |
+| Guaranteed peak output torque | ≥685 kN·m. Please state your guaranteed peak capacity formally. |
+| Expansion option | Peak 840 kN·m, priced separately |
 | Rated power | ≥1800 kW (for 1600 kW motor) / ≥2200 kW (for 2000 kW motor) |
 | Service factor used by us | 2.21 = 1.75 application × 1.15 reversing × 1.00 thermal × 1.10 margin |
 | Rating standards | ISO 6336 (gear teeth); ISO 281 (bearings); bearing life L10h 100,000 h; infinite bending-fatigue life of teeth |
-| Reversals | 85–170 per hour depending on product thickness (≈204,000–408,000 per year at 2400 h); accelerations plus brakings up to ≈238 per hour |
+| Reversals | 85–170 per hour depending on product thickness (≈204,000–408,000 per year at 2400 h); accelerations plus brakings about 204–374 per hour over the same range |
 | Arrangement | Single-stage or two-stage, your choice; our preliminary preference is two-stage (manufacturability, serviceability). Double-helical gearing avoids reversing axial load. |
 | Lubrication and cooling | Forced lubrication with pump and filter; oil-to-water cooler |
 | Monitoring | Oil temperature with alarm; vibration on each output bearing; oil particle count |
@@ -49,7 +49,7 @@ These are our own engineering estimates, based on S355JR. They are not a purchas
 | Block | Output torque | Share of cycle time | Frequency |
 |---|---|---|---|
 | Loaded passes (6 per slab) | 154 to 227 kN·m | 22 % | 102 per hour |
-| Acceleration and braking (12 per slab) | 11 to 28 kN·m equivalent at motor shaft | 38 % | 204 per hour |
+| Acceleration and braking (12 per slab) | 12 to 29 kN·m equivalent at motor shaft | 38 % | 204 per hour |
 | Idle and positioning | ≈0 | 40 % | — |
 | Bite impact | 455 to 682 kN·m, momentary | < 1 % | 102 per hour |
 

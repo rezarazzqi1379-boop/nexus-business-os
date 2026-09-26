@@ -622,3 +622,368 @@ def gearbox_centre_distance_mm(ratio: float, module_mm: float, pinion_teeth: int
         raise ValueError("ratio, module and tooth count must be positive")
     z2 = ratio * pinion_teeth
     return module_mm * (pinion_teeth + z2) / 2.0
+
+
+# ---------------------------------------------------------------------------
+# 9. CORRECTIONS ADDED 2026-09-21 AFTER EXTERNAL REVIEW
+# ---------------------------------------------------------------------------
+# Three of the review's points were reproduced against the model and confirmed
+# as errors in the first issue of this study. They are fixed here rather than
+# patched in prose, and each carries a regression test.
+
+MILL_MODULUS_MN_PER_MM = (3.0, 8.0)
+# ASSUMPTION - plausible range for a two-high stand of this size. The mill
+# modulus is the WHOLE stand: housing stretch, screws and nuts, chock
+# clearance, bearing oil film and Hertzian flattening at the roll contact.
+# It is measured by closing the rolls on themselves and reading the screw
+# position against load - a half-day test. Until it is measured it is UNKNOWN.
+
+
+def stand_stretch_mm(force_n: float, mill_modulus_mn_per_mm: float) -> float:
+    """Total stand deflection under roll separating force. This is the number
+    that governs thickness control, NOT the barrel bending."""
+    if mill_modulus_mn_per_mm <= 0:
+        raise ValueError("mill modulus must be positive")
+    return force_n / 1e6 / mill_modulus_mn_per_mm
+
+
+def roll_centre_distance_mm(exit_thickness_mm: float,
+                            diameter_mm: float = ROLL_DIAMETER_MM) -> float:
+    """Centre distance of the two work rolls during a pass = D + gap, and the
+    gap is that pass's EXIT thickness."""
+    if exit_thickness_mm < 0:
+        raise ValueError("thickness must be non-negative")
+    return diameter_mm + exit_thickness_mm
+
+
+def roll_centre_range_mm(passes: list[Pass], diameter_mm: float = ROLL_DIAMETER_MM,
+                         include_entry: bool = True) -> tuple[float, float]:
+    """The FULL range across a schedule, first pass included.
+
+    The first issue of this study tabulated only the finishing gaps (6-30 mm)
+    and concluded the spindle angle stayed under 1 degree. The roughing passes,
+    where the gap is 80-125 mm, were omitted, and there the angle reaches 1.6-2
+    degrees. Caught by external review.
+    """
+    gaps = [p.exit_h for p in passes]
+    if include_entry:
+        gaps.append(passes[0].entry_h)
+    return diameter_mm + min(gaps), diameter_mm + max(gaps)
+
+
+def optimal_pinion_centre_mm(passes: list[Pass], diameter_new_mm: float = ROLL_DIAMETER_MM,
+                             diameter_worn_mm: float | None = None) -> dict:
+    """Minimise the WORST spindle offset across the whole operating range.
+
+    For a symmetric penalty the optimum is the midpoint of the range, because
+    the offset is |centre - pinion_centre| and the max of that over an interval
+    is minimised at its midpoint.
+    """
+    lo, hi = roll_centre_range_mm(passes, diameter_new_mm)
+    if diameter_worn_mm:
+        lo2, hi2 = roll_centre_range_mm(passes, diameter_worn_mm)
+        lo, hi = min(lo, lo2), max(hi, hi2)
+    mid = (lo + hi) / 2.0
+    return {"range_low_mm": lo, "range_high_mm": hi,
+            "optimal_centre_mm": mid, "max_offset_mm": (hi - lo) / 2.0}
+
+
+def inertia_at_motor_kgm2(gear_ratio: float, n_rolls: int = 2,
+                          motor_rotor_j: float = 400.0,
+                          drivetrain_j: float = 50.0,
+                          diameter_mm: float = ROLL_DIAMETER_MM,
+                          barrel_mm: float = BARREL_LENGTH_MM,
+                          neck_allowance: float = 1.20) -> float:
+    """J referred to the motor shaft. motor_rotor_j is an ASSUMPTION for a
+    ~1600 kW / 400 rpm DC mill machine (GD^2/4); the nameplate replaces it."""
+    r = diameter_mm / 2000.0
+    mass = math.pi * r ** 2 * (barrel_mm / 1000.0) * RHO * neck_allowance
+    j_roll = 0.5 * mass * r ** 2
+    return motor_rotor_j + drivetrain_j + n_rolls * j_roll / gear_ratio ** 2
+
+
+@dataclass(frozen=True)
+class MotorDuty:
+    rolling_rms_nm: float
+    accel_torque_nm: float
+    worst_simultaneous_nm: float
+    thermal_rms_nm: float
+    base_torque_nm: float
+    thermal_utilisation: float
+    peak_utilisation: float
+    reversals_per_hour: float
+    verdict: str
+
+
+def motor_duty(passes: list[Pass], rated_kw: float, base_rpm: float,
+               gear_ratio: float, cycle_seconds: float,
+               slabs_per_hour: float, accel_time_s: float = 2.0,
+               max_rpm: float | None = None,
+               motor_rotor_j: float = 400.0) -> MotorDuty:
+    """The check the first issue of this study did NOT do.
+
+    Feasibility was tested pass by pass on torque alone. A reversing mill also
+    has to be checked THERMALLY over the whole cycle, and the acceleration of
+    the rotating masses has to be counted - at 100-190 reversals an hour it is
+    not a rounding error.
+    """
+    eta = ETA_GEARBOX * ETA_PINION * ETA_SPINDLE
+    w_base = 2 * math.pi * base_rpm / 60.0
+    t_base = rated_kw * 1000.0 / w_base
+    n_max = max_rpm or base_rpm * 3.0
+
+    motor_torques = [p.torque_roll_nm / (gear_ratio * eta) for p in passes]
+    times = [p.rolling_time_s for p in passes]
+
+    j = inertia_at_motor_kgm2(gear_ratio, motor_rotor_j=motor_rotor_j)
+    alpha = (2 * math.pi * n_max / 60.0) / accel_time_s
+    t_acc = j * alpha
+
+    # every pass is preceded by an acceleration and followed by a deceleration
+    n_events = 2 * len(passes)
+    accel_time_total = n_events * accel_time_s
+
+    sum_sq = sum(t ** 2 * dt for t, dt in zip(motor_torques, times))
+    sum_sq += t_acc ** 2 * accel_time_total
+    idle = max(cycle_seconds - sum(times) - accel_time_total, 0.0)
+    thermal_rms = math.sqrt(sum_sq / (sum(times) + accel_time_total + idle))
+
+    rolling_rms = math.sqrt(sum_sq_r / sum(times)) if (sum_sq_r := sum(
+        t ** 2 * dt for t, dt in zip(motor_torques, times))) else 0.0
+    worst_sim = max(motor_torques) + t_acc
+
+    util_th = thermal_rms / t_base
+    util_pk = worst_sim / t_base
+    if util_th > 1.0:
+        verdict = "THERMALLY OVERLOADED - the machine will overheat"
+    elif util_pk > 2.0:
+        verdict = "PEAK EXCEEDS 200 % OVERLOAD - commutation limit likely breached"
+    elif util_th > 0.85:
+        verdict = "thermally tight - confirm duty class with the maker"
+    else:
+        verdict = "acceptable on both thermal and peak criteria"
+    return MotorDuty(rolling_rms, t_acc, worst_sim, thermal_rms, t_base,
+                     util_th, util_pk, slabs_per_hour * n_events, verdict)
+
+
+# ---------------------------------------------------------------------------
+# 10. DRIVE-TRAIN DETAIL FOR THE VENDOR PACKAGE (2026-09-21)
+# ---------------------------------------------------------------------------
+ETA_COUPLING = 0.995        # ASSUMPTION gear coupling, per coupling
+SPINDLE_SPLIT = 0.50        # two spindles, nominally equal share
+SPINDLE_SPLIT_IMBALANCE = 0.10
+# ASSUMPTION. In a two-high stand the top and bottom rolls do NOT take exactly
+# half the torque each: the strip is not symmetric about the pass line, the
+# rolls wear differently and the spindle angles differ. A 10 % imbalance is a
+# conventional design allowance, so each spindle is rated for 0.55 of the total.
+
+
+def torque_per_roll_nm(total_torque_nm: float,
+                       imbalance: float = SPINDLE_SPLIT_IMBALANCE) -> dict:
+    """Split of the total rolling torque between the two rolls/spindles."""
+    if total_torque_nm < 0 or not 0.0 <= imbalance < 1.0:
+        raise ValueError("invalid torque or imbalance")
+    nominal = total_torque_nm * SPINDLE_SPLIT
+    return {"nominal_per_roll_nm": nominal,
+            "design_per_spindle_nm": nominal * (1.0 + imbalance),
+            "imbalance_allowance": imbalance}
+
+
+def loss_chain(roll_torque_nm: float, gear_ratio: float, stages: int = 2) -> dict:
+    """Torque referred back station by station, with each loss shown separately
+    rather than lumped into one efficiency."""
+    eta_gb = ETA_GEARBOX ** stages
+    spindles = roll_torque_nm / ETA_SPINDLE
+    pinion_out = spindles / ETA_COUPLING
+    pinion_in = pinion_out / ETA_PINION
+    gb_out = pinion_in / ETA_COUPLING
+    gb_in = gb_out / (gear_ratio * eta_gb)
+    motor = gb_in / ETA_COUPLING
+    return {
+        "at_rolls_nm": roll_torque_nm,
+        "after_spindles_nm": spindles,
+        "pinion_output_nm": pinion_out,
+        "pinion_input_nm": pinion_in,
+        "gearbox_output_nm": gb_out,
+        "gearbox_input_nm": gb_in,
+        "motor_shaft_nm": motor,
+        "eta_gearbox_total": eta_gb,
+        "eta_overall": roll_torque_nm / (motor * gear_ratio),
+        "stages": stages,
+    }
+
+
+def split_ratio(total_ratio: float, stages: int = 2) -> list[tuple[float, ...]]:
+    """Candidate stage splits that multiply to the target, snapped to standard
+    ratios. For a two-stage box the first stage normally carries the larger
+    share so the slow-speed wheel stays small."""
+    if stages != 2:
+        raise ValueError("only two-stage splits are generated here")
+    out = []
+    for r1 in STANDARD_RATIOS:
+        if not 2.5 <= r1 <= 5.6:
+            continue
+        r2 = total_ratio / r1
+        near = min(STANDARD_RATIOS, key=lambda r: abs(r - r2))
+        if abs(near - r2) / r2 < 0.06 and 2.5 <= near <= 5.6:
+            out.append((r1, near, r1 * near))
+    return out
+
+
+def reverse_time_s(speed_m_s: float, accel_time_s: float, dwell_s: float = 1.0,
+                   max_line_speed: float = MAX_LINE_SPEED_M_S) -> float:
+    """Decelerate to zero, dwell for the screw-down move, accelerate the other
+    way. Ramp times scale with the fraction of top speed actually used."""
+    if accel_time_s <= 0 or speed_m_s < 0:
+        raise ValueError("invalid ramp inputs")
+    f = speed_m_s / max_line_speed
+    return 2.0 * accel_time_s * f + dwell_s
+
+
+def braking_energy_j(inertia_kgm2: float, motor_rpm: float) -> float:
+    """Rotational kinetic energy that must go somewhere on every reversal."""
+    w = 2 * math.pi * motor_rpm / 60.0
+    return 0.5 * inertia_kgm2 * w ** 2
+
+
+def braking_power_kw(inertia_kgm2: float, motor_rpm: float, decel_s: float) -> float:
+    if decel_s <= 0:
+        raise ValueError("deceleration time must be positive")
+    return braking_energy_j(inertia_kgm2, motor_rpm) / decel_s / 1000.0
+
+
+def commutation_overload_limit(motor_rpm: float, base_rpm: float,
+                               limit_at_base: float = 2.0,
+                               limit_at_3x: float = 1.2) -> float:
+    """DC machines cannot hold their base-speed overload factor up into the
+    field-weakened range: commutation, not heating, is the ceiling there.
+
+    ASSUMPTION - a linear fall from `limit_at_base` at n_base to `limit_at_3x`
+    at 3x base. The real envelope is a vendor curve and must replace this.
+    """
+    if base_rpm <= 0:
+        raise ValueError("base speed must be positive")
+    if motor_rpm <= base_rpm:
+        return limit_at_base
+    f = min((motor_rpm / base_rpm - 1.0) / 2.0, 1.0)
+    return limit_at_base + f * (limit_at_3x - limit_at_base)
+
+
+def commutation_check(passes: list[Pass], rated_kw: float, base_rpm: float,
+                      gear_ratio: float, accel_torque_nm: float) -> dict:
+    """Check every pass against the speed-dependent overload envelope, not
+    against a flat 200 %."""
+    eta = ETA_GEARBOX ** 2 * ETA_PINION * ETA_SPINDLE * ETA_COUPLING ** 2
+    t_base = rated_kw * 1000.0 / (2 * math.pi * base_rpm / 60.0)
+    worst, worst_pass, ok = 0.0, 0, True
+    for p in passes:
+        n_motor = p.roll_rpm * gear_ratio
+        t_needed = p.torque_roll_nm / (gear_ratio * eta)
+        t_avail_cont = t_base if n_motor <= base_rpm else t_base * base_rpm / n_motor
+        allowed = t_avail_cont * commutation_overload_limit(n_motor, base_rpm)
+        util = t_needed / allowed
+        if util > worst:
+            worst, worst_pass = util, p.index
+        if util > 1.0:
+            ok = False
+    # the reversal itself happens at top speed, where the envelope is tightest
+    n_top = max(p.roll_rpm for p in passes) * gear_ratio
+    t_cont_top = t_base * base_rpm / n_top if n_top > base_rpm else t_base
+    accel_util = accel_torque_nm / (t_cont_top * commutation_overload_limit(n_top, base_rpm))
+    return {"worst_rolling_utilisation": worst, "worst_pass": worst_pass,
+            "reversal_utilisation": accel_util,
+            "rolling_ok": ok, "reversal_ok": accel_util <= 1.0,
+            "envelope_at_top_speed": commutation_overload_limit(n_top, base_rpm)}
+
+
+# ---------------------------------------------------------------------------
+# 11. TRACEABILITY AND UNIT DISCIPLINE (added 2026-09-21 after owner review)
+# ---------------------------------------------------------------------------
+def braking_per_stop(inertia_kgm2: float, motor_rpm: float, decel_s: float) -> dict:
+    """ENERGY and POWER reported separately and in their own units.
+
+    A previous issue of this package wrote "each reversal returns 284-945 kW of
+    energy". kW is power, not energy. The two are reported here as distinct
+    quantities with distinct units, plus the hourly AVERAGE power, which is a
+    third quantity again.
+    """
+    e_j = braking_energy_j(inertia_kgm2, motor_rpm)
+    return {
+        "energy_per_stop_mj": e_j / 1e6,
+        "energy_per_stop_kwh": e_j / 3.6e6,
+        "instantaneous_power_kw": e_j / decel_s / 1000.0,
+        "decel_s": decel_s,
+    }
+
+
+def braking_hourly_average_kw(inertia_kgm2: float, motor_rpm: float,
+                              reversals_per_hour: float) -> float:
+    """Average regenerated power over an hour - a different number again from
+    the instantaneous peak, and the one the substation sees as a load."""
+    if reversals_per_hour < 0:
+        raise ValueError("reversals per hour must be non-negative")
+    return braking_energy_j(inertia_kgm2, motor_rpm) * reversals_per_hour / 3.6e6
+
+
+def reversals_per_slab(passes: list[Pass]) -> int:
+    """One reversal between consecutive passes. NOT a single number shared by
+    every thickness - it runs 5 at 30 mm to 10 at 6 mm."""
+    return max(len(passes) - 1, 0)
+
+
+def gearbox_rating_trace(passes: list[Pass], gear_ratio: float,
+                         cycle_seconds: float,
+                         peak_allowance: float = GEARBOX_PEAK_ALLOWANCE,
+                         headroom: float = 1.23) -> dict:
+    """Every gearbox number traced back to the computed rolling torque.
+
+    Returns each step so the reader can see which figure is a REQUIREMENT
+    (derived from a computed load plus a stated factor), which is a
+    RECOMMENDATION (a requirement plus headroom) and which is an EXPANSION
+    OPTION (priced separately, not needed for phase one).
+    """
+    ch = torque_chain(passes, gear_ratio, cycle_seconds)
+    crit_a = ch.rms_roll_nm * ch.service_factor
+    crit_b = ch.bite_shock_high_nm / peak_allowance
+    governing = max(crit_a, crit_b)
+    return {
+        "computed_peak_roll_nm": ch.peak_rolling_roll_nm,
+        "at_gearbox_output_nm": ch.peak_rolling_roll_nm / (
+            ETA_SPINDLE * ETA_COUPLING * ETA_PINION * ETA_COUPLING),
+        "rms_roll_nm": ch.rms_roll_nm,
+        "service_factor": ch.service_factor,
+        "criterion_a_fatigue_nm": crit_a,
+        "bite_shock_2x_nm": ch.bite_shock_low_nm,
+        "bite_shock_3x_nm": ch.bite_shock_high_nm,
+        "criterion_b_peak_nm": crit_b,
+        "governing_criterion": "B (bite shock)" if crit_b > crit_a else "A (fatigue)",
+        "rated_requirement_nm": governing,
+        "rated_recommendation_nm": governing * headroom,
+        "guaranteed_peak_requirement_nm": ch.bite_shock_high_nm,
+        "expansion_option_peak_nm": ch.bite_shock_high_nm * headroom,
+        "headroom_factor": headroom,
+    }
+
+
+def motor_at_operating_point(pass_: Pass, rated_kw: float, base_rpm: float,
+                             gear_ratio: float, eta_overall: float = 0.899) -> dict:
+    """Is this motor adequate at THIS pass on its continuous rating, or only
+    with short-time overload? The package must state which."""
+    n_motor = pass_.roll_rpm * gear_ratio
+    w_base = 2 * math.pi * base_rpm / 60.0
+    t_base = rated_kw * 1000.0 / w_base
+    t_continuous = t_base if n_motor <= base_rpm else t_base * base_rpm / n_motor
+    t_needed = pass_.torque_roll_nm / gear_ratio / eta_overall
+    envelope = commutation_overload_limit(n_motor, base_rpm)
+    return {
+        "motor_rpm": n_motor,
+        "roll_power_kw": pass_.power_kw,
+        "motor_shaft_power_kw": pass_.power_kw / eta_overall,
+        "torque_needed_nm": t_needed,
+        "torque_continuous_nm": t_continuous,
+        "fraction_of_continuous": t_needed / t_continuous,
+        "commutation_envelope": envelope,
+        "fraction_of_envelope": t_needed / (t_continuous * envelope),
+        "needs_overload": t_needed > t_continuous,
+        "duration_s": pass_.rolling_time_s,
+    }

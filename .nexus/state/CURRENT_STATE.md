@@ -1,589 +1,211 @@
 # NEXUS CURRENT STATE
-Last updated: 2026-09-19 by Claude Code (via Reza) -- reconciled the second main/feat divergence (see MAIN/FEAT MERGE #2 section at the end); rest unchanged
-RULE: Read this file FIRST in any new session before doing anything
-else. Overwrite stale sections when updating — do not just append.
+Last updated: 2026-09-26 by Claude Code (branch `feat/state-freshness-v0.1`, worktree off
+`integ/2026-09-26`) -- full rewrite (RULE below: overwrite stale sections, don't just append).
+Previous version (2026-09-19) is in git history at this same path if any old wording is needed.
 
-## ⚠️ ENVIRONMENT WARNING — TWO INDEPENDENT CLONES EXIST
-Confirmed 2026-09-07 (git cat-file -t cross-check, definitive):
+RULE: Read this file FIRST in any new session before doing anything else. Overwrite stale
+sections when updating -- do not just append. This file governs `docs/procurement/`,
+`docs/expert_foundry/`, `docs/authority/`, `docs/system/`, `.nexus/steel/`,
+`.nexus/expert_foundry/`, `AGENTS.md` and `nexus_checks/` (see
+`.nexus/state/STATE_GOVERNANCE.json`) -- `python -m nexus_checks --state --repo .` fails loud
+if any of those move without this file being touched in the same window (tolerance 2 days).
 
-- Clone A (Claude Code): C:/Users/AvallPc/nexus-business-os
-- Clone B (Codex/ChatGPT): C:\Users\AvallPc\.codex\.chatgpt-projects\
-  g-p-6a8492b077348191a541806c6ff52d75\nexus-business-os
+## ⚠️ ENVIRONMENT WARNING — TWO INDEPENDENT CLONES EXIST (still true, unchanged since 2026-09-07)
+- Clone A (Claude Code): `C:/Users/AvallPc/nexus-business-os`
+- Clone B (Codex/ChatGPT): `C:\Users\AvallPc\.codex\.chatgpt-projects\g-p-6a8492b077348191a541806c6ff52d75\nexus-business-os`
 
-These have SEPARATE .git object stores pointing to the same GitHub
-remote. A commit pushed from one is NOT visible in the other until
-that clone does `git fetch`. Any cross-AI comparison/reconciliation
-work MUST start with an explicit fetch on both sides, or SHAs will
-appear to "not exist" when they actually do (just not fetched yet).
+Separate `.git` object stores, same GitHub remote. A commit pushed from one is invisible in the
+other until that clone runs `git fetch`. Any cross-AI comparison MUST fetch first, or SHAs will
+look "missing" when they're only unfetched (FM-011 is this exact class of error, just applied to
+a single ref instead of a whole clone).
 
-## ⚠️ PYTHON ENVIRONMENT WARNING
-`python` on PATH is a Windows Store stub with NO project dependencies
-installed (no fastapi/uvicorn/pytest/httpx). The real environment is
-`.venv/Scripts/python.exe` in each clone. ALWAYS specify this
-explicitly in any test-running instruction to any AI/agent — do not
-assume `python`/`pytest` bare commands use the right interpreter.
+## ⚠️ PYTHON ENVIRONMENT WARNING (unchanged)
+`python` on PATH is a Windows Store stub with no project dependencies. Use `.venv/Scripts/python.exe`
+in each clone; always say so explicitly in any instruction to any AI/agent.
 
-## AUTHORITY STATUS — ⚠️ UNRESOLVED, BLOCKING
-Status: AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28
+## ⚠️ NEVER `git stash` ON THIS REPO (new rule, 2026-09-26, FM-012)
+A `git stash` / `git stash pop` cycle on 2026-09-24 left one file staged while the commit
+message claimed 15; the reported test counts (682/501) were read from the working tree, not
+the commit. CI was green because it only tests what's actually there. Rule now: never stash to
+set work aside; use a WIP commit or a separate worktree. Before reporting any commit, run
+`git show --stat <sha>` and check it against the message; get test counts from a **fresh
+worktree of the final SHA**, never the working tree that produced it. This is why this session
+used `git worktree add` instead of working in place.
 
-- Notion Cross-AI Handoff Log recorded an OPEN HOLD on 2026-08-28:
-  GitHub main allegedly declared "Master v1.9 / Registry v1.6" but
-  artifacts were not retrievable. Never closed. Zero follow-up for
-  10 days until rediscovered on 2026-09-07.
-- Two files (NEXUS_Source_Registry_v1.8_2026-09-01.docx,
-  NEXUS_Master_Context_v2.1_2026-09-01.docx) are REAL (exist in
-  File Library) but NOT independently confirmed in Drive or Notion
-  as the canonical store. Master_Context_v2.1 also has an internal
-  self-contradiction: its own authority section says v1.8/v2.1
-  govern; its own activation section says v1.9/v1.6 are active.
-- Only versions independently verified as actually stored in
-  Drive/Notion: Source Registry v1.1, Master Context v1.4
-  (dated 2026-08-24).
-- A docs/authority/AUTHORITY_STATUS.md exists on branch
-  feat/authority-reconciliation-status-v0.1 (based on main),
-  independently corroborated by two separate AI sessions. NOT yet
-  merged to main — deliberately held until reconciliation completes.
-- DO NOT cite PRJ-FAL-01-EV-001 ("Pars Damghan") as a registered
-  CLAIM anywhere — not even with the CLAIM label — until this
-  reconciles. Generic FAL-A/FAL-B structure (import ferromanganese /
-  export ferrosilicon, lane isolation) is fine to keep using; it
-  doesn't depend on which version wins. As of 2026-09-07 both
-  fal_vertical.py and prj_fal_01.py have had authority-wording
-  cleanup applied (canonical/governing language removed, replaced
-  with "working structural model... reconciliation pending") —
-  independently cross-verified by Claude Code via git fetch/git show.
-- NEXT ACTION (owner: ChatGPT/NEXUS): build a full Authority
-  Reconciliation Pack comparing v1.1/v1.4/v1.6/v1.8/v1.9/v2.1,
-  publish ONE resolved version to Drive AND docs/authority/ in repo.
+## AUTHORITY STATUS — RECONCILED (PARTIAL), corrected in this update
+**Finding while doing this rewrite:** the 2026-09-19 version of this file still said
+`AUTHORITY_CONFLICT / RECONCILIATION_PENDING since 2026-08-28`, but `docs/authority/AUTHORITY_STATUS.md`
+was updated on **2026-09-17** -- two days *before* that CURRENT_STATE.md revision -- to
+`RECONCILED (PARTIAL)`. This file simply never got the update; a live example of the class of
+staleness `nexus_checks.state_freshness` (added this session, see below) now catches
+mechanically for governed docs, though this particular miss predates that check and was found
+by reading `AUTHORITY_STATUS.md` directly, not by the tool.
 
-## PROJECT PRIORITIES (confirmed 2026-09-05, not disputed)
-- Geography: Iran = Tier 0 (deepest local layer, not "Iran only").
-  Tiers 1-4 are priors, evidence-adaptive reranking, not fixed.
-- First commercial vertical: PRJ-FAL-01 (Ferroalloys) — architecture
-  proceeds regardless of the authority dispute above.
-  - FAL-A: ferromanganese import to Iran → supplier discovery
-  - FAL-B: ferrosilicon export from Iran → foreign buyer discovery
-  - Lanes must stay isolated (no shared prices/counterparties/evidence)
+Current state, per `docs/authority/AUTHORITY_STATUS.md` (dated 2026-09-17, Reza's explicit
+promotion decision):
+- **Canonical, promoted:** NEXUS Master Context v1.4 + Source Registry v1.1 (both 2026-08-24).
+- **NOT promoted, still RECONCILIATION_PENDING:** the v1.6/v1.8/v1.9/v2.1 draft lineage (v2.1 is
+  also internally self-contradictory -- its own Authority section names v1.8/v2.1 as governing
+  while its Activation section names v1.9/v1.6 as active).
+- `docs/expert_foundry/PROJECT_CONTROL_PRJ-STEEL-ROLLING-LINE-01.md` and `.nexus/steel/CHECKPOINT.md`
+  already had this right (`Master Context v1.4 + Source Registry v1.1, commit 68c0832`); this
+  file was the one out of sync.
+- Do not cite `PRJ-FAL-01-EV-001` ("Pars Damghan") as a registered CLAIM anywhere until the
+  draft lineage reconciles. Generic FAL-A/FAL-B lane structure is fine to use regardless.
+
+## PROJECT PRIORITIES (confirmed 2026-09-05, still not disputed)
+- Geography: Iran = Tier 0. Tiers 1-4 are priors, not fixed.
+- First commercial vertical: PRJ-FAL-01 (Ferroalloys) — proceeds regardless of the draft-lineage
+  dispute above. FAL-A: ferromanganese import. FAL-B: ferrosilicon export. Lanes stay isolated.
 - After FAL: KCl/SOP → Hydrotester → Can Forming. Heat Treatment paused.
-- Buyer discovery is primary goal; supplier discovery equally supported.
-- No live Iranian source has been contacted yet (LIVE_PROVIDER_UNWIRED
-  across all 8 source families in iran_source_providers.py). This is
-  a deliberate, separate future decision — NOT to be inferred from
-  "continue autonomously" instructions. Live outreach to real
-  Iran-related commercial contacts may carry export-control/compliance
-  considerations — get real legal advice before that step.
+- No live Iranian source has been contacted (`LIVE_PROVIDER_UNWIRED` in `iran_source_providers.py`,
+  all 8 source families). Deliberate hold, not inferrable from "continue autonomously". Get real
+  export-control/sanctions legal advice before any live outreach.
 
 ## ARCHITECTURE DECISIONS (settled, don't re-litigate)
-- REJECTED: live AI-to-AI autonomous bridge / message bus / daemon
-  that lets one AI execute the other's instructions.
-- ACCEPTED: GitHub-backed Coordination Kit (task_handoff.py →
-  coordination_kit.py → public_mirror_guard.py). Repo-file-based only.
-- Public mirror exists: github.com/rezarazzqi1379-boop/nexus-ai-handoff-public
-  (data only, never authority/instructions — governance rules in its README).
-- human_authorized_extra_rounds (bool) → replaced with
-  extra_round_approval_id bound to a real ApprovalStore grant.
-  KNOWN GAP: verify_handoff_package() doesn't yet independently
-  re-check this against a live ApprovalStore in a separate process.
-- cross_project_touch: v1=bool, v2=tuple. NOT unified. Adapter:
-  v1 False→v2 (), v1 True→v2 fail-closed UNKNOWN sentinel.
-- TestEvidenceV2 distinguishes CALLER_DECLARED vs
-  INDEPENDENTLY_CAPTURED; capture_test_evidence() structurally cannot
-  accept a caller-supplied head_sha.
-- Secret guard is pattern-based only — "no findings" ≠ "confirmed
-  secret-free." Documented, not solved.
-- Review-round budget: 2 automatic, 3rd requires a real
-  human-set approval record, never an AI self-assertion.
+- REJECTED: live AI-to-AI autonomous bridge / daemon that lets one AI execute the other's
+  instructions. ACCEPTED: GitHub-backed Coordination Kit (`task_handoff.py` → `coordination_kit.py`).
+- The old `nexus_brain` / `nexus_control_plane` graph-execution architecture was deliberately
+  deleted at `c7e5c36` (2026-08-25 release commit) in favor of the current flat module layout.
+  `feature/nexus-forge-loop-v0-1` (src/nexus_control_plane/forge.py and siblings, ~7400 lines,
+  branch-only -- not a path in any tree that includes main)
+  rebuilt a similar idea afterwards on a branch that was **never merged** -- that path does not
+  exist on any live branch; it is kept only as an unmerged design-idea reference, not a pointer
+  to real code. Same for the `nexus_brain_v0-1..v0-4` cluster -- abandoned, unmerged, superseded.
+- `human_authorized_extra_rounds` (bool) → replaced by `extra_round_approval_id` bound to a real
+  `ApprovalStore` grant. Known gap: `verify_handoff_package()` doesn't independently re-check this
+  against a live store in a separate process.
+- `cross_project_touch`: v1=bool, v2=tuple, not unified; adapter maps v1 False→v2 (), v1 True→v2
+  fail-closed UNKNOWN sentinel.
+- `TestEvidenceV2` distinguishes CALLER_DECLARED vs INDEPENDENTLY_CAPTURED; `capture_test_evidence()`
+  structurally cannot accept a caller-supplied head_sha.
+- Secret guard is pattern-based only -- "no findings" is not "confirmed secret-free" (documented,
+  not solved).
+- Review-round budget: 2 automatic, 3rd requires a real human-set approval record.
 
-## BRANCH STATE (updated 2026-09-07)
-10+ branches, two independent stacks + one standalone + FAL duplicates:
-- Standalone: feat/prj-hyd-01-engineering-review-v0.1
-- Stack 1 (Deep Search): research-evidence-provider-v0.1 (root) +
-  deep-research-lab-v0.1 (root) → discovery-pipeline-v0.1 →
-  trade-intel-vertical-proof-v0.1 → deep-search-fabric-v2-core-engine
-  → deep-search-market-intelligence-v0.1 (contains prj_fal_01.py,
-  iran_source_providers.py, market_intelligence.py, persian_text.py)
-- Stack 2 (Coordination): dual-ai-task-handoff-v0.1 (root) →
-  nexus-coordination-kit-v0.2 → public-handoff-mirror-contract-v0.1
-- feat/fal-vertical-binding-v0.1: independently real (was mistakenly
-  thought to be a ghost reference — confirmed real 2026-09-07, 13/13
-  tests pass, pushed by ChatGPT via a SEPARATE Codex clone — see
-  environment warning above). Contains fal_vertical.py. Authority
-  wording cleaned up 2026-09-07 (commit 6474519), independently
-  verified via git fetch/git show by Claude Code.
-- feat/authority-reconciliation-status-v0.1: docs/authority/
-  AUTHORITY_STATUS.md, based on main, not yet merged.
-- feat/nexus-state-tracking-v0.1: MERGED to main 2026-09-07
-  (fast-forward, e1d01fa...→e07869d...). This file now lives directly
-  on main.
-- DUPLICATION UNRESOLVED: fal_vertical.py vs prj_fal_01.py — both
-  real, both tested, comparison table exists (fal_vertical.py has
-  better state enforcement/lexicon/isolation API; prj_fal_01.py has
-  a unique buyer-classification bug fix). NOT yet reconciled into one
-  canonical file — pending a neutral comparison harness AND a
-  semantic decision on END_USER vs IMPORTER for FAL-A's home role.
-- Verified mergeable in dependency order with 0 conflicts (disposable
-  local test, nothing pushed/merged). No real GitHub PRs opened yet
-  for any of these (no gh CLI in Claude Code's environment).
-- No PR has been created. No merge to main. Nothing deployed.
+## REPO STATE (2026-09-26) — main, PR #99, PR #100
 
-## OTHER REAL ASSETS DISCOVERED (2026-09-07, exist but disconnected from GitHub)
-- Google Drive: NEXUS_CANONICAL_CONFLICT_REGISTER_v1 (stale since
-  23 Aug — different conflict-tracking doc than the Notion HOLD above)
-- Google Drive: ATF_Asset_Registry_CURRENT_v1.0 — ALREADY BUILT,
-  well-designed: SHA-256-locked golden masters for logo/stamp/
-  signature, fail-closed release gate, 6/6 tests passed. Open gap:
-  EN/FA letterheads still REVIEW_ONLY_PRINT_RELEASE_BLOCKED (not true
-  vector/300dpi masters yet). Linking into docs/authority/ deferred —
-  kept as a separate lane from NEXUS/FAL authority reconciliation.
-- Notion: "Cross-AI Handoff Log" — 63 entries, ChatGPT-only (no Claude
-  entries ever), last activity 2026-08-28. Effectively superseded by
-  GitHub .nexus/handoffs/ going forward but its history was never
-  migrated — this is where the authority HOLD was found.
+- `origin/main` = `49ba5a0` (merge of PR #98, china-sourcing v0.2), unchanged since 2026-09-19's
+  round-2 branch archaeology.
+- **PR #99** `fix/governance-carryover-v0.1`, head `7ca442b` (was `9d4244f`, then `724dbe4`):
+  intended to carry over the safe part of the abandoned `feat/unified-system-governance-v0.1`
+  branch's commit `2451722` -- `closing()` wrapping on sqlite connections across 6 modules,
+  `system_capability_registry` wired into `activate()`, PRJ-FAL-01/FAL text in `AGENTS.md`.
+  **FM-012:** the first version of this PR (`9d4244f`) contained *only a test file* -- the code
+  it claimed (six modules' worth of `closing()` fixes) was never actually staged, because a
+  `git stash pop` had put the changes in the working tree but not the index. An independent
+  red-team review caught it by diffing `git show --stat` against the commit message
+  (`docs/system/REDTEAM_PR99_PR100_2026-09-26.md`, finding P0-1). Fixed in `7ca442b`, which
+  actually contains the carry-over code. **Still open (P2-4, same red-team review, not fixed by
+  this session -- out of this session's scope):** `nexus_status_brief.py:51,62` still uses
+  unwrapped `with sqlite3.connect(...)`, so "main no longer leaks connections" is not fully true
+  yet even after `7ca442b`. **Also open (P2-5):** the PRJ-FAL-01 portfolio-priority row has no
+  test asserting which project it displaces from `watch_portfolio`'s running set.
+- **PR #100** `feat/steel-recovery-sync-v0.2`, head `0940544` (was `21c51b6`, `14407f4`, `b33d42b`):
+  slab-line code corrections from the external + owner review rounds, CI switched to run the
+  full `pytest evals` tree (previously 18 pytest-style files, 402 tests, never ran in CI --
+  FM-011's companion finding), branch triage of the 71 remaining branches
+  (`docs/system/BRANCH_TRIAGE_2026-09-24.md`), and (in `583216e`/`0940544`) a v5.1 fix to four
+  wrong numbers in the vendor-facing procurement RFIs found by the 2026-09-26 transmission audit
+  (`docs/system/TRANSMISSION_AUDIT_STEEL_2026-09-26.md`) plus the same red-team review's
+  corrections (FM-012's writeup, ENG-10 in the control doc).
+- **Neither PR is merged to `origin/main` yet.** This session's base, local branch
+  `integ/2026-09-26` (`68f8d89`), is main + both PRs merged locally for testing -- both merge
+  cleanly in either order and both produce the same tree (`REDTEAM_PR99_PR100_2026-09-26.md`,
+  "Checked and clean"). Merging the real PRs on GitHub is Reza's action, not automated here.
+- Full suite on the combined tree (from the red-team's fresh-worktree run, reproduced by this
+  session below): `pytest evals` 1097 passed, `pytest tests` (PYTHONPATH=src) 501 passed,
+  `unittest discover -s evals` picks up the TestCase subset, `nexus_checks docs/procurement
+  --exclude '*_2026-09-22.md'` 0 errors.
 
-## OPEN / NEXT ACTIONS
-1. [ChatGPT] Close the authority reconciliation (see above) — blocking.
-2. [Either AI] Build a neutral comparison harness for fal_vertical.py
-   vs prj_fal_01.py; resolve END_USER vs IMPORTER via semantic
-   review, not just code-convention matching. Both clones must fetch
-   first and use their own .venv/Scripts/python.exe.
-3. [Reza] Decide: merge docs/authority/AUTHORITY_STATUS.md to main
-   once reconciliation completes (currently deliberately held on a
-   separate branch).
-4. [Reza] Decide: proceed with live Iran-source integration (first
-   real attempt at ONE source) or hold for legal/compliance check first.
-5. [DONE, 2026-09-14, commit 7e7c96f, on main — corrected 2026-09-17]
-   Opportunity Suggestion Engine (Track E) is BUILT, not just designed:
-   opportunity_suggestion_engine.py (251 lines) + evals/test_opportunity_suggestion_engine.py
-   (16/16 tests passing, verified 2026-09-17). Draft-only queue, human
-   review required, compliance gate (UNREVIEWED/CLEARED/BLOCKED) blocks
-   any next-step ApprovalRequest until a named human clears sanctions/
-   export-control review — no send/execute/outreach method exists in
-   the module. Surfaced via nexus_status_brief.py's pending-opportunity
-   count. This line was stale for 3 days (built the same week it was
-   still listed here as "not yet built") — a reminder to check the
-   actual file/git history before trusting this section, not just the
-   prose.
-   REMAINING GAP (not done): no real signal has ever been submitted to
-   it — no opportunity_drafts.db exists anywhere in the repo, only
-   test runs against tmp paths. submit() currently validates lane scope
-   via fal_vertical.assert_lane_scope(), i.e. FAL-A/FAL-B only; it has
-   not been checked against/generalized for other verticals (e.g. the
-   real evidence-graded Hydrotester data in
-   data/entry_map_baku_eastpipes_2026-08-21.json, which is a different
-   vertical, currently paused per project priorities above). Next real
-   step, if wanted: get one genuine FAL-A/FAL-B signal and run it
-   through OpportunityQueue.submit() end-to-end — not fabricated test
-   data standing in for a real signal.
+## OPEN OWNER DECISIONS (full detail: `docs/expert_foundry/PROJECT_CONTROL_PRJ-STEEL-ROLLING-LINE-01.md` §3 -- not duplicated here, per this repo's own "point, don't copy" rule in `.nexus/steel/KERNEL.md`)
 
-6. [Reza] Get real sanctions/export-control legal advice for FAL-A/FAL-B --
-   the compliance gate above only records a human decision, it doesn't
-   determine legality itself.
-7. [Not started] fal_trade_economics.py exists (landed cost, margin,
-   breakeven, spec-adjusted price) but has never been run against a real
-   quote -- needs real FX/freight/duty numbers before it means anything.
+Blocking, needs Reza:
+- **DEC-01** — design basis: engineer's spec (DC 1250 kW, 1:25, pinion centre 600, ~1-1.5 m/s,
+  thick product) vs Package A (1600/2000 kW, ~1:7.1, centre 646, 3 m/s, 6-30 mm). Both kept as
+  CLAIM/RDR side by side (FM-009: neither "incompatible" verdict held once the hidden assumption
+  was named). Opens ENG-08, PRC-15.
+- **PRC-01/02/13** — is the Ø600 stand existing-in-hand or broker-sourced; furnace target rate
+  (20 t/h only, or also quote higher); approval to add Jinghuanre (南京净环热) as a furnace RFI
+  recipient and whether to also RFI non-Chinese makers (NSKO Iran, CTS Turkey, Tenova).
+- **ENG-09** — six unresolved questions back to the engineer (photo source, manual adjustment
+  screw on a reversing mill, 600 vs 620, motor rpm 1250, target thickness, spindle type) --
+  `docs/procurement/ENGINEER_SPEC_AND_STOCK_SEARCH_2026-09-23.md` §5.
+- **ENG-10** — number-transmission audit (model → vendor documents), P1 items needing an
+  engineering call: cycle-time basis mismatch (~95 s vs 212 s), gearbox nameplate power not
+  derived from any model function, one RFI's 5.12 MN doesn't state its scenario basis, no drive
+  torque limit requested against a motor that can deliver ~729 kN·m, and Package B still repeats
+  a "cast iron rejected" verdict Package A already retracted.
+- **OPS-04** — 129 untracked ruflo paths on the owner's laptop clone (not reproduced in this
+  worktree, which is clean); `.claude/settings.json` there still enables ruflo plugins the
+  owner turned off locally. Needs a decision to delete or `.gitignore`, and a commit only Reza
+  can make (Claude cannot write `.claude/`).
+- **OPS-05** — ~145 files that only differ by line-ending/permission mount noise; candidate fix
+  `core.filemode=false`.
+- **OPS-08** — merge PR #99 once Reza reviews the FM-012 fix, plus a separate governance call
+  (lock "PILOT/ADOPTED agents only"; PRJ-FAL-01 portfolio row priority, see P2-5 above).
+- **OPS-11** — 71 remaining branches: 9 merge candidates, 14 partially extractable, 40 archive,
+  8 need Reza's call (`docs/system/BRANCH_TRIAGE_2026-09-24.md`).
+- **PARK-01** — PRJ-CAN-01 package review (zip + docx, v1.9/v2.1 version mismatch), parked
+  pending explicit go-ahead.
 
-## EXPERT FOUNDRY ACTIVATION (2026-09-08)
-- Expert Foundry v0.1 merged to main as a governed research-memory scaffold.
-- Phase-0 steel-ingot preflight exists and passes focused tests; it is not the
-  architecture's full acceptance proof.
-- Current runtime state: READY_FOR_FACTORY_DATA, not production/process control.
-- The preflight stores curated sources (not a claimed live search), gaps, a falsifiable hypothesis, hash chain
-  and snapshot; it refuses to invent a recipe while plant inputs are missing.
-- Next evidence required: one acceptable and one defective historical heat of the same
-  grade/route, with chemistry, process timeline, equipment context and quality results.
-- Governed CSV/JSON/XLSX ingestion is merged to main. Raw inputs are SHA-256 vaulted;
-  normalized records remain unverified and bind back to the raw-file digest.
-- Staff launcher: `scripts/expert_foundry_intake.ps1`; default is dry-run and `-Commit`
-  is required for storage. No web UI or central production deployment exists yet.
+## SCHEDULED WORK
+Weekly stock search (manual/PRC-14 style sourcing sweep): cloud run Saturdays 08:00 Tehran time,
+laptop run Saturdays 09:00 Tehran time. (Owner-stated 2026-09-26; not yet backed by a committed
+schedule file or script in this repo -- if a scheduler config is added for this later, record its
+path here so this line doesn't go stale on its own.)
 
-## ROLLING MILL STUDY (2026-09-12, updated 2026-09-16)
-- Initial equipment description received by voice transcription and preserved as eight
-  `UNVERIFIED` claims; no units or meanings were inferred.
-- Dedicated contract: `.nexus/expert_foundry/ROLLING_MILL_ENGINEERING_INTAKE.json`.
-- Readiness gate: `rolling_mill_intake.py`. Current state is still
-  `READY_FOR_ENGINEER_INTERVIEW`; calculations and operation changes remain blocked.
-- Engineer questionnaire: `docs/expert_foundry/ROLLING_MILL_ENGINEER_QUESTIONNAIRE_FA.md`.
-- **2026-09-16: engineer (Sanami) answered 8 of 34 questionnaire items via WhatsApp** +
-  a handwritten ST1-ST4 stand sketch + a CAD drawing for ST1 (roll dia. 518mm) + an
-  unlabeled ST1-ST4/P1-P10 number table (units not stated -- NOT treated as pass-schedule
-  data). Evidence archived under `docs/expert_foundry/evidence/2026-09-16-engineer-answers/`;
-  recorded as an `EXPERT_INTERVIEW`-sourced CLAIM in the Expert Foundry ledger
-  (`claim-rolling-mill-engineer-answers-20260916`).
-  - Resolved: billet 150x150mm square / 3150mm max length / St37 grade; target width
-    300mm (separate from a 8-10-12-15-20-25mm thickness set, min 8 max 25); the
-    800/125kW/1002 reading turned out to be TWO motors (ST1=1250kW/999rpm/420V/2300A AC
-    w/ starting resistor, ST2=800kW only); the 15/20/25 figures are thickness options,
-    not widths.
-  - Still open / genuinely unresolved (not papered over): safety (guards/E-stop/LOTO)
-    entirely unaddressed; no torque/force limits; no actual nameplate photos (numbers
-    were typed, not photographed); no reheating temp, pass-schedule, or target
-    standard; 4 of 8 original ambiguous claims remain unresolved -- notably barrel
-    length was given as 1280mm (matches the CAD drawing) which does NOT match the
-    previously-logged 1350mm claim, and the original "450" in "roll 450 to 480" is
-    still unaccounted for (480 turned out to be ST2's diameter, not a range on one
-    roll). Full per-stand detail (ST1-ST4 motor/gearbox/roll) lives in the intake
-    JSON's `mill_stands_detail` key since the schema's flat fields only fit one stand.
+## EXPERT FOUNDRY / ROLLING MILL / STEEL PROJECT
+Full detail lives in the steel project's own files, which this file points at rather than copies
+(kept in sync via `.nexus/state/STATE_GOVERNANCE.json`'s freshness check):
+- `.nexus/steel/KERNEL.md`, `.nexus/steel/CHECKPOINT.md` — kernel design + latest engineering
+  checkpoint (active basis: slab 400x125x3000mm, 20 t/h furnace, Ø600 two-high stand, 3 m/s cap,
+  DC drive; billet-line data superseded 2026-09-21, kept for history, do not use).
+- `docs/expert_foundry/PROJECT_CONTROL_PRJ-STEEL-ROLLING-LINE-01.md` — the living control doc
+  (status table, gates G0-G5, full backlog, risk register, decision log). Read this, not this
+  section, for anything steel-specific.
+- `.nexus/expert_foundry/registers/ENGINEERING_FAILURE_MEMORY.md` (FM-001..FM-012),
+  `PRIOR_ART_AND_BENCHMARK_REGISTER.md`, `TECHNOLOGY_RADAR_AND_MARKET_EVIDENCE.md`.
+- Gates as of 2026-09-26 (unchanged from CHECKPOINT.md): `concept_calculation_allowed=True`,
+  `fabrication_release_allowed=False` (11 blockers), old `calculation_allowed` gate untouched
+  at `False`.
 
-## DEEP SEARCH / FAL-A LIVE RESEARCH (2026-09-17, new)
+## OTHER PROJECTS (unchanged, not touched this session)
+- PRJ-HYD-01 (Hydrotester): consolidated onto main 2026-09-19 (commit `1e6d5d5`) from the best of
+  10 independent branch attempts. See the 2026-09-19 history further down this file's git log if
+  full detail is needed; nothing has changed here since.
+- PRJ-KCL-01, PRJ-CAN-01: PRJ-CAN-01 is PARK-01 above; PRJ-KCL-01 not yet started.
+- Opportunity Suggestion Engine (`opportunity_suggestion_engine.py`): built, draft-only queue,
+  compliance gate blocks any next step until a named human clears sanctions/export-control
+  review. No real signal has ever been submitted to it (no `opportunity_drafts.db` exists
+  outside test tmp paths).
 
-- Fixed a real cross-branch integrity gap found while doing this: this branch
-  (feat/unified-system-governance-v0.1) never actually had fal_vertical.py in its
-  own git history, even though opportunity_suggestion_engine.py (already committed
-  here as 7e7c96f) hard-depends on it. It "worked" only because an untracked,
-  uncommitted copy happened to sit in the working directory, content-identical to
-  main's already-committed version. Fixed by committing that same file here too
-  (commit e34c62b) -- a clean clone of this branch before that fix would have
-  failed to import opportunity_suggestion_engine.py.
-- First real (non-synthetic) discovery run for FAL-A (ferromanganese import,
-  foreign SUPPLIER role): 7 candidate entities gathered via live public web search
-  (Georgia/CIS, Turkey, Gulf directories/companies -- China search returned no
-  in-corridor hits worth including) and run through the existing
-  discovery_pipeline.py machinery (ingest_external_discoveries + process_discovery_batch),
-  persisted under research_lab/. Driver: scripts/run_fal_a_discovery.py. Raw data:
-  data/research/fal_a_ferromanganese_discoveries_2026-09-17.jsonl.
-- Result: plausible_buyer_count=0, verified_buyer_count=0 -- correctly declined
-  to promote any single-source, unclassified-category hit. This is the scoring
-  working as designed, not a failure. Next real step to get a non-zero result:
-  either find a second independent source per candidate entity, or manually
-  classify each entity's category (steel_mill/trader/distributor/etc.) rather
-  than leaving all seven as "unknown".
-- Explicitly NOT done and not automatable: contacting any of these entities,
-  creating an account anywhere, or any outreach. outreach_authorized stays
-  hardcoded False in need_radar.py; nothing here reaches OpportunityQueue
-  without further corroboration, and nothing in OpportunityQueue can reach a
-  human-approved next step without a separate, explicit compliance_status=CLEARED
-  review (see opportunity_suggestion_engine.py's compliance gate, and the
-  project-priorities section above on Iran-related sourcing needing real legal
-  advice before live outreach).
+## ROLE SPLIT (unchanged)
+- Claude Code: engineering executor (code/tests/branches).
+- ChatGPT/NEXUS: orchestrator, business context, live connectors, authority recovery.
+- Claude Chat: independent reviewer -- verifies claims against raw evidence, never assumes access
+  it doesn't have.
+- Reza: final approval on all protected actions, tie-breaker on cross-AI disagreement, sole
+  human-in-the-loop for compliance-sensitive decisions.
 
-## ROLE SPLIT (still true)
-- Claude Code: engineering executor (code/tests/branches)
-- ChatGPT/NEXUS (via both a Drive/Notion-connected session AND a
-  separate Codex clone — see environment warning above): orchestrator,
-  business context, live connectors, authority recovery
-- Claude Chat (this): independent reviewer — verifies claims against
-  raw evidence when given file/link access, challenges both other
-  AIs, never assumes access it doesn't have
-- Reza: final approval on all protected actions, tie-breaker on any
-  cross-AI disagreement, sole human-in-the-loop for compliance-
-  sensitive decisions
-
-## MAIN/FEAT MERGE (2026-09-14)
-- feat/unified-system-governance-v0.1 merged into main as commit 5686e14
-  (parents 98a1d44 on main, 4eb3b45 on feat). Confirms the environment
-  warning above with a concrete case, not just a risk: both clones had
-  independently rebuilt the SAME Expert Foundry rolling-mill package
-  (21 overlapping files). 14 were byte-identical (CRLF-vs-LF noise from a
-  file copy); the other 6 (rolling_mill_intake.py + its test,
-  ROLLING_MILL_ENGINEERING_INTAKE.json, this file, and the two
-  CLAUDE_ROLLING_MILL_*.md handoffs) had genuinely different content --
-  main's version won all 6 because it carried the confirmed 2026-09-14
-  dimensions (this file's own ROLLING MILL STUDY section is that content);
-  feat's copies were a stale pre-2026-09-14-confirmation draft pulled from
-  an earlier audit-ZIP reconciliation. fal_vertical.py -- a load-bearing
-  dependency of the new FAL modules below -- existed only as an uncommitted
-  working-tree file on neither branch and is now committed via this merge.
-- New on main from this merge: opportunity_suggestion_engine.py,
-  fal_trade_economics.py, nexus_status_brief.py, market_price_snapshot.py,
-  rolling_mill_mechanics.py (retrospective hot-rolling geometry/force
-  envelope, Sims-style, no material-property assumptions), plus this
-  branch's earlier (pre-2026-09-14) governance-layer work (collaboration
-  growth, continuous research, owner-decision runtime, portfolio watchdog,
-  project control plane, self-improvement runtime, unified data
-  environment, external account orchestrator, learning media pipeline) --
-  none of that governance-layer work has been read/audited as part of this
-  merge; it was carried through unchanged because it never conflicted.
-- NOT pushed to origin yet -- pending Reza's go-ahead, since the remote is
-  what the Codex/ChatGPT clone reads from next.
-- Sandbox note for whichever AI touches this repo via a device-bridge-style
-  sandboxed shell next: that environment could not unlink files under the
-  mounted repo folder (git status/commit/merge all left stale
-  index.lock/HEAD.lock/objects/*/tmp_obj_* debris behind, harmless but
-  noisy -- `mv` the stale lock aside, don't try to `rm` it). A real
-  worktree-based merge failed for the same reason; the fix used here was
-  git plumbing (read-tree -m + commit-tree) with a scratch index file
-  outside the mounted folder.
-
-## MAIN/FEAT MERGE #2 (2026-09-19)
-- Since the first merge (5686e14, above), main and feat/unified-system-governance-v0.1
-  diverged again. Surveyed with `git merge-tree` against their merge-base (4eb3b45):
-  of the files that differ, the huge majority (13 new modules/tests, including
-  self_improvement_runtime.py and unified_data_environment.py) are BYTE-IDENTICAL on
-  both sides -- another instance of the two clones independently rebuilding the same
-  content from a shared source, not a real conflict. Checked by content hash before
-  trusting the file list, per the CRLF-lesson above.
-- 2 of 3 real conflicts resolved by evidence recency (not by which clone produced
-  them), same principle as the first merge; the 3rd is FLAGGED, not resolved:
-  1. `.nexus/expert_foundry/ROLLING_MILL_ENGINEERING_INTAKE.json`, `rolling_mill_intake.py`,
-     `evals/test_rolling_mill_intake.py`, and this file's ROLLING MILL STUDY section --
-     RESOLVED by Reza on 2026-09-19 (explicit, not inferred): the mill's existing
-     physical-capability study and the 220x220mm question are the same topic, not two
-     separate ones. main's schema wins (220x220x3000mm billet, width_options_mm
-     [300,400,600], thickness_range_mm, reported_diameter_around / barrel_length,
-     dated "conversation:2026-09-14"). feat's 150x150mm / ST1-ST4 draft (from the
-     2026-09-16 engineer (Sanami) WhatsApp answers) is superseded for this contract --
-     not deleted from git history, just no longer the live schema. Applied in a
-     follow-up commit on top of the pushed merge (13c7760) rather than amending it,
-     so the record of the original open question and how it got closed stays intact.
-     This is the kind of factual/schema call this project's evidence-discipline rules
-     say Claude must never make silently -- it was made by Reza, on request, which is
-     exactly the required human tie-breaker.
-  2. `.nexus/runtime/expert_foundry/events.jsonl` (append-only, hash-chained ledger)
-     -- feat's copy is a strict superset (one additional CORROBORATED claim record
-     for the same 2026-09-16 engineer answers, appended after 3 records both sides
-     already shared identically). Took feat's full file.
-  3. This file (CURRENT_STATE.md) -- manually synthesized rather than picking one
-     side: kept feat's corrected Track E (Opportunity Suggestion Engine) item 5 and
-     its DEEP SEARCH / FAL-A LIVE RESEARCH and ROLLING MILL STUDY sections (newer,
-     more accurate), added main's items 6-7 (real, non-conflicting facts feat's
-     numbered list didn't have), and kept main's MAIN/FEAT MERGE (2026-09-14)
-     section immediately above this one as unmodified history.
-- Also new on feat since the first merge (not previously on main, no conflict,
-  carried through as-is): FAL-B (ferrosilicon export) live discovery + a second,
-  genuinely multi-provider (claude-web-search-manual + exa-agent-run) pass on both
-  FAL-A and FAL-B; a fix to discovery_pipeline.group_duplicates() so a shared
-  listing/directory-page URL no longer forces distinct named companies into one
-  false "ambiguous" entity (opt-in `source_is_multi_entity_listing` flag, default
-  False, existing fail-closed behavior for an unflagged URL is unchanged and still
-  tested); a reconciled `docs/authority/AUTHORITY_STATUS.md` promoting Master
-  Context v1.4 + Source Registry v1.1 as canonical (the newer v1.6-v2.1 draft
-  lineage stays unpromoted -- still internally self-contradictory); a factual,
-  sourced EO 13871 / Iran-sanctions brief and a 3-tier action-risk policy Reza
-  dictated on 2026-09-17 (`docs/compliance/`) governing which actions run
-  automatically vs. need his approval vs. stop outright for this project going
-  forward; new subagents (branch-integrity-auditor, fal-discovery-batch-runner,
-  rolling-mill-evidence-reviewer).
-- Full evals/ suite run against feat's tip (af20da5) before this merge: 1 unrelated
-  pre-existing failure (test_rolling_mill_intake.py::test_current_voice_claims_fail_closed,
-  no import dependency on anything touched here) -- left untouched, out of scope.
-- Merge commit 13c7760 (parents bb2acae + origin/main's 258be46) built via git
-  plumbing, verified (904 passed, 1 known pre-existing unrelated failure), and pushed
-  to origin main by Reza on 2026-09-19. The rolling-mill flag above was resolved and
-  applied in a follow-up commit on the same day, also pushed to main.
-
-## SESSION SUMMARY (2026-09-19): approvals fix, connector control plane, PRJ-HYD-01 consolidation
-
-Full "check everything, troubleshoot, upgrade" pass requested by Reza after a
-2-day gap. In order:
-
-1. **approvals.py fix** (bb2acae, feat branch) -- see MERGE #2 above.
-2. **feat+main reconciliation** (13c7760 -> e7922b2, main) -- see MERGE #2 above.
-   Reza's call: the rolling-mill 220x220 vs 150x150 schema question was one
-   topic, not two; main's 220x220 schema is authoritative. Confirmed after the
-   fact by the JSON's own claim_existing_150x150_products entry, which already
-   references the 150x150 line as background inside the same 2026-09-14
-   conversation main's schema was built from -- not a separate untracked topic.
-3. **Full branch survey**: all 124 non-main/feat remote branches checked by
-   ancestry. 19 fully merged into main already (prune candidates). Of the
-   remaining 105, 18 are content-identical to what main already has under
-   different history (also prune candidates). The other ~87 were reviewed for
-   scope/overlap; two led to real merges (below); the rest are either small
-   single-purpose commits with no clear gap to fill, or superseded in concept
-   by what main already ships (e.g. `experiment/altari-public-patterns-v0-1`'s
-   workforce/project-fabric orchestration vs. main's `project_control_plane.py`;
-   the `src/nexus_evals/*` eval-harness/audit-event-envelope lineage vs. main's
-   `adoption_gate.py` + `evaluation_suite.py`/`evaluation_constitution.py`).
-4. **Connector control plane merged** (fcbb6b1, main), from the orphaned
-   `feat/connector-control-plane-v0.1` (last commit 2026-09-11, never merged
-   anywhere). Adds `nexus_connector_control_plane.py` (bounded per-connector
-   manifests, freshness/health snapshots, project-scoped evidence envelopes;
-   blocks stale sources, cross-project evidence leakage, fact-vs-fact
-   contradictions, duplicate snapshots, and external actions without
-   exact-scope approval; credentials stored as locators only), plus
-   `nexus_event_preflight.py`, `nexus_chat_bootstrap.py`, and
-   `config/connectors.json` (first adapter set: Gmail + PRJ-HYD-01 canonical
-   sources). 18 tests. Only conflict was `AGENTS.md` -- both sides had
-   independently written a new one from scratch; merged by hand, keeping
-   main's fuller "NEXUS Project Operating Contract" as the base and adding
-   this branch's "Mandatory chat preflight" as its own section, cross-
-   referenced rather than duplicated against the existing approval-gating item.
-5. **PRJ-HYD-01 (hydrotester) vertical consolidated** (1e6d5d5, main). Ten
-   independent branches (2026-08-19 to 2026-09-03) had attempted this vertical;
-   main had only the source reference document, no code. All ten read in full;
-   none is an ancestor of any other (independent attempts, not a chain). Kept
-   the two highest-quality, most evidence-disciplined, most real-data-grounded:
-   - `feature/hydrotester-registry-v0-1` (supplier registry, superset form
-     including the SupplierTR/AKPAYA channel added later by
-     `hydrotester-qualification-matrix-v0-1`) plus its `supplier_identity.py`
-     dependency (present on ~40 old branches from a shared ancestor, absent
-     from main -- pulled in as a self-contained, stdlib-only module).
-   - `fix/hydrotester-rev1-2-authority` for the readiness engine
-     (`src/nexus_verticals/hydrotester_readiness.py`) and qualification matrix
-     (v0.2). Best of 4 sibling attempts at the same file: fixes a real
-     fail-open bug (an unrecognized field status used to silently count as
-     "usable"; now only an explicit allowlist counts), and explicitly tracks
-     buyer revision supersession (rev1.2 vs. stale v0.1 dimensions) instead of
-     silently overwriting old values. 11 tests, real supplier cases (Marley,
-     Yaxing, GH).
-   - `feat/prj-hyd-01-engineering-review-v0.1` -- the only one of the ten
-     actually built against main's live `canonical_sources.py`. Extends the
-     `HYD_HOLD_POINT_RULES` already there (same real numbers: 120 MPa, 60
-     pipes/hour) with explicit contradiction-detection (numeric value match or
-     explicit-negation keyword), and adds `engineering_review.py`, which
-     classifies supplier evidence as CONFIRMED/CONTRADICTED/SILENT against
-     those buyer hold-points. Supplier evidence is evidence, never authority;
-     this module never writes to the canonical store.
-   Not merged: `temporal-evidence-opportunity-radar-v0-1` and
-   `vertical-acceptance-observability-v0-1` (broader generic
-   opportunity/observability frameworks; their `hydrotester_vertical.py`
-   hardcodes per-parameter string matching against one specific vendor
-   transcript rather than being data-driven -- a real quality gap versus the
-   matrix-based approach kept here); `nexus-vnext-hydrotester-vertical`
-   (generic claim-supersession store, redundant with the supersession handling
-   already in the kept qualification matrix); `requirement-readiness-shadow`
-   (a simpler, generic readiness assessor without the real procurement data
-   behind the kept version).
-6. **Rolling-mill engineer questionnaire prepared** (not yet sent -- task #10):
-   ran `rolling_mill_intake.assess()` against the now-adopted 220x220 schema.
-   Status `READY_FOR_ENGINEER_INTERVIEW`, all 9 claims still unresolved,
-   `calculation_allowed: False`. Two values flagged as likely
-   transcription/unit errors and prioritized first: roll diameter "550 cm"
-   (5.5 m -- implausible for this mill) and barrel length "1350 cm" (13.5 m --
-   same issue); both are almost certainly meant to be mm.
-
-**End of day state**: `main` at 1e6d5d5, `feat/unified-system-governance-v0.1`
-at bb2acae. Full suite (`evals/` + `tests/`, `PYTHONPATH=src` needed for
-`tests/`): 972 passed, 0 failed, run twice for determinism. Nothing pending
-except the engineer's answers to the rolling-mill questionnaire (external,
-task #10) and Reza's own call on any of the ~85 remaining small/superseded
-branches he wants a second look at.
-
-## BRANCH ARCHAEOLOGY, ROUND 2 (2026-09-19, continued)
-
-After the morning's merges (approvals.py fix, connector control plane,
-PRJ-HYD-01 consolidation), surveyed the remaining ~85 unmerged branches via 4
-parallel read-only agents plus direct review. Findings and actions:
-
-**Merged to main today (7 more commits, all built via git-plumbing 3-way
-comparison against the actual merge-base, tested twice on a fresh worktree
-before push):**
-- `4810411` -- security fix: `security.py` unconditionally sent
-  `WWW-Authenticate: Basic` on every 401, which can trigger a native
-  browser Basic-auth dialog that loops without a session cookie. Added
-  `NEXUS_BASIC_CHALLENGE` env gate (default off). From
-  `feat/external-access-broker-v0-1` (only `security.py` + `ui/login.html` +
-  its test -- that branch's broker/mesh/bootstrap scaffolding was left out
-  as unused speculative work).
-- `341a9ac` -- `capability_governor.py` + `agent_lab.py` (fault-aware
-  capability gating + trial evaluation), from
-  `feat/capability-governor-implementation`.
-- `032bade` -- OmniRoute evaluation module + 2026-08-28 research findings,
-  from `reconcile/omniroute-evaluation-v0-1`.
-- `e5a030a` -- Supabase least-privilege hardening SQL (apply/audit/verify
-  scripts, operator-run, not imported by app code -- still needs Reza to
-  actually run them against the Supabase project), from
-  `hardening/supabase-data-api-v0-1`.
-- `b4cdad4` -- research_data_mesh / evidence_authority / constraint_registry /
-  capabilities / policy / state_audit / state_promotion under
-  `src/nexus_core/`, from `experiment/research-data-mesh-v0-1` (excluded that
-  branch's own CI-workflow and `__init__.py` changes -- main's CI has since
-  been independently overhauled to a newer superset, and `src/nexus_core`
-  has always worked fine as an implicit namespace package).
-- `aefe320` -- `access_authority_registry.py` (connector capability is never
-  execution authority; consequential actions always need exact human
-  approval) + `autonomy_adapter.py` / `delegated_operator.py` /
-  `settlement_executor.py` / `worker_lifecycle.py`, from
-  `feature/access-authority-registry-v0-1`. Also removed a dead, unused
-  `approval_inbox` table from `autonomy.py` (approval authority lives solely
-  in the canonical `ApprovalStore`) and added `AutonomyStore.defer()`.
-- `765d687` -- expanded `NEXUS_MCP_BASELINE` from 6 to 12 read-only,
-  disabled-by-default MCP candidates (google_drive, apollo, zotero, canva,
-  figma, supabase) with project_scopes/cost_class/health_probe/fallback
-  metadata and `activation_waves()` rollout ordering, from
-  `feat/nexus-capability-portfolio` (see ADR-004).
-- `4c26e7a` -- `coding_sandbox_benchmark.py` (a decision rubric only --
-  REJECT/CANDIDATE_WINS/etc. from externally-supplied metrics; it does not
-  execute anything or provide isolation itself) + `idea_forge.py`, from
-  `experiment/coding-sandbox-benchmark-v0-1`.
-
-Full suite run twice after each push: 974 -> 1071 -> 1140 passed, 0 failed
-throughout (test count grows as each branch's own tests land).
-
-**Also committed on `feat/unified-system-governance-v0.1`** (`2451722`,
-confirmed by Reza as his own in-progress work, not touched otherwise):
-`contextlib.closing()` hardening on every sqlite3 connection across
-`api.py`/`audit.py`/`autonomy.py`/`canonical_sources.py`/`ops.py`/`state.py`;
-a sandbox-only lifecycle gate in `project_control_plane.py` (SANDBOX_READY/
-EXPERIMENT agents can only run in the new "sandbox" lane, never on
-external-risk work); `PRJ-FAL-01` project policy + a "Cross-agent handoff
-and FAL reconciliation" section in AGENTS.md; `system_capability_registry.py`
-as a capability-activation read model; a Tavily EXPERIMENT_ONLY research
-topic; and README.md documentation of the Ruflo/claude-flow orchestration
-layer now installed in this repo for Claude Code sessions (26->28 plugins,
-`.mcp.json`, `.swarm/` vector memory, a `ruflo-federation` plugin that can
-publish swarm-coordination events to an external relay `relay.ruv.io` --
-currently no business data routed through it, daemon not started). The
-`.claude/*`, `.mcp.json`, `.swarm/`, and root `CLAUDE.md` scaffolding files
-themselves remain untracked/uncommitted pending a separate decision.
-
-**`c7e5c36` investigated (the Aug 25 "release: deploy NEXUS Autopilot
-v2.0.0rc2 cloud hardened" commit that deleted `src/nexus_brain/*` graph-
-execution engine and `src/nexus_control_plane/*`):** confirmed single-parent,
-explicit release message, immediately following completed shadow-execution
-feature work (PRs #50/#51). Current main's own docs (AGENTS.md, roadmap)
-describe only the new flat architecture and explicitly say "do not create
-parallel control planes" with zero living reference to the deleted
-`nexus_brain`/`nexus_control_plane` package. Reza confirmed treating this as
-a deliberate, accepted pivot.
-
-**Branches explicitly abandoned by Reza's decision today (left unmerged,
-not deleted from origin):**
-- Old `nexus_brain` graph-engine cluster: `feature/nexus-brain-v0-1`,
-  `-v0-2`, `-v0-3-live-snapshot`, `-v0-4-command-live`,
-  `feature/nexus-brain-plo-contract-v0-5`, `feature/durable-shadow-queue-v0-1`,
-  `feature/postgres-shadow-queue-v0-1`, `feature/execution-shadow-bridge-v0-1`,
-  `feature/shadow-worker-v0-1` -- all import files `c7e5c36` deleted from
-  main and no longer exist anywhere on main; confirms the pivot was final.
-- Doc-only branches describing the dead architecture:
-  `docs/nexus-brain-v0-2-state-sync`, `docs/readme-brain-v0-2`,
-  `docs/plo-consolidation-review-v0-1`.
-- Already superseded: `feature/ai-router-v0-5-public-shadow-probe` and
-  `fix/redact-public-shadow-probe-secrets-v0-1` -- target main's *current*
-  (unrelated, same-named) `src/nexus_brain/public_shadow_probe.py`, but the
-  secret-redaction fix they carry is already on main via a different PR;
-  byte-for-byte diff against main is empty.
-- `feature/evidence-classification` -- patches `src/nexus_verticals/
-  procurement.py`, which `c7e5c36` deleted; the epistemic-classification idea
-  may be worth reapplying later but would need to be rewritten from scratch
-  against `hydrotester_readiness.py`, not merged as-is.
-- `feature/nexus-forge-loop-v0-1` -- a full alternate control-plane
-  (`src/nexus_control_plane/forge.py`, `workforce_orchestrator.py`,
-  `recursive_evolution.py`, `contradiction_graph.py`, `outcome_gate.py`,
-  ~7400 lines) built entirely on the architecture `c7e5c36` abandoned; kept
-  only as a design-idea reference (contradiction-graph, recursive-evolution
-  loop), not a merge candidate.
-- `experiment/opencode-shadow-adapter-v0-1` -- fully subsumed by
-  `experiment/model-runner-arena-v0-1` (strict git ancestor of it);
-  redundant.
-
-**Still open, needs Reza's call (not yet actioned):**
-- Needs manual rebase, not a clean merge: `feature/p0-benchmark-pair-v0-1`
-  (good A0-A8 evidence-authority framework for Hydrotester/Can-Forming, but
-  conflicts with the `hydrotester_readiness.py` refactor); `hardening/
-  external-ingress-guard-v0-2` (real, still-open gap -- unvalidated inbound
-  external messages + ungated auto-replies -- but duplicates logic that
-  already exists in `ApprovalStore`/`nexus_core.policy` instead of reusing
-  it).
-- Product decision, not a technical blocker: `plo-v0.2-linux-runtime`
-  (65 commits, fully standalone Postgres-backed queue/worker infra, clean
-  technically -- does Reza still want this concept?); `feature/
-  decision-learning-v0-1` (decision->outcome->evaluation loop, 14 tests,
-  clean, but nothing calls it yet); `feature/engineering-proposal-delta-
-  v0-1` (automated supplier-proposal-vs-spec deviation detection, clean,
-  5 tests); `experiment/model-runner-arena-v0-1` ("sandbox" here means a
-  path-prefix policy check only, not real isolation -- conflicts with
-  main's independently-merged `HERDR` runner block, resolvable); `feat/
-  posthog-observability-v0-1` (external SaaS, needs a new API key + a PII
-  policy decision before ever enabling; currently inert/unwired).
-- Needs deeper comparison before a call: `feature/requirement-readiness-
-  shadow` vs. current `hydrotester_readiness.py`; `feature/evaluation-
-  harness-v0-1-shadow-adapters` and `integration/shadow-pr1-pr2-pr4-pr7-pr8`
-  vs. current `evaluation_suite.py`/`evaluation_constitution.py`.
-
-**End of round-2 state**: `main` at `4c26e7a`, `feat/unified-system-
-governance-v0.1` at `2451722`. Full suite: 1140 passed, 0 failed, run twice.
-Leftover local worktree metadata from the review agents
-(`.worktrees/merge-governance-v0.1`, and two under `/tmp`) could not be
-cleaned up via the device bridge (unlink permission denied on the
-bind-mounted folder) -- harmless, but Reza should run `git worktree prune`
-locally when convenient.
+## THIS SESSION (2026-09-26): state-freshness check + bringing this file current
+- Built `nexus_checks/state_freshness.py` (stdlib-only): a governed state/kernel file is flagged
+  STALE when a path it governs (per `.nexus/state/STATE_GOVERNANCE.json`) has git commits newer
+  than the state file's own last commit by more than the configured tolerance (2 days default).
+  Also scans the same state/kernel files for `` `backtick path` `` references that don't exist
+  in the tree. Wired into the CLI as `python -m nexus_checks --state --repo .`. Tests:
+  `evals/test_nexus_checks_state.py` (fresh passes, stale fails, missing-governed-path warns,
+  broken reference fails, non-path backtick spans like a Windows machine path or a shell command
+  are correctly not flagged).
+- Before this rewrite, the check found (and this update fixes): this file was ~7 days stale
+  against `docs/procurement/`, `docs/expert_foundry/`, `docs/system/`, `.nexus/steel/`, `AGENTS.md`
+  and `nexus_checks/`; `.nexus/steel/CHECKPOINT.md` was ~4 days stale against the same procurement
+  and expert-foundry work; `.nexus/steel/GAP_ANALYSIS.md` pointed at `registers/*.md` instead of
+  `.nexus/expert_foundry/registers/*.md` (missing path prefix, fixed); this file's own branch-
+  archaeology section named src/nexus_control_plane/forge.py as if it were a real tracked path
+  (it only ever existed on an unmerged branch, reworded above to say so); and the control doc's
+  OPS-04 row named .claude/helpers/auto-commit.sh as a tracked path when it was in fact an
+  untracked, never-committed local file (reworded in that doc, see its own change note).
+- Next: run `python -m nexus_checks --state --repo .` after any future edit to
+  `docs/procurement/`, `docs/expert_foundry/`, `.nexus/steel/` or `docs/system/`, and update this
+  file (or `.nexus/steel/CHECKPOINT.md` for steel-only changes) in the same sitting, not later.

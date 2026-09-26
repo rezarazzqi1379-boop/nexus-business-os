@@ -1,8 +1,8 @@
 # CHECKPOINT — PRJ-STEEL-ROLLING-LINE-01
 
-**آخرین به‌روزرسانی:** ۲۰۲۶-۰۹-۲۱ (پس از تأیید مالک و بستن C-07)
+**آخرین به‌روزرسانی این بخش (بیلت، SUPERSEDED):** ۲۰۲۶-۰۹-۲۱ (پس از تأیید مالک و بستن C-07). آخرین چک‌پوینت فعال زندهٔ این فایل پایین صفحه است (۲۰۲۶-۰۹-۲۶).
 **project_id:** `rolling_mill_strip_300_pilot`
-**authority:** Master Context v1.4 + Source Registry v1.1 (commit `68c0832`) — **تناقض حل‌نشده:** `AUTHORITY_STATUS.md` می‌گوید RECONCILED PARTIAL، `CURRENT_STATE.md` می‌گوید UNRESOLVED BLOCKING. هیچ‌کدام به‌صرف تازگی حاکم نشد.
+**authority:** Master Context v1.4 + Source Registry v1.1 (commit `68c0832`) — **حل شد ۲۰۲۶-۰۹-۲۶:** `AUTHORITY_STATUS.md` (تاریخ واقعی ۲۰۲۶-۰۹-۱۷) RECONCILED PARTIAL می‌گوید؛ نسخهٔ ۲۰۲۶-۰۹-۱۹ فایل `CURRENT_STATE.md` که UNRESOLVED BLOCKING می‌گفت صرفاً هرگز به‌روز نشده بود (خودِ آپدیت authority دو روز زودتر، در ۰۹-۱۷ اتفاق افتاده بود). `CURRENT_STATE.md` در ۰۹-۲۶ بازنویسی و اصلاح شد.
 
 ## وضعیت گیت
 - `calculation_allowed` (گیت قدیمی، دست‌نخورده): **False**
@@ -89,3 +89,16 @@ H-1 گردن/یاتاقان · H-2 فریم و پیچ تنظیم · H-3 برگش
 ### دفعه‌ی بعد از اینجا شروع کن
 
 ۱. بازبینی diff برنچ · ۲. تصمیم مسیر PR · ۳. اجرای Hold Pointهای دسته الف (۹ مورد، هزینه‌ی تقریباً صفر) · ۴. خرید متن DIN 59200
+
+---
+
+## چک‌پوینت ۲۰۲۶-۰۹-۲۶ · بررسی تازگی وضعیت (state freshness) — بدون تغییر مهندسی
+
+کار این نشست روی خودِ ماشین تداوم بود، نه روی طراحی خط. خلاصه:
+
+- **بررسی جدید:** `nexus_checks/state_freshness.py` — یک فایل وضعیت/kernel وقتی STALE علامت می‌خورد که مسیری که حاکم است (طبق `.nexus/state/STATE_GOVERNANCE.json`) کامیت تازه‌تر از خودِ فایل وضعیت داشته باشد (تحمل پیش‌فرض ۲ روز)؛ ارجاع‌های `` `مسیر` `` شکسته در همان فایل‌ها هم پیدا می‌شوند. اجرا: `python -m nexus_checks --state --repo .`. تست: `evals/test_nexus_checks_state.py`.
+- **چه چیزی STALE بود (پیش از این commit):** `.nexus/state/CURRENT_STATE.md` حدود ۷ روز عقب بود (آخرین ویرایش ۲۰۲۶-۰۹-۱۹) در برابر تغییرات `docs/procurement/`، `docs/expert_foundry/`، `docs/system/`، `.nexus/steel/` و `AGENTS.md`. همین فایل CHECKPOINT هم حدود ۴ روز عقب بود. هر دو در این commit به‌روز شدند.
+- **ارجاع شکسته پیدا و اصلاح شد:** `.nexus/steel/GAP_ANALYSIS.md` به `registers/*.md` اشاره می‌کرد، بدون پیشوند `.nexus/expert_foundry/`؛ اصلاح شد. `CURRENT_STATE.md` مسیر یک برنچ مرج‌نشده (src/nexus_control_plane/forge.py) را طوری نوشته بود که انگار مسیر واقعی ریپو است؛ بازنویسی شد تا روشن باشد فقط روی یک برنچ ادغام‌نشده وجود داشت. `PROJECT_CONTROL...md`، ردیف OPS-04، به .claude/helpers/auto-commit.sh را طوری ارجاع می‌داد که انگار tracked است؛ اصلاح شد (هرگز commit نشده بود).
+- **یافتهٔ جانبی (نه از ابزار جدید، از خواندن مستقیم):** `CURRENT_STATE.md` نسخهٔ ۲۰۲۶-۰۹-۱۹ هنوز وضعیت authority را UNRESOLVED/BLOCKING می‌نوشت، در حالی که `docs/authority/AUTHORITY_STATUS.md` از ۲۰۲۶-۰۹-۱۷ (دو روز زودتر) RECONCILED (PARTIAL) شده بود. این فایل هرگز آپدیت را نگرفته بود؛ در بازنویسی امروز اصلاح شد.
+- **بدون تغییر:** هیچ عدد مهندسی، Hold Point یا وضعیت گیت این نشست تغییر نکرد. Gate ها همان‌طور که بالای همین فایل آمده باقی‌اند.
+- **بعدی:** پس از هر ویرایش در `docs/procurement/`، `docs/expert_foundry/`، `.nexus/steel/` یا `docs/system/`، همان نشست `python -m nexus_checks --state --repo .` را اجرا و `CURRENT_STATE.md`/این فایل را به‌روز کنید — نه بعداً.

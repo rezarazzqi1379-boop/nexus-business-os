@@ -11,7 +11,7 @@ import fnmatch
 import sys
 from pathlib import Path
 
-from . import bilingual_parity, git_health, superseded_values, vendor_hygiene
+from . import bilingual_parity, git_health, superseded_values, transmission, vendor_hygiene
 
 
 def _collect(items: list[str]) -> list[Path]:
@@ -32,6 +32,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--repo", help="also run git health on this repo")
     ap.add_argument("--exclude", action="append", default=[],
                     help="glob on file name to skip (e.g. superseded archives); repeatable")
+    ap.add_argument("--transmission", action="store_true",
+                    help="also check docs/procurement RFIs against slab_line_design "
+                         "(see nexus_checks/transmission.py); requires --repo")
     a = ap.parse_args(argv)
 
     files = [f for f in _collect(a.paths)
@@ -43,6 +46,10 @@ def main(argv: list[str] | None = None) -> int:
     findings += bilingual_parity.check_paths(vendor)
     if a.repo:
         findings += git_health.check_repo(Path(a.repo))
+    if a.transmission:
+        if not a.repo:
+            ap.error("--transmission requires --repo")
+        findings += transmission.check_repo(Path(a.repo))
 
     for f in findings:
         print(f.fmt())

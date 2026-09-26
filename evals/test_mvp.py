@@ -3,6 +3,7 @@ from __future__ import annotations
 import sqlite3
 import tempfile
 import unittest
+from contextlib import closing
 from threading import Barrier, Thread
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -95,8 +96,9 @@ class AuditTests(unittest.TestCase):
             log.append("operator", "event.received", {"id": "e1"}, occurred_at=NOW)
             log.append("worker", "draft.created", {"id": "d1"}, occurred_at=NOW)
             self.assertTrue(log.verify())
-            with sqlite3.connect(path) as db:
-                db.execute("UPDATE audit_log SET body_json='{}' WHERE sequence=1")
+            with closing(sqlite3.connect(path)) as db:
+                with db:
+                    db.execute("UPDATE audit_log SET body_json='{}' WHERE sequence=1")
             self.assertFalse(log.verify())
 
 

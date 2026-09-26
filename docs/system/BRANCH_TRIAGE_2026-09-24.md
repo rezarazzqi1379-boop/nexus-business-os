@@ -2,7 +2,7 @@
 
 Repository: `github.com/rezarazzqi1379-boop/nexus-business-os`. `origin/main` is at `49ba5a0`.
 
-Scope: the 71 branches that remain after the 57 already-merged/subset branches were deleted on the remote (per `/home/claude/work/BRANCH_INVENTORY_2026-09-24.md`), excluding `main`, `fix/governance-carryover-v0.1` (open PR #99) and `feat/unified-system-governance-v0.1` (under separate review). This reuses that inventory's ahead/behind, dates and unique-file counts, adds actual unique-file paths, checks each one against main's current module/file layout, and spot-tests the top candidates.
+Scope: the 71 branches that remain after the 57 already-merged/subset branches were deleted on the remote (per `docs/system/BRANCH_INVENTORY_2026-09-24.md` (PR #99)), excluding `main`, `fix/governance-carryover-v0.1` (open PR #99) and `feat/unified-system-governance-v0.1` (under separate review). This reuses that inventory's ahead/behind, dates and unique-file counts, adds actual unique-file paths, checks each one against main's current module/file layout, and spot-tests the top candidates.
 
 ## 1. One-screen summary
 
@@ -24,7 +24,7 @@ Scope: the 71 branches that remain after the 57 already-merged/subset branches w
 
 ## 2. Branch-by-branch table
 
-Sorted alphabetically. "Uniq files" = files that differ from main's current content, CR-stripped, measured against each branch's merge-base with main (same methodology as the prior inventory; recomputed and re-verified against current main). Full unique-file lists per branch are in `/home/claude/work/scratch/unique_files_by_branch.tsv`.
+Sorted alphabetically. "Uniq files" = files that differ from main's current content, CR-stripped, measured against each branch's merge-base with main (same methodology as the prior inventory; recomputed and re-verified against current main). (Per-branch unique-file lists were produced in a scratch workspace and are not kept in the repo; rerun the method above to regenerate.)
 
 | Branch | Recommendation | Uniq files | Reason |
 |---|---|---|---|

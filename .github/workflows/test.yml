@@ -40,10 +40,11 @@ jobs:
         run: python -m unittest discover -s evals -v
 
       - name: Run pytest-style eval suites and NEXUS failure-derived checks (FM-005..FM-008, FM-011)
-        # `unittest discover -s evals` collects only TestCase classes; 19 eval files
-        # (all steel engineering models, nexus_checks, ...) are plain pytest functions
-        # and were never run in CI before. Running the whole evals/ tree under pytest
-        # covers them; the TestCase suites run a second time, which costs about 8 s.
+        # `unittest discover -s evals` collects only TestCase classes; 18 eval files
+        # (402 tests, all steel engineering models among them) are plain pytest functions
+        # and never ran in CI before (test_nexus_checks.py already ran here by name).
+        # Running the whole evals/ tree under pytest covers them; the TestCase suites
+        # run a second time, which costs about 8 s.
         run: |
           pytest -q -p no:cacheprovider evals
           if [ -d docs/procurement ]; then

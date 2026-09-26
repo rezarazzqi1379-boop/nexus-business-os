@@ -1,0 +1,62 @@
+{
+  "_comment": "Config for nexus_checks.state_freshness. A governed state/kernel file is STALE when the newest git commit under any path it governs is more than tolerance_days newer than the state file's own newest commit. broken_reference_scan lists the state/kernel files whose inline `backtick path` references are checked against the actual tree. JSON, not YAML, on purpose: this repo parses TTL/routing YAML nowhere (steel_kernel.py hardcodes the same values in Python; the .yaml files are the human-readable mirror) and this checker is stdlib-only.",
+  "version": 1,
+  "tolerance_days": 2,
+  "entries": [
+    {
+      "state_file": ".nexus/state/CURRENT_STATE.md",
+      "governs": [
+        "docs/procurement",
+        "docs/expert_foundry",
+        "docs/authority",
+        "docs/system",
+        ".nexus/steel",
+        ".nexus/expert_foundry",
+        "AGENTS.md",
+        "nexus_checks"
+      ],
+      "note": "repo-wide session state; RULE says read this first in any new session"
+    },
+    {
+      "state_file": ".nexus/steel/CHECKPOINT.md",
+      "governs": [
+        "docs/expert_foundry",
+        "docs/procurement",
+        ".nexus/steel",
+        ".nexus/expert_foundry"
+      ],
+      "note": "steel project checkpoint (PRJ-STEEL-ROLLING-LINE-01)"
+    },
+    {
+      "state_file": ".nexus/steel/KERNEL.md",
+      "governs": [
+        ".nexus/steel/CONTEXT_ROUTER.yaml",
+        ".nexus/steel/FRESHNESS_POLICY.yaml",
+        ".nexus/steel/TOKEN_BUDGET_POLICY.yaml",
+        "steel_kernel.py"
+      ],
+      "note": "kernel points at policy/router files and steel_kernel.py; it must track them"
+    },
+    {
+      "state_file": "docs/expert_foundry/PROJECT_CONTROL_PRJ-STEEL-ROLLING-LINE-01.md",
+      "governs": [
+        "docs/procurement",
+        "docs/expert_foundry",
+        ".nexus/steel"
+      ],
+      "note": "living control doc (Persian); explicitly says sanad-e zende / last-updated at top",
+      "tolerance_days": 3
+    }
+  ],
+  "broken_reference_scan": [
+    ".nexus/state/CURRENT_STATE.md",
+    ".nexus/steel/KERNEL.md",
+    ".nexus/steel/CHECKPOINT.md",
+    ".nexus/steel/CHANGELOG.md",
+    ".nexus/steel/CONTEXT_ROUTER.yaml",
+    ".nexus/steel/FRESHNESS_POLICY.yaml",
+    ".nexus/steel/TOKEN_BUDGET_POLICY.yaml",
+    ".nexus/steel/GAP_ANALYSIS.md",
+    "docs/expert_foundry/PROJECT_CONTROL_PRJ-STEEL-ROLLING-LINE-01.md"
+  ]
+}

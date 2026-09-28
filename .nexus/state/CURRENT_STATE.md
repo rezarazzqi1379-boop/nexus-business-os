@@ -1,7 +1,8 @@
 # NEXUS CURRENT STATE
-Last updated: 2026-09-26 by Claude Code (branch `feat/project-memory-and-checks-v0.1`, built on
-`integ/2026-09-26`) -- full rewrite (RULE below: overwrite stale sections, don't just append).
-Previous version (2026-09-19) is in git history at this same path if any old wording is needed.
+Last updated: 2026-09-28 by Claude Code (branch `feat/steel-experiments-v0.1`, built on
+`feat/project-memory-and-checks-v0.1`) -- see THIS SESSION below for what changed; the rest of
+this file is unchanged since the 2026-09-26 rewrite. Previous version (2026-09-19) is in git
+history at this same path if any old wording is needed.
 
 RULE: Read this file FIRST in any new session before doing anything else. Overwrite stale
 sections when updating -- do not just append. This file governs `docs/procurement/`,
@@ -217,3 +218,45 @@ Full detail lives in the steel project's own files, which this file points at ra
 - Next: run `python -m nexus_checks --state --repo .` after any future edit to
   `docs/procurement/`, `docs/expert_foundry/`, `.nexus/steel/` or `docs/system/`, and update this
   file (or `.nexus/steel/CHECKPOINT.md` for steel-only changes) in the same sitting, not later.
+
+## THIS SESSION (2026-09-28): read-only what-if experiment harness for the slab-line model
+- New branch `feat/steel-experiments-v0.1` off `feat/project-memory-and-checks-v0.1`. Added
+  `slab_line_experiments.py` (repo root, stdlib-only): perturbs friction `mu` (0.20-0.40), the
+  flow-stress anchor scale (0.85/1.00/1.15), grade (S235JR/S355JR), rotor inertia
+  (250/450/750 kg.m^2), accel/brake ramp time (2/3/4 s), and the Ar3 thermal pass/fail cutoff
+  (630/750/820/850 C -- not a `slab_line_design.py` constant, computed and compared only) against
+  `slab_line_design.py`, without ever editing that file. Every perturbation is restored via a
+  `finally`-guarded context manager (module-constant overrides) or by using arguments the model
+  already accepts (grade, motor_rotor_j, accel_time_s, decel_s) -- see
+  `evals/test_slab_line_experiments.py::test_a_*` for the restoration proof, including under a
+  raised exception.
+  - Reports headline outputs per experiment value (peak force/torque/power, gearbox output
+    torque requirement, regen kW, accel/brake events/h, capacity t/h, finish temp at 12/6 mm,
+    bite limit) and, for every model-sourced claim in `nexus_checks/transmission.py`, recomputes
+    it under the perturbation and classifies it stable/moves/breaks against the claim's own
+    rounding rule -- this is the harness's answer to "which RFI numbers are fragile to which
+    uncertainty".
+  - `--report <path>` CLI flag writes a markdown report (one table per experiment, the fragility
+    matrix, a ranked list of the most-fragility-driving inputs); top line states this is
+    sensitivity analysis on a concept model, not operating setpoints. Generated once and
+    committed as `docs/system/EXPERIMENTS_SENSITIVITY_2026-09-28.md`.
+  - Headline finding: `friction-mu` is by far the most fragile input to the vendor-facing
+    transmission numbers (moves or breaks nearly every model-sourced claim across its tested
+    range, including within the literature range 0.25-0.35, not only at the 0.20/0.40 edges);
+    `flow-stress-scale` and `grade` move the force/torque/gearbox family of claims but never flip
+    a rounded value by more than 25%; `rotor-inertia` and `ramp-time` are fully decoupled from
+    the rolling-force/torque/gearbox claims (physically correct -- inertia and ramp only enter
+    the accel-torque and regen-power claims) and move only those two; `ar3-threshold` changes no
+    vendor-facing transmission number at all (Ar3 only gates the separate thermal-feasibility
+    table, which has no model function and is therefore not in the transmission registry).
+  - Tests: `evals/test_slab_line_experiments.py` (21 tests) -- restoration incl. under exception,
+    exact nominal reproduction, monotonic sanity, Ar3 consistency, and a full
+    `nexus_checks.transmission.check()` pass after every experiment has run (no leaked state).
+  - Verified from a fresh worktree of the branch's final SHA (FM-012 discipline): full `evals`
+    suite (pytest and `unittest discover`) and `tests/` all green; `python -m nexus_checks
+    --transmission --state` and `python -m nexus_checks docs/procurement --exclude
+    '*_2026-09-22.md'` both pass with 0 errors.
+- This file is the only state/checkpoint file touched this session: the work adds a new,
+  independent read-only tool plus one `docs/system/` report and does not change
+  `docs/procurement/`, `docs/expert_foundry/`, `.nexus/steel/` or `.nexus/expert_foundry/`, so
+  `.nexus/steel/CHECKPOINT.md` and the Persian control doc need no update for this branch.

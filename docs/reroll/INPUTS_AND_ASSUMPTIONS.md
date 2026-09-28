@@ -12,81 +12,83 @@ No value here is an operating setpoint or a recipe.
 | 2 | Piece B L x W x T | 400 x 300 x 20 | mm | ASSUMPTION | brief s2 | as A |
 | 3 | Piece C L x W x T | 700 x 200 x 15 | mm | ASSUMPTION | brief s2 | as A |
 | 4 | Number of pieces / tonnage | unknown | - | UNKNOWN | control doc HP-01 | decides pilot vs workshop vs industrial economics |
-| 5 | Photo shows 5 pieces, 3 dimension groups | - | - | CLAIM (ChatGPT description) | brief s3 | two pieces unassigned [SM] |
-| 6 | Density | 7850 | kg/m3 | ASSUMPTION | brief s2 | linear on mass |
-| 7 | Grade | S235JR nominal, S355JR bound | - | ASSUMPTION | brief s2, HP-02 | flow stress x1.15 for S355 (UNSOURCED multiplier) -> force/torque +15 % |
-| 8 | Targets | 6 / 8 / 10 | mm | FACT (owner requirement) | brief s1 | - |
-| 9 | Hot friction mu | 0.25-0.35 (0.30 nominal) | - | ASSUMPTION | validation memo #1 (CONSISTENT); bite checked at 0.25 | bite not binding in S1-S3; force +/- ~4-6 % across the range |
-| 10 | Flow stress fit (imported) | A=2586, beta=0.00307, m=0.13, n=0.15 | MPa | ESTIMATE (anchors UNSOURCED) | slab_line_design.py; validation memo #14 | force, torque and power scale linearly; below 900 C it is an extrapolation |
-| 11 | S355 flow-stress multiplier | 1.15 | - | ESTIMATE (UNSOURCED) | slab_line_design.GRADES; memo #15 | linear on all loads |
-| 12 | Plane-strain factor | 2/sqrt(3) blended b/h 1..5 | - | FACT (mechanics) | memo #19 | +15 % on loads for b/h >= 5 (all passes here) |
-| 13 | Geometry factor Q_p | 0.8+0.2L/h (L/h<1); 1+muL/2h | - | ESTIMATE | memo #17 (CONSISTENT) | L/h 1.5-4 here -> Q_p 1.2-1.6 |
-| 14 | Torque arm lambda | 0.48 | - | ESTIMATE (EDGE) | memo #2 | linear on torque, power |
-| 15 | Bearing friction | 0.004 | - | ASSUMPTION (UNSOURCED) | memo #3 | < 5 % of torque |
-| 16 | Wusatowski spread | w=10^(-1.269 (b/h)(h/D)^0.556) | - | ESTIMATE (+/-10-20 %) | memo #16 | gives < 0.1 % here (b/h 10-35, h/D < 0.06); real edge bulge a few mm [SM] |
-| 17 | Emissivity | 0.85 (0.75-0.90) | - | ESTIMATE (EDGE) | memo #5: scale 0.85-0.89 | reheat count; see report sensitivity |
-| 18 | Specific heat cp | 700.0 | J/kg.K | ESTIMATE | memo #6 | linear on cooling rate |
-| 19 | Convection h | 15.0 | W/m2.K | ESTIMATE | memo #9 | minor vs radiation |
-| 20 | Ambient | 29.9 | C | ASSUMPTION | imported T_AMB_K | minor |
-| 21 | Roll-gap heat transfer h_gap | 15000 (10000-30000) | W/m2.K | ASSUMPTION | order of magnitude commonly reported for hot rolling (not pinned to a source) | roll chill ~14-22 C/pass at 15 kW/m2K, ~25-37 C at 30 kW/m2K; B 20->6 gains a reheat at 30 |
-| 22 | Roll surface temperature | 150.0 | C | ASSUMPTION | uncooled small mill | weak (enters as T - T_roll) |
-| 23 | Deformation heat fraction | 0.9 | - | ESTIMATE | Taylor-Quinney ~0.9 (textbook) | +4-10 C per pass |
-| 24 | First heat piece temperature | 1200 (1150-1250) | C | ESTIMATE | see THERMAL_SOURCE_NOTE (ASM Handbook Vol. 14A, recalled) | first-pass force -8/+9 % for +/-50 C; scale 2.2-3.1 % (B) |
-| 25 | Reheat piece temperature | 1150 | C | ASSUMPTION | lower bound to limit scale | passes per reheat |
-| 26 | Overheating onset | 1300.0 | C | ESTIMATE | see THERMAL_SOURCE_NOTE | hard limit for furnace set point |
-| 27 | Burning onset | 1400.0 | C | ESTIMATE | see THERMAL_SOURCE_NOTE | irreversible; furnace overshoot protection |
-| 28 | Minimum finishing temperature | 800 / 850 / 880 | C | HYPOTHESIS (Ar3 EDGE) | memo #30: two sources differ by ~200 C | reheat count 0-2 per conversion |
-| 29 | Furnace margin above target | 40.0 | C | ASSUMPTION | - | heating time |
-| 30 | Furnace effective emissivity | 0.7 | - | ASSUMPTION | - | heating time +/- 20-30 % |
-| 31 | First-heat soak | 600 (300-900) | s | ASSUMPTION [RDR] | equalisation; Bi < 0.1 so through-thickness gradient is small | scale, furnace size |
-| 32 | Scale law | kp = 0.37 exp(-138 kJ/RT) g2/cm4/s | - | ESTIMATE | Paidassi (1958) as quoted in Chen & Yuen 2003 review; recalled | scale loss |
-| 33 | Scale kp factor | 0.5 / 0.8 / 1.2 | - | ASSUMPTION | atmosphere, chemistry | scale loss ~ sqrt(factor): 2.1-3.2 / 2.6-4.0 / 3.2-5.0 % per piece, one heat |
-| 34 | Irregular end per end (average over all ends) | 5 / 15 / 30 | mm | ASSUMPTION [SM] | photo description (CLAIM): SOME ends rounded/conical | crop 2.5-5 / 7-13 / 13-24 % of input (low/nominal/high, incl. tongue) |
-| 35 | Tongue/fishtail per end | 10 / 25 / 40 at >= 50 % reduction, pro rata below | mm | ASSUMPTION | - | part of the crop figures above |
-| 36 | Edge trim per side | 0 / 5 / 12 | mm | ASSUMPTION | HP-03 (product spec) | trim loss 0 / 3-4.5 / 6-10 % of input |
-| 37 | Out-of-tolerance fraction | 2 / 5 / 10 | % | ASSUMPTION | manual mill pilot | linear on yield |
-| 38 | S1 roll diameter | 400 (350-450) | mm | ASSUMPTION [RDR] | task scenario S1 | force ~ sqrt(D); torque ~ D |
-| 39 | S1 barrel | 550 (500-600) | mm | ASSUMPTION [RDR] | task scenario S1 | must exceed exit width + margin |
-| 40 | S1 speed | 0.6 (0.3-1.0) | m/s | ASSUMPTION | task scenario S1 | power ~ v; at 0.3 m/s longer contact chill adds a reheat on A and B 6 mm |
-| 41 | S1 interpass time | 8 (5-12) | s | ASSUMPTION [SM] | manual/semi-auto handling | B 20->6 last-pass force 1.29-1.55 MN; reheats under the cold-side set |
-| 42 | S1 furnace-to-bite transfer | 20 (12-40) | s | ASSUMPTION [SM] | - | 40 s adds a reheat on A 12->6 and +17 % force on B 20->6 |
-| 43 | S1 bearing offset | 150 | mm | ASSUMPTION | ~0.375 D | neck stress, crown |
-| 44 | Neck/barrel diameter ratio | 0.55 | - | ASSUMPTION (UNSOURCED) | memo #10 | neck stress ~ d^-3 |
-| 45 | S1 mill modulus | 0.5-1.5 | MN/mm | ASSUMPTION [SM] | small stand; measure by closed-roll test | thickness spread and absolute gauge |
-| 46 | S1 max reduction / last pass | 30 % / 20 % | - | ASSUMPTION [RDR] | conventional hot flat practice | pass count |
-| 47 | Bite utilisation | 0.85 | - | ASSUMPTION | margin on exact bite limit | - |
-| 48 | Handling overhead per piece | 30.0 | s | ASSUMPTION [SM] | - | capacity |
-| 49 | Mill utilisation | 0.65 (0.5-0.8) | - | ASSUMPTION | manual crew | capacity linear |
-| 50 | VFD overload | 1.5 | x | ESTIMATE | generic heavy-duty VFD rating 150 %/60 s | motor kW ~ 1/overload |
-| 51 | Drive efficiencies | gear 0.97/stage, pinion 0.98, spindle 0.99 | - | ESTIMATE | memo #20 | minor |
-| 52 | Gearbox service factor | 2.214 | - | ASSUMPTION | slab_line_design.SERVICE_FACTORS; memo #21-22 EDGE | gearbox rating linear |
-| 53 | Bite shock | 2-3 x steady torque | - | ASSUMPTION (UNSOURCED) | memo #24 | gearbox peak criterion |
-| 54 | Force margin (bearings/frame) | 1.3-1.5 | - | ASSUMPTION | - | rating |
-| 55 | Option C stand | D600 x 600, up to 3 m/s | - | UNKNOWN status | control doc: not operational, not recorded as owned | verdict |
-| 56 | Option C furnace | 20 t/h walking beam, 1250 C, 1.2 t slabs | - | ASSUMPTION (design basis of the other project) | control doc; RFI draft only | verdict |
-| 57 | Option C rating proxy | 3.0 MN / 218 kN.m | - | ESTIMATE (model duty, not a rating) | slab_line_design build_schedule, hot range | force fraction |
-| 58 | S3 toll-mill class | D500-1000, barrel 800-2500, 0.5-3 m/s, >=5 MN | - | ASSUMPTION | task scenario S3 | acceptance of short pieces is the risk |
-| 59 | Cold hardening S235 | K=530 MPa, n=0.26 | - | ESTIMATE | Kalpakjian & Schmid Table 2.3 (1020 annealed), recalled | cold force linear |
-| 60 | Cold hardening S355 | K=760 MPa, n=0.18 | - | ASSUMPTION | - | cold force |
-| 61 | Cold friction | 0.08 (0.05-0.12) | - | ASSUMPTION | lubricated | passes ~ 1/mu^2 |
-| 62 | Cold torque arm | 0.45 | - | ASSUMPTION | - | cold torque linear |
-| 63 | Hitchcock constant | 2.207e-05 | mm2/N | FACT (elastic formula, E 210 GPa, nu 0.3) | Hitchcock roll flattening | cold force +5-20 % |
-| 64 | Cold max reduction per pass | 25 % | - | ASSUMPTION | - | cold pass count |
-| 65 | Cold mills evaluated | two-high D400; four-high work roll D180 | mm | ASSUMPTION | task scenario S4 | passes ~ 1/D; force ~ sqrt(D) |
-| 66 | Young's modulus (roll) | 200000.0 | MPa | ESTIMATE | memo #4 | crown only |
-| 67 | Shear modulus (roll) | 80000.0 | MPa | ESTIMATE | handbook order | crown only |
-| 68 | Timoshenko shear coefficient | 0.9 | - | ESTIMATE | solid round section | crown only |
-| 69 | Roll conductivity / cp | 45 / 480 | W/m.K / J/kg.K | ASSUMPTION | roll steel near 150 C | roll-chill cap only |
-| 70 | Stock conductivity | 28.0 | W/m.K | ESTIMATE | memo #7 | chill cap, Biot |
-| 71 | Furnace efficiency (small batch) | 0.20-0.35 | - | ASSUMPTION | - | firing kW ~ 1/eff |
-| 72 | Steel enthalpy 20->1200 C | 800.0 | kJ/kg | ESTIMATE | generic thermophysical data incl. alpha-gamma | firing kW linear |
-| 73 | Hearth packing | 0.6 | - | ASSUMPTION | single layer with gaps | hearth area ~ 1/packing |
-| 74 | Pilot charge heat time | 1.0 | h | ASSUMPTION | slow low-power chamber furnace | pilot firing kW |
-| 75 | Tier hours available | workshop 2000; industrial 4000 | h/yr | ASSUMPTION | 1 and 2 shifts x 250 d | shift count needed |
-| 76 | Motor speed | 985 rpm (6-pole, 50 Hz) | rpm | ESTIMATE | synchronous 1000 rpm FACT | gear ratio |
-| 77 | IEC motor sizes | 30-400 kW series | kW | FACT (standard series, IEC 60072) | - | rounding only |
-| 78 | Option C table roller pitch | 600-1000 | mm | ASSUMPTION [SM] | heavy slab table | short-piece conveyance |
-| 79 | Option C furnace fuel | 1.2-1.6 GJ/t full rate; 20-30 % to hold | - | ESTIMATE / ASSUMPTION | typical reheating furnace | idle energy per kg |
-| 80 | Option C min threading speed | 0.8 | m/s | ASSUMPTION | slab_line_design v_first | chill, rolling time |
+| 5 | Photo (ChatGPT's description): 5 pieces, 3 dimension groups | - | - | CLAIM (superseded by the photo itself) | brief s3 | - |
+| 6 | Photo received 2026-09-28: 4 pieces visible | 4 | pieces | MEASUREMENT (count only) | docs/reroll/evidence/PHOTO_pieces_2026-09-28.jpg | contradicts the brief's 5; kept side by side |
+| 7 | Photo: plan aspect ratio L/W of the 4 pieces | 1.75-2.44 | - | ESTIMATE (pixel measurement, unscaled, slight perspective) | evidence/PHOTO_NOTES | fits group A (2.0); B (1.33) and C (3.5) are not visible [SM] |
+| 8 | Density | 7850 | kg/m3 | ASSUMPTION | brief s2 | linear on mass |
+| 9 | Grade | S235JR nominal, S355JR bound | - | ASSUMPTION | brief s2, HP-02 | flow stress x1.15 for S355 (UNSOURCED multiplier) -> force/torque +15 % |
+| 10 | Targets | 6 / 8 / 10 | mm | FACT (owner requirement) | brief s1 | - |
+| 11 | Hot friction mu | 0.25-0.35 (0.30 nominal) | - | ASSUMPTION | validation memo #1 (CONSISTENT); bite checked at 0.25 | bite not binding in S1-S3; force +/- ~4-6 % across the range |
+| 12 | Flow stress fit (imported) | A=2586, beta=0.00307, m=0.13, n=0.15 | MPa | ESTIMATE (anchors UNSOURCED) | slab_line_design.py; validation memo #14 | force, torque and power scale linearly; below 900 C it is an extrapolation |
+| 13 | S355 flow-stress multiplier | 1.15 | - | ESTIMATE (UNSOURCED) | slab_line_design.GRADES; memo #15 | linear on all loads |
+| 14 | Plane-strain factor | 2/sqrt(3) blended b/h 1..5 | - | FACT (mechanics) | memo #19 | +15 % on loads for b/h >= 5 (all passes here) |
+| 15 | Geometry factor Q_p | 0.8+0.2L/h (L/h<1); 1+muL/2h | - | ESTIMATE | memo #17 (CONSISTENT) | L/h 1.5-4 here -> Q_p 1.2-1.6 |
+| 16 | Torque arm lambda | 0.48 | - | ESTIMATE (EDGE) | memo #2 | linear on torque, power |
+| 17 | Bearing friction | 0.004 | - | ASSUMPTION (UNSOURCED) | memo #3 | < 5 % of torque |
+| 18 | Wusatowski spread | w=10^(-1.269 (b/h)(h/D)^0.556) | - | ESTIMATE (+/-10-20 %) | memo #16 | gives < 0.1 % here (b/h 10-35, h/D < 0.06); real edge bulge a few mm [SM] |
+| 19 | Emissivity | 0.85 (0.75-0.90) | - | ESTIMATE (EDGE) | memo #5: scale 0.85-0.89 | reheat count; see report sensitivity |
+| 20 | Specific heat cp | 700.0 | J/kg.K | ESTIMATE | memo #6 | linear on cooling rate |
+| 21 | Convection h | 15.0 | W/m2.K | ESTIMATE | memo #9 | minor vs radiation |
+| 22 | Ambient | 29.9 | C | ASSUMPTION | imported T_AMB_K | minor |
+| 23 | Roll-gap heat transfer h_gap | 15000 (10000-30000) | W/m2.K | ASSUMPTION | order of magnitude commonly reported for hot rolling (not pinned to a source) | roll chill ~14-22 C/pass at 15 kW/m2K, ~25-37 C at 30 kW/m2K; B 20->6 gains a reheat at 30 |
+| 24 | Roll surface temperature | 150.0 | C | ASSUMPTION | uncooled small mill | weak (enters as T - T_roll) |
+| 25 | Deformation heat fraction | 0.9 | - | ESTIMATE | Taylor-Quinney ~0.9 (textbook) | +4-10 C per pass |
+| 26 | First heat piece temperature | 1200 (1150-1250) | C | ESTIMATE | see THERMAL_SOURCE_NOTE (ASM Handbook Vol. 14A, recalled) | first-pass force -8/+9 % for +/-50 C; scale 2.2-3.1 % (B) |
+| 27 | Reheat piece temperature | 1150 | C | ASSUMPTION | lower bound to limit scale | passes per reheat |
+| 28 | Overheating onset | 1300.0 | C | ESTIMATE | see THERMAL_SOURCE_NOTE | hard limit for furnace set point |
+| 29 | Burning onset | 1400.0 | C | ESTIMATE | see THERMAL_SOURCE_NOTE | irreversible; furnace overshoot protection |
+| 30 | Minimum finishing temperature | 800 / 850 / 880 | C | HYPOTHESIS (Ar3 EDGE) | memo #30: two sources differ by ~200 C | reheat count 0-2 per conversion |
+| 31 | Furnace margin above target | 40.0 | C | ASSUMPTION | - | heating time |
+| 32 | Furnace effective emissivity | 0.7 | - | ASSUMPTION | - | heating time +/- 20-30 % |
+| 33 | First-heat soak | 600 (300-900) | s | ASSUMPTION [RDR] | equalisation; Bi < 0.1 so through-thickness gradient is small | scale, furnace size |
+| 34 | Scale law | kp = 0.37 exp(-138 kJ/RT) g2/cm4/s | - | ESTIMATE | Paidassi (1958) as quoted in Chen & Yuen 2003 review; recalled | scale loss |
+| 35 | Scale kp factor | 0.5 / 0.8 / 1.2 | - | ASSUMPTION | atmosphere, chemistry | scale loss ~ sqrt(factor): 2.1-3.2 / 2.6-4.0 / 3.2-5.0 % per piece, one heat |
+| 36 | Irregular end per end (average over all ends) | 5 / 15 / 30 | mm | ASSUMPTION [SM] | photo description (CLAIM): SOME ends rounded/conical | crop 2.5-5 / 7-13 / 13-24 % of input (low/nominal/high, incl. tongue) |
+| 37 | Tongue/fishtail per end | 10 / 25 / 40 at >= 50 % reduction, pro rata below | mm | ASSUMPTION | - | part of the crop figures above |
+| 38 | Edge trim per side | 0 / 5 / 12 | mm | ASSUMPTION | HP-03 (product spec) | trim loss 0 / 3-4.5 / 6-10 % of input |
+| 39 | Out-of-tolerance fraction | 2 / 5 / 10 | % | ASSUMPTION | manual mill pilot | linear on yield |
+| 40 | S1 roll diameter | 400 (350-450) | mm | ASSUMPTION [RDR] | task scenario S1 | force ~ sqrt(D); torque ~ D |
+| 41 | S1 barrel | 550 (500-600) | mm | ASSUMPTION [RDR] | task scenario S1 | must exceed exit width + margin |
+| 42 | S1 speed | 0.6 (0.3-1.0) | m/s | ASSUMPTION | task scenario S1 | power ~ v; at 0.3 m/s longer contact chill adds a reheat on A and B 6 mm |
+| 43 | S1 interpass time | 8 (5-12) | s | ASSUMPTION [SM] | manual/semi-auto handling | B 20->6 last-pass force 1.29-1.55 MN; reheats under the cold-side set |
+| 44 | S1 furnace-to-bite transfer | 20 (12-40) | s | ASSUMPTION [SM] | - | 40 s adds a reheat on A 12->6 and +17 % force on B 20->6 |
+| 45 | S1 bearing offset | 150 | mm | ASSUMPTION | ~0.375 D | neck stress, crown |
+| 46 | Neck/barrel diameter ratio | 0.55 | - | ASSUMPTION (UNSOURCED) | memo #10 | neck stress ~ d^-3 |
+| 47 | S1 mill modulus | 0.5-1.5 | MN/mm | ASSUMPTION [SM] | small stand; measure by closed-roll test | thickness spread and absolute gauge |
+| 48 | S1 max reduction / last pass | 30 % / 20 % | - | ASSUMPTION [RDR] | conventional hot flat practice | pass count |
+| 49 | Bite utilisation | 0.85 | - | ASSUMPTION | margin on exact bite limit | - |
+| 50 | Handling overhead per piece | 30.0 | s | ASSUMPTION [SM] | - | capacity |
+| 51 | Mill utilisation | 0.65 (0.5-0.8) | - | ASSUMPTION | manual crew | capacity linear |
+| 52 | VFD overload | 1.5 | x | ESTIMATE | generic heavy-duty VFD rating 150 %/60 s | motor kW ~ 1/overload |
+| 53 | Drive efficiencies | gear 0.97/stage, pinion 0.98, spindle 0.99 | - | ESTIMATE | memo #20 | minor |
+| 54 | Gearbox service factor | 2.214 | - | ASSUMPTION | slab_line_design.SERVICE_FACTORS; memo #21-22 EDGE | gearbox rating linear |
+| 55 | Bite shock | 2-3 x steady torque | - | ASSUMPTION (UNSOURCED) | memo #24 | gearbox peak criterion |
+| 56 | Force margin (bearings/frame) | 1.3-1.5 | - | ASSUMPTION | - | rating |
+| 57 | Option C stand | D600 x 600, up to 3 m/s | - | UNKNOWN status | control doc: not operational, not recorded as owned | verdict |
+| 58 | Option C furnace | 20 t/h walking beam, 1250 C, 1.2 t slabs | - | ASSUMPTION (design basis of the other project) | control doc; RFI draft only | verdict |
+| 59 | Option C rating proxy | 5.12 MN / 218 kN.m | - | ESTIMATE (model design duty, not a rating) | slab_line_design worst_cases over 6-30 mm, balanced, S355JR (= stand RFI basis) | force fraction |
+| 60 | S3 toll-mill class | D500-1000, barrel 800-2500, 0.5-3 m/s, >=5 MN | - | ASSUMPTION | task scenario S3 | acceptance of short pieces is the risk |
+| 61 | Cold hardening S235 | K=530 MPa, n=0.26 | - | ESTIMATE | Kalpakjian & Schmid Table 2.3 (1020 annealed), recalled | cold force linear |
+| 62 | Cold hardening S355 | K=760 MPa, n=0.18 | - | ASSUMPTION | - | cold force |
+| 63 | Cold friction | 0.08 (0.05-0.12) | - | ASSUMPTION | lubricated | passes ~ 1/mu^2 |
+| 64 | Cold torque arm | 0.45 | - | ASSUMPTION | - | cold torque linear |
+| 65 | Hitchcock constant | 2.207e-05 | mm2/N | FACT (elastic formula, E 210 GPa, nu 0.3) | Hitchcock roll flattening | cold force +5-20 % |
+| 66 | Cold max reduction per pass | 25 % | - | ASSUMPTION | - | cold pass count |
+| 67 | Cold mills evaluated | two-high D400; four-high work roll D180 | mm | ASSUMPTION | task scenario S4 | passes ~ 1/D; force ~ sqrt(D) |
+| 68 | Young's modulus (roll) | 200000.0 | MPa | ESTIMATE | memo #4 | crown only |
+| 69 | Shear modulus (roll) | 80000.0 | MPa | ESTIMATE | handbook order | crown only |
+| 70 | Timoshenko shear coefficient | 0.9 | - | ESTIMATE | solid round section | crown only |
+| 71 | Roll conductivity / cp | 45 / 480 | W/m.K / J/kg.K | ASSUMPTION | roll steel near 150 C | roll-chill cap only |
+| 72 | Stock conductivity | 28.0 | W/m.K | ESTIMATE | memo #7 | chill cap, Biot |
+| 73 | Furnace efficiency (small batch) | 0.20-0.35 | - | ASSUMPTION | - | firing kW ~ 1/eff |
+| 74 | Steel enthalpy 20->1200 C | 800.0 | kJ/kg | ESTIMATE | generic thermophysical data incl. alpha-gamma | firing kW linear |
+| 75 | Hearth packing | 0.6 | - | ASSUMPTION | single layer with gaps | hearth area ~ 1/packing |
+| 76 | Pilot charge heat time | 1.0 | h | ASSUMPTION | slow low-power chamber furnace | pilot firing kW |
+| 77 | Tier hours available | workshop 2000; industrial 4000 | h/yr | ASSUMPTION | 1 and 2 shifts x 250 d | shift count needed |
+| 78 | Motor speed | 985 rpm (6-pole, 50 Hz) | rpm | ESTIMATE | synchronous 1000 rpm FACT | gear ratio |
+| 79 | IEC motor sizes | 30-400 kW series | kW | FACT (standard series, IEC 60072) | - | rounding only |
+| 80 | Option C table roller pitch | 600-1000 | mm | ASSUMPTION [SM] | heavy slab table | short-piece conveyance |
+| 81 | Option C furnace fuel | 1.2-1.6 GJ/t full rate; 20-30 % to hold | - | ESTIMATE / ASSUMPTION | typical reheating furnace | idle energy per kg |
+| 82 | Option C min threading speed | 0.8 | m/s | ASSUMPTION | slab_line_design v_first | chill, rolling time |
 
 Computed sensitivities are in `ENGINEERING_CALCS_2026-09-28.md`, section 12.

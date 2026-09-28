@@ -295,3 +295,15 @@ def test_s1_sizing_margins_cover_the_envelope():
         assert s["gearbox_output_rating_nm"] >= s["torque_total_peak_nm"]
         for dv in s["drive"].values():
             assert dv["motor_kw_iec"] >= dv["motor_kw_min"]
+
+
+def test_option_c_proxy_is_the_slab_line_envelope_duty_not_one_thickness():
+    # Independent check 2026-09-28: the proxy was hard-coded as 3.0 MN (the slab line's
+    # 30 mm case) and described as its "hot range" duty. It must be recomputed over the
+    # whole 6-30 mm envelope, which is the 5.12 MN its stand RFI quotes.
+    import slab_line_design as sld
+    import reroll_study as rs
+    env = max(sld.worst_cases(sld.build_schedule(t, "balanced", grade="S355JR"))["max_force"].force_n
+              for t in sld.THICKNESS_TARGETS_MM)
+    assert rs.SCENARIOS["S2"].force_rating_n == env
+    assert abs(env / 1e6 - 5.12) < 0.01

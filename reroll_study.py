@@ -222,6 +222,23 @@ class Scenario:
     handling: str
 
 
+def _slab_line_design_duty() -> tuple[float, float]:
+    """Option C proxy, recomputed from the other project's model on ITS stated basis:
+    peak separating force and peak roll torque over its whole product envelope
+    (balanced scenario, S355JR, all THICKNESS_TARGETS_MM 6-30 mm). This is the design
+    DUTY the stand RFI quotes (5.12 MN, 218.3 kN.m), not a rating - the real stand
+    rating is UNKNOWN. Computed, never hard-coded (FM-010: a value at one thickness
+    must not stand in for the envelope)."""
+    f_max = t_max = 0.0
+    for t in sld.THICKNESS_TARGETS_MM:
+        w = sld.worst_cases(sld.build_schedule(t, "balanced", grade="S355JR"))
+        f_max = max(f_max, w["max_force"].force_n)
+        t_max = max(t_max, w["max_torque"].torque_roll_nm)
+    return f_max, t_max
+
+
+_SLD_FORCE_N, _SLD_TORQUE_NM = _slab_line_design_duty()
+
 SCENARIOS = {
     "S1": Scenario(
         key="S1", label="Small two-high reversing hot mill (new or stock)", hot=True,
@@ -249,10 +266,10 @@ SCENARIOS = {
                       "not take back 12-19 kg pieces; any reheat needs a separate furnace",
         bearing_offset_mm=250.0, neck_ratio=0.55,
         mill_modulus_mn_mm=(3.0, 8.0),
-        force_rating_n=3.0e6, torque_rating_nm=218.3e3,
-        rating_basis="PROXY, not a rating: the slab-line model's own computed design "
-                     "duty (about 3.0 MN and 218 kN.m total at the rolls over its hot "
-                     "range). The real stand rating is UNKNOWN (that project's hold point).",
+        force_rating_n=_SLD_FORCE_N, torque_rating_nm=_SLD_TORQUE_NM,
+        rating_basis="PROXY, not a rating: the slab-line model's computed design duty "
+                     "over its 6-30 mm envelope (balanced, S355JR), the figure its stand "
+                     "RFI quotes. The real stand rating is UNKNOWN (that project's PRC-01).",
         max_reduction=0.30, last_pass_max_reduction=0.20, bite_utilisation=0.85,
         status="NOT operational; no equipment recorded as owned or purchased "
                "(control doc, 2026-09-28); stand status open under PRC-01",
@@ -1043,8 +1060,13 @@ INPUT_REGISTER = [
     ("Piece C L x W x T", "700 x 200 x 15", "mm", "ASSUMPTION", "brief s2", "as A"),
     ("Number of pieces / tonnage", "unknown", "-", "UNKNOWN", "control doc HP-01",
      "decides pilot vs workshop vs industrial economics"),
-    ("Photo shows 5 pieces, 3 dimension groups", "-", "-", "CLAIM (ChatGPT description)",
-     "brief s3", "two pieces unassigned [SM]"),
+    ("Photo (ChatGPT's description): 5 pieces, 3 dimension groups", "-", "-",
+     "CLAIM (superseded by the photo itself)", "brief s3", "-"),
+    ("Photo received 2026-09-28: 4 pieces visible", 4, "pieces", "MEASUREMENT (count only)",
+     "docs/reroll/evidence/PHOTO_pieces_2026-09-28.jpg", "contradicts the brief's 5; kept side by side"),
+    ("Photo: plan aspect ratio L/W of the 4 pieces", "1.75-2.44", "-",
+     "ESTIMATE (pixel measurement, unscaled, slight perspective)", "evidence/PHOTO_NOTES",
+     "fits group A (2.0); B (1.33) and C (3.5) are not visible [SM]"),
     ("Density", 7850, "kg/m3", "ASSUMPTION", "brief s2", "linear on mass"),
     ("Grade", "S235JR nominal, S355JR bound", "-", "ASSUMPTION", "brief s2, HP-02",
      "flow stress x1.15 for S355 (UNSOURCED multiplier) -> force/torque +15 %"),
@@ -1142,8 +1164,9 @@ INPUT_REGISTER = [
      "control doc: not operational, not recorded as owned", "verdict"),
     ("Option C furnace", "20 t/h walking beam, 1250 C, 1.2 t slabs", "-", "ASSUMPTION "
      "(design basis of the other project)", "control doc; RFI draft only", "verdict"),
-    ("Option C rating proxy", "3.0 MN / 218 kN.m", "-", "ESTIMATE (model duty, not a "
-     "rating)", "slab_line_design build_schedule, hot range", "force fraction"),
+    ("Option C rating proxy", f"{_SLD_FORCE_N / 1e6:.2f} MN / {_SLD_TORQUE_NM / 1e3:.0f} kN.m", "-",
+     "ESTIMATE (model design duty, not a rating)",
+     "slab_line_design worst_cases over 6-30 mm, balanced, S355JR (= stand RFI basis)", "force fraction"),
     ("S3 toll-mill class", "D500-1000, barrel 800-2500, 0.5-3 m/s, >=5 MN", "-",
      "ASSUMPTION", "task scenario S3", "acceptance of short pieces is the risk"),
     ("Cold hardening S235", "K=530 MPa, n=0.26", "-", "ESTIMATE",
@@ -1792,8 +1815,9 @@ def build_report() -> str:
       f"option, not an asset. The numbers below answer 'would it make sense IF it existed'.\n\n")
     w("| Check | Value [PC] | Reading |\n|---|---|---|\n")
     w(f"| Peak force, all 9 conversions, S355, mu 0.35, D600 at 0.8 m/s | "
-      f"{_mn(oc['force_peak_n'])} MN | {oc['force_fraction'] * 100:.0f} % of the 3.0 MN proxy "
-      f"(the slab-line model's own hot design duty at S355; the real rating is UNKNOWN). "
+      f"{_mn(oc['force_peak_n'])} MN | {oc['force_fraction'] * 100:.0f} % of the {_SLD_FORCE_N / 1e6:.2f} MN proxy "
+      f"(the slab-line model's design duty over 6-30 mm at S355, as quoted in its stand RFI; "
+      f"the real rating is UNKNOWN). "
       f"At S235 / mu 0.30: {_mn(oc['force_peak_nominal_n'])} MN = "
       f"{oc['force_peak_nominal_n'] / SCENARIOS['S2'].force_rating_n * 100:.0f} %. "
       f"Not a tiny fraction: the D600 roll has a longer arc of contact on thin, cooler stock "

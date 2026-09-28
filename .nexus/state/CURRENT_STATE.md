@@ -179,6 +179,13 @@ Full detail lives in the steel project's own files, which this file points at ra
   `fabrication_release_allowed=False` (11 blockers), old `calculation_allowed` gate untouched
   at `False`.
 
+## NEW PROJECT: PRJ-STEEL-REROLL-01 (opened 2026-09-28)
+Feasibility study for re-rolling existing thick steel pieces (12/15/20 mm; 500×250, 400×300 and 700×200 mm, all ASSUMED units) to 6/8/10 mm product.
+- The brief came from Reza via ChatGPT: `docs/reroll/MISSION_BRIEF_2026-09-28_FA.md`.
+- Control doc: `docs/reroll/PROJECT_CONTROL_PRJ-STEEL-REROLL-01.md`.
+- It is isolated from other projects. The only exception is option C ("use the existing line"), which may cite the recorded status of PRJ-STEEL-ROLLING-LINE-01. As of 2026-09-28 that line has no operational or purchased equipment.
+- Decision-critical unknown: total quantity/tonnage (HP-01).
+
 ## OTHER PROJECTS (unchanged, not touched this session)
 - PRJ-HYD-01 (Hydrotester): consolidated onto main 2026-09-19 (commit `1e6d5d5`) from the best of
   10 independent branch attempts. See the 2026-09-19 history further down this file's git log if

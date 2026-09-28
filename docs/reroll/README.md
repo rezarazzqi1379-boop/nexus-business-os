@@ -8,5 +8,7 @@ Start here: `PROJECT_CONTROL_PRJ-STEEL-REROLL-01.md` (Persian, living). It holds
 | `PROJECT_CONTROL_PRJ-STEEL-REROLL-01.md` | Control document |
 | `INPUTS_AND_ASSUMPTIONS.md` | Every input with its evidence class |
 | `../../reroll_study.py` + `../../evals/test_reroll_study.py` | Reproducible calculations |
+| `ENGINEERING_CALCS_2026-09-28.md` | Generated engineering report (RR-01): pass schedules, thermal window, yield, capacity, S1 sizing, option C, cold route |
+| `pass_schedules_2026-09-28.csv` | Every pass of every scenario/conversion, generated |
 
 Isolation rule: no data from other projects is used. The one exception is option C (the existing line), which cites the recorded status of PRJ-STEEL-ROLLING-LINE-01. Nothing may be sent to vendors without explicit owner approval.

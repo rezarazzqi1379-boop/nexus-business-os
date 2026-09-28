@@ -185,6 +185,14 @@ Feasibility study for re-rolling existing thick steel pieces (12/15/20 mm; 500×
 - Control doc: `docs/reroll/PROJECT_CONTROL_PRJ-STEEL-REROLL-01.md`.
 - It is isolated from other projects. The only exception is option C ("use the existing line"), which may cite the recorded status of PRJ-STEEL-ROLLING-LINE-01. As of 2026-09-28 that line has no operational or purchased equipment.
 - Decision-critical unknown: total quantity/tonnage (HP-01).
+- 2026-09-28 package, all on branch `feat/steel-reroll-01`:
+  - `reroll_study.py` (engineering, 104 tests) and `reroll_economics.py` (7 tests);
+  - the management report (Persian), pilot plan, risk register and two draft RFIs;
+  - the photo evidence: 4 pieces, plate crop-end shape.
+- Recommendation, pending Reza: route E (sell or use as usable offcut; buy 6/8/10 mm).
+  - Toll rolling after a pilot only if recurring tonnage is shown.
+  - Own line above ~445 t/yr against scrap, or ~1,076 t/yr against offcut.
+- Project memory store `.nexus/memory/`: stale billet decision-0002 superseded; current decisions recorded (AGENTS.md "Cross-agent shared project memory").
 
 ## OTHER PROJECTS (unchanged, not touched this session)
 - PRJ-HYD-01 (Hydrotester): consolidated onto main 2026-09-19 (commit `1e6d5d5`) from the best of

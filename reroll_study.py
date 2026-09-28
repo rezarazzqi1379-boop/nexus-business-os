@@ -31,7 +31,7 @@ import argparse
 import csv
 import io
 import math
-from dataclasses import asdict, dataclass, field, replace
+from dataclasses import asdict, dataclass, field
 from functools import lru_cache
 
 import slab_line_design as sld
@@ -57,7 +57,6 @@ from slab_line_design import (
     flow_stress_mpa,
     geometry_factor,
     max_draft_bite_exact_mm,
-    max_draft_bite_mm,
     neck_bending_stress_mpa,
     roll_rpm,
     stand_stretch_mm,

@@ -24,6 +24,8 @@ existed under another name).
 0. Memory check, first: `python -m nexus_checks --state --repo .`. A STALE state file or a
    broken pointer means the written memory is behind the repo: fix the state file before
    relying on it (`.nexus/state/STATE_GOVERNANCE.json` says which file governs what).
+   Then the duplicate-work check (FM-013): `git worktree list`, `git branch -a --list '*<kw>*'`,
+   `git log --all --oneline --grep '<PROJECT-ID>'`. Finished work on another branch is resumed, not redone.
 1. Identify the project. Steel rolling line: read `.nexus/steel/KERNEL.md` and
    `.nexus/steel/CHECKPOINT.md`, then `docs/expert_foundry/PROJECT_CONTROL_PRJ-STEEL-ROLLING-LINE-01.md`.
    Re-roll study (thick pieces → 6/8/10 mm, PRJ-STEEL-REROLL-01): `docs/reroll/README.md`.
@@ -34,6 +36,8 @@ existed under another name).
    `.nexus/steel/TOKEN_BUDGET_POLICY.yaml`). Never reload whole chat histories.
 4. Then do the work. Do not ask "what next?" when the objective follows from the state
    files; stop only at an approval gate (AGENTS.md §7, §Owner-delegated) or a real blocker.
+   An explicit owner scope limit ("Phase 1 only", "no new agents", "stop after X") overrides every
+   autonomy default, including Constitution v4.0 §VII (see `docs/system/NEXUS_V4_CONSTITUTION_AUDIT_2026-09-30.md`).
 
 ## 3. Truth and maturity (two vocabularies, never mixed)
 

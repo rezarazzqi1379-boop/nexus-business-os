@@ -212,3 +212,13 @@ Q_p        ×۱٫۰۴۴۷   (تپه‌ی اصطکاک با L/h بالا می‌�
 - **چه شد (۲۰۲۶-۰۹-۲۹):** مطالعهٔ PRJ-STEEL-REROLL-01 روز ۰۹-۲۸ کامل شده بود، روی برنچ محلیِ push‌نشدهٔ `feat/steel-reroll-01`. جلسهٔ بعد بدون نگاه‌کردن به `git worktree list` و برنچ‌های محلی، از روی یک برنچ دیگر شروع کرد. نتیجه: ~۷۸۰ هزار توکن زیرعامل صرف تکرار همان کار شد، تا اینکه Reza دامنه را محدود کرد.
 - **قاعده:** پیش از شروع هر پروژه این سه فرمان اجرا شود: `git worktree list`، `git branch -a --list '*<کلیدواژه>*'` و `git log --all --oneline --grep '<PROJECT-ID>'`. هیچ کاری فقط روی ماشین ابری نمی‌ماند: همان چرخه bundle به لپ‌تاپ برود، و برای push و PR فرمان به مالک داده شود.
 - **درس کلی:** حافظه‌ای که فقط روی یک برنچ push‌نشده است، از نظر جلسهٔ بعدی وجود ندارد.
+
+- **Recurrence (2026-09-30, CASE FM-013-b):** the Constitution v4.0 audit was also done twice on the same day:
+  - once on `feat/nexus-v4-audit` (13:17), which added the manual rule to CLAUDE.md;
+  - once again in another run, on `docs/constitution-v4-audit`.
+
+  The second run's checkout was based on a branch that did not contain the rule, so the rule never reached it.
+  - **Missed signal:** `git worktree list` showed `wtA4 [feat/nexus-v4-audit]`, but nobody ran it.
+  - **Detection method:** `python -m nexus_checks --boot --project <ID>`, now executable (`nexus_checks/boot.py`). It has 4 tests and is required first in CLAUDE.md §2.
+  - **Permanent rule:** push the rule itself to every live branch (consolidation branch `nexus/consolidated-2026-09-30`), and push state-bearing work the same day.
+  - **Limit:** the guard only sees refs present in the current clone. Unpushed work on another machine stays invisible, so pushing is the real fix.

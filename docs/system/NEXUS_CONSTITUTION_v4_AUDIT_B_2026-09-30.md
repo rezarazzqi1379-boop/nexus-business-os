@@ -1,3 +1,5 @@
+> **Status: secondary.** This is a second audit, run later the same day without seeing the first (FM-013-b). **Canonical:** `NEXUS_V4_CONSTITUTION_AUDIT_2026-09-30.md` together with `VP-01_COLD_START_RESUME.md`. The findings agree on the authority conflict, the resume gap and the adoption gap. Kept because it adds four things the first audit lacks: the capability ladder table (§2), the measured token waste (§8), the least-privilege GitHub escalation (§13) and the CLAUDE.md delta list (§5, now applied).
+
 # NEXUS × Claude — Constitution v4.0 implementation audit (READ-ONLY)
 
 **Date:** 2026-09-30

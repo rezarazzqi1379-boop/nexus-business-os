@@ -24,8 +24,9 @@ existed under another name).
 0. Memory check, first: `python -m nexus_checks --state --repo .`. A STALE state file or a
    broken pointer means the written memory is behind the repo: fix the state file before
    relying on it (`.nexus/state/STATE_GOVERNANCE.json` says which file governs what).
-   Then the duplicate-work check (FM-013): `git worktree list`, `git branch -a --list '*<kw>*'`,
-   `git log --all --oneline --grep '<PROJECT-ID>'`. Finished work on another branch is resumed, not redone.
+   Then the duplicate-work guard (FM-013, recurred twice): `python -m nexus_checks --boot --project <PROJECT-ID>
+   --project <keyword>`. Any B5 hit outside main is finished or running work: resume it, never redo it.
+   Push state-bearing branches the same day; a local-only branch is invisible to the next session.
 1. Identify the project. Steel rolling line: read `.nexus/steel/KERNEL.md` and
    `.nexus/steel/CHECKPOINT.md`, then `docs/expert_foundry/PROJECT_CONTROL_PRJ-STEEL-ROLLING-LINE-01.md`.
    Re-roll study (thick pieces → 6/8/10 mm, PRJ-STEEL-REROLL-01): `docs/reroll/README.md`.
@@ -50,6 +51,21 @@ existed under another name).
   (FM-009: "1:25 is incompatible" was true only at 3 m/s and a 700 rpm motor ceiling).
 - Compare new work against the project's engineering basis, not only against your own
   earlier outputs (FM-010).
+
+Constitution v4.0 deltas (the full text and its audit are in `docs/system/`; only these rules are new):
+- Shadow Scientist: before any consequential recommendation, name the hidden constraint most likely to
+  invalidate it, and check that constraint first.
+- Agreement between agents or models is not evidence. Resolve disagreement by measurement, test, physical
+  constraint, independent calculation, or authoritative source. "Independent" means different inputs or
+  method, not only different code.
+- Outbound gate: a non-Persian message to any third party is prepared as the exact recipient, subject,
+  attachments and payload, plus a faithful Persian rendering, and is sent only after an exact approval
+  for that recipient. A blanket "all approvals" does not cover sending.
+- Capability ladder: AVAILABLE, CONNECTED, AUTHENTICATED, READ_VERIFIED, WRITE_ENABLED, TESTED,
+  PRODUCTION_APPROVED. Report the level actually reached.
+- Report outcomes, not activity: no agent counts, search counts or line counts as achievements.
+- Arena: 1 worker by default; 2-4 for a contradiction or a consequential number; 5 or more only with
+  the owner's explicit opt-in (each agent costs about 150-380k tokens, measured).
 
 ## 4. Token economy — concrete levers, not intentions
 

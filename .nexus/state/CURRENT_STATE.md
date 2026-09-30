@@ -1,8 +1,8 @@
 # NEXUS CURRENT STATE
-Last updated: 2026-09-28 by Claude Code (branch `feat/steel-experiments-v0.1`, built on
-`feat/project-memory-and-checks-v0.1`) -- see THIS SESSION below for what changed; the rest of
-this file is unchanged since the 2026-09-26 rewrite. Previous version (2026-09-19) is in git
-history at this same path if any old wording is needed.
+Last updated: 2026-09-30 by Claude Code (branch `nexus/consolidated-2026-09-30`, which merges
+`feat/steel-experiments-v0.1`, `feat/steel-reroll-01`, `feat/nexus-v4-audit` and
+`docs/constitution-v4-audit` into one reviewable branch). Sections REROLL, SYSTEM and
+PROCUREMENT: DC MOTOR were rewritten this update; the rest is unchanged since 2026-09-28.
 
 RULE: Read this file FIRST in any new session before doing anything else. Overwrite stale
 sections when updating -- do not just append. This file governs `docs/procurement/`,
@@ -193,11 +193,21 @@ Feasibility study for re-rolling existing thick steel pieces (12/15/20 mm; 500×
   - Toll rolling after a pilot only if recurring tonnage is shown.
   - Own line above ~445 t/yr against scrap, or ~1,076 t/yr against offcut.
 - Project memory store `.nexus/memory/`: stale billet decision-0002 superseded; current decisions recorded (AGENTS.md "Cross-agent shared project memory").
-- 2026-09-29: **Phase 1 delivered**: `docs/reroll/PHASE1_RECOMMENDATION_FA_2026-09-29.md` (primary option E, conditional). Reza then asked for **PHASE1_5_DECISION_CLOSURE**; it is **pending, not delivered**. Phase 2 is not authorised. A duplicate run 2 exists only on branch `feat/reroll-01-v0.1` (FM-013); it is not merged.
+- 2026-09-29: **Phase 1 delivered**: `docs/reroll/PHASE1_RECOMMENDATION_FA_2026-09-29.md` (primary option E, conditional). - 2026-09-30: **Phase 1.5 delivered**: `docs/reroll/PHASE1_5_DECISION_CLOSURE_FA_2026-09-30.md` (commit 6f16bb4), with the closure functions in `reroll_economics.py` (`closure_delta`, `closure_verdict`, `closure_threshold_toll`, `pilot_cost`) and 12 tests. Conditional decision: (a) sell direct if the best offcut offer clears ~68k toman/kg; (b) a 500-1000 kg toll pilot if the real toll rate is under the recomputed threshold; (c) internal test only if the old line is cheaply operational; (d) otherwise stop.
+- **STOPPED by owner order.** Waiting for five real data points: total weight; two offcut-buyer prices; the thin-piece sale price; one toll-rolling quote; the old line's status. Phase 2 is not authorised.
+- A duplicate run 2 exists only on branch `feat/reroll-01-v0.1` (FM-013); it is not merged.
 
 ## SYSTEM: Constitution v4.0 audit (2026-09-30)
-- `docs/system/NEXUS_V4_CONSTITUTION_AUDIT_2026-09-30.md`. The authority contradiction is OPEN: the activation text names v1.8/v2.1; the repo record keeps v1.4/v1.1.
-- Next proof: `docs/system/VP-01_COLD_START_RESUME.md`. It runs after the PR stack is merged.
+- Canonical audit: `docs/system/NEXUS_V4_CONSTITUTION_AUDIT_2026-09-30.md` (audit A). A second, duplicate audit (FM-013-b) is kept as `docs/system/NEXUS_CONSTITUTION_v4_AUDIT_B_2026-09-30.md`, marked secondary.
+- Authority decision 2026-09-30 (`docs/authority/AUTHORITY_STATUS.md`): the promoted tuple stays Master v1.4 + Registry v1.1. The v1.8/v2.1 named by the activation text is recorded as a CLAIM until the files themselves are produced and pass the promotion checks listed there.
+- Permanent fixes applied under the owner's delegation: `python -m nexus_checks --boot --project <ID>` (duplicate-work guard, `nexus_checks/boot.py`, 4 tests); CLAUDE.md step 0 runs it; CLAUDE.md "Constitution v4.0 deltas" block; AGENTS.md names the operative Claude Code preflight.
+- Next proof: `docs/system/VP-01_COLD_START_RESUME.md`. It runs after `nexus/consolidated-2026-09-30` is merged.
+
+## PROCUREMENT: DC MOTOR 1-2.5 MW, 500-600 rpm (opened 2026-09-30)
+- Rounds 1 and 2: `docs/procurement/DC_MOTOR_STOCK_SEARCH_2026-09-30.md`, `docs/procurement/DC_MOTOR_STOCK_SEARCH_ROUND2_2026-09-30.md`.
+- No LIVE in-spec used unit confirmed in China or neighbouring markets. Candidates are stale or near-spec (Z710-1B 1000 kW 600/1200; Z800-6B 1600 kW; Z800-8 1800 kW; МПЭ-1000 1120 kW 630/1000). New Chinese build ~$35-40/kW is an ESTIMATE; an exact price needs a FORMAL QUOTE.
+- OPEN engineering check (FM-010): a 500-600 rpm base differs from Package A (~400 rpm base) and from the engineer's 1:25 gearbox. Check against `slab_line_design` before any quote request.
+- Quote requests are drafts only. Sending needs an exact per-recipient approval (outbound gate).
 
 ## OTHER PROJECTS (unchanged, not touched this session)
 - PRJ-HYD-01 (Hydrotester): consolidated onto main 2026-09-19 (commit `1e6d5d5`) from the best of

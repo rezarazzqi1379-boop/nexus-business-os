@@ -33,6 +33,11 @@ For every consequential task that draws on connector data:
    — send, publish, payment, signature, deployment, permission change, or deletion still
    require their own exact-scope human approval regardless of what the preflight reports.
 
+In Claude Code sessions, the operative preflight is `python -m nexus_checks --boot --state` (FM-013,
+FM-011). `nexus_chat_bootstrap` is required when the task consumes connector data (Gmail, Drive, Notion,
+CRM). Clarified 2026-09-30 under the owner's delegation: this aligns the contract with practice instead of
+leaving a mandate that is not executed.
+
 Never place credentials or full OAuth tokens in manifests, evidence, prompts, logs, or
 commits — store a credential locator only, never the value. Connector availability proves
 access only; it does not prove data correctness or authority. This preflight applies to

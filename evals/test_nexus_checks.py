@@ -159,3 +159,10 @@ def test_v51_superseded_gearbox_and_regen_values(tmp_path):
                               "v5.1: 655 kN·m was roll-referred; now 685 kN·m at the output\n")
     assert superseded_values.check_file(ok) == []
 
+
+def test_reversal_238_ignores_grouped_numbers(tmp_path):
+    # FP 2026-09-28 (PRJ-STEEL-REROLL-01 market research): prices like "238,540" or
+    # "1,238" are not the superseded duty figure.
+    ok = _w(tmp_path, "p.md", "flat bar 238,540-262,390 Toman/kg; total 1,238 kg\n")
+    assert superseded_values.check_file(ok) == []
+

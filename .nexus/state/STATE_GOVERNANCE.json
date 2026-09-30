@@ -46,6 +46,16 @@
       ],
       "note": "living control doc (Persian); explicitly says sanad-e zende / last-updated at top",
       "tolerance_days": 3
+    },
+    {
+      "state_file": "docs/reroll/PROJECT_CONTROL_PRJ-STEEL-REROLL-01.md",
+      "governs": [
+        "docs/reroll",
+        "reroll_study.py",
+        "evals/test_reroll_study.py"
+      ],
+      "note": "PRJ-STEEL-REROLL-01 living control doc (Persian)",
+      "tolerance_days": 2
     }
   ],
   "broken_reference_scan": [
@@ -58,6 +68,7 @@
     ".nexus/steel/FRESHNESS_POLICY.yaml",
     ".nexus/steel/TOKEN_BUDGET_POLICY.yaml",
     ".nexus/steel/GAP_ANALYSIS.md",
-    "docs/expert_foundry/PROJECT_CONTROL_PRJ-STEEL-ROLLING-LINE-01.md"
+    "docs/expert_foundry/PROJECT_CONTROL_PRJ-STEEL-ROLLING-LINE-01.md",
+    "docs/reroll/PROJECT_CONTROL_PRJ-STEEL-REROLL-01.md"
   ]
 }

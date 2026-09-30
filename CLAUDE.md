@@ -26,6 +26,7 @@ existed under another name).
    relying on it (`.nexus/state/STATE_GOVERNANCE.json` says which file governs what).
 1. Identify the project. Steel rolling line: read `.nexus/steel/KERNEL.md` and
    `.nexus/steel/CHECKPOINT.md`, then `docs/expert_foundry/PROJECT_CONTROL_PRJ-STEEL-ROLLING-LINE-01.md`.
+   Re-roll study (thick pieces → 6/8/10 mm, PRJ-STEEL-REROLL-01): `docs/reroll/README.md`.
    Procurement: `docs/procurement/README.md`. Repo-wide state: `.nexus/state/CURRENT_STATE.md`.
 2. Authority: `docs/authority/AUTHORITY_STATUS.md`. A newer file name is not authority;
    match Source ID, status, effective date and supersession rule.

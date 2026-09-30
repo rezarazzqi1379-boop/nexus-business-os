@@ -55,7 +55,7 @@ RULES: list[Rule] = [
     Rule("SV-reversals-238",
          # (?<!\d)/(?!\d) instead of \b so CJK text ("238次/小时") is caught; a line count
          # ("238-line file", "238行") is skipped unless a rate follows ("238 lines/h").
-         _r(r"(?<![\d.])238(?!\d)(?!(?:[- ]?(?:lines?|سطر)\b|\s?行)(?!\s*(?:/\s*h|per\s+hour|در\s+ساعت)))"),
+         _r(r"(?<![\d.,])238(?!\d|,\d)(?!(?:[- ]?(?:lines?|سطر)\b|\s?行)(?!\s*(?:/\s*h|per\s+hour|در\s+ساعت)))"),
          "85-170 reversals/h by thickness; accelerations+brakings 204-374/h (238 = the 20 mm case only)",
          "Package A §8.4, T-3; transmission audit 2026-09-26 M1",
          exempt=_r(r"accel|brak|شتاب|ترمز|加速|制动")),

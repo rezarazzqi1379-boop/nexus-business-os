@@ -278,6 +278,103 @@ def build_report() -> str:
     return "\n".join(L) + "\n"
 
 
+# --------------------------------------------------------------------------------------
+# Phase 1.5 (2026-09-30): full decision identity, all costs explicit
+# --------------------------------------------------------------------------------------
+# Every value is an ESTIMATE or ASSUMPTION (Toman per kg of INPUT unless stated); none is a quote.
+CLOSURE_COSTS = {
+    #          low     high     basis
+    "H": (1_000, 3_000),    # transport round trip per kg, campaign scale (ASSUMPTION)
+    "R": (0, 3_000),        # extra reheat charge if billed separately (ASSUMPTION)
+    "L": (1_500, 3_000),    # cropping + levelling per kg (ASSUMPTION)
+    "Q": (1_000, 4_000),    # QC tests spread over the campaign lot (ESTIMATE)
+    "r": (0.0, 0.15),       # reject fraction of rolled product, sold as scrap (ASSUMPTION)
+    "s": (0.03, 0.06),      # scale loss of input, no value (reroll_study 2.6-4 %; 05 doc 3-6 %)
+    "months": (1, 3),       # capital tied up (ASSUMPTION)
+}
+FIN_RATE_MONTH = 0.03       # cost of money per month, ~36 %/yr (ASSUMPTION)
+P_STD = 125_000             # standard 6-10 mm plate, mid of DAILY-MARKET-LIST 120-131k (ADVERTISED)
+P_SCR = 54_000              # heavy scrap buyer posting, mesterahan 2026-09-28 (ADVERTISED)
+
+
+def closure_delta(p_in, k, y, toll, *, H, R, L, Q, r, s, months,
+                  p_std=P_STD, p_scr=P_SCR, fin=FIN_RATE_MONTH):
+    """Advantage of toll re-rolling over selling the piece as it is, per kg of input.
+
+    revenue = y(1-r)*k*p_std + (y*r + max(0, 1-y-s))*p_scr   # product + rejects/crop as scrap
+    costs   = toll + H + R + L + Q + F,  F = (p_in + toll + H + R + L + Q) * fin * months
+    delta   = revenue - costs - p_in                            # > 0: roll; < 0: sell as is
+    """
+    revenue = y * (1 - r) * k * p_std + (y * r + max(0.0, 1 - y - s)) * p_scr
+    outlay = toll + H + R + L + Q
+    F = (p_in + outlay) * fin * months
+    return revenue - outlay - F - p_in
+
+
+def _cost_case(which: str) -> dict:
+    i = 0 if which == "low" else 1
+    return {k: v[i] for k, v in CLOSURE_COSTS.items()}
+
+
+def closure_verdict(p_in, k, y, toll) -> str:
+    """ROLL if it pays even with high other costs; SELL if it loses even with low ones."""
+    best = closure_delta(p_in, k, y, toll, **_cost_case("low"))
+    worst = closure_delta(p_in, k, y, toll, **_cost_case("high"))
+    if worst > 0:
+        return "ROLL"
+    if best < 0:
+        return "SELL"
+    return "UNCLEAR"
+
+
+def closure_threshold_toll(p_in, k, y, which="nom") -> float:
+    """Maximum toll rate (Toman/kg) at which rolling still breaks even (delta = 0)."""
+    if which == "nom":
+        c = {k2: (v[0] + v[1]) / 2 for k2, v in CLOSURE_COSTS.items()}
+    else:
+        c = _cost_case(which)
+    lo, hi = -200_000.0, 200_000.0
+    for _ in range(80):
+        mid = (lo + hi) / 2
+        if closure_delta(p_in, k, y, mid, **c) > 0:
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2
+
+
+CLOSURE_GRID = {"p_in": (60_000, 75_000, 90_000), "k": (0.70, 0.82, 0.92),
+                "y": (0.60, 0.70, 0.80, 0.90), "toll": (5_000, 10_000, 15_000, 20_000, 30_000)}
+
+
+def closure_table() -> list:
+    g = CLOSURE_GRID
+    return [{"p_in": p, "k": k, "cells": [[closure_verdict(p, k, y, t) for t in g["toll"]] for y in g["y"]]}
+            for p in g["p_in"] for k in g["k"]]
+
+
+def pilot_breakdown() -> list:
+    """Bottom-up pilot cost (Toman). Fixed items do not scale with kg; variable items do."""
+    items = [  # name, fixed (low, nom, high), variable per kg (low, nom, high), basis
+        ("حمل رفت و برگشت (تا ۱٫۵ تن یک سفر)", (6e6, 10e6, 15e6), (0, 0, 0), "ASSUMPTION"),
+        ("آماده‌سازی: شماره‌گذاری، اندازه‌گیری، برس یا ساچمه", (1e6, 3e6, 5e6), (500, 1_000, 2_000), "ASSUMPTION"),
+        ("کوره: گرم‌کردن برای یک نوبت کوچک", (8e6, 15e6, 25e6), (0, 0, 0), "ESTIMATE"),
+        ("اجرت نورد", (0, 0, 0), (5_000, 20_000, 35_000), "ESTIMATE (بدون نرخ منتشرشده)"),
+        ("حداقل هزینهٔ پذیرش کارگاه (راه‌اندازی، تنظیم غلتک)", (10e6, 25e6, 40e6), (0, 0, 0), "ESTIMATE"),
+        ("برش سر و ته و لولر", (2e6, 5e6, 8e6), (1_000, 2_000, 3_000), "ASSUMPTION"),
+        ("آنالیز شیمیایی (۴ نمونه: یکی از هر گروه + مرجع)", (4e6, 6e6, 12e6), (0, 0, 0), "ESTIMATE"),
+        ("کشش ۳ + خمش ۳", (6e6, 9e6, 15e6), (0, 0, 0), "ESTIMATE"),
+        ("متالوگرافی ۱ + سختی", (3e6, 6e6, 10e6), (0, 0, 0), "ESTIMATE"),
+        ("سایر: ماشین‌کاری نمونه، هماهنگی، گزارش", (3e6, 7e6, 12e6), (0, 0, 0), "ASSUMPTION"),
+    ]
+    return items
+
+
+def pilot_cost(kg: float, case: str = "nom") -> float:
+    i = {"low": 0, "nom": 1, "high": 2}[case]
+    return sum(fx[i] + var[i] * kg for _, fx, var, _ in pilot_breakdown())
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--report")

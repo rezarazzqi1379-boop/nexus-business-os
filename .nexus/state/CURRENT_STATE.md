@@ -193,6 +193,11 @@ Feasibility study for re-rolling existing thick steel pieces (12/15/20 mm; 500×
   - Toll rolling after a pilot only if recurring tonnage is shown.
   - Own line above ~445 t/yr against scrap, or ~1,076 t/yr against offcut.
 - Project memory store `.nexus/memory/`: stale billet decision-0002 superseded; current decisions recorded (AGENTS.md "Cross-agent shared project memory").
+- 2026-09-29: **Phase 1 delivered**: `docs/reroll/PHASE1_RECOMMENDATION_FA_2026-09-29.md` (primary option E, conditional). Reza then asked for **PHASE1_5_DECISION_CLOSURE**; it is **pending, not delivered**. Phase 2 is not authorised. A duplicate run 2 exists only on branch `feat/reroll-01-v0.1` (FM-013); it is not merged.
+
+## SYSTEM: Constitution v4.0 audit (2026-09-30)
+- `docs/system/NEXUS_V4_CONSTITUTION_AUDIT_2026-09-30.md`. The authority contradiction is OPEN: the activation text names v1.8/v2.1; the repo record keeps v1.4/v1.1.
+- Next proof: `docs/system/VP-01_COLD_START_RESUME.md`. It runs after the PR stack is merged.
 
 ## OTHER PROJECTS (unchanged, not touched this session)
 - PRJ-HYD-01 (Hydrotester): consolidated onto main 2026-09-19 (commit `1e6d5d5`) from the best of

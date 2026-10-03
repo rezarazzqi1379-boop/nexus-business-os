@@ -4,8 +4,14 @@
     {
       "connector_id": "gmail",
       "system": "Gmail",
-      "authority_scope": ["dynamic_email", "attachments", "thread_state"],
-      "project_scope": ["*"],
+      "authority_scope": [
+        "dynamic_email",
+        "attachments",
+        "thread_state"
+      ],
+      "project_scope": [
+        "*"
+      ],
       "read_capable": true,
       "write_capable": true,
       "freshness_seconds": 604800,
@@ -14,8 +20,13 @@
     {
       "connector_id": "google_drive",
       "system": "Google Drive",
-      "authority_scope": ["documents", "canonical_candidate"],
-      "project_scope": ["*"],
+      "authority_scope": [
+        "documents",
+        "canonical_candidate"
+      ],
+      "project_scope": [
+        "*"
+      ],
       "read_capable": true,
       "write_capable": true,
       "freshness_seconds": 2592000,
@@ -24,8 +35,14 @@
     {
       "connector_id": "github",
       "system": "GitHub",
-      "authority_scope": ["code", "tests", "versioned_state"],
-      "project_scope": ["*"],
+      "authority_scope": [
+        "code",
+        "tests",
+        "versioned_state"
+      ],
+      "project_scope": [
+        "*"
+      ],
       "read_capable": true,
       "write_capable": true,
       "freshness_seconds": 86400,
@@ -34,8 +51,13 @@
     {
       "connector_id": "notion",
       "system": "Notion",
-      "authority_scope": ["workspace_notes", "handoff_history"],
-      "project_scope": ["*"],
+      "authority_scope": [
+        "workspace_notes",
+        "handoff_history"
+      ],
+      "project_scope": [
+        "*"
+      ],
       "read_capable": true,
       "write_capable": true,
       "freshness_seconds": 2592000,
@@ -44,8 +66,13 @@
     {
       "connector_id": "supabase",
       "system": "Supabase",
-      "authority_scope": ["database_state", "migrations"],
-      "project_scope": ["*"],
+      "authority_scope": [
+        "database_state",
+        "migrations"
+      ],
+      "project_scope": [
+        "*"
+      ],
       "read_capable": true,
       "write_capable": true,
       "freshness_seconds": 86400,
@@ -54,8 +81,12 @@
     {
       "connector_id": "vercel",
       "system": "Vercel",
-      "authority_scope": ["deployment_state"],
-      "project_scope": ["*"],
+      "authority_scope": [
+        "deployment_state"
+      ],
+      "project_scope": [
+        "*"
+      ],
       "read_capable": true,
       "write_capable": true,
       "freshness_seconds": 3600,
@@ -64,12 +95,31 @@
     {
       "connector_id": "railway",
       "system": "Railway",
-      "authority_scope": ["deployment_state", "runtime_health"],
-      "project_scope": ["*"],
+      "authority_scope": [
+        "deployment_state",
+        "runtime_health"
+      ],
+      "project_scope": [
+        "*"
+      ],
       "read_capable": true,
       "write_capable": true,
       "freshness_seconds": 3600,
       "credential_locator": "connector://railway"
+    },
+    {
+      "connector_id": "agent_reach",
+      "system": "Agent-Reach public acquisition",
+      "authority_scope": [
+        "public_discovery"
+      ],
+      "project_scope": [
+        "*"
+      ],
+      "read_capable": true,
+      "write_capable": false,
+      "freshness_seconds": 3600,
+      "credential_locator": "none://public-only"
     }
   ]
 }

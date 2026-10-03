@@ -145,3 +145,6 @@ A cycle is not finished until the memory is written: update `.nexus/state/CURREN
 and the project's checkpoint and control doc, then make `python -m nexus_checks --state --repo .`
 pass. Report only: what now works (with test evidence), discoveries, failures converted to
 checks, open decisions for the owner, next safe action, exact approval required.
+
+## Agent-Reach
+Use the acquisition preflight in AGENTS.md. Load docs/system/AGENT_REACH_INTEGRATION.md only for external research. Local edits skip internet retrieval.

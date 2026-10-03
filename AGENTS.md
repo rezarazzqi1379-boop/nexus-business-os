@@ -127,3 +127,17 @@ every agent and chat entry point that operates through this repository.
 - Record durable, evidence-backed statements with `record()` into one of three namespaces: `preference` (how the owner wants work done), `decision` (a settled project/architecture call, with `evidence_refs` pointing at the commit, file, or doc that backs it), and `context` (current working state). Never record raw chat transcripts -- only distilled statements, matching this project's evidence-discipline rules.
 - When a new decision supersedes an old one, use `supersede()` rather than editing or deleting the old entry -- history stays intact, `bootstrap_context()` simply stops surfacing it.
 - This module is a peer store to `CURRENT_STATE.md`, not a replacement: `CURRENT_STATE.md` remains the narrative session log a human reads; `project_memory` is the structured, queryable form another AI session (Claude Code, Codex, or otherwise) reads programmatically at startup.
+
+
+## Agent-Reach acquisition preflight
+
+Before every substantial task, evaluate whether external evidence is needed with
+`source_failover.agent_reach_preflight`. This is a cheap routing decision, not a
+mandatory internet call. Read `docs/system/AGENT_REACH_INTEGRATION.md` only when
+external acquisition is relevant. Use fresh project/lane-scoped evidence first,
+then existing native connectors; Agent-Reach tools are an optional public-data
+fallback after a fresh, recorded channel health observation. Never run the
+installer, import browser cookies, enable every channel, or send private project
+data to public retrieval services. Keep existing approval and evidence gates.
+This contract covers agents operating in this repository; it cannot configure
+other installed plugins, Claude web sessions, or Notion agents automatically.

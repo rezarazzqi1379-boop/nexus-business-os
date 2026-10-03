@@ -104,3 +104,46 @@ This is fixture-tested, not live-backend-tested. No actual model token saving
 measurement exists. Regression result: 58 tests and 17 subtests passed.
 A second push attempt was rejected by automatic approval review. No remote
 publication, merge, production activation or global chat/plugin change occurred.
+
+## v1.3 actual model-entry acquisition candidate
+agent.py now invokes collect_reach_evidence in a worker thread before its model
+call and includes acquired_evidence in the envelope. Read failure blocks the
+model and records blocked_acquisition. Project policy is evaluated before any
+read; unknown or forbidden project routes make no network call. The runtime
+uses the existing projects.py IDs (for example hydrostatic_tester), not an
+assumed alias mapping from PRJ-HYD-01.
+
+Production switch: NEXUS_REACH_ENABLED=1. Default remains disabled; source text
+cannot switch it on. For this candidate only exact github.com HTTPS URLs are
+allowlisted. This narrow acceptance scope does not constitute supplier-web
+coverage; new approved hosts require a reviewed code/config change. All URLs
+in the batch are validated before calls; no query strings, login, cookies,
+private data, shells, installers or social write actions are enabled.
+
+Install in the intended isolated runtime with uv sync --extra reach (dev tests
+add --extra dev). The optional dependency and uv.lock pin Agent-Reach to
+commit a19a171fa980a0785849596492e0af4db800c82f. Installation here was confined
+to the test environment. No Railway/main/production switch was changed.
+
+For the event control acquisition object, supply the normal preflight fields
+plus urls (one or two exact public URLs). An approved trusted runner must
+record recent live_read health with a retrievable evidence reference; a caller
+claim is not authenticated proof. Returned text is untrusted CLAIM evidence.
+The model prompt already treats retrieved documents as data, not instructions.
+
+Learning from inspected APIs: WebChannel supplies read; RSS requires upstream
+feedparser operations; most other channels primarily check their upstream CLI
+or MCP availability. Do not invent universal read/search methods. GitHub native
+connector is already usable and should precede gh CLI. Local CLI inventory:
+gh, yt-dlp, mcporter, bili, twitter, opencli and rdt were absent from PATH.
+They were not auto-installed or marked healthy. No browser session or token
+was imported. All channels are not concurrently healthy merely because the
+package imports.
+
+Validation v1.3: 67 tests and 17 subtests passed, including fixture end-to-end
+model envelope and failure blocking; optional-dependency lock regenerated.
+Runtime cost is bounded by read attempts and excerpts; actual model token
+savings and commercial retrieval quality remain unmeasured. New candidate
+changes are local only until exact payload publication approval.
+
+Measured v1.3 live collector: 1 evidence record, 6.90 seconds, 1200 excerpt characters, project hydrostatic_tester; SHA-256 b782118a62983783c1db36bc7d11b5e5a788aa9192b8a9e9aeda0f8f9ea3a462. This was a sandbox call with enabled=True, not a production event or paid model invocation.

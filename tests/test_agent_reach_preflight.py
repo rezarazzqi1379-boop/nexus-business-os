@@ -93,3 +93,49 @@ class ReachSessionTests(unittest.TestCase):
         from source_failover import ReachReadSession
         with self.assertRaises(ValueError):
             ReachReadSession(run(sensitivity="restricted"), lambda url: "x")
+
+class ReachCollectorTests(unittest.TestCase):
+    def setUp(self):
+        from dataclasses import asdict
+        self.preflight = dict(gate='SAFE', project_id='PRJ-HYD-01',
+                              acquisition=asdict(run()))
+        self.control = dict(urls=['https://github.com/Panniantong/Agent-Reach'])
+
+    def test_real_collector_enforces_caps(self):
+        from source_failover import collect_reach_evidence
+        result = collect_reach_evidence(self.preflight, self.control,
+                                        reader=lambda url: 'x' * 5000, enabled=True)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(len(result[0]['excerpt']), 1200)
+        self.assertEqual(result[0]['project_id'], 'PRJ-HYD-01')
+
+    def test_batch_validated_before_any_read(self):
+        from source_failover import collect_reach_evidence, ReachAcquisitionError
+        calls = []
+        self.control['urls'].append('https://localhost/secret')
+        with self.assertRaises(ReachAcquisitionError):
+            collect_reach_evidence(self.preflight, self.control,
+                                   reader=lambda url: calls.append(url), enabled=True)
+        self.assertEqual(calls, [])
+
+    def test_disabled_and_review_do_not_call_reader(self):
+        from source_failover import collect_reach_evidence, ReachAcquisitionError
+        for enabled, gate in ((False, 'SAFE'), (True, 'REVIEW'), (True, 'BLOCK')):
+            calls = []
+            self.preflight['gate'] = gate
+            with self.assertRaises(ReachAcquisitionError):
+                collect_reach_evidence(self.preflight, self.control,
+                                       reader=lambda url: calls.append(url), enabled=enabled)
+            self.assertEqual(calls, [])
+
+    def test_backend_errors_are_sanitized(self):
+        from source_failover import collect_reach_evidence, ReachAcquisitionError
+        def reader(url):
+            raise RuntimeError('sensitive backend body')
+        with self.assertRaisesRegex(ReachAcquisitionError, '^reach_read_failed$'):
+            collect_reach_evidence(self.preflight, self.control, reader=reader, enabled=True)
+
+    def test_non_reach_route_makes_no_calls(self):
+        from source_failover import collect_reach_evidence
+        self.preflight['acquisition']['route'] = 'native'
+        self.assertEqual(collect_reach_evidence(self.preflight, {}, enabled=False), [])

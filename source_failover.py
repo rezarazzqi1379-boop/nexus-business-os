@@ -159,3 +159,65 @@ class ReachReadSession:
                 "content_sha256": hashlib.sha256(body.encode()).hexdigest(),
                 "excerpt": body[:self.decision.excerpt_chars],
                 "truncated": len(body) > self.decision.excerpt_chars}
+
+
+class ReachAcquisitionError(RuntimeError):
+    """Safe, code-only acquisition failure; never relays backend output."""
+
+
+def collect_reach_evidence(preflight: dict, control: dict, *, reader=None,
+                           enabled: bool = False,
+                           allowed_hosts: tuple[str, ...] = ("github.com",)) -> list[dict]:
+    """Actual optional public read path used by process_event before the model.
+
+    Enabling is a deployment-side switch, never an instruction from source text.
+    URLs must be exact allowlisted HTTPS hosts; no shell commands, credentials,
+    installer, login session, cookies or plugin-wide side effects are supported.
+    """
+    from urllib.parse import urlsplit
+    route = preflight.get("acquisition", {})
+    if route.get("route") != "agent_reach":
+        return []
+    if preflight.get("gate") != "SAFE":
+        raise ReachAcquisitionError("reach_preflight_not_safe")
+    if enabled is not True:
+        raise ReachAcquisitionError("reach_runtime_disabled")
+    project_id = preflight.get("project_id")
+    if not project_id or route.get("project_id") != project_id:
+        raise ReachAcquisitionError("reach_project_mismatch")
+    urls = control.get("urls")
+    if not isinstance(urls, list) or not 1 <= len(urls) <= route["max_queries"]:
+        raise ReachAcquisitionError("reach_url_budget_invalid")
+    # Validate the entire batch before making any calls.
+    for url in urls:
+        if not isinstance(url, str) or any(ord(c) <= 32 for c in url):
+            raise ReachAcquisitionError("reach_url_invalid")
+        try:
+            parsed = urlsplit(url)
+            valid = (parsed.scheme == "https" and parsed.hostname in allowed_hosts
+                     and parsed.port in (None, 443) and not parsed.username
+                     and not parsed.password and not parsed.query and not parsed.fragment)
+        except ValueError:
+            valid = False
+        if not valid:
+            raise ReachAcquisitionError("reach_host_not_allowed")
+    if reader is None:
+        try:
+            import agent_reach
+            from agent_reach.channels.web import WebChannel
+            if agent_reach.__version__ != "1.5.0":
+                raise ReachAcquisitionError("reach_version_not_validated")
+            reader = WebChannel().read
+        except ImportError:
+            raise ReachAcquisitionError("reach_optional_dependency_missing") from None
+    decision = ReachPreflight(**route)
+    session = ReachReadSession(decision, reader)
+    evidence = []
+    try:
+        for url in urls:
+            item = session.read(url)
+            if item["status"] == "retrieved":
+                evidence.append(item)
+    except Exception:
+        raise ReachAcquisitionError("reach_read_failed") from None
+    return evidence

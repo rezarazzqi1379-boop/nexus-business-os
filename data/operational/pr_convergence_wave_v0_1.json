@@ -1,0 +1,45 @@
+{
+  "schema_version": "nexus.pr_convergence.v0.1",
+  "captured_at": "2026-08-27T23:16:00+03:30",
+  "canonical_pair": {
+    "master_context": "NEXUS_Master_Context_v1.9_2026-08-27.docx",
+    "source_registry": "NEXUS_Source_Registry_v1.6_2026-08-27.docx"
+  },
+  "main_sha": "95e46c2e6d58aa771dc2ade8fa8381f77e9776e6",
+  "policy": {
+    "group_rebase_or_merge_forbidden": true,
+    "transplant_only_missing_tested_behavior": true,
+    "historical_green_ci_not_current_merge_proof": true,
+    "external_or_production_actions_require_exact_gate": true
+  },
+  "dispositions": [
+    {"pr": 64, "disposition": "MERGE_CANDIDATE_AFTER_LIVE_SANITIZED_PILOT", "owner": "runner_adapter", "reason": "Small governed OpenCode shadow adapter; CI green; no live runtime/model proof yet."},
+    {"pr": 65, "disposition": "KEEP_STACKED_EXPERIMENT", "owner": "model_runner_measurement", "reason": "Deterministic arena; CI green; depends on PR64 and has no live candidate observations yet."},
+    {"pr": 54, "disposition": "EXTRACT_INTO_PLO_OR_SUPERSEDE", "owner": "durable_execution", "reason": "Postgres shadow queue overlaps PLO; retain only missing durability behavior."},
+    {"pr": 40, "disposition": "CANONICAL_DURABLE_EXECUTION_CANDIDATE", "owner": "durable_execution", "reason": "Most complete PLO substrate; must be transplanted onto current main rather than merged wholesale."},
+    {"pr": 39, "disposition": "KEEP_EXPERIMENT", "owner": "productization", "reason": "Useful tenant/workflow contract but requires second-tenant proof; no current production authority."},
+    {"pr": 37, "disposition": "EXTRACT_SECURITY_INVARIANT", "owner": "exact_action_approval", "reason": "Exact outbound action binding is P0 security; transplant minimal tested primitive."},
+    {"pr": 36, "disposition": "EXTRACT_SELECTED_FORGE_CONTROLS", "owner": "verification_evolution", "reason": "Large divergent stack; keep lifecycle/preflight/failure-memory/telemetry only where missing on main."},
+    {"pr": 35, "disposition": "CLOSE_AFTER_EVIDENCE_EXTRACTION", "owner": "historical_pattern_research", "reason": "Altari adaptation is research/incubator evidence; should not remain a runtime owner."},
+    {"pr": 33, "disposition": "EXTRACT_OUTCOME_LEARNING", "owner": "opportunity_learning", "reason": "Keep stage-aware outcome and negative-knowledge logic; no ROI/contract calibration yet."},
+    {"pr": 30, "disposition": "SUPERSEDE_WITH_CURRENT_CONVERGENCE", "owner": "architecture_checkpoint", "reason": "Useful architecture checkpoint but canonical anchors and main lineage are stale."},
+    {"pr": 29, "disposition": "CLOSE_AFTER_AUTHORITY_DIFF_CHECK", "owner": "hydrotester_authority_history", "reason": "Buyer Rev.1.2 authority is already represented by current Hydrotester master and canonical controls; avoid duplicate authority path."},
+    {"pr": 28, "disposition": "EXTRACT_SMALL_GOVERNOR_IF_MISSING", "owner": "capability_governance", "reason": "Useful hard gates; avoid separate adoption oracle if Resource Router already covers behavior."},
+    {"pr": 24, "disposition": "DO_NOT_MERGE_EXTRACT_BENCHMARK_RULES", "owner": "benchmark_history", "reason": "Explicitly partially superseded; preserve reusable authority/measurement rules only."},
+    {"pr": 19, "disposition": "EXTRACT_EVOLUTION_EVAL", "owner": "self_improvement", "reason": "Keep baseline-vs-candidate and rollback promotion logic; no recursive deployment."},
+    {"pr": 18, "disposition": "SUPERSEDED_BY_PR37_FOR_SECURITY_EXTRACTION", "owner": "outbound_approval_history", "reason": "PR37 is the smaller core-oriented exact-action invariant."},
+    {"pr": 17, "disposition": "INCUBATOR_ONLY", "owner": "autonomy_history", "reason": "Do not create competing runtime beside PLO; extract research-only scheduling/outcome behavior if missing."},
+    {"pr": 16, "disposition": "HOLD_PRODUCTION_HARDENING", "owner": "supabase_security", "reason": "Live production ACL/RLS changes remain separately gated and current connector state must be refreshed."},
+    {"pr": 15, "disposition": "EXTRACT_PROMPT_INJECTION_REGRESSION", "owner": "ingress_security", "reason": "Keep malicious-content-as-data invariant and e2e regression; avoid dependency on old autonomy branch."},
+    {"pr": 14, "disposition": "EXTRACT_RESEARCH_FUSION_IF_MEASURED", "owner": "research", "reason": "Only retain source fan-out/dedup behavior if it improves measured research outcomes."},
+    {"pr": 13, "disposition": "DO_NOT_MERGE_WHOLESALE", "owner": "autonomy_planning_history", "reason": "Large divergent fabric; main now has newer dedicated components. Extract missing tested adapters only."},
+    {"pr": 12, "disposition": "EXTRACT_SECURITY_POLICY_IF_MISSING", "owner": "security_policy", "reason": "Policy/threat-model content remains useful but stale branch should not merge wholesale."},
+    {"pr": 10, "disposition": "CANONICAL_AUDIT_CONCEPT_CANDIDATE", "owner": "audit_metadata", "reason": "Privacy-first audit envelope is the named audit semantics owner; transplant onto current main if absent."},
+    {"pr": 9, "disposition": "CLOSE_HISTORICAL_INTEGRATION_ONLY", "owner": "integration_history", "reason": "PR explicitly says DO NOT MERGE; useful only as historical compatibility evidence."},
+    {"pr": 7, "disposition": "EXTRACT_DECISION_OUTCOME_LEARNING", "owner": "decision_learning", "reason": "Keep immutable decision-to-outcome lineage and malformed-state hardening."},
+    {"pr": 6, "disposition": "EXTRACT_EVAL_CORE_IF_MISSING", "owner": "evaluation", "reason": "Deterministic fail-closed eval harness remains valuable as one canonical regression core."},
+    {"pr": 4, "disposition": "EXTRACT_CAPABILITY_AND_ACTION_GATE_IF_MISSING", "owner": "capability_action_gate", "reason": "Small exact action-scoped gate behavior is foundational; current main must be compared before transplant."},
+    {"pr": 2, "disposition": "CLOSE_AFTER_REQUIREMENT_GATE_DIFF_CHECK", "owner": "requirement_readiness_history", "reason": "Hydrotester authority has since advanced; retain generic readiness concept only if not already represented."},
+    {"pr": 1, "disposition": "CLOSE_AFTER_EVIDENCE_KIND_DIFF_CHECK", "owner": "evidence_classification_history", "reason": "Evidence classification is now a project-wide invariant; avoid duplicate old vertical implementation if main already covers it."}
+  ]
+}

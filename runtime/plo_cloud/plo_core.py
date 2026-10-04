@@ -1,0 +1,165 @@
+import contextlib, sqlite3, uuid
+from datetime import datetime, timezone, timedelta
+
+STATES={"PENDING","RUNNING","WAITING","COMPLETED","FAILED","CANCELLED"}
+MAX_ORPHAN_RETRIES=3
+
+def now(): return datetime.now(timezone.utc).isoformat()
+class PLOError(Exception): pass
+class OwnershipError(PLOError): pass
+class ApprovalError(PLOError): pass
+class IdempotencyConflictError(PLOError): pass
+
+class PLOStore:
+    def __init__(self,path): self.path=path; self._init()
+    @contextlib.contextmanager
+    def tx(self):
+        db=sqlite3.connect(self.path,timeout=10,isolation_level=None)
+        db.execute("PRAGMA journal_mode=WAL"); db.execute("PRAGMA busy_timeout=5000")
+        try:
+            db.execute("BEGIN IMMEDIATE"); yield db; db.execute("COMMIT")
+        except Exception:
+            db.execute("ROLLBACK"); raise
+        finally: db.close()
+    def _init(self):
+        db=sqlite3.connect(self.path)
+        try:
+            db.executescript('''
+            CREATE TABLE IF NOT EXISTS tasks(
+              run_id TEXT PRIMARY KEY, task_id TEXT NOT NULL, idempotency_key TEXT UNIQUE NOT NULL,
+              binding_digest TEXT,
+              status TEXT NOT NULL, task_version INTEGER NOT NULL DEFAULT 1,
+              approval_required INTEGER NOT NULL DEFAULT 0,
+              lease_token TEXT, lease_owner TEXT, lock_expires_at TEXT, retry_count INTEGER NOT NULL DEFAULT 0);
+            CREATE TABLE IF NOT EXISTS approvals(
+              approval_id TEXT PRIMARY KEY, run_id TEXT NOT NULL, task_version INTEGER NOT NULL,
+              scope TEXT NOT NULL, decision TEXT, expires_at TEXT NOT NULL, consumed_at TEXT);
+            CREATE TABLE IF NOT EXISTS operations(
+              operation_key TEXT PRIMARY KEY, run_id TEXT NOT NULL, scope TEXT NOT NULL,
+              auth_token TEXT NOT NULL, state TEXT NOT NULL, created_at TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS execution_log(
+              id INTEGER PRIMARY KEY AUTOINCREMENT, operation_key TEXT NOT NULL UNIQUE, ts TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS audit(
+              id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, action TEXT NOT NULL,
+              run_id TEXT, result TEXT);
+            ''')
+            cols={r[1] for r in db.execute("PRAGMA table_info(tasks)").fetchall()}
+            if "binding_digest" not in cols:
+                db.execute("ALTER TABLE tasks ADD COLUMN binding_digest TEXT")
+            db.commit()
+        finally:
+            db.close()
+    def audit(self,db,action,run_id=None,result=None):
+        db.execute("INSERT INTO audit(ts,action,run_id,result) VALUES(?,?,?,?)",(now(),action,run_id,result))
+    def enqueue(self,task_id,idempotency_key,approval_required=False,binding_digest=None):
+        with self.tx() as db:
+            row=db.execute("SELECT run_id,binding_digest FROM tasks WHERE idempotency_key=?",(idempotency_key,)).fetchone()
+            if row:
+                if binding_digest is not None:
+                    if row[1] is None:
+                        raise IdempotencyConflictError("existing idempotency key has no immutable binding")
+                    if row[1] != binding_digest:
+                        raise IdempotencyConflictError("idempotency key rebound to different payload")
+                return row[0]
+            rid=str(uuid.uuid4())
+            db.execute("INSERT INTO tasks(run_id,task_id,idempotency_key,binding_digest,status,approval_required) VALUES(?,?,?,?,?,?)",
+                       (rid,task_id,idempotency_key,binding_digest,"PENDING",int(approval_required)))
+            self.audit(db,"enqueue",rid,"created"); return rid
+    def claim_next(self,worker,lock_seconds=30):
+        with self.tx() as db:
+            n=now()
+            row=db.execute("SELECT run_id,status,task_version FROM tasks WHERE status='PENDING' OR (status='RUNNING' AND lock_expires_at<?) ORDER BY rowid LIMIT 1",(n,)).fetchone()
+            if not row: return None
+            rid,status,ver=row; token=str(uuid.uuid4()); exp=(datetime.now(timezone.utc)+timedelta(seconds=lock_seconds)).isoformat()
+            db.execute("UPDATE tasks SET status='RUNNING',task_version=task_version+1,lease_token=?,lease_owner=?,lock_expires_at=? WHERE run_id=? AND status=? AND task_version=?",
+                       (token,worker,exp,rid,status,ver))
+            if db.execute("SELECT changes()").fetchone()[0]!=1: return None
+            return {"run_id":rid,"_lease_token":token,"task_version":ver+1}
+    def renew_lease(self,rid,token,worker,extend_seconds=30):
+        with self.tx() as db:
+            row=db.execute("SELECT status,lease_token,lease_owner,lock_expires_at FROM tasks WHERE run_id=?",(rid,)).fetchone()
+            if not row: raise OwnershipError("missing task")
+            status,cur,owner,exp=row
+            if status!="RUNNING" or cur!=token or owner!=worker or not exp or exp<=now(): raise OwnershipError("lease invalid or expired")
+            new=(datetime.now(timezone.utc)+timedelta(seconds=extend_seconds)).isoformat()
+            db.execute("UPDATE tasks SET lock_expires_at=? WHERE run_id=? AND lease_token=?",(new,rid,token))
+    def complete_read_only(self,rid,lease_token,worker,result_ref):
+        if not isinstance(result_ref,str) or not result_ref.strip() or result_ref!=result_ref.strip():
+            raise PLOError("invalid result_ref")
+        with self.tx() as db:
+            task=db.execute("SELECT status,lease_token,lease_owner,lock_expires_at,approval_required FROM tasks WHERE run_id=?",(rid,)).fetchone()
+            if not task or task[0]!="RUNNING" or task[1]!=lease_token or task[2]!=worker or not task[3] or task[3]<=now():
+                raise OwnershipError("lease invalid, expired, or not owned")
+            if task[4]:
+                raise ApprovalError("consequential task cannot use read-only completion")
+            if db.execute("SELECT 1 FROM operations WHERE run_id=? LIMIT 1",(rid,)).fetchone() is not None:
+                raise ApprovalError("task with operation journal cannot use read-only completion")
+            db.execute("UPDATE tasks SET status='COMPLETED',lease_token=NULL,lease_owner=NULL,lock_expires_at=NULL WHERE run_id=? AND status='RUNNING' AND lease_token=?",(rid,lease_token))
+            if db.execute("SELECT changes()").fetchone()[0]!=1:
+                raise OwnershipError("task state changed concurrently")
+            self.audit(db,"read_only_completed",rid,result_ref)
+            return True
+    def request_approval(self,rid,scope,ttl_seconds=3600):
+        with self.tx() as db:
+            row=db.execute("SELECT task_version FROM tasks WHERE run_id=?",(rid,)).fetchone()
+            if not row: raise ApprovalError("missing task")
+            aid=str(uuid.uuid4()); exp=(datetime.now(timezone.utc)+timedelta(seconds=ttl_seconds)).isoformat()
+            db.execute("INSERT INTO approvals VALUES(?,?,?,?,?,?,?)",(aid,rid,row[0],scope,None,exp,None)); return aid
+    def decide_approval(self,aid,decision):
+        if decision not in ("approved","denied"): raise ApprovalError("bad decision")
+        with self.tx() as db:
+            row=db.execute("SELECT decision FROM approvals WHERE approval_id=?",(aid,)).fetchone()
+            if not row or row[0] is not None: raise ApprovalError("missing or already decided")
+            db.execute("UPDATE approvals SET decision=? WHERE approval_id=?",(decision,aid))
+    def authorize_operation(self,rid,op_key,scope,lease_token,worker):
+        with self.tx() as db:
+            t=db.execute("SELECT status,lease_token,lease_owner,lock_expires_at,task_version,approval_required FROM tasks WHERE run_id=?",(rid,)).fetchone()
+            if not t or t[0]!="RUNNING" or t[1]!=lease_token or t[2]!=worker or not t[3] or t[3]<=now(): raise OwnershipError("lease invalid, expired, or not owned")
+            if not t[5]: raise ApprovalError("approval path misuse")
+            existing=db.execute("SELECT run_id,scope FROM operations WHERE operation_key=?",(op_key,)).fetchone()
+            if existing and existing!=(rid,scope): raise ApprovalError("operation key rebound")
+            a=db.execute("SELECT approval_id FROM approvals WHERE run_id=? AND task_version=? AND scope=? AND decision='approved' AND consumed_at IS NULL AND expires_at>?",(rid,t[4],scope,now())).fetchone()
+            if not a: raise ApprovalError("no valid approval")
+            db.execute("UPDATE approvals SET consumed_at=? WHERE approval_id=?",(now(),a[0]))
+            token=str(uuid.uuid4())
+            db.execute("INSERT INTO operations(operation_key,run_id,scope,auth_token,state,created_at) VALUES(?,?,?,?,?,?)",(op_key,rid,scope,token,"authorized",now()))
+            self.audit(db,"operation_authorized",rid,op_key); return token
+    def record_intent(self,rid,op_key,auth_token,lease_token,worker):
+        with self.tx() as db:
+            task=db.execute("SELECT status,lease_token,lease_owner,lock_expires_at FROM tasks WHERE run_id=?",(rid,)).fetchone()
+            if not task or task[0]!="RUNNING" or task[1]!=lease_token or task[2]!=worker or not task[3] or task[3]<=now(): raise OwnershipError("lease invalid, expired, or not owned")
+            row=db.execute("SELECT run_id,auth_token,state FROM operations WHERE operation_key=?",(op_key,)).fetchone()
+            if not row or row!=(rid,auth_token,"authorized"): raise ApprovalError("missing authorization")
+            db.execute("UPDATE operations SET state='intended' WHERE operation_key=?",(op_key,))
+    def mark_executed(self,op_key):
+        with self.tx() as db:
+            row=db.execute("SELECT state FROM operations WHERE operation_key=?",(op_key,)).fetchone()
+            if not row: raise ApprovalError("unknown operation")
+            if row[0]=="executed": return False
+            if row[0]!="intended": raise ApprovalError("operation was not intended")
+            db.execute("UPDATE operations SET state='executed' WHERE operation_key=? AND state='intended'",(op_key,))
+            if db.execute("SELECT changes()").fetchone()[0]!=1: raise ApprovalError("execution state changed concurrently")
+            db.execute("INSERT INTO execution_log(operation_key,ts) VALUES(?,?)",(op_key,now()))
+            return True
+    def recover_orphans(self):
+        with self.tx() as db:
+            rows=db.execute("SELECT run_id,retry_count FROM tasks WHERE status='RUNNING' AND lock_expires_at<?",(now(),)).fetchall()
+            recovered=[]
+            for rid,retry_count in rows:
+                uncertain=db.execute("SELECT 1 FROM operations WHERE run_id=? AND state='intended' LIMIT 1",(rid,)).fetchone() is not None
+                exhausted=(retry_count+1)>=MAX_ORPHAN_RETRIES
+                next_status="WAITING" if uncertain or exhausted else "PENDING"
+                result="reconciliation_required" if uncertain else ("retry_budget_exhausted" if exhausted else "requeued")
+                db.execute("UPDATE tasks SET status=?,task_version=task_version+1,lease_token=NULL,lease_owner=NULL,lock_expires_at=NULL,retry_count=retry_count+1 WHERE run_id=? AND status='RUNNING'",(next_status,rid))
+                self.audit(db,"orphan_recovered",rid,result)
+                recovered.append(rid)
+            return recovered
+    def operation_state(self,op_key):
+        db=sqlite3.connect(self.path); row=db.execute("SELECT state FROM operations WHERE operation_key=?",(op_key,)).fetchone(); db.close(); return row[0] if row else None
+    def metrics(self):
+        db=sqlite3.connect(self.path)
+        dup=db.execute("SELECT COUNT(*) FROM (SELECT operation_key,COUNT(*) n FROM execution_log GROUP BY operation_key HAVING n>1)").fetchone()[0]
+        pending=db.execute("SELECT COUNT(*) FROM tasks WHERE status='PENDING'").fetchone()[0]
+        waiting=db.execute("SELECT COUNT(*) FROM tasks WHERE status='WAITING'").fetchone()[0]
+        completed=db.execute("SELECT COUNT(*) FROM tasks WHERE status='COMPLETED'").fetchone()[0]
+        db.close(); return {"duplicate_execution_count":dup,"pending":pending,"reconciliation_required":waiting,"completed":completed}

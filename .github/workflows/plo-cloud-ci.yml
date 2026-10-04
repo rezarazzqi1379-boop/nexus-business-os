@@ -1,0 +1,69 @@
+name: PLO Cloud Runtime CI
+on:
+  push:
+    paths: ['runtime/plo_cloud/**','.github/workflows/plo-cloud-ci.yml']
+  pull_request:
+    paths: ['runtime/plo_cloud/**','.github/workflows/plo-cloud-ci.yml']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: nexus
+          POSTGRES_PASSWORD: nexus
+          POSTGRES_DB: nexus_plo
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U nexus -d nexus_plo"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      NEXUS_PLO_DATABASE_URL: postgresql://nexus:nexus@localhost:5432/nexus_plo
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Install PostgreSQL driver
+        run: python -m pip install --disable-pip-version-check 'psycopg[binary]>=3.2,<4'
+      - name: SQLite safety tests
+        working-directory: runtime/plo_cloud
+        run: python tests/test_cloud.py
+      - name: Control-to-PLO boundary tests
+        working-directory: runtime/plo_cloud
+        run: python tests/test_control_bridge.py
+      - name: Audit projection boundary tests
+        working-directory: runtime/plo_cloud
+        run: python tests/test_audit_projection.py
+      - name: Hydrotester Brain-to-PLO shadow vertical replay
+        if: github.event_name == 'pull_request'
+        working-directory: runtime/plo_cloud
+        run: python tests/test_hydro_shadow_vertical.py
+      - name: KCl Brain-to-PLO shadow vertical replay
+        if: github.event_name == 'pull_request'
+        working-directory: runtime/plo_cloud
+        run: python tests/test_kcl_shadow_vertical.py
+      - name: PostgreSQL schema isolation tests
+        working-directory: runtime/plo_cloud
+        run: python tests/test_postgres_isolation.py
+      - name: PostgreSQL least-privilege runtime role
+        working-directory: runtime/plo_cloud
+        run: python tests/test_postgres_least_privilege.py
+      - name: PostgreSQL durability and concurrency tests
+        working-directory: runtime/plo_cloud
+        run: python tests/test_postgres.py
+      - name: SQLite one-shot worker
+        working-directory: runtime/plo_cloud
+        run: python worker.py --backend sqlite --db /tmp/nexus-plo-ci.db
+      - name: PostgreSQL one-shot worker
+        working-directory: runtime/plo_cloud
+        run: python worker.py --backend postgres
+      - name: Container build
+        working-directory: runtime/plo_cloud
+        run: docker build -t nexus-plo-cloud:ci .

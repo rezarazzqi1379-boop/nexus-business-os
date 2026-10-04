@@ -1,0 +1,81 @@
+{
+  "schema_version": "0.1",
+  "run_id": "hydro-prospective-001",
+  "project_id": "PRJ-HYD-01",
+  "candidate_id": "nexus-governed-hydro-qualification-v0.1",
+  "workflow_name": "hydrotester-qualification",
+  "data_classification": "INTERNAL_METADATA_ONLY",
+  "evidence_snapshot": {
+    "canonical_basis": [
+      "NEXUS_Master_Context_v1.9_2026-08-27",
+      "NEXUS_Source_Registry_v1.6_2026-08-27",
+      "Hydrostatic_Tester_Engineering_Master_v1.1_2026-08-24"
+    ],
+    "live_refs": [
+      "gmail:1a048bfc44a30ac6",
+      "gmail:1a0474872759cd97",
+      "gmail:1a04bad85a6dba0d"
+    ]
+  },
+  "buyer_basis": {
+    "od_mm": "89-180",
+    "wall_thickness_mm": "6-20",
+    "length_m": "9-12",
+    "machine_rating_mpa": 120,
+    "hold_time_s": "5-10",
+    "throughput_pipes_per_hour": 60,
+    "standard": "API 5CT"
+  },
+  "supplier_dispositions": [
+    {
+      "supplier": "GH Petro",
+      "decision": "CONDITIONAL_TECHNICAL_LEAD",
+      "po_ready": false,
+      "evidence_class": "SUPPLIER_CLAIM_PLUS_SIGNED_RESPONSE"
+    },
+    {
+      "supplier": "Marley",
+      "decision": "COMMERCIAL_BENCHMARK_WITH_MATERIAL_THROUGHPUT_DEVIATION",
+      "po_ready": false,
+      "evidence_class": "SUPPLIER_CLAIM"
+    },
+    {
+      "supplier": "ANZ Global",
+      "decision": "PENDING_CANDIDATE_OEM_QUOTATION",
+      "po_ready": false,
+      "evidence_class": "LIVE_EMAIL_STATUS"
+    }
+  ],
+  "blocking_unknowns": [
+    "GH contractual pressure pass/fail and stability criterion not closed",
+    "GH full guaranteed duty matrix across final grade/end/full buyer envelope not closed",
+    "GH signed structural calculation/FEA with worst-case load and safety factor not delivered",
+    "GH tooling inclusion versus extra-mould pricing needs contractual reconciliation",
+    "Marley guaranteed throughput materially deviates from 60 pipes/hour buyer basis",
+    "Marley structural calculations are promised but not yet delivered",
+    "Marley final ITP/TPI/NDT scope remains to be finalized",
+    "ANZ candidate OEM identity and technical/commercial quotation are still pending",
+    "Final buyer pipe-end condition scope remains unresolved"
+  ],
+  "observed_metrics": {
+    "decisions": 3,
+    "human_corrections": null,
+    "unknowns_presented": 9,
+    "unknowns_blocked": 9,
+    "duplicate_attempts": 0,
+    "duplicates_prevented": 0,
+    "decision_time_ms": null,
+    "policy_violations": 0,
+    "cross_project_leaks": 0,
+    "external_effects": 0
+  },
+  "measurement_interpretation": {
+    "human_correction": "UNKNOWN until this replay output is actually reviewed/corrected by a human",
+    "duplicate_prevention": "UNMEASURED because no controlled duplicate challenge was executed",
+    "decision_time": "UNMEASURED because prospective end-to-end timing was not captured from workflow start",
+    "unknown_blocking": "OBSERVED for the enumerated blocker set; all nine remained blocking"
+  },
+  "expected_acceptance_state": "FAIL_NOT_SCOREABLE",
+  "authority_effect": "NONE",
+  "external_effect": "NONE"
+}

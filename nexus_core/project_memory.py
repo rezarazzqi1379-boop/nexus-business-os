@@ -57,17 +57,25 @@ class ProjectMemoryStore:
         if project_id is not None: items=[x for x in items if x.project_id==project_id]
         if lane is not None: items=[x for x in items if x.lane==lane]
         if not include_superseded: items=[x for x in items if x.superseded_by is None]
+        supersessions=self._supersessions()
+        if supersessions:
+            materialized=[]
+            for x in items:
+                target=supersessions.get(x.entry_id)
+                if target and x.superseded_by!=target:
+                    d=asdict(x); d["superseded_by"]=target; d["evidence_refs"]=tuple(d["evidence_refs"]); x=MemoryEntry(**d)
+                materialized.append(x)
+            items=materialized
+        if not include_superseded: items=[x for x in items if x.superseded_by is None]
         return tuple(sorted(items,key=lambda x:(x.created_at,x.entry_id)))
     def supersede(self,namespace:Namespace,entry_id:str,*,superseded_by:str):
         items=list(self.query(namespace=namespace))
         if not any(x.entry_id==entry_id for x in items): raise KeyError("unknown_entry_id")
         if not any(x.entry_id==superseded_by for x in self._all()): raise KeyError("unknown_superseding_entry_id")
-        new=[]
-        for x in items:
-            if x.entry_id==entry_id:
-                d=asdict(x); d["superseded_by"]=superseded_by; d["evidence_refs"]=tuple(d["evidence_refs"]); x=MemoryEntry(**d)
-            new.append(x)
-        self._rewrite(namespace,new)
+        event={"namespace":namespace,"entry_id":entry_id,"superseded_by":superseded_by,
+               "created_at":datetime.now(timezone.utc).isoformat()}
+        with self._events_file().open("a",encoding="utf-8") as f:
+            f.write(json.dumps(event,ensure_ascii=False,sort_keys=True)+"\\n")
     def bootstrap_context(self,limit=20):
         if type(limit) is not int or limit<1: raise ValueError("invalid_limit")
         items=list(self.query(include_superseded=False))[-limit:]

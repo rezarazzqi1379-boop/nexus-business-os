@@ -1,7 +1,8 @@
-from commercial_genome import CommercialGenome
+from commercial_genome import GenomeFeature,CommercialGenome
 from commercial_outcomes import outcome_summary
+def feat(d,v): return GenomeFeature(d,v,(f"e:{d}:{v}",),"2026-10-05")
 def g(i,outcome,refs=()):
- return CommercialGenome(i,{"application":("gear",),"product":("20MnCr5",),"market":("Turkey",)},outcome,refs)
+ return CommercialGenome(i,(feat("application","gear"),feat("product","20MnCr5"),feat("market","Turkey")),outcome,refs)
 def test_summary_uses_only_evidenced_known_outcomes():
  s=outcome_summary(g("T","UNKNOWN"),[g("1","WON",("e:1",)),g("2","LOST",("e:2",)),g("3","UNKNOWN"),g("4","RFQ",("e:4",))])
  assert s["comparable_cases"]==3

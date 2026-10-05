@@ -86,3 +86,10 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - VERIFIED EXTERNAL EVIDENCE: UN Comtrade currently documents a free registered tier with up to 500 API calls/day and up to 100,000 records/call; use official Comtrade as the preferred trade-data provider before paid aggregators where coverage is sufficient.
 - VERIFIED EXTERNAL EVIDENCE: EAEU official material lists HS 7228 30 for other alloy-steel bars/rods not further worked than hot-rolled/hot-drawn/extruded and 7228 40 for not further worked than forged. NEXUS still treats these as candidates until product/jurisdiction evidence is complete.
 - NEXT: wait for CI on the new evidence-quality/milestone head, then wire freshness/dedup into country lead validation and create normalized trade-query adapter schema.
+
+
+## RED TEAM MAX checkpoint
+- TESTED FACT: head e1562c0 passed GitHub Actions run 37285002206 (#959).
+- DEFECT FOUND/FIXED: country lead validation accepted evidence without freshness metadata. Validator now requires observed_at and rejects stale/future/unknown dates from supporting Tier-A; regression tests added.
+- ARCHITECTURE DEFECT FOUND: ProjectMemoryStore describes itself as append-first but supersede() rewrites a namespace JSONL file. This preserves logical history in normal operation but is not a true append-only audit log and has weaker crash/concurrency semantics. Do not claim append-only durability until redesigned/tested.
+- NEXT: implement append-only supersession events with backward-compatible query semantics and regression tests; then add normalized trade-query/result records with provenance and source timestamp.

@@ -46,3 +46,10 @@ Therefore no claim of system-wide commercial improvement is made.
 
 ## Next safe action
 Implement a small read-only Change-Set/Architecture Health adapter and a held-out Red Team fixture registry; then rerun the 24-family audit and full CI. Do not merge or deploy without human approval.
+
+
+## Revalidation update — CI #1066
+- Outcome measurement and Deal Room/Genome adapter are now TESTED by repository CI #1066.
+- Held-out Red Team execution has been connected across the registered nine fixtures; promotion beyond TESTED still requires benchmark/real-world outcome evidence.
+- COMMERCIAL_OUTCOME remains PARTIAL rather than PASS: the measurement path is implemented/tested, but no comparable real baseline/candidate commercial dataset has yet demonstrated improvement.
+- Human-gated external actions remain gated. Broad autonomy does not substitute for transaction-specific approval where amount/provider/recipient/terms are material.

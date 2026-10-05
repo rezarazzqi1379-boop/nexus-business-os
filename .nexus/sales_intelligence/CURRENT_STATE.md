@@ -207,3 +207,12 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - REGRESSION TESTS migrated to evidence-bound Genome and measured Scientist samples.
 - STATUS: these changes are IMPLEMENTED awaiting CI on current head. No merge/deploy/external send/paid credit.
 - NEXT: CI closure; then temporal evidence precision and source-authority binding, followed by real evidence-backed country coverage/discovery execution.
+
+
+## 2026-10-05 CI failure autopsy + temporal precision
+- CI #1030 on dea431a FAILED only in pytest regression: 1 failed / 624 passed; canonical unittest 682 OK and eval suite 1266 passed. Root cause: tests/test_commercial_outcomes.py still constructed the superseded dict-style CommercialGenome and was not migrated with the new evidence-bound feature schema.
+- FIX IMPLEMENTED: migrated commercial outcome regression fixture to GenomeFeature records with evidence refs + observed date.
+- IMPLEMENTED: evidence_time now preserves source temporal precision (DATE/DATETIME/PERIOD/UNKNOWN) separately from timezone-aware retrieval audit time; DATE is not silently converted to fabricated midnight.
+- REGRESSION TEST added to prove date precision preservation and reject naive DATETIME observations.
+- STATUS: fixes are IMPLEMENTED awaiting CI on current head. Previous failure is classified schema-migration regression, not evidence that canonical/eval suites failed.
+- NEXT: close CI; bind source authority/independence to evidence; then execute refreshed country coverage and buyer discovery with real current evidence.

@@ -216,3 +216,13 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - REGRESSION TEST added to prove date precision preservation and reject naive DATETIME observations.
 - STATUS: fixes are IMPLEMENTED awaiting CI on current head. Previous failure is classified schema-migration regression, not evidence that canonical/eval suites failed.
 - NEXT: close CI; bind source authority/independence to evidence; then execute refreshed country coverage and buyer discovery with real current evidence.
+
+
+## 2026-10-05 CI #1034 autopsy + triangulation guard
+- CI #1034 on de19a31: canonical unittest/evals remained green (682 unittest OK; 1266 eval passed); pytest had 626 passed / 1 failed.
+- ROOT CAUSE: commercial_outcomes still referenced removed CommercialGenome.evidence_refs after outcome evidence was split into outcome_evidence_refs.
+- FIX IMPLEMENTED: outcome_summary now consumes outcome_evidence_refs only, preventing feature evidence from being mistaken for outcome evidence.
+- IMPLEMENTED: evidence_triangulation.py adds explicit source authority, source-family independence, stale exclusion and contradiction blocking. Mirrored/copied evidence from one family cannot manufacture independent corroboration.
+- REGRESSION TESTS added for copied-source non-independence, independent strong-source verification, and contradiction veto.
+- STATUS: current fixes IMPLEMENTED, awaiting CI; no production/merge/external send/paid Apollo action.
+- NEXT SAFE ACTION: close CI, then wire triangulation into Tier-A/Opportunity Graph promotion and build evidence-backed Discovery Coverage cells.

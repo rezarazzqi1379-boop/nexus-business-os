@@ -132,3 +132,12 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - IMPLEMENTED: lost_deal_autopsy with controlled reason taxonomy; specific loss reasons require evidence. Repeated identical evidenced patterns become LESSON only at >=3 cases; smaller samples remain HYPOTHESIS.
 - OPEN DESIGN ISSUE: v3 evidence adapter currently normalizes date-only observed_at to UTC midnight. This is convenient but can imply precision not present in source evidence. Next evolution should separate observed_date/source_precision from retrieved_at timestamp instead of silently manufacturing precision.
 - NEXT: await CI; implement explicit evidence temporal precision + Agent Health observability; then connect distilled patterns to ProjectMemory only after evidence refs and threshold validation.
+
+
+## 2026-10-05 NEXUS v3 evidence/observability cycle
+- BOOTSTRAP: head 8234dc8; PR #103 mergeable=true; CI #995 pending. No premature TESTED promotion.
+- IMPLEMENTED: EvidenceTime separates source observed_value + temporal precision from timezone-aware retrieved_at; avoids manufacturing source precision.
+- IMPLEMENTED: AgentTrace + deterministic Agent Health Score covering success, evidence use, silent failure and retry penalty; invalid negative cost/latency/retry traces fail closed.
+- IMPLEMENTED: Experience Distillation memory gate. Promoted knowledge requires evidence and >=3 cases; single-case observations may persist only as HYPOTHESIS.
+- IMPLEMENTED: Commercial Genome historical outcome aggregation ignores UNKNOWN/unevidenced outcomes and reports deterministic comparable-case counts/outcome distribution.
+- NEXT: CI closure; integrate EvidenceTime into v3 hub adapter without breaking existing source dates; then wire eligible distilled knowledge into append-only ProjectMemory and add cost-to-accepted-outcome metrics.

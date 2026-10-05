@@ -61,3 +61,12 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - OpenEnrich candidate: openenrich/openenrich. Potential low-cost/local enrichment waterfall; AGPL-3.0 and SMTP/network behavior require license/security/ToS review before adoption.
 - sales-intelligence-mcp and LeadPipe MCP are pattern candidates for scoring/CRM adapters, not trusted production dependencies.
 - Provider selection principle: native/official data and existing connected tools first; public repos provide adapters/patterns only after measured sandbox evaluation.
+
+
+## 2026-10-05 autonomous cycle checkpoint
+- PR #103 head d7cdef5 was CI-tested by GitHub Actions run 37283892058: compile, canonical unittest, failure-derived eval suites and pytest regression all succeeded.
+- ProjectMemoryStore contract is now restored at nexus_core/project_memory.py and the incompatible root duplicate was removed.
+- Evidence-aware buyer scoring is implemented and covered by repository tests.
+- Conservative HS candidate engine added: 722840 is only a candidate for alloy-steel bars/rods not further worked than forged; 722830 is only a candidate for other bars/rods not further worked than hot-rolled/hot-drawn/extruded. Grade alone never yields final classification.
+- Country discovery is now application-first: gears/gearboxes -> case-hardening grades such as 20MnCr5/8620; shafts/heavy engineering -> 42CrMo4/C45; every lead still needs company-specific evidence.
+- Merge/production remains gated; Apollo paid enrichment and external outreach remain unspent/unsent.

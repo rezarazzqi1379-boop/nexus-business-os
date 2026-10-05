@@ -141,3 +141,12 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - IMPLEMENTED: Experience Distillation memory gate. Promoted knowledge requires evidence and >=3 cases; single-case observations may persist only as HYPOTHESIS.
 - IMPLEMENTED: Commercial Genome historical outcome aggregation ignores UNKNOWN/unevidenced outcomes and reports deterministic comparable-case counts/outcome distribution.
 - NEXT: CI closure; integrate EvidenceTime into v3 hub adapter without breaking existing source dates; then wire eligible distilled knowledge into append-only ProjectMemory and add cost-to-accepted-outcome metrics.
+
+
+## 2026-10-05 NEXUS v3 memory/cost cycle
+- BOOTSTRAP: head 34fafe1, PR #103 mergeable=true, CI #999 in_progress; prior additions remain unpromoted until CI completes.
+- STATE DRIFT FIXED: ProjectMemoryStore now has a distinct hypothesis namespace. Weak inference no longer needs to masquerade as context/lesson.
+- MEMORY INTEGRATION IMPLEMENTED: gated DistilledKnowledge persists HYPOTHESIS separately from LESSON; ineligible promoted knowledge is rejected before append.
+- MEMORY QUERY CLEANUP: removed premature superseded filter; supersession events are materialized before active-only filtering.
+- IMPLEMENTED: Cost-to-Accepted-Outcome metrics for qualified lead, verified decision maker, RFQ, accepted opportunity and order. Zero outcomes return UNKNOWN/None rather than fake zero cost.
+- NEXT: close CI; add evidence temporal precision to hub observations without mutating source dates; provider/agent health comparison and country digital-twin baseline.

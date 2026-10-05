@@ -152,3 +152,10 @@ other installed plugins, Claude web sessions, or Notion agents automatically.
 - Public sales/agent repositories remain `EXPERIMENT_ONLY` until license, security, credentials, network behavior, tests, isolation and rollback are reviewed. Never auto-install them.
 - Separate technical/commercial attractiveness from legal/compliance clearance. Russia and Belarus leads require the additional compliance gate recorded in the steel-sales state.
 - Update the steel-sales state after a material milestone so ChatGPT, Claude Code and later sessions can recover where the work stopped.
+
+
+## NEXUS Operating Contract v2 bootstrap
+- Read `.nexus/OPERATING_CONTRACT_V2.md` before substantial autonomous NEXUS work.
+- Treat it as the repository-wide operating contract for evidence, continuity, self-improvement, red-team, cost control and approval gates.
+- If this file, CURRENT_STATE, memory or a tool result conflicts, do not silently choose: resolve by source authority/freshness, record the conflict, and preserve superseded history.
+- An autonomous cycle must continue safe independent lanes when a consequential action is approval-gated.

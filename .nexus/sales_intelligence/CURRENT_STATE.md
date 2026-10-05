@@ -102,3 +102,13 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - FIX IMPLEMENTED: missing append-only supersession helpers added in commit c03f1543; requires new CI before TESTED status.
 - v3 core additions: three-engine architecture, Opportunity Graph, Demand Signal Radar, Reverse Buyer Discovery, Commercial Genome, Deal Room, Lost Deal Autopsy, NEXUS Scientist, experience distillation, held-out eval discipline and cost-to-accepted-outcome.
 - NEXT: require green CI, then implement Opportunity Graph + Demand Signal schemas and machine-validate v3 agent promotion stages.
+
+
+## 2026-10-05 RED TEAM MAX v3
+- CI run #976 was still in progress at bootstrap; no TESTED claim made for the latest Memory/Graph changes.
+- STATE DRIFT FIXED: agent candidate registry now includes PRIVACY_TOS_REVIEWED required by Operating Contract v3.
+- SCHEMA DRIFT FIXED: country lead evidence now declares type/ref/observed_at requirements and claim-only evidence cannot qualify Tier A.
+- FALSE-POSITIVE LOOPHOLE FIXED: steel_country_leads now separates current evidence from current qualifying (non-CLAIM) evidence; validation clock is injectable for deterministic tests.
+- GRAPH HARDENING IMPLEMENTED: FACT/VERIFIED_EVIDENCE graph edges require evidence and fresh observed_at; malformed/undated evidence is rejected.
+- MEMORY FAILURE LESSON: persistence-format regressions require multi-event parse tests; prior CI #970 exposed literal newline serialization. Fix is implemented but remains untested until a green subsequent CI.
+- NEXT: close CI; then implement reverse-buyer discovery contract and persist Opportunity Graph/Demand Signals into UnifiedDataHub with deterministic IDs.

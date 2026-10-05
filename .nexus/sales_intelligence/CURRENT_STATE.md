@@ -226,3 +226,12 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - REGRESSION TESTS added for copied-source non-independence, independent strong-source verification, and contradiction veto.
 - STATUS: current fixes IMPLEMENTED, awaiting CI; no production/merge/external send/paid Apollo action.
 - NEXT SAFE ACTION: close CI, then wire triangulation into Tier-A/Opportunity Graph promotion and build evidence-backed Discovery Coverage cells.
+
+
+## 2026-10-05 v6 / Red Team Max v5 integration checkpoint
+- TESTED: GitHub Actions #1051 on head 4d7f982 completed SUCCESS; 1266 canonical/eval checks passed and pytest regression reported 646 passed.
+- REGRESSION FOUND/FIXED: v6 discovery_coverage initially replaced the v4 CoverageCell/blind_cells/evidence_state API and broke test collection. Backward-compatible v4 primitives were restored without weakening the v6 mandatory-layer guard.
+- TESTED through #1051: mandatory market-layer coverage guard; NOT_SEARCHED and SOURCE_UNAVAILABLE remain blind; NO_EVIDENCE and NEGATIVE_EVIDENCE remain distinct; manufacturer-only discovery cannot be complete; trader/stockist channel is separated from economic lead role.
+- TESTED through #1051: Historical Decision Autopsy + State Drift primitives preserve prior claims and require explicit supersession when stale/contradicted.
+- CHANGE-SET RISK: PR #103 is intentionally still Draft and has grown large; merge/production remain gated. Future work should prefer small reversible commits and compatibility-preserving integration rather than replacing existing control-plane APIs.
+- NEXT: integrate state-drift/supersession signals with Opportunity Graph and ProjectMemory using adapters; audit Contract↔Code drift and stale CURRENT_STATE assertions; then run full CI again.

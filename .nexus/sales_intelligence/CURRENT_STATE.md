@@ -150,3 +150,12 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - MEMORY QUERY CLEANUP: removed premature superseded filter; supersession events are materialized before active-only filtering.
 - IMPLEMENTED: Cost-to-Accepted-Outcome metrics for qualified lead, verified decision maker, RFQ, accepted opportunity and order. Zero outcomes return UNKNOWN/None rather than fake zero cost.
 - NEXT: close CI; add evidence temporal precision to hub observations without mutating source dates; provider/agent health comparison and country digital-twin baseline.
+
+
+## 2026-10-05 RED TEAM MAX v3 — trade/spend certainty
+- BOOTSTRAP: head 3745a8a, PR #103 mergeable=true, CI #1003 in_progress; no TESTED promotion yet.
+- FALSE CERTAINTY FIXED: TradeResult now carries explicit source_type. UnifiedDataHub confidence is no longer hardcoded 1.0: official customs > official government > trade dataset > commercial aggregator.
+- CREDIT WASTE GUARDRAIL HARDENED: Apollo Spend Gate validates buyer_fit 0..100 and requires evidence refs for current evidence, free-resolution attempt and expected commercial value. Boolean assertions alone cannot make a paid enrichment eligible.
+- IMPORTANT: eligible remains distinct from authorized; this change does not spend Apollo credits.
+- REGRESSION TESTS added for commercial-aggregator confidence and evidence-free Apollo spend eligibility.
+- NEXT: close CI; migrate older trade-result tests/callers if constructor compatibility breaks; then add provider health/cost comparison and Market Digital Twin baseline.

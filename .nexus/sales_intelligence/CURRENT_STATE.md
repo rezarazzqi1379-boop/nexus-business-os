@@ -189,3 +189,12 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - IMPLEMENTED: Query Evolution baseline generates multilingual industrial query candidates for application-first discovery; generated queries are explicitly CANDIDATE, never Evidence.
 - REGRESSION TESTS added for accepted-output denominator, zero-outcome economics, unfair-budget ablation, and query/evidence separation.
 - NEXT: close CI on current head; build source/provider benchmark record tied to Evidence refs; populate first real coverage cells from refreshed official evidence; extend multilingual industrial ontology only from validated terminology.
+
+
+## 2026-10-05 RED TEAM MAX — v4 continuity
+- BOOTSTRAP VERIFIED: PR #103 head 998b396 was draft+mergeable and CI #1023 completed SUCCESS. Therefore v4 Discovery Fabric plus AgentEconomics/CapabilityAblation/QueryEvolution through that head are TESTED by GitHub CI.
+- RED TEAM FIX: repeated lost-deal observations no longer auto-promote to LESSON at a count threshold. >=3 unique opportunities with complete context and distinct evidence can form FAILURE_PATTERN; LESSON additionally requires replicated eval evidence.
+- RED TEAM FIX: duplicate records for the same opportunity cannot inflate pattern case count; contextless repetition remains HYPOTHESIS.
+- REGRESSION TESTS updated for duplicate inflation, missing context, FAILURE_PATTERN status and evidence-gated LESSON promotion.
+- STATUS: lost-deal hardening after 998b396 is IMPLEMENTED awaiting CI. No merge/deploy/external send/paid credit.
+- NEXT SAFE ACTION: close CI; harden Commercial Genome feature provenance and Scientist sample/effect semantics before using historical outcomes for recommendations.

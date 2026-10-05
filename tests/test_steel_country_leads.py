@@ -23,3 +23,12 @@ def test_fresh_official_evidence_can_support_tier_a():
  e=m.validate_lead(r,today=date(2026,10,5))
  assert "tier_a_requires_current_evidence" not in e
  assert "tier_a_requires_qualifying_evidence" not in e
+
+def test_trader_channel_does_not_overwrite_economic_role():
+ r=base();r["role"]="IMPORTER";r["channel"]="TRADER"
+ assert "invalid_role" not in m.validate_lead(r)
+ assert "invalid_channel" not in m.validate_lead(r)
+
+def test_unknown_channel_fails_closed():
+ r=base();r["channel"]="BROKERISH"
+ assert "invalid_channel" in m.validate_lead(r)

@@ -198,3 +198,12 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - REGRESSION TESTS updated for duplicate inflation, missing context, FAILURE_PATTERN status and evidence-gated LESSON promotion.
 - STATUS: lost-deal hardening after 998b396 is IMPLEMENTED awaiting CI. No merge/deploy/external send/paid credit.
 - NEXT SAFE ACTION: close CI; harden Commercial Genome feature provenance and Scientist sample/effect semantics before using historical outcomes for recommendations.
+
+
+## 2026-10-05 Commercial Genome + Scientist hardening
+- BOOTSTRAP: PR #103 head fce83d6 was draft+mergeable; CI #1026 was still in_progress at reconciliation, so post-998b lost-deal hardening was not promoted to TESTED yet.
+- IMPLEMENTED: Commercial Genome features are now first-class GenomeFeature records requiring dimension, value, evidence_refs and observed_at. Outcome evidence is separate. Comparable history requires >=2 shared evidenced dimensions by default, reducing sparse-similarity inflation.
+- IMPLEMENTED: NEXUS Scientist experiments now require sample_size, explicit metric direction and minimum practical effect; invalid/zero samples cannot produce promotion candidates. PROMOTE_CANDIDATE remains recommendation, never deployment authority.
+- REGRESSION TESTS migrated to evidence-bound Genome and measured Scientist samples.
+- STATUS: these changes are IMPLEMENTED awaiting CI on current head. No merge/deploy/external send/paid credit.
+- NEXT: CI closure; then temporal evidence precision and source-authority binding, followed by real evidence-backed country coverage/discovery execution.

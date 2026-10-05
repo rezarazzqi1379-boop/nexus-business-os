@@ -19,3 +19,7 @@ class AdaptiveTask:
 
 def prioritize_adaptive(tasks):
  return tuple(sorted(tasks,key=lambda x:(-x.priority(),x.base.task_id)))
+
+
+def should_reactivate(task:AdaptiveTask,*,new_evidence:bool=False,new_source:bool=False,commercial_value_increased:bool=False)->bool:
+ return task.state()=="PAUSED_LOW_INFORMATION_GAIN" and any((new_evidence,new_source,commercial_value_increased))

@@ -26,3 +26,22 @@ def evaluate_market_coverage(states:dict[str,str],required=REQUIRED_MARKET_LAYER
 
 def can_mark_market_discovery_complete(states:dict[str,str],required=REQUIRED_MARKET_LAYERS)->bool:
     return bool(evaluate_market_coverage(states,required)["complete"])
+
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class CoverageCell:
+    country:str
+    industry:str
+    product:str
+    application:str
+    buyer_type:str
+    source_type:str
+    discovery_method:str
+    state:str="NOT_CHECKED"
+
+def evidence_state(cell:CoverageCell)->str:
+    return cell.state if cell.state in COVERAGE_STATES else "NOT_CHECKED"
+
+def blind_cells(cells):
+    return tuple(c for c in cells if evidence_state(c) in {"NOT_CHECKED","NOT_SEARCHED","SOURCE_UNAVAILABLE"})

@@ -159,3 +159,12 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - IMPORTANT: eligible remains distinct from authorized; this change does not spend Apollo credits.
 - REGRESSION TESTS added for commercial-aggregator confidence and evidence-free Apollo spend eligibility.
 - NEXT: close CI; migrate older trade-result tests/callers if constructor compatibility breaks; then add provider health/cost comparison and Market Digital Twin baseline.
+
+
+## 2026-10-05 whole-project backlog / RED TEAM cycle
+- CI #1007 FAILED only in pytest regression: legacy Apollo spend test still expected boolean-only eligibility after the new evidence-ref guardrail. Canonical unittest, evals (1266 passed) and NEXUS checks passed. Legacy regression updated to require evidence/current-free-resolution/value refs; no guardrail rollback.
+- Opportunity Graph was discovered already implemented (not missing). Added regression coverage that company→material FACT requires evidence and stale evidence cannot remain verified; HYPOTHESIS remains non-asserted.
+- Market Digital Twin baseline IMPLEMENTED: country ranking is evidence-gated, rejects invalid 0..1 factors, and returns UNKNOWN/None when evidence or sufficient dimensions are missing instead of fabricating a ranking.
+- Historical backlog reconciled: prior Apollo 'permanently blocked' state is SUPERSEDED for connector availability only; current policy still treats Apollo as resolver/enrichment and paid credit as human-gated. Older vertical blockers (Hydrotester, Can Forming, KCl) remain separate projects and must not contaminate Steel Sales evidence.
+- PR #103 remains Draft and unmerged. Merge/production/external send/paid credit remain human gates.
+- NEXT: close CI on current head; then provider/agent health-cost benchmark, country-twin evidence population, exact-source refresh for seed leads, and integration of accepted Opportunity outcomes into Genome/Distillation.

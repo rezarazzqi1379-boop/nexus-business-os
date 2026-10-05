@@ -141,3 +141,14 @@ installer, import browser cookies, enable every channel, or send private project
 data to public retrieval services. Keep existing approval and evidence gates.
 This contract covers agents operating in this repository; it cannot configure
 other installed plugins, Claude web sessions, or Notion agents automatically.
+
+
+## Steel sales intelligence continuity
+
+- For steel sales, export, buyer discovery, Apollo, competitor, customs, or market work, read `.nexus/sales_intelligence/CURRENT_STATE.md` before planning or spending credits.
+- Treat that file as the human-readable checkpoint and `ProjectMemoryStore` / `UnifiedDataHub` as structured durable state; do not rely on chat memory alone.
+- Resume from the recorded next work and unresolved blockers; deduplicate companies and evidence before new discovery.
+- Use `steel_sales_intelligence.evaluate_lead` as the minimum fail-closed spend/outreach gate. It supplements, never weakens, the repository-wide approval rules.
+- Public sales/agent repositories remain `EXPERIMENT_ONLY` until license, security, credentials, network behavior, tests, isolation and rollback are reviewed. Never auto-install them.
+- Separate technical/commercial attractiveness from legal/compliance clearance. Russia and Belarus leads require the additional compliance gate recorded in the steel-sales state.
+- Update the steel-sales state after a material milestone so ChatGPT, Claude Code and later sessions can recover where the work stopped.

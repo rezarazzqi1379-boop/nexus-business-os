@@ -180,3 +180,12 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - REGRESSION TESTS added for outcome economics, unsearched cells, contradiction priority and evidence-backed failure labels.
 - STATUS: current v4 code is IMPLEMENTED, not TESTED until CI on the current head succeeds. No merge/deploy/paid credit/external send.
 - NEXT: CI closure; then Discovery Strategy Generator + source/provider benchmark records + populate evidence-backed coverage cells for Turkey/Iran/Kazakhstan/Oman before expanding sensitive markets.
+
+
+## 2026-10-05 NEXUS v4 evolution/economics continuation
+- BOOTSTRAP: head 0a4235f, PR #103 draft+mergeable; CI #1020 was in_progress at reconciliation. No TESTED promotion before completion.
+- IMPLEMENTED: AgentEconomics measures acceptance/failure and cost-per-accepted across token/API/credit cost; zero accepted outputs produce UNKNOWN cost rather than fake zero.
+- IMPLEMENTED: Capability Ablation compares baseline vs candidate under a configurable comparable-budget envelope and blocks promotion on unfair budget comparisons.
+- IMPLEMENTED: Query Evolution baseline generates multilingual industrial query candidates for application-first discovery; generated queries are explicitly CANDIDATE, never Evidence.
+- REGRESSION TESTS added for accepted-output denominator, zero-outcome economics, unfair-budget ablation, and query/evidence separation.
+- NEXT: close CI on current head; build source/provider benchmark record tied to Evidence refs; populate first real coverage cells from refreshed official evidence; extend multilingual industrial ontology only from validated terminology.

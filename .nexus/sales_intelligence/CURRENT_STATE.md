@@ -77,3 +77,12 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - AGENTS.md bootstraps substantial autonomous work from that contract.
 - Contract codifies evidence-native scoring, agent promotion funnel, improvement/eval flywheel, anti-stall behavior, durable continuity, cost optimization and human gates.
 - This is IMPLEMENTED on feat/steel-sales-intelligence-v1; ACTIVE/PRODUCTION status requires the normal merge/promotion gate.
+
+
+## 2026-10-05 v2 evidence-quality cycle
+- FACT: Operating Contract v2 head b238230 passed GitHub Actions tests run 37284820844 (#956).
+- IMPLEMENTED after that tested head: steel_evidence_quality.py adds deterministic domain-based lead identity and evidence freshness states FRESH/STALE/UNKNOWN/INVALID_FUTURE, with regression tests.
+- IMPLEMENTED after that tested head: nexus_milestone.py requires evidence refs for DONE/TESTED/IMPROVED machine-readable milestones, with regression tests.
+- VERIFIED EXTERNAL EVIDENCE: UN Comtrade currently documents a free registered tier with up to 500 API calls/day and up to 100,000 records/call; use official Comtrade as the preferred trade-data provider before paid aggregators where coverage is sufficient.
+- VERIFIED EXTERNAL EVIDENCE: EAEU official material lists HS 7228 30 for other alloy-steel bars/rods not further worked than hot-rolled/hot-drawn/extruded and 7228 40 for not further worked than forged. NEXUS still treats these as candidates until product/jurisdiction evidence is complete.
+- NEXT: wait for CI on the new evidence-quality/milestone head, then wire freshness/dedup into country lead validation and create normalized trade-query adapter schema.

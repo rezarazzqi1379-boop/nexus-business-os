@@ -52,3 +52,12 @@ At the start of every substantial steel-sales task:
 
 ## Next work
 Build country candidate universes; add provider/capability registry for sales/trade; add deterministic buyer-fit/spend/compliance gates; qualify Tier-A companies; evaluate public agent repos in sandbox; connect approved adapters to existing NEXUS control plane; add tests; then prepare outreach packages for explicit approval.
+
+
+## 2026-10-05 QA / agent-discovery checkpoint
+- Draft PR #103 opened against nexus/consolidated-2026-09-30; GitHub now reports mergeable=true.
+- No GitHub Actions workflow/status is currently attached to PR head 2595e3d6fd8b3e01813582fb8821e99bed9604db; do not claim tests passed until a runner executes them.
+- UN Comtrade MCP candidate: cyanheads/un-comtrade-mcp-server. Strong fit for country/HS lookup and bilateral flows. Keep EXPERIMENT_ONLY until local license/credential/runtime review; UN data redistribution restrictions mean local user-key use is preferred over a hosted proxy.
+- OpenEnrich candidate: openenrich/openenrich. Potential low-cost/local enrichment waterfall; AGPL-3.0 and SMTP/network behavior require license/security/ToS review before adoption.
+- sales-intelligence-mcp and LeadPipe MCP are pattern candidates for scoring/CRM adapters, not trusted production dependencies.
+- Provider selection principle: native/official data and existing connected tools first; public repos provide adapters/patterns only after measured sandbox evaluation.

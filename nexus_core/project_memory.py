@@ -34,6 +34,15 @@ class ProjectMemoryStore:
         return out
     def _rewrite(self,ns:str,items):
         self._file(ns).write_text("".join(x.to_json()+"\n" for x in items),encoding="utf-8")
+    def _events_file(self)->Path: return self.path/"supersession_events.jsonl"
+    def _supersessions(self):
+        out={}
+        p=self._events_file()
+        if p.exists():
+            for line in p.read_text(encoding="utf-8").splitlines():
+                if not line.strip(): continue
+                d=json.loads(line); out[d["entry_id"]]=d["superseded_by"]
+        return out
     def _validate(self,ns,statement,decided_by,evidence_refs):
         if ns not in self._names: raise ValueError("invalid_namespace")
         if not isinstance(statement,str) or not statement.strip(): raise ValueError("invalid_statement")

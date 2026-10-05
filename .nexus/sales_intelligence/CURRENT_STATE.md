@@ -168,3 +168,15 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - Historical backlog reconciled: prior Apollo 'permanently blocked' state is SUPERSEDED for connector availability only; current policy still treats Apollo as resolver/enrichment and paid credit as human-gated. Older vertical blockers (Hydrotester, Can Forming, KCl) remain separate projects and must not contaminate Steel Sales evidence.
 - PR #103 remains Draft and unmerged. Merge/production/external send/paid credit remain human gates.
 - NEXT: close CI on current head; then provider/agent health-cost benchmark, country-twin evidence population, exact-source refresh for seed leads, and integration of accepted Opportunity outcomes into Genome/Distillation.
+
+
+## 2026-10-05 NEXUS v4 Discovery Fabric implementation
+- CI #1011 diagnosed: 1266 evals passed and 612/613 regression tests passed; sole failure was the new Opportunity Graph test passing a string instead of datetime.date into an intentionally typed test seam. Test fixed without weakening freshness guardrails.
+- IMPLEMENTED: .nexus/OPERATING_CONTRACT_V4.md extends v3 with measured discovery strategy, coverage, contradiction, ablation, failure-autopsy and Discovery Scientist contracts. AGENTS.md now bootstraps v4 first while retaining v3 as historical foundation.
+- IMPLEMENTED: Discovery Method Registry measures precision, recall proxy, cost-per-accepted and baseline-vs-candidate promotion. Search volume alone cannot promote a method.
+- IMPLEMENTED: Discovery Coverage Map distinguishes NOT_CHECKED from NO_EVIDENCE and exposes blind cells.
+- IMPLEMENTED: Contradiction Engine keeps supporting, negative, contradictory, stale/unavailable/no-evidence semantics distinct.
+- IMPLEMENTED: Discovery Failure taxonomy converts evidenced misses into structured regression candidates.
+- REGRESSION TESTS added for outcome economics, unsearched cells, contradiction priority and evidence-backed failure labels.
+- STATUS: current v4 code is IMPLEMENTED, not TESTED until CI on the current head succeeds. No merge/deploy/paid credit/external send.
+- NEXT: CI closure; then Discovery Strategy Generator + source/provider benchmark records + populate evidence-backed coverage cells for Turkey/Iran/Kazakhstan/Oman before expanding sensitive markets.

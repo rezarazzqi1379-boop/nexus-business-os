@@ -7,6 +7,7 @@ class TradeQuery:
 @dataclass(frozen=True)
 class TradeResult:
     query:TradeQuery; source:str; observed_at:str
+    source_type:str="TRADE_DATASET"
     trade_value_usd:float|None=None; quantity:float|None=None; net_weight_kg:float|None=None
     source_ref:str=""
 def validate_trade_result(r:TradeResult)->tuple[str,...]:
@@ -14,6 +15,7 @@ def validate_trade_result(r:TradeResult)->tuple[str,...]:
     if r.query.flow not in {"IMPORT","EXPORT"}:e.append("invalid_flow")
     if not (2<=len(r.query.hs)<=10 and r.query.hs.isdigit()):e.append("invalid_hs")
     if not r.source.strip():e.append("source_required")
+    if r.source_type not in {"OFFICIAL_CUSTOMS","OFFICIAL_GOVERNMENT","TRADE_DATASET","COMMERCIAL_AGGREGATOR"}:e.append("invalid_source_type")
     if not r.source_ref.strip():e.append("source_ref_required")
     if not r.observed_at.strip():e.append("observed_at_required")
     if r.trade_value_usd is None and r.quantity is None and r.net_weight_kg is None:e.append("no_measurement")

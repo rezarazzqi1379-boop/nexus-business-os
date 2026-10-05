@@ -84,7 +84,7 @@ class ProjectMemoryStore:
         event={"namespace":namespace,"entry_id":entry_id,"superseded_by":superseded_by,
                "created_at":datetime.now(timezone.utc).isoformat()}
         with self._events_file().open("a",encoding="utf-8") as f:
-            f.write(json.dumps(event,ensure_ascii=False,sort_keys=True)+"\\n")
+            f.write(json.dumps(event,ensure_ascii=False,sort_keys=True)+chr(10))
     def bootstrap_context(self,limit=20):
         if type(limit) is not int or limit<1: raise ValueError("invalid_limit")
         items=list(self.query(include_superseded=False))[-limit:]

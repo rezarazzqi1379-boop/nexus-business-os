@@ -93,3 +93,12 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - DEFECT FOUND/FIXED: country lead validation accepted evidence without freshness metadata. Validator now requires observed_at and rejects stale/future/unknown dates from supporting Tier-A; regression tests added.
 - ARCHITECTURE DEFECT FOUND: ProjectMemoryStore describes itself as append-first but supersede() rewrites a namespace JSONL file. This preserves logical history in normal operation but is not a true append-only audit log and has weaker crash/concurrency semantics. Do not claim append-only durability until redesigned/tested.
 - NEXT: implement append-only supersession events with backward-compatible query semantics and regression tests; then add normalized trade-query/result records with provenance and source timestamp.
+
+
+## 2026-10-05 NEXUS v3 activation checkpoint
+- IMPLEMENTED: Operating Contract v3, machine-readable operating policy v3, and v3 capability roadmap on feature branch.
+- v3 supersedes v2 for future autonomous cycles; v2 retained as immutable historical contract.
+- VERIFIED FAILURE: GitHub Actions run 37285877122 (#967) failed with 9 ProjectMemory tests because _supersessions() was referenced but missing. This invalidated the prior claim that append-only Memory was tested.
+- FIX IMPLEMENTED: missing append-only supersession helpers added in commit c03f1543; requires new CI before TESTED status.
+- v3 core additions: three-engine architecture, Opportunity Graph, Demand Signal Radar, Reverse Buyer Discovery, Commercial Genome, Deal Room, Lost Deal Autopsy, NEXUS Scientist, experience distillation, held-out eval discipline and cost-to-accepted-outcome.
+- NEXT: require green CI, then implement Opportunity Graph + Demand Signal schemas and machine-validate v3 agent promotion stages.

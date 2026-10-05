@@ -1,11 +1,58 @@
 {
- "schema_version":"nexus.agent-candidate-registry.v1",
- "promotion_stages":["DISCOVERED","LICENSE_CHECKED","SECURITY_REVIEWED","SANDBOXED","BENCHMARKED","EXPERIMENT_ONLY","APPROVED_ADAPTER","ACTIVE"],
- "candidates":[
-  {"repo":"cyanheads/un-comtrade-mcp-server","capability":"trade_intelligence","stage":"DISCOVERED","risk":["credential handling","UN redistribution terms"],"strategy":"local adapter; no public proxy"},
-  {"repo":"openenrich/openenrich","capability":"enrichment_waterfall","stage":"DISCOVERED","risk":["AGPL","SMTP/network behavior","ToS"],"strategy":"sandbox only before any adoption"},
-  {"repo":"aria-agentworks/sales-intelligence-mcp","capability":"sales_patterns","stage":"DISCOVERED","risk":["young project","external providers"],"strategy":"adapt patterns; do not trust as core"},
-  {"repo":"langchain-ai/langgraph","capability":"durable_execution","stage":"DISCOVERED","risk":["dependency weight","framework lock-in"],"strategy":"benchmark only if native NEXUS memory/orchestration fails requirements"}
- ],
- "rule":"No candidate may become ACTIVE without recorded license, security, sandbox, benchmark and rollback evidence."
+  "schema_version": "nexus.agent-candidate-registry.v1",
+  "promotion_stages": [
+    "DISCOVERED",
+    "LICENSE_CHECKED",
+    "SECURITY_REVIEWED",
+    "PRIVACY_TOS_REVIEWED",
+    "SANDBOXED",
+    "BENCHMARKED",
+    "EXPERIMENT_ONLY",
+    "APPROVED_ADAPTER",
+    "ACTIVE"
+  ],
+  "candidates": [
+    {
+      "repo": "cyanheads/un-comtrade-mcp-server",
+      "capability": "trade_intelligence",
+      "stage": "DISCOVERED",
+      "risk": [
+        "credential handling",
+        "UN redistribution terms"
+      ],
+      "strategy": "local adapter; no public proxy"
+    },
+    {
+      "repo": "openenrich/openenrich",
+      "capability": "enrichment_waterfall",
+      "stage": "DISCOVERED",
+      "risk": [
+        "AGPL",
+        "SMTP/network behavior",
+        "ToS"
+      ],
+      "strategy": "sandbox only before any adoption"
+    },
+    {
+      "repo": "aria-agentworks/sales-intelligence-mcp",
+      "capability": "sales_patterns",
+      "stage": "DISCOVERED",
+      "risk": [
+        "young project",
+        "external providers"
+      ],
+      "strategy": "adapt patterns; do not trust as core"
+    },
+    {
+      "repo": "langchain-ai/langgraph",
+      "capability": "durable_execution",
+      "stage": "DISCOVERED",
+      "risk": [
+        "dependency weight",
+        "framework lock-in"
+      ],
+      "strategy": "benchmark only if native NEXUS memory/orchestration fails requirements"
+    }
+  ],
+  "rule": "No candidate may become ACTIVE without recorded license, security, privacy/ToS, sandbox, benchmark and rollback evidence."
 }

@@ -1,4 +1,4 @@
-"""Lost-deal autopsy and evidence-aware experience distillation."""
+"""Lost-deal autopsy: repeated observations become patterns, not lessons without validation."""
 from dataclasses import dataclass
 REASONS={"PRICE","DELIVERY","SPECIFICATION","QUALITY","TRUST","PAYMENT","LOGISTICS","COMPETITOR","TIMING","NO_RESPONSE","COMPLIANCE","INTERNAL_FAILURE","UNKNOWN"}
 @dataclass(frozen=True)
@@ -12,13 +12,19 @@ def validate_lost_deal(x:LostDeal)->tuple[str,...]:
  return tuple(e)
 def distill_failure_pattern(items,minimum_cases=3):
  valid=[x for x in items if not validate_lost_deal(x) and x.reason!="UNKNOWN"]
- counts={}
- refs={}
+ groups={}
  for x in valid:
   key=(x.reason,x.country,x.application,x.product)
-  counts[key]=counts.get(key,0)+1;refs.setdefault(key,set()).update(x.evidence_refs)
+  groups.setdefault(key,{})[x.opportunity_id]=x
  out=[]
- for key,n in counts.items():
-  status="LESSON" if n>=minimum_cases else "HYPOTHESIS"
-  out.append({"status":status,"pattern":key,"cases":n,"evidence_refs":tuple(sorted(refs[key]))})
+ for key,by_opp in groups.items():
+  xs=tuple(by_opp.values()); refs={r for x in xs for r in x.evidence_refs}
+  context_complete=all(key[1:])
+  distinct_evidence=len(refs)>=len(xs)
+  status="FAILURE_PATTERN" if len(xs)>=minimum_cases and context_complete and distinct_evidence else "HYPOTHESIS"
+  out.append({"status":status,"pattern":key,"cases":len(xs),"evidence_refs":tuple(sorted(refs))})
  return tuple(sorted(out,key=lambda x:(-x["cases"],x["pattern"])))
+def promote_pattern(pattern,*,eval_evidence_refs:tuple[str,...],replicated:bool)->str:
+ if pattern.get("status")!="FAILURE_PATTERN":return "NOT_READY"
+ if not replicated or not eval_evidence_refs:return "FAILURE_PATTERN"
+ return "LESSON"

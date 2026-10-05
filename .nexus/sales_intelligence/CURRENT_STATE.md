@@ -112,3 +112,13 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - GRAPH HARDENING IMPLEMENTED: FACT/VERIFIED_EVIDENCE graph edges require evidence and fresh observed_at; malformed/undated evidence is rejected.
 - MEMORY FAILURE LESSON: persistence-format regressions require multi-event parse tests; prior CI #970 exposed literal newline serialization. Fix is implemented but remains untested until a green subsequent CI.
 - NEXT: close CI; then implement reverse-buyer discovery contract and persist Opportunity Graph/Demand Signals into UnifiedDataHub with deterministic IDs.
+
+
+## 2026-10-05 NEXUS v3 commercial/evolution cycle
+- FAILED CI EVIDENCE: run #985 preserved the legacy suite at 1266 passed but new tests had 2 failures: Python banker rounding made 86.5 -> 86, and UnifiedDataHub rejected timezone-naive observed_at.
+- FIX IMPLEMENTED: opportunity queue now uses deterministic Decimal ROUND_HALF_UP; v3 evidence adapter normalizes date/datetime input to timezone-aware ISO at the hub boundary.
+- IMPLEMENTED: Commercial Genome baseline with explicit DNA dimensions, evidence-required historical outcomes, deterministic Jaccard feature similarity and comparable-case ranking.
+- IMPLEMENTED: Deal Room contract with evidence-gated advanced stages and mandatory next action for open deals.
+- IMPLEMENTED: NEXUS Scientist experiment contract; no evidence -> reject, no held-out eval -> human review, measured held-out gain with non-increased cost -> PROMOTE_CANDIDATE only, never production deployment.
+- AGENT DISCOVERY: added self-evolve, Future AGI, Saber skills and sales-agent-foundation as DISCOVERED only. No external code integrated; promotion funnel still applies.
+- NEXT: await CI; on green mark these capabilities TESTED, then add Lost Deal Autopsy/Experience Distillation and Agent Health observability.

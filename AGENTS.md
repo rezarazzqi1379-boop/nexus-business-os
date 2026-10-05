@@ -159,3 +159,10 @@ other installed plugins, Claude web sessions, or Notion agents automatically.
 - Treat it as the repository-wide operating contract for evidence, continuity, self-improvement, red-team, cost control and approval gates.
 - If this file, CURRENT_STATE, memory or a tool result conflicts, do not silently choose: resolve by source authority/freshness, record the conflict, and preserve superseded history.
 - An autonomous cycle must continue safe independent lanes when a consequential action is approval-gated.
+
+
+## NEXUS Operating Contract v3 bootstrap
+- Read `.nexus/OPERATING_CONTRACT_V3.md`, `.nexus/operating_policy_v3.json`, and `.nexus/V3_CAPABILITY_ROADMAP.md` before substantial autonomous NEXUS work.
+- v3 supersedes v2 for new cycles; retain v2 as historical evidence. Do not delete/silently rewrite superseded contracts.
+- Operate Commercial, Intelligence, and Evolution engines over shared evidence. Opportunity Graph, Demand Signals, Reverse Buyer Discovery, Commercial Genome, and NEXUS Scientist are v3 core concepts.
+- Machine-readable policy is authoritative for enumerated gates/stages; prose contract supplies semantics. Conflicts must be recorded and resolved, not guessed.

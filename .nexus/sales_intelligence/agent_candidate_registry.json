@@ -52,6 +52,50 @@
         "framework lock-in"
       ],
       "strategy": "benchmark only if native NEXUS memory/orchestration fails requirements"
+    },
+    {
+      "repo": "DaizeDong/self-evolve",
+      "capability": "eval_gated_self_improvement",
+      "stage": "DISCOVERED",
+      "risks": [
+        "young project",
+        "open-domain judge quality",
+        "external pattern not yet sandboxed"
+      ],
+      "strategy": "Benchmark deterministic accept/reject/rollback patterns; do not vendor."
+    },
+    {
+      "repo": "future-agi/future-agi",
+      "capability": "observability_evals_guardrails",
+      "stage": "DISCOVERED",
+      "risks": [
+        "large dependency surface",
+        "telemetry/network review required",
+        "integration complexity"
+      ],
+      "strategy": "Benchmark trace/eval contracts against native NEXUS observability before adoption."
+    },
+    {
+      "repo": "saberapp/skills",
+      "capability": "revenue_signal_skills",
+      "stage": "DISCOVERED",
+      "risks": [
+        "vendor coupling",
+        "external service/privacy/ToS review",
+        "sales patterns may not fit industrial trade"
+      ],
+      "strategy": "Adapt signal/deal-coaching patterns only after license/security/privacy review."
+    },
+    {
+      "repo": "alipouw13/sales-agent-foundation",
+      "capability": "shared_sales_agent_contracts",
+      "stage": "DISCOVERED",
+      "risks": [
+        "pattern-only framework",
+        "quality/activity must be verified",
+        "domain adaptation required"
+      ],
+      "strategy": "Benchmark shared-contract validator pattern; prefer pattern adaptation."
     }
   ],
   "rule": "No candidate may become ACTIVE without recorded license, security, privacy/ToS, sandbox, benchmark and rollback evidence."

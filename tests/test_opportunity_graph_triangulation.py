@@ -10,4 +10,4 @@ def test_graph_promotion_requires_independent_evidence():
 def test_graph_promotion_fails_on_contradiction():
  e=GraphEdge("Company","uses","20MnCr5","HYPOTHESIS",("a","b"),"2026-10-05")
  ev=(EvidenceRef("a","OFFICIAL_COMPANY","x"),EvidenceRef("b","TRADE_DATASET","trade-y"),EvidenceRef("c","REGULATOR","r",True,True))
- assert not can_promote_verified(e,ev,today="2026-10-05")
+ assert not can_promote_verified(e,ev,today=date(2026,10,5))

@@ -2,12 +2,14 @@
 from __future__ import annotations
 from steel_evidence_quality import evidence_freshness
 ALLOWED_ROLES={"END_USER","BUYER","IMPORTER","DISTRIBUTOR","COMPETITOR","STRATEGIC_PARTNER","UNKNOWN"}
+ALLOWED_CHANNELS={"MANUFACTURER","TRADER","STOCKIST","IMPORTER","DISTRIBUTOR","SERVICE_CENTER","END_USER","OEM","PROJECT_EPC","COMPETITOR","UNKNOWN"}
 ALLOWED_EVIDENCE={"OFFICIAL_COMPANY","OFFICIAL_CUSTOMS","TRADE_DATA","STANDARD","REGULATOR","INDEPENDENT","CLAIM"}
 def validate_lead(r:dict,*,today=None)->tuple[str,...]:
     errors=[]
     for k in ("lead_id","country","company","role","applications","grade_candidates","evidence","status"):
         if k not in r:errors.append(f"missing:{k}")
     if r.get("role") not in ALLOWED_ROLES:errors.append("invalid_role")
+    if "channel" in r and r.get("channel") not in ALLOWED_CHANNELS:errors.append("invalid_channel")
     ev=r.get("evidence",[])
     if not isinstance(ev,list):errors.append("evidence_must_be_list");ev=[]
     valid_current=0

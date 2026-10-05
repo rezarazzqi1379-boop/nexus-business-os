@@ -6,5 +6,5 @@ def test_existing_contact_blocks_paid_enrichment():
  d=assess_spend(buyer_fit=90,evidence_current=True,dedup_clear=True,free_resolution_attempted=True,existing_contact=True,expected_value=True)
  assert not d.eligible
 def test_paid_enrichment_can_become_eligible_but_not_authorized():
- d=assess_spend(buyer_fit=90,evidence_current=True,dedup_clear=True,free_resolution_attempted=True,existing_contact=False,expected_value=True)
+ d=assess_spend(buyer_fit=90,evidence_current=True,dedup_clear=True,free_resolution_attempted=True,existing_contact=False,expected_value=True,evidence_refs=("e:current",),free_resolution_refs=("apollo-free:org",),value_refs=("value:estimate",))
  assert d.eligible and d.confidence==100

@@ -1,5 +1,6 @@
 """Deterministic Commercial Genome baseline. Similarity is feature overlap, never LLM intuition."""
 from dataclasses import dataclass
+OUTCOMES={"UNKNOWN","RFQ","QUOTED","WON","LOST","NO_RESPONSE","DISQUALIFIED"}
 DIMENSIONS=("buyer","need","product","application","market","trade","competitor","price","logistics","payment","compliance","relationship","timing")
 @dataclass(frozen=True)
 class CommercialGenome:
@@ -9,6 +10,8 @@ class CommercialGenome:
  evidence_refs:tuple[str,...]=()
 def validate_genome(g:CommercialGenome)->tuple[str,...]:
  e=[]
+ if not g.opportunity_id.strip():e.append("opportunity_id_required")
+ if g.outcome not in OUTCOMES:e.append("invalid_outcome")
  unknown=set(g.features)-set(DIMENSIONS)
  if unknown:e.append("unknown_dimensions:"+",".join(sorted(unknown)))
  for k,v in g.features.items():

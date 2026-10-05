@@ -70,3 +70,10 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - Conservative HS candidate engine added: 722840 is only a candidate for alloy-steel bars/rods not further worked than forged; 722830 is only a candidate for other bars/rods not further worked than hot-rolled/hot-drawn/extruded. Grade alone never yields final classification.
 - Country discovery is now application-first: gears/gearboxes -> case-hardening grades such as 20MnCr5/8620; shafts/heavy engineering -> 42CrMo4/C45; every lead still needs company-specific evidence.
 - Merge/production remains gated; Apollo paid enrichment and external outreach remain unspent/unsent.
+
+
+## Operating contract v2 activation
+- .nexus/OPERATING_CONTRACT_V2.md is now the feature-branch operating contract for autonomous NEXUS cycles.
+- AGENTS.md bootstraps substantial autonomous work from that contract.
+- Contract codifies evidence-native scoring, agent promotion funnel, improvement/eval flywheel, anti-stall behavior, durable continuity, cost optimization and human gates.
+- This is IMPLEMENTED on feat/steel-sales-intelligence-v1; ACTIVE/PRODUCTION status requires the normal merge/promotion gate.

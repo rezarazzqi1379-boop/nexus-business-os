@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal
 
-Namespace=Literal["preference","decision","context","constraint","lesson"]
+Namespace=Literal["preference","decision","context","constraint","lesson","hypothesis"]
 
 @dataclass(frozen=True)
 class MemoryEntry:
@@ -19,7 +19,7 @@ class MemoryEntry:
         d=json.loads(s); d["evidence_refs"]=tuple(d.get("evidence_refs",())); return cls(**d)
 
 class ProjectMemoryStore:
-    _names={"preference","decision","context","constraint","lesson"}
+    _names={"preference","decision","context","constraint","lesson","hypothesis"}
     def __init__(self,path:Path):
         self.path=Path(path); self.path.mkdir(parents=True,exist_ok=True)
 
@@ -65,7 +65,6 @@ class ProjectMemoryStore:
         if namespace is not None: items=[x for x in items if x.namespace==namespace]
         if project_id is not None: items=[x for x in items if x.project_id==project_id]
         if lane is not None: items=[x for x in items if x.lane==lane]
-        if not include_superseded: items=[x for x in items if x.superseded_by is None]
         supersessions=self._supersessions()
         if supersessions:
             materialized=[]

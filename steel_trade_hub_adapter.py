@@ -4,6 +4,8 @@ import hashlib
 from unified_data_environment import EvidenceObservation,UnifiedDataHub
 from steel_trade_records import TradeResult,validate_trade_result
 
+CONFIDENCE={"OFFICIAL_CUSTOMS":1.0,"OFFICIAL_GOVERNMENT":.95,"TRADE_DATASET":.85,"COMMERCIAL_AGGREGATOR":.6}
+
 def ingest_trade_result(hub:UnifiedDataHub,r:TradeResult,*,project_id:str="STEEL_SALES")->bool:
     errors=validate_trade_result(r)
     if errors: raise ValueError("invalid_trade_result:"+",".join(errors))
@@ -15,5 +17,5 @@ def ingest_trade_result(hub:UnifiedDataHub,r:TradeResult,*,project_id:str="STEEL
     if r.quantity is not None:metrics.append(f"quantity={r.quantity}")
     if r.net_weight_kg is not None:metrics.append(f"net_weight_kg={r.net_weight_kg}")
     statement=f"{q.flow} reporter={q.reporter} partner={q.partner} hs={q.hs} period={q.period}; "+", ".join(metrics)
-    obs=EvidenceObservation(oid,project_id,"trade_measurement",statement,(r.source_ref,),r.observed_at,1.0)
+    obs=EvidenceObservation(oid,project_id,"trade_measurement",statement,(r.source_ref,),r.observed_at,CONFIDENCE[r.source_type])
     return hub.record_observation(obs)

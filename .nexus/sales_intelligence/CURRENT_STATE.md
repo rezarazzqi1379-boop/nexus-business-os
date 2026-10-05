@@ -122,3 +122,13 @@ Build country candidate universes; add provider/capability registry for sales/tr
 - IMPLEMENTED: NEXUS Scientist experiment contract; no evidence -> reject, no held-out eval -> human review, measured held-out gain with non-increased cost -> PROMOTE_CANDIDATE only, never production deployment.
 - AGENT DISCOVERY: added self-evolve, Future AGI, Saber skills and sales-agent-foundation as DISCOVERED only. No external code integrated; promotion funnel still applies.
 - NEXT: await CI; on green mark these capabilities TESTED, then add Lost Deal Autopsy/Experience Distillation and Agent Health observability.
+
+
+## 2026-10-05 RED TEAM MAX v3 — commercial learning
+- BOOTSTRAP FACT: PR #103 head 00663f6 was mergeable=true; CI #991 was pending, so previous commercial/evolution additions were not promoted to TESTED.
+- BLIND SPOT FIXED: Commercial Genome now rejects unknown outcomes and blank opportunity IDs; evidenced outcome is still mandatory.
+- BLIND SPOT FIXED: NEXUS Scientist rejects out-of-range metrics and negative costs before any promotion recommendation.
+- BLIND SPOT FIXED: LOST Deal Room state requires a loss reason.
+- IMPLEMENTED: lost_deal_autopsy with controlled reason taxonomy; specific loss reasons require evidence. Repeated identical evidenced patterns become LESSON only at >=3 cases; smaller samples remain HYPOTHESIS.
+- OPEN DESIGN ISSUE: v3 evidence adapter currently normalizes date-only observed_at to UTC midnight. This is convenient but can imply precision not present in source evidence. Next evolution should separate observed_date/source_precision from retrieved_at timestamp instead of silently manufacturing precision.
+- NEXT: await CI; implement explicit evidence temporal precision + Agent Health observability; then connect distilled patterns to ProjectMemory only after evidence refs and threshold validation.

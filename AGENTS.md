@@ -161,9 +161,8 @@ other installed plugins, Claude web sessions, or Notion agents automatically.
 - An autonomous cycle must continue safe independent lanes when a consequential action is approval-gated.
 
 
-## NEXUS Operating Contract v3 bootstrap
-- Read `.nexus/OPERATING_CONTRACT_V4.md
-- `.nexus/OPERATING_CONTRACT_V3.md` (historical foundation)`, `.nexus/operating_policy_v3.json`, and `.nexus/V3_CAPABILITY_ROADMAP.md` before substantial autonomous NEXUS work.
-- v3 supersedes v2 for new cycles; retain v2 as historical evidence. Do not delete/silently rewrite superseded contracts.
+## NEXUS Operating Contract v4 bootstrap
+- Read `.nexus/OPERATING_CONTRACT_V4.md`, `.nexus/OPERATING_CONTRACT_V3.md` (historical foundation), `.nexus/operating_policy_v3.json`, and `.nexus/V3_CAPABILITY_ROADMAP.md` before substantial autonomous NEXUS work.
+- v4 extends v3 for new discovery cycles; retain v3 and v2 as historical evidence. Do not delete or silently rewrite superseded contracts.
 - Operate Commercial, Intelligence, and Evolution engines over shared evidence. Opportunity Graph, Demand Signals, Reverse Buyer Discovery, Commercial Genome, and NEXUS Scientist are v3 core concepts.
 - Machine-readable policy is authoritative for enumerated gates/stages; prose contract supplies semantics. Conflicts must be recorded and resolved, not guessed.

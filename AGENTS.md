@@ -166,3 +166,10 @@ other installed plugins, Claude web sessions, or Notion agents automatically.
 - v4 extends v3 for new discovery cycles; retain v3 and v2 as historical evidence. Do not delete or silently rewrite superseded contracts.
 - Operate Commercial, Intelligence, and Evolution engines over shared evidence. Opportunity Graph, Demand Signals, Reverse Buyer Discovery, Commercial Genome, and NEXUS Scientist are v3 core concepts.
 - Machine-readable policy is authoritative for enumerated gates/stages; prose contract supplies semantics. Conflicts must be recorded and resolved, not guessed.
+
+
+## NEXUS v6 + Red Team Max v4 bootstrap
+- Read `.nexus/OPERATING_CONTRACT_V6.md` and `.nexus/RED_TEAM_MAX_V4.md` before substantial commercial discovery/evolution work.
+- v6 extends v4/v3; Red Team Max v4 is the adversarial companion. Historical contracts remain evidence.
+- Every live commercial case must check mandatory market layers and run adversarial attacks on role, product fit, source independence, freshness, trade inference, price comparability, coverage and evidence binding.
+- A red-team finding changes production behavior only after a reproducible regression/evaluation; no test evidence means IMPLEMENTED/EXPERIMENT_ONLY, not TESTED.

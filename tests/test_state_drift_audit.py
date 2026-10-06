@@ -23,3 +23,8 @@ def test_no_silent_supersession_without_trigger():
 def test_failure_becomes_regression_candidate():
  a=DecisionAutopsy("d2","buyer","e1".split(),"2026-01-01",failure_mode="ROLE_MISCLASSIFICATION")
  assert a.regression_candidate
+
+
+def test_commercial_relationship_fields_are_volatile():
+ for field in ("procurement_status","award_winner","decision_authority","sales_readiness","relationship_state"):
+  assert field in VOLATILE_FIELDS

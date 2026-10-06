@@ -2,7 +2,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 
-VOLATILE_FIELDS=frozenset({"stock","price","employment","compliance","availability","provider_health","ci_status","opportunity_stage"})
+VOLATILE_FIELDS=frozenset({"stock","price","employment","compliance","availability","provider_health","ci_status","opportunity_stage","procurement_status","award_winner","decision_authority","sales_readiness","relationship_state"})
 DRIFT_STATES=frozenset({"CONSISTENT","DRIFTED","STALE","CONTRADICTED","UNKNOWN"})
 
 def audit_state(*,stored,observed,field:str,stale:bool=False,contradicted:bool=False)->str:

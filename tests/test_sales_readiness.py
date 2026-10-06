@@ -16,3 +16,10 @@ def test_missing_dimension_invalid():
 
 def test_partial_not_ready():
  assert overall_readiness({"TECHNICAL":"PARTIAL","COMMERCIAL":"PARTIAL","COMPLIANCE":"READY","CONTACT":"READY"})=="PARTIAL"
+
+
+def test_contact_partial_cannot_make_overall_ready():
+ assert overall_readiness({"TECHNICAL":"READY","COMMERCIAL":"READY","COMPLIANCE":"READY","CONTACT":"PARTIAL"})=="PARTIAL"
+
+def test_unknown_compliance_dominates_named_contact():
+ assert overall_readiness({"TECHNICAL":"PARTIAL","COMMERCIAL":"PARTIAL","COMPLIANCE":"UNKNOWN","CONTACT":"PARTIAL"})=="UNKNOWN"

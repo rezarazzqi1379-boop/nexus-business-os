@@ -12,3 +12,7 @@ def test_all_ready():
 
 def test_missing_dimension_invalid():
  with pytest.raises(ValueError):overall_readiness({"TECHNICAL":"READY"})
+
+
+def test_partial_not_ready():
+ assert overall_readiness({"TECHNICAL":"PARTIAL","COMMERCIAL":"PARTIAL","COMPLIANCE":"READY","CONTACT":"READY"})=="PARTIAL"

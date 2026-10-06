@@ -1,5 +1,5 @@
 import pytest
-from state_drift_audit import DecisionAutopsy,audit_state,supersession_record
+from state_drift_audit import DecisionAutopsy,VOLATILE_FIELDS,audit_state,supersession_record
 
 def test_state_drift_distinguishes_unknown_stale_and_change():
  assert audit_state(stored="A",observed=None,field="stock")=="UNKNOWN"

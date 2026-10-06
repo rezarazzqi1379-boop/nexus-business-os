@@ -1,0 +1,6 @@
+entity,evidence_type,state,claim,relationship_state
+PAO ZVEZDA,PROCUREMENT_PLATFORM,CLOSED_UNKNOWN,"40ХН2МА round demand; 5.4 t platform/line-item support; contradictory 5.04 t secondary observation",UNKNOWN
+PAO ZVEZDA,DECISION_ROLE,LIKELY,"Tatiana Ivanovna Nikolaeva; Lead Specialist; Metal Supply Group; technical-question contact",UNKNOWN
+AO CKBM,PROCUREMENT,CLOSED_UNKNOWN,"3495114; 38ХН3МФА forgings; 1/1/2 pcs",UNKNOWN
+Afrikantov OKBM,PROCUREMENT,UNKNOWN,"2026 38ХН3МФА round demand signal",UNKNOWN
+Belarus chain,STAGNATION,PAUSED_LOW_INFORMATION_GAIN,"no reactivation trigger",UNKNOWN

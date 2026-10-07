@@ -10,7 +10,13 @@ def test_contradicted_edge_not_verified():
  assert verified_neighbors(add_edge((),e(contradicted=True)),"C")==()
 def test_relationship_path_requires_more_than_demand():
  g=add_edge((),e()); assert not relationship_path_ready(g,"C")
- g=add_edge(g,e(edge_id="E2",target_node="S",relation="HAS_INCUMBENT",target_type=NodeType.SUPPLIER)); assert relationship_path_ready(g)
+ g=add_edge(g,e(edge_id="E2",target_node="S",relation="HAS_INCUMBENT",target_type=NodeType.SUPPLIER)); assert relationship_path_ready(g,"C")
 def test_cross_project_graph_rejected():
  g=add_edge((),e())
  with pytest.raises(ValueError): add_edge(g,e(edge_id="E2",project_id="OTHER"))
+
+def test_relationship_path_is_company_scoped():
+ g=add_edge((),e())
+ g=add_edge(g,e(edge_id="E2",target_node="S",relation="HAS_INCUMBENT",target_type=NodeType.SUPPLIER))
+ assert relationship_path_ready(g,"C")
+ assert not relationship_path_ready(g,"OTHER")

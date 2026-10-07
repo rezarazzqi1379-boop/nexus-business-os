@@ -18,7 +18,7 @@ def compile_prompt(*,project_id:str,stage:str,blocker:str,adapters:tuple[str,...
  a=", ".join(adapters) if adapters else "NONE"
  return (
   "LOAD NEXUS_GLOBAL_KERNEL_V1.\n"
-  f"PROJECT={project_id}\nSTAGE={stage}\nBLOCKER={blocker}\nALLOWED_ADAPTERS={a}\n"
+  f"PROJECT={project_id}\nSTAGE={stage}\nSTAGE_CONTRACT={contract}\nBLOCKER={blocker}\nALLOWED_ADAPTERS={a}\n"
   f"EVIDENCE_AUTHORITY={evidence_authority}\nACCEPTANCE_TEST={acceptance_test}\n"
   f"CURRENT_MATURITY={maturity}\nCAPABILITY_POLICY={capability_policy}\n"
   f"APPROVAL_BOUNDARY={approval_boundary}\n"

@@ -22,3 +22,36 @@ def test_supplier_change_detected_across_awards_contracts():
 def test_process_cannot_cross_project_boundary():
  h=append_event((),e())
  with pytest.raises(ValueError): append_event(h,e(event_id="E2",project_id="PRJ-HYD-01"))
+
+
+def test_invalid_validity_window_rejected():
+ with pytest.raises(ValueError):
+  append_event((),e(valid_from=datetime(2026,2,1,tzinfo=timezone.utc),valid_to=T))
+
+def test_expired_or_noncurrent_event_not_current():
+ old=e(valid_from=T,valid_to=datetime(2026,1,31,tzinfo=timezone.utc))
+ assert not current_events((old,),"P",datetime(2026,2,1,tzinfo=timezone.utc))
+ assert not current_events((e(current=False),),"P",T)
+
+def test_superseded_event_drops_from_current_view():
+ h=append_event((),e())
+ h=append_event(h,e(event_id="E2",stage=ProcurementStage.TENDER,supersedes_event_id="E1"))
+ assert tuple(x.event_id for x in current_events(h,"P",T))==("E2",)
+
+def test_bidder_is_not_incumbent():
+ h=(e(stage=ProcurementStage.AWARD,supplier_id="S1",bidder_ids=("S1",),award_state=AwardState.BIDDER_ONLY),)
+ assert incumbent_supplier(h,"P")==""
+
+def test_hidden_winner_is_not_incumbent():
+ h=(e(stage=ProcurementStage.AWARD,award_state=AwardState.WINNER_HIDDEN),)
+ assert incumbent_supplier(h,"P")==""
+
+def test_verified_winner_can_be_incumbent():
+ h=(e(stage=ProcurementStage.AWARD,supplier_id="S1",award_state=AwardState.WINNER_VERIFIED),)
+ assert incumbent_supplier(h,"P")=="S1"
+ assert verified_winners(h,"P")==("S1",)
+
+def test_supplier_change_requires_verified_winners():
+ h=(e(stage=ProcurementStage.AWARD,supplier_id="S1",award_state=AwardState.BIDDER_ONLY),
+    e(event_id="E2",stage=ProcurementStage.AWARD,supplier_id="S2",award_state=AwardState.BIDDER_ONLY))
+ assert not supplier_change(h,"P")

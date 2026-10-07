@@ -1,14 +1,20 @@
-"""Detect commercially meaningful changes across immutable procurement events."""
+"""Detect commercially meaningful procurement changes; never grants action authority."""
 from dataclasses import dataclass
 from enum import Enum
 from procurement_event_chain import ProcurementEvent,ProcurementStage
 
 class ChangeType(str,Enum):
- NEW_PROCESS="NEW_PROCESS"; STAGE_ADVANCE="STAGE_ADVANCE"; SUPPLIER_CHANGE="SUPPLIER_CHANGE"; CANCELLATION="CANCELLATION"; REVISION="REVISION"
+ NEW_PROCESS="NEW_PROCESS"; STAGE_ADVANCE="STAGE_ADVANCE"; STAGE_REGRESSION="STAGE_REGRESSION"; SUPPLIER_CHANGE="SUPPLIER_CHANGE"; CANCELLATION="CANCELLATION"; REVISION="REVISION"
+
+_STAGE_ORDER={ProcurementStage.PLANNING:0,ProcurementStage.PREQUALIFICATION:1,ProcurementStage.TENDER:2,ProcurementStage.AWARD:3,ProcurementStage.CONTRACT:4,ProcurementStage.IMPLEMENTATION:5}
 
 @dataclass(frozen=True)
 class CommercialChange:
- process_id:str; project_id:str; change_type:ChangeType; from_event_id:str; to_event_id:str; actionable:bool
+ process_id:str; project_id:str; change_type:ChangeType; from_event_id:str; to_event_id:str; commercial_review_signal:bool
+ @property
+ def actionable(self)->bool:
+  """Backward-compatible alias. This NEVER means permission to execute an external action."""
+  return self.commercial_review_signal
 
 def detect_change(previous:ProcurementEvent|None,current:ProcurementEvent)->CommercialChange:
  if previous is None:
@@ -20,5 +26,8 @@ def detect_change(previous:ProcurementEvent|None,current:ProcurementEvent)->Comm
  if previous.supplier_id and current.supplier_id and previous.supplier_id!=current.supplier_id:
   return CommercialChange(current.process_id,current.project_id,ChangeType.SUPPLIER_CHANGE,previous.event_id,current.event_id,True)
  if current.stage!=previous.stage:
+  old=_STAGE_ORDER.get(previous.stage); new=_STAGE_ORDER.get(current.stage)
+  if old is not None and new is not None and new<old:
+   return CommercialChange(current.process_id,current.project_id,ChangeType.STAGE_REGRESSION,previous.event_id,current.event_id,False)
   return CommercialChange(current.process_id,current.project_id,ChangeType.STAGE_ADVANCE,previous.event_id,current.event_id,current.stage in {ProcurementStage.PREQUALIFICATION,ProcurementStage.TENDER})
  return CommercialChange(current.process_id,current.project_id,ChangeType.REVISION,previous.event_id,current.event_id,False)

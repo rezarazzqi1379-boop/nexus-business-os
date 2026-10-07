@@ -5,6 +5,16 @@ def compile_prompt(*,project_id:str,stage:str,blocker:str,adapters:tuple[str,...
  if not project_id or not stage or not blocker: raise ValueError("incomplete_execution_context")
  if not evidence_authority or not acceptance_test: raise ValueError("evidence_and_acceptance_contract_required")
  if maturity not in _ALLOWED_MATURITY: raise ValueError("invalid_maturity_state")
+ stage_contracts={
+  "RECOVERY":"READ_ONLY; recover Registry/Master/live state; no promotion",
+  "TECHNICAL":"PRIMARY_EVIDENCE; exact spec/edition; ambiguity fail-closed",
+  "COMMERCIAL_GRAPH":"CURRENT_EVIDENCE; relationship/demand are separate claims",
+  "CONVERSION":"NO_VOLUME_PROXY; require canonical conversion/readiness/stock gates",
+  "SOURCE_ROI":"SANDBOX_ONLY; measure unique qualified evidence/cost/latency",
+  "LEARNING":"VERSIONED_CHANGE; acceptance test + rollback required",
+  "ACTION_GATE":"PROTECTED; exact target/payload/version approval required",
+ }
+ contract=stage_contracts.get(stage,"GOVERNED_STAGE; smallest measured reversible action")
  a=", ".join(adapters) if adapters else "NONE"
  return (
   "LOAD NEXUS_GLOBAL_KERNEL_V1.\n"

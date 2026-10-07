@@ -12,3 +12,8 @@ def queue_score(x:OpportunityCandidate)->int:
  return int(raw.quantize(Decimal("1"),rounding=ROUND_HALF_UP))
 def build_country_queue(items):
  return tuple(sorted(items,key=lambda x:(-queue_score(x),x.opportunity_id)))
+
+
+def actionable(x:OpportunityCandidate)->bool:
+    """Ranking is informational; execution requires explicit compliance readiness."""
+    return x.compliance_ready is True

@@ -1,0 +1,4 @@
+pathway,evidence,state,next_test
+"BHEL UPC quarterly steel rate contracts","official BHEL tender portal states UPC enters quarterly rate contracts for steel and registered prospective suppliers may be considered",FACT_PUBLIC_CURRENT,"resolve supplier registration/PQR/eligibility without submitting"
+"BHEL E5563018 current tender","open 200mm rolled/forged round bar rate contract",FACT_CURRENT_OPEN,"resolve PQR + exact quantity + spec acceptance"
+"RINL GEM/2026/B/8049767","open forged-round tender with large geometry",FACT_CURRENT_OPEN,"extract forged_rounds_spec PDF and map material spec per row"

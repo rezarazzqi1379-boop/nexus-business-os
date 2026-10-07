@@ -1,0 +1,5 @@
+candidate,evidence_type,named_buyer,grade,geometry_visible,current_demand,route,reason
+Voestalpine HPM Ecuador,shipment,YES,42CrMo4,"YES Ø400 x ~6m",NO,RETAIN_ONE_OBSERVED,"recent procurement observation; no independent recurrence/open demand"
+Sideria Srl,official seller capability,NO,42CrMo4,"seller range Ø40-400",NO,REJECT_AS_BUYER_EVIDENCE,"company sells/stocks forged and rolled special steel; not buyer-side demand evidence"
+IMS Belgium,official seller stock,NO,42CrMo4,"stock round bars; exact target geometry not established",NO,REJECT_AS_BUYER_EVIDENCE,"supplier stock page is not buyer demand"
+GoldSupplier anonymous activity,marketplace activity,NO,42CrMo4/1.7225,"not reliably bound to named buyer geometry",UNKNOWN,REJECT_IDENTITY_UNBOUND,"anonymous role/activity cannot enter named durable demand ledger"

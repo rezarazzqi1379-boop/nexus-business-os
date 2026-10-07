@@ -38,3 +38,28 @@ No Temporal installation justified yet.
 
 ## Growth rule
 Novelty is not repository count. A mechanism is new only when it closes a measured NEXUS failure mode not already covered. Preserve HOLD/REJECT results to avoid repeated research.
+
+## 2026-10-07 continuous discovery additions
+
+### CAP-EVAL-005 — Offline Trace Evaluation
+Mechanism: evaluate already-recorded OpenTelemetry/agent traces against golden expected tool trajectories without re-running expensive agents.
+Evidence candidates: agentevals-dev/agentevals; OpenSearch Agent Health; AgentEval.
+Failure mode addressed: repeated live evaluation burns tokens/API cost and obscures whether regressions are tool-selection vs final-answer failures.
+Overlap: extends existing NEXUS regression/eval layer; does not justify a second orchestrator.
+Disposition: STUDY + NATIVE PILOT FIRST.
+Acceptance: same recorded trace can be rescored under a new eval contract with zero external model/tool re-execution; catches wrong-tool and redundant-tool fixtures.
+
+### CAP-MON-006 — Structured Change Monitoring
+Mechanism: scheduled snapshot → selector/structured extraction → normalized diff → threshold → evidence event; optional visual diff only as supporting evidence.
+Evidence candidates: website-monitoring-agent; changedetection.io; webdog.
+Failure mode addressed: NEXUS can discover current pages but lacks durable page-level change history for procurement plans, supplier portals, pricing and hiring signals.
+Overlap: feeds Commercial Change Detector and Procurement Event Chain.
+Disposition: HIGH-VALUE SANDBOX CANDIDATE.
+Acceptance: on controlled fixtures detect a meaningful tender/date/supplier change, ignore layout/noise change, preserve old+new source snapshots and lineage.
+
+### CAP-OBS-007 — Cross-Agent Trajectory Observability
+Mechanism: normalize session/tool traces across heterogeneous coding/agent clients and derive markers for loops, retries, cost and progress.
+Evidence candidate: datadog-labs/trajectory.
+Failure mode addressed: permanent multi-agent use can become expensive/duplicative without comparable run telemetry.
+Disposition: PATTERN_DONOR; external installation only if native metrics cannot provide cross-client visibility.
+Acceptance: identify redundant loop and cost regression across two agent runners from trace data.

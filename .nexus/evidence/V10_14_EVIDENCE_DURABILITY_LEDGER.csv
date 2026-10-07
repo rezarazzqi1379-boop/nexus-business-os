@@ -1,0 +1,5 @@
+claim_id,claim,locator,retrieved_at,observation_key,classification,independent_source_count,supersession_state
+ECU-42-001,"Voestalpine Ecuador imported 42CrMo4 QT 1.7225 forged pre-machined round Ø400 mm ~6m 1978kg on 2026-01-29","Trademo company profile public row","2026-10-07","buyer|2026-01-29|722840|1978|42CrMo4|400mm|~6m","FACT_PUBLIC_OBSERVATION",1,"ACTIVE_ONE_OBSERVED"
+ECU-42-SUP-001,"DEW Stahltrade was supplier for ECU-42-001","prior-cycle claim; not reproduced in current public refresh","2026-10-07","ECU-42-001|supplier","CLAIM",0,"CLAIM_REVALIDATION_HOLD"
+ECU-42-REC-001,"42CrMo4 recurrence at Voestalpine Ecuador","duplicate public renderings share same observation fingerprint","2026-10-07","buyer|42CrMo4|recurrence","UNKNOWN",0,"NOT_PROVEN"
+EICO-STOCK-001,"EICO ready stock snapshot is currently available","user sheet lacks visible observation date","2026-10-07","EICO|stock|snapshot","CLAIM",0,"RECONFIRM_REQUIRED"

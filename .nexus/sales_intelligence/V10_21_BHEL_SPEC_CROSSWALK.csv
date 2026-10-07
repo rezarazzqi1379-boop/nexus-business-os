@@ -1,0 +1,6 @@
+candidate,requirement,verified_public_basis,eico_evidence,state,decision
+BHEL-E5563018,AA10119 Rev15,"IS 2062 E250-BR with impact test OR EN10025-2 S275JR","historical EICO capability/stock includes S355J2G3/St52, not source-backed S275JR/E250-BR equivalence",SPEC_MISMATCH_OR_UNVERIFIED,"DO_NOT_EQUIVALENCE_PROMOTE"
+BHEL-E5563018,Test certificate,"melt no; size/quantity; batch/HT; chemistry; mechanical tests; NDT; supplier ID; TC authority","exact EICO certificate package for this BHEL spec not verified",UNVERIFIED,"REQUIRE_DOCUMENTARY_ACCEPTANCE"
+BHEL-E5563018,Condition,"current tender says Normalized; AA10119 bars normally hot rolled, PO may add requirements","EICO exact normalized supply to controlling BHEL requirement not verified",ENGINEERING_REVIEW,"VERIFY_PROCESS_ROUTE"
+BHEL-E5563018,UT,"current tender AA0850118 Category II","generic/other UT capability does not prove Category II acceptance",UNVERIFIED,"REQUIRE_EXACT_NDT_CROSSWALK"
+BHEL-E5563018,Geometry,"Ø200; max 3.6m","EICO capability 120-1600mm; up to 10m proportional to piece weight",CAPABILITY_MATCH_ONLY,"NOT_STOCK_OR_TECHNICAL_FIT"

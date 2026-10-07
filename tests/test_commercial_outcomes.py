@@ -1,5 +1,5 @@
 from commercial_genome import GenomeFeature,CommercialGenome
-from commercial_outcomes import outcome_summary
+from commercial_outcomes import outcome_summary,benchmark_interpretation
 def feat(d,v): return GenomeFeature(d,v,(f"e:{d}:{v}",),"2026-10-05")
 def g(i,outcome,refs=()):
  return CommercialGenome(i,(feat("application","gear"),feat("product","20MnCr5"),feat("market","Turkey")),outcome,refs)

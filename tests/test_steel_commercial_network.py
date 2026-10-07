@@ -9,7 +9,7 @@ def test_unknown_authority_not_verified_neighbor():
 def test_contradicted_edge_not_verified():
  assert verified_neighbors(add_edge((),e(contradicted=True)),"C")==()
 def test_relationship_path_requires_more_than_demand():
- g=add_edge((),e()); assert not relationship_path_ready(g)
+ g=add_edge((),e()); assert not relationship_path_ready(g,"C")
  g=add_edge(g,e(edge_id="E2",target_node="S",relation="HAS_INCUMBENT",target_type=NodeType.SUPPLIER)); assert relationship_path_ready(g)
 def test_cross_project_graph_rejected():
  g=add_edge((),e())

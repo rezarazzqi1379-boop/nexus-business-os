@@ -2,6 +2,7 @@
 
 PROJECT=NEXUS-BUSINESS-OS
 STAGE=SOURCE_ROI
+STAGE_CONTRACT=SANDBOX_ONLY; measure unique qualified evidence/cost/latency
 BLOCKER=external capability candidates are discovered but not yet ablated against canonical NEXUS mechanisms
 ALLOWED_ADAPTERS=GitHub, Search
 EVIDENCE_AUTHORITY=Source Registry v1.8 + Master Context v2.1 + tested repository state

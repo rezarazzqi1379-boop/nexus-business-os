@@ -1,0 +1,3 @@
+entity,claim,state,independent_shipment_specific_sources,decision
+DEW STAHLTRADE,"supplier of Jan-29-2026 Ecuador 42CrMo4 shipment",CLAIM_REVALIDATION_HOLD,0,"do not use as verified supplier"
+Aggregate supplier tables,"supplier candidates around Ecuador buyer",DISCOVERY_ONLY,0,"never bind to shipment without shipment-specific evidence"

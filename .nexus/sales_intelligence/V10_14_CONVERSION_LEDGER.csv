@@ -1,0 +1,8 @@
+layer,state,evidence_state,blocker
+buyer,VERIFIED_SINGLE_OBSERVATION,REPRODUCIBLE,"none for identity/observation"
+demand_currentness,UNKNOWN,NOT_REPRODUCED,"one import does not prove open/current demand"
+geometry,OBSERVED,REPRODUCIBLE,"Ø400 x ~6m observation only"
+technical_fit,PARTIAL,INCOMPLETE,"full standard/HT/chemistry/mechanics/UT-NDT/cert/origin acceptance unresolved"
+current_stock,UNKNOWN,INCOMPLETE,"undated EICO snapshot; fresh auditable confirmation required"
+relationship,UNKNOWN,NO_EVIDENCE_FOUND,"EICO relationship refs 0"
+EVIDENCE_READY,0,FAIL_CLOSED,"all conversion layers not satisfied"

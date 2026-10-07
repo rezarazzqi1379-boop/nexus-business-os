@@ -141,3 +141,35 @@ installer, import browser cookies, enable every channel, or send private project
 data to public retrieval services. Keep existing approval and evidence gates.
 This contract covers agents operating in this repository; it cannot configure
 other installed plugins, Claude web sessions, or Notion agents automatically.
+
+
+## Steel sales intelligence continuity
+
+- For steel sales, export, buyer discovery, Apollo, competitor, customs, or market work, read `.nexus/sales_intelligence/CURRENT_STATE.md` before planning or spending credits.
+- Treat that file as the human-readable checkpoint and `ProjectMemoryStore` / `UnifiedDataHub` as structured durable state; do not rely on chat memory alone.
+- Resume from the recorded next work and unresolved blockers; deduplicate companies and evidence before new discovery.
+- Use `steel_sales_intelligence.evaluate_lead` as the minimum fail-closed spend/outreach gate. It supplements, never weakens, the repository-wide approval rules.
+- Public sales/agent repositories remain `EXPERIMENT_ONLY` until license, security, credentials, network behavior, tests, isolation and rollback are reviewed. Never auto-install them.
+- Separate technical/commercial attractiveness from legal/compliance clearance. Russia and Belarus leads require the additional compliance gate recorded in the steel-sales state.
+- Update the steel-sales state after a material milestone so ChatGPT, Claude Code and later sessions can recover where the work stopped.
+
+
+## NEXUS Operating Contract v2 bootstrap
+- Read `.nexus/OPERATING_CONTRACT_V2.md` before substantial autonomous NEXUS work.
+- Treat it as the repository-wide operating contract for evidence, continuity, self-improvement, red-team, cost control and approval gates.
+- If this file, CURRENT_STATE, memory or a tool result conflicts, do not silently choose: resolve by source authority/freshness, record the conflict, and preserve superseded history.
+- An autonomous cycle must continue safe independent lanes when a consequential action is approval-gated.
+
+
+## NEXUS Operating Contract v4 bootstrap
+- Read `.nexus/OPERATING_CONTRACT_V4.md`, `.nexus/OPERATING_CONTRACT_V3.md` (historical foundation), `.nexus/operating_policy_v3.json`, and `.nexus/V3_CAPABILITY_ROADMAP.md` before substantial autonomous NEXUS work.
+- v4 extends v3 for new discovery cycles; retain v3 and v2 as historical evidence. Do not delete or silently rewrite superseded contracts.
+- Operate Commercial, Intelligence, and Evolution engines over shared evidence. Opportunity Graph, Demand Signals, Reverse Buyer Discovery, Commercial Genome, and NEXUS Scientist are v3 core concepts.
+- Machine-readable policy is authoritative for enumerated gates/stages; prose contract supplies semantics. Conflicts must be recorded and resolved, not guessed.
+
+
+## NEXUS v6 + Red Team Max v6 bootstrap
+- Read `.nexus/OPERATING_CONTRACT_V7.md` and `.nexus/RED_TEAM_MAX_V6.md` before substantial commercial discovery/evolution work.
+- v6 extends v4/v3; Red Team Max v4 is the adversarial companion. Historical contracts remain evidence.
+- Every live commercial case must check mandatory market layers and run adversarial attacks on role, product fit, source independence, freshness, trade inference, price comparability, coverage and evidence binding.
+- A red-team finding changes production behavior only after a reproducible regression/evaluation; no test evidence means IMPLEMENTED/EXPERIMENT_ONLY, not TESTED.

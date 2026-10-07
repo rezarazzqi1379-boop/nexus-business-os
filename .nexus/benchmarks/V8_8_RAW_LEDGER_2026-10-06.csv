@@ -1,0 +1,10 @@
+strategy,query_id,search_intent,evidence_class,entity,economic_role,grade,signal,accepted,rejection_reason
+A,A1,"Russia Belarus 40HN2MA 38HN3MFA 42CrMo4 companies","OFFICIAL_COMPANY","Mosoboronsnab","stockist/supplier","40HN2MA;38HN3MFA","catalogue/current stock claim",true,
+A,A2,"Belarus alloy steel companies","INDEPENDENT_SOURCE","Belenergomash-BZEM","manufacturer","40HN2MA;38HN3MFA","historical production capability",true,
+A,A3,"Russia alloy steel companies","OFFICIAL_COMPANY","VMZKO","producer/stock","40HN2MA","current free-sale stock with dimensions/spec",true,
+B,B1,"40HN2MA supplier buyer processor chain","COMMERCIAL_AGGREGATOR","Cometal","commercial stock/order node","40HN2MA;38HN3MFA","ingot/blume listings",true,
+B,B2,"38HN3MFA producer stockist processor end user","OFFICIAL_COMPANY","RLP Plant","forging manufacturer","38HN3MFA;40HN2MA","forging capability",true,
+B,B3,"42CrMo4 Belarus Russia importer stockist processor","OFFICIAL_COMPANY","Sino East Steel","exporter","42CrMo4","EAEU export offer",true,
+C,C1,"PAO ZVEZDA 40HN2MA 5.04 procurement award supplier","SEARCH_SNIPPET","","buyer procurement","40HN2MA","no award evidence surfaced",false,"award/supplier unresolved"
+C,C2,"AO CKBM 38HN3MFA procurement award winner supplier","SEARCH_SNIPPET","","buyer procurement","38HN3MFA","no award evidence surfaced",false,"award/supplier unresolved"
+C,C3,"Afrikantov OKBM 38HN3MFA procurement award winner supplier","SEARCH_SNIPPET","","buyer procurement","38HN3MFA","no award evidence surfaced",false,"award/supplier unresolved"

@@ -1,0 +1,6 @@
+seed,hop,entity,role,evidence,commercial_use,state
+EICO,1,Gunes Metalurji ve Kimya Ticaret Ltd,TRADER_SERVICE_CENTER,"EICO -> Gunes forged alloy steel; Gunes official forged/rolled steel distributor","Buyer DNA + merchant hub",VERIFIED_HISTORICAL_RELATIONSHIP
+Gunes,2,South Rouhina Steel Complex,SUPPLIER_TO_GUNES,"public trade data names Gunes buyer of South Rouhina hot rolled round rod","Gunes sourcing graph / competitor route",HISTORICAL_RELATIONSHIP
+Gunes,2,Iran Alloy Steel Co,SUPPLIER_AND_BUYER_NETWORK,"trade record identifies Gunes -> Iran Alloy Steel; source also names Iran Alloy as Gunes partner","merchant network / product adjacency",HISTORICAL_RELATIONSHIP
+Gunes,2,Azinforge Company,SUPPLIER_TO_GUNES,"2023 trade record HS722840 names Gunes buyer","EICO lookalike exporter / forged-bar ecosystem",HISTORICAL_RELATIONSHIP
+EICO,1,Marmara Metal Mamulleri,UPSTREAM_TRADER,"2022 records: ferrochrome and pump supplied to EICO","upstream raw-material / trader graph",VERIFIED_HISTORICAL_RELATIONSHIP

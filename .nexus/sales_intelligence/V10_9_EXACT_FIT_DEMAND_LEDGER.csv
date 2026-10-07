@@ -1,0 +1,6 @@
+buyer,grade,demand_item,diameter_mm,length_m,quantity,observation,status,stock_fit,currentness,evidence_gap
+"Chinese crankshaft-forging procurement (public notice)","42CrMo4","hot-forged round steel for crankshaft",250,UNKNOWN,"quantity masked","2026-09","BUY_NOTICE","NO_MATCH_DIAMETER","CURRENT","buyer legal identity/quantity; EICO snapshot starts 290mm"
+"PGO S.A. / Kuznia Glinik","42CrMo4","planned steel purchases through end-2026",UNKNOWN,UNKNOWN,"~120000 kg planned","2026-08","PROCUREMENT_PLAN","SIZE_UNKNOWN","RECENT","exact size/form/condition for planned 42CrMo4"
+"Zrem-Bud Sp. z o.o.","C45","drawn steel bar",35,2,"8 pcs","2026-09-30","TENDER","NO_MATCH_DIAMETER","CURRENT","snapshot C45 starts 290mm"
+"Ukraine public procurement","C45 / steel 45","steel bar/hexagon",27,6,"0.30 t hexagon item","2026-09-21","TENDER","NO_MATCH_DIAMETER","CURRENT","snapshot C45 starts 290mm; section also differs"
+"Jastrzebskie Zaklady Remontowe","S355J2G3","channel 160",UNKNOWN,6,UNKNOWN,"2026-05-05","RFQ","NO_MATCH_FORM","HISTORICAL","snapshot is large forged/round-capability context; channel is different form"

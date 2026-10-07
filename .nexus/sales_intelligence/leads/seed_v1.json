@@ -1,0 +1,30 @@
+[
+  {
+    "lead_id":"TR-MODULSAN-001","country":"Turkey","company":"Modulsan Makina","role":"END_USER",
+    "applications":["industrial gears","gear manufacturing"],"grade_candidates":["8620","16MnCr5/20MnCr5 family"],
+    "evidence":[{"type":"OFFICIAL_COMPANY","ref":"https://www.modulsan.com/"}],
+    "status":"EVIDENCE_REFRESH_REQUIRED","tier":"B","apollo_resolution":"MATCHED_PREVIOUSLY",
+    "next_action":"re-verify exact material/application page; dimension-fit; trade evidence"
+  },
+  {
+    "lead_id":"TR-REWELD-001","country":"Turkey","company":"ReWeld","role":"END_USER",
+    "applications":["shafts","rolls","heavy components"],"grade_candidates":["42CrMo4"],
+    "evidence":[{"type":"OFFICIAL_COMPANY","ref":"https://reweld.com.tr/"}],
+    "status":"EVIDENCE_REFRESH_REQUIRED","tier":"B","apollo_resolution":"MATCHED_PREVIOUSLY",
+    "next_action":"re-verify exact forged-blank evidence; dimension-fit; trade evidence"
+  },
+  {
+    "lead_id":"TR-EFOR-001","country":"Turkey","company":"Efor Celik","role":"COMPETITOR",
+    "applications":["forged round steel supply"],"grade_candidates":["42CrMo4","C45","S355","8620","20MnCr5"],
+    "evidence":[{"type":"OFFICIAL_COMPANY","ref":"https://eforcelik.com/"}],
+    "status":"COMPETITOR_BENCHMARK","tier":"B","apollo_resolution":"MATCHED_PREVIOUSLY",
+    "next_action":"refresh grade/range evidence and benchmark channel/pricing/logistics"
+  },
+  {
+    "lead_id":"OM-QAIS-001","country":"Oman","company":"QAIS Contracting & Engineering Services","role":"END_USER",
+    "applications":["machine shop","industrial maintenance"],"grade_candidates":["42CrMo4","C45"],
+    "evidence":[{"type":"OFFICIAL_COMPANY","ref":"https://qaisoman.com/"}],
+    "status":"EVIDENCE_REFRESH_REQUIRED","tier":"C",
+    "next_action":"verify material consumption and component dimensions before Apollo resolution"
+  }
+]

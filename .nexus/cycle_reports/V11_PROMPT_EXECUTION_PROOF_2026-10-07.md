@@ -15,7 +15,7 @@ STOP_CONDITION=missing source evidence, red CI, protected credential/runtime act
 MEASURE=unique mechanism gain, evidence quality, regression gain, latency/cost/operational risk
 RECORD_TARGET=.nexus/registries/EXTERNAL_CAPABILITY_CANDIDATES_V1.md + versioned tests/cycle report
 
-## Execution result
+Recover Source Registry/canonical master/live dynamic state first. Treat adapters and external GitHub systems as non-authoritative; stop at protected gates.\n\n## Execution result
 - Browser4: keep as SANDBOX_PATTERN; deterministic extraction hypothesis remains measurable, runtime not promoted.
 - Strands Evals: MERGE_PATTERN; trajectory/tool/failure/chaos concepts are useful but do not justify a second evaluation framework.
 - Opik: HOLD_STUDY until a measured observability/trace attribution gap exists.

@@ -5,6 +5,7 @@ DIMENSIONS=("buyer","need","product","application","market","trade","competitor"
 @dataclass(frozen=True)
 class GenomeFeature:
  dimension:str; value:str; evidence_refs:tuple[str,...]; observed_at:str
+ stale:bool=False; contradicted:bool=False
 def validate_feature(f):
  e=[]
  if f.dimension not in DIMENSIONS:e.append("invalid_dimension")
@@ -24,7 +25,9 @@ def validate_genome(g):
  return tuple(e)
 def _sets(g):
  out={}
- for f in g.features:out.setdefault(f.dimension,set()).add(f.value)
+ for f in g.features:
+  if f.stale or f.contradicted: continue
+  out.setdefault(f.dimension,set()).add(f.value)
  return out
 def similarity(a,b):
  if validate_genome(a) or validate_genome(b):raise ValueError("invalid_genome")

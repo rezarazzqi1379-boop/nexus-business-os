@@ -1,0 +1,4 @@
+candidate,source_date,status,buyer,evidence_type,product,geometry,quantity,grade_state,current_stock_state,route,source
+RINL-GEM-8049767,2026-10-05,OPEN_TO_2026-10-26,"Rashtriya Ispat Nigam Limited / Visakhapatnam Steel Plant",BUY_TENDER,"forged rounds","includes Ø460 x 3200 mm; Ø400 x 3500 mm","79 total units; cited rows 9 and 10",UNRESOLVED_FROM_PUBLIC_EVIDENCE,UNCONFIRMED,"TECHNICAL_SPEC_RESOLUTION","GEM/2026/B/8049767"
+TN-GEM-8093618,2026-09-28,OPEN_TO_2026-10-08,"State Project Implementation Unit, Dept Labour & Employment Tamil Nadu",BUY_TENDER,"Alloy Steel Round Bars (BHEL)",UNRESOLVED,620,UNRESOLVED,UNCONFIRMED,"LOWER_PRIORITY_MISSING_TECH_SPEC","GEM/2026/B/8093618"
+PGO-120T-PLAN,2026-07/08,HISTORICAL_PURCHASE_PLAN,"PGO S.A. / Kuźnia Glinik",PURCHASE_PLAN,"42CrMo4","not resolved for future lots","~120000 kg planned through end-2026",42CrMo4,UNCONFIRMED,"WATCH_FOR_NEXT_EXACT_GEOMETRY_NOTICE","OnePlace RFP 3701190"

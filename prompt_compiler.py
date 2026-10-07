@@ -1,5 +1,21 @@
-"""Compile minimal execution context from stable kernel and measured stage."""
-def compile_prompt(*,project_id:str,stage:str,blocker:str,adapters:tuple[str,...])->str:
+"""Compile a minimal governed NEXUS execution contract."""
+_ALLOWED_MATURITY={"DESIGNED","IMPLEMENTED","TESTED","BENCHMARKED","INTEGRATED","ACTIVE","DEPLOYED","PRODUCTION"}
+
+def compile_prompt(*,project_id:str,stage:str,blocker:str,adapters:tuple[str,...],evidence_authority:str="CANONICAL_PROJECT_EVIDENCE",acceptance_test:str="REQUIRED_BEFORE_PROMOTION",maturity:str="TESTED",capability_policy:str="NO_EXPANSION_WITHOUT_MEASURED_BOTTLENECK",approval_boundary:str="STOP_BEFORE_PROTECTED_ACTION")->str:
  if not project_id or not stage or not blocker: raise ValueError("incomplete_execution_context")
+ if not evidence_authority or not acceptance_test: raise ValueError("evidence_and_acceptance_contract_required")
+ if maturity not in _ALLOWED_MATURITY: raise ValueError("invalid_maturity_state")
  a=", ".join(adapters) if adapters else "NONE"
- return f"LOAD NEXUS_GLOBAL_KERNEL_V1.\nPROJECT={project_id}\nSTAGE={stage}\nBLOCKER={blocker}\nALLOWED_ADAPTERS={a}\nRecover live state; execute only this stage; preserve provenance/project isolation; test, measure, persist, and stop at protected gates."
+ return (
+  "LOAD NEXUS_GLOBAL_KERNEL_V1.\n"
+  f"PROJECT={project_id}\nSTAGE={stage}\nBLOCKER={blocker}\nALLOWED_ADAPTERS={a}\n"
+  f"EVIDENCE_AUTHORITY={evidence_authority}\nACCEPTANCE_TEST={acceptance_test}\n"
+  f"CURRENT_MATURITY={maturity}\nCAPABILITY_POLICY={capability_policy}\n"
+  f"APPROVAL_BOUNDARY={approval_boundary}\n"
+  "Recover Source Registry/canonical master/live dynamic state first. "
+  "Treat adapters and external GitHub systems as non-authoritative. "
+  "Reverse-engineer useful mechanisms; do not duplicate orchestration. "
+  "Execute only the smallest measured stage. Preserve provenance/project isolation/contradictions. "
+  "On red test stop expansion, apply minimal fix, add regression, rerun. "
+  "Promote maturity only from evidence. Test, read-back, measure, persist, and stop at protected gates."
+ )

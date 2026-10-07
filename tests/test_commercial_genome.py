@@ -10,3 +10,9 @@ def test_feature_and_historical_outcome_require_evidence():
  assert "outcome_requires_evidence" in validate_genome(g("W","gear","20MnCr5","WON"))
 def test_comparables_are_ranked_and_need_shared_dimensions():
  assert comparable(g("A","gear","20MnCr5"),[g("C","shaft","42CrMo4"),g("B","gear","20MnCr5")])[0][1].opportunity_id=="B"
+
+
+def test_similarity_excludes_stale_and_contradicted_features():
+ a=CommercialGenome("a",(GenomeFeature("buyer","X",("r",),"2026-10-01",stale=True),GenomeFeature("product","P",("p",),"2026-10-01")))
+ b=CommercialGenome("b",(GenomeFeature("buyer","X",("r2",),"2026-10-01"),GenomeFeature("product","P",("p2",),"2026-10-01")))
+ assert similarity(a,b) < 1.0

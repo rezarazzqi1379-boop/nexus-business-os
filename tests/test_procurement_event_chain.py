@@ -15,9 +15,9 @@ def test_stage_chain_preserves_history_not_latest_snapshot_only():
  h=append_event((),e())
  h=append_event(h,e(event_id="E2",stage=ProcurementStage.TENDER,event_at=datetime(2026,2,1,tzinfo=timezone.utc),supersedes_event_id="E1"))
  assert stage_progression(h,"P")== (ProcurementStage.PLANNING,ProcurementStage.TENDER)
-def test_supplier_change_detected_across_awards_contracts():
- h=append_event((),e(stage=ProcurementStage.AWARD,supplier_id="S1"))
- h=append_event(h,e(event_id="E2",stage=ProcurementStage.CONTRACT,supplier_id="S2"))
+def test_supplier_change_detected_across_verified_awards_contracts():
+ h=append_event((),e(stage=ProcurementStage.AWARD,supplier_id="S1",award_state=AwardState.WINNER_VERIFIED))
+ h=append_event(h,e(event_id="E2",stage=ProcurementStage.CONTRACT,supplier_id="S2",award_state=AwardState.WINNER_VERIFIED))
  assert supplier_change(h,"P")
 def test_process_cannot_cross_project_boundary():
  h=append_event((),e())

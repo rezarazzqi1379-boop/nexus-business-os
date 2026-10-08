@@ -16,3 +16,8 @@ data/nexus_system/capability_status.json
 .claude-flow/logs/
 .claude-flow/sessions/
 node_modules/
+
+# Isolated intelligence experiment runtime and local extraction state
+.venv-intelligence/
+.nexus/intelligence-runtime/
+data/research/intelligence-install-plan.json

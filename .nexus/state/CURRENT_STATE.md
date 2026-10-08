@@ -1,4 +1,18 @@
 # NEXUS CURRENT STATE
+## Codex intelligence sandbox, 2026-10-08
+
+Local draft branch: draft/nexus-intelligence-proof-2026-10-08, based on PR #105.
+Incremental proof code 50a7e51; report 884e2f0. No remote publication or production
+activation. Registry v1.8/Master v2.1 binaries remain unavailable after bounded
+Drive searches; canonical promotion conflict remains unresolved.
+Windows git-health false positive corrected: successful command stderr warnings
+are no longer counted as staged changes. Existing stale-index regression passes.
+See docs/research/NEXUS_INTELLIGENCE_PROOF_2026-10-08.md for tested scope/unknowns.
+Continuation: isolated pinned dlt runtime installed and restart/deduplication,
+scope and lineage probes passed; bounded live PyPI metadata source reaches existing
+graph and UnifiedDataHub. Existing daily heartbeat extended, saved ACTIVE; future
+execution unobserved. See docs/research/NEXUS_INTELLIGENCE_RUNTIME_2026-10-08.md.
+
 Last updated: 2026-09-30 by Claude Code (branch `nexus/consolidated-2026-09-30`, which merges
 `feat/steel-experiments-v0.1`, `feat/steel-reroll-01`, `feat/nexus-v4-audit` and
 `docs/constitution-v4-audit` into one reviewable branch). Sections REROLL, SYSTEM and

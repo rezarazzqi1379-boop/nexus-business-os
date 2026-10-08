@@ -77,6 +77,11 @@ no environment was installed or modified. Bundled runtime lacked pytest.
 Control-plane plan executed with concurrency=1 and safe GitHub source;
 no blocked/approval lanes. Catalog assignment is a planning result, not an active agent.
 An initial unsupported lane was rejected; corrected to existing research lane.
+Broader evals: 1267 passed, 1 failed (existing staged-index resync test in
+evals/test_nexus_checks.py). This is a real local verification limitation;
+no all-suite-green claim is made. Failure occurs outside the changed modules.
+Regression suite also passed from a fresh detached worktree of code commit
+50a7e51: 1090 passed. This report-only follow-up does not change tested code.
 
 ## Next safe step and exact approval
 

@@ -63,6 +63,21 @@ $env:PYTHONUTF8='1'
 
 ## Unknowns and rollback
 
+## Codex skill discovery, 2026-10-08
+
+Installed a scoped discovery skill at
+C:/Users/AvallPc/.codex/skills/nexus-intelligence-runtime/SKILL.md.
+Versioned source: .agents/skills/nexus-intelligence-runtime/SKILL.md.
+Both copies pass skill-creator quick_validate. Installed file SHA256:
+6fed8c8c97cc6a2b995b2d736c13b4d108a1dbf34058b98312c0578799035785.
+The skill identifies the checkout and existing runtime, with automatic discovery
+allowed by default. No model/account settings or unrelated skills were changed.
+New-session automatic selection remains unobserved; installed is not loaded/active.
+Explicit invocation in a future session: $nexus-intelligence-runtime.
+Local runtime probe and pip check passed again after installation.
+
+## Remaining unknowns
+
 Registry v1.8/Master v2.1 binaries remain missing after bounded Drive searches.
 Canonical tuple promotion conflict is preserved. No source-specific commercial
 facts are adopted. Cheap/strong model selection remains a tested policy, not an

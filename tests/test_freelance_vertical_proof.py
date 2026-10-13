@@ -54,3 +54,51 @@ def test_duplicate_events_rejected():
 def test_naive_time_rejected():
     with pytest.raises(ValueError,match="timezone_required"):
         deal_rhythm((DealEvent("opp","a","PROSPECT","2026-10-10T00:00:00","a"),))
+
+from commercial_chain_graph import candidate_edge
+
+def _review():
+    edge = candidate_edge(source_id="provider", relation="OFFERS_SERVICE_TO",
+                          target_id="buyer", evidence_refs=("e1", "e2"),
+                          source_families=("official", "independent"))
+    receipt = dict(decision="APPROVED", project_id="SANDBOX",
+                   source_id="provider", target_id="buyer",
+                   relation="OFFERS_SERVICE_TO",
+                   evidence_digests=("sha256:e1", "sha256:e2"),
+                   reviewer_id="reviewer", receipt_id="receipt",
+                   opportunity_id="opp-1", evidence_digest="sha256:abc",
+                   need_observed_at="2026-10-10T00:00:00Z", need_verified=True)
+    return edge, receipt
+
+def test_trusted_review_promotes_to_human_review_not_outreach():
+    edge, receipt = _review()
+    x = prove_sandbox(packet(), assessment(), opportunity_id="opp-1",
+                      as_of="2026-10-13T00:00:00Z",
+                      trusted_review=receipt, reviewed_edge=edge)
+    assert x["status"] == "HUMAN_REVIEW"
+    assert x["external_action_authorized"] is False
+    assert x["deal_stage"] == "PROSPECT"
+
+def test_review_for_different_opportunity_fails_closed():
+    edge, receipt = _review()
+    receipt["opportunity_id"] = "opp-other"
+    x = prove_sandbox(packet(), assessment(), opportunity_id="opp-1",
+                      as_of="2026-10-13T00:00:00Z",
+                      trusted_review=receipt, reviewed_edge=edge)
+    assert x["status"] == "RESEARCH_ONLY"
+
+def test_review_for_different_need_digest_fails_closed():
+    edge, receipt = _review()
+    receipt["evidence_digest"] = "sha256:other"
+    x = prove_sandbox(packet(), assessment(), opportunity_id="opp-1",
+                      as_of="2026-10-13T00:00:00Z",
+                      trusted_review=receipt, reviewed_edge=edge)
+    assert x["status"] == "RESEARCH_ONLY"
+
+def test_review_without_verified_need_fails_closed():
+    edge, receipt = _review()
+    receipt["need_verified"] = False
+    x = prove_sandbox(packet(), assessment(), opportunity_id="opp-1",
+                      as_of="2026-10-13T00:00:00Z",
+                      trusted_review=receipt, reviewed_edge=edge)
+    assert x["status"] == "RESEARCH_ONLY"

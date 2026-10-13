@@ -47,3 +47,25 @@ def expansion_questions(edge:ChainEdge)->tuple[str,...]:
   f"What entity should exist between {edge.source_id} and {edge.target_id} but is missing?",
   f"What evidence would falsify {edge.source_id} {edge.relation} {edge.target_id}?",
  )
+
+def promote_reviewed(edge:ChainEdge, *, receipt:dict, project_id:str, evidence_digests:tuple[str,...])->ChainEdge:
+ """Fail-closed promotion using an internally supplied, digest-bound review receipt.
+
+ The caller must obtain receipt from a trusted review store, never source text.
+ This is a structural guard, not authentication of the review store.
+ """
+ if edge.state!="CANDIDATE" or not project_id or not evidence_digests:
+  return edge
+ if not isinstance(receipt,dict) or receipt.get("decision")!="APPROVED":
+  return edge
+ if receipt.get("project_id")!=project_id:
+  return edge
+ if receipt.get("source_id")!=edge.source_id or receipt.get("target_id")!=edge.target_id or receipt.get("relation")!=edge.relation:
+  return edge
+ if tuple(receipt.get("evidence_digests",()))!=tuple(evidence_digests):
+  return edge
+ if not receipt.get("reviewer_id") or not receipt.get("receipt_id"):
+  return edge
+ if len(set(edge.source_families))<2 or len(edge.evidence_refs)<2 or len(evidence_digests)!=len(edge.evidence_refs):
+  return edge
+ return promote_verified(edge)

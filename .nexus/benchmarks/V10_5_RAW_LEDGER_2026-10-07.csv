@@ -1,0 +1,10 @@
+strategy,query_id,target,result_class,relationship_or_current_demand,information_gain,false_positive_prevented,notes
+MERCHANT_HUB,A1,Gunes downstream customer,NO_NAMED_CUSTOMER,0,MEDIUM,1,"official pages expose sectors/products, not named downstream buyers"
+MERCHANT_HUB,A2,Gunes trade network,RELATIONSHIP_NETWORK,1,HIGH,1,"public trade profile exposes bidirectional Iran producer relationships; downstream customer still unresolved"
+MERCHANT_HUB,A3,merchant hub clone,CANDIDATE_HUBS,0,MEDIUM,1,"Turkish alloy/steel service-center candidates surfaced; no promotion without shipment relationship"
+APPLICATION_FIRST,B1,Iran gear shaft alloy steel,IRAN_MANUFACTURER_SIGNAL,0,HIGH,1,"Iranian industrial gear manufacturer surfaced; material-demand relationship not yet bound"
+APPLICATION_FIRST,B2,Iran mining crusher shaft forging,IRAN_MANUFACTURER_SIGNAL,0,MEDIUM,1,"Iran mining/heavy-equipment ecosystem surfaced; exact forged/alloy demand unresolved"
+APPLICATION_FIRST,B3,Iran steel mill roll shaft MRO,IRAN_SERVICE_SIGNAL,0,MEDIUM,1,"Iran steel-industry repair/manufacturing signal; current procurement unresolved"
+PROCUREMENT_FIRST,C1,Iran alloy steel shaft tender,NO_QUALIFYING_RESULT,0,LOW,1,"no direct current procurement evidence surfaced"
+PROCUREMENT_FIRST,C2,Iran forging tender alloy steel,NO_QUALIFYING_RESULT,0,LOW,1,"no direct current procurement evidence surfaced"
+PROCUREMENT_FIRST,C3,Iran steel mill roll shaft procurement,NO_QUALIFYING_RESULT,0,LOW,1,"no direct current procurement evidence surfaced"

@@ -1,0 +1,6 @@
+claim,previous_state,current_state,reason
+"Jan-29-2026 Ecuador 42CrMo4 Ø400 x ~6m 1978kg buyer observation","VERIFIED_OBSERVATION","VERIFIED_SINGLE_OBSERVATION","fresh public profile reproduces buyer/date/product/weight; duplicate rows deduplicated"
+"42CrMo4 recurrence at Ecuador buyer","POSSIBLE_RECURRENCE","NOT_PROVEN","visible repeated rows are duplicate representations of same shipment"
+"DEW STAHLTRADE supplier of Jan-29 shipment","SHIPMENT_SUPPLIER_BOUND","CLAIM_REVALIDATION_HOLD","current live public refresh did not reproduce shipment-specific supplier evidence"
+"EICO relationship to Ecuador buyer","UNKNOWN","UNKNOWN","no relationship-specific evidence"
+"EICO current 42CrMo4 stock","UNKNOWN","UNKNOWN","undated snapshot fails fresh-stock evidence contract"

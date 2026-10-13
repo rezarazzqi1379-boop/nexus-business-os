@@ -1,0 +1,9 @@
+grade,diameter_mm,length_m,approx_tonnage,source_state,currentness,notes
+20MnCrS5,280-500,3-10,700,USER_DOCUMENT_SNAPSHOT,UNKNOWN,"ready-stock sheet; snapshot date not visible"
+42CrMo4,290-760,2-7,80,USER_DOCUMENT_SNAPSHOT,UNKNOWN,"ready-stock sheet; snapshot date not visible"
+8620,350-450,3-7,140,USER_DOCUMENT_SNAPSHOT,UNKNOWN,"ready-stock sheet; snapshot date not visible"
+C15,300-450,3-8,1141,USER_DOCUMENT_SNAPSHOT,UNKNOWN,"ready-stock sheet; snapshot date not visible"
+C45,290-980,2-8,156,USER_DOCUMENT_SNAPSHOT,UNKNOWN,"ready-stock sheet; snapshot date not visible"
+S355J2G3,300-500,3-7,419,USER_DOCUMENT_SNAPSHOT,UNKNOWN,"ready-stock sheet; snapshot date not visible"
+St52,300-500,3-8,64,USER_DOCUMENT_SNAPSHOT,UNKNOWN,"ready-stock sheet; snapshot date not visible"
+CK Series,100-980,2-10,1100,USER_DOCUMENT_SNAPSHOT,UNKNOWN,"ready-stock sheet; snapshot date not visible"

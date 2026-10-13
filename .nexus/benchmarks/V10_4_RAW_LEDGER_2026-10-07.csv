@@ -1,0 +1,10 @@
+strategy,query_id,result_type,relationship_or_current_demand,information_gain,false_edge_prevented,notes
+MERCHANT_HUB,A1,OFFICIAL_CAPABILITY,0,HIGH,1,"Gunes official distributor/service-center; sectors, products, sizes; no named downstream customer"
+MERCHANT_HUB,A2,OFFICIAL_MARKET_SIGNAL,0,HIGH,1,"Gunes says raw-material supply to automotive/machinery/agriculture/marine/mining/defense/aerospace; sector != named buyer"
+MERCHANT_HUB,A3,RELATIONSHIP_BOUND,1,HIGH,1,"Trade record EICO -> Gunes 42,715kg forged alloy steel bar HS722840900000; also exposes another Iranian supplier relationship"
+APPLICATION_FIRST,B1,SERVICE_PROVIDER_SIGNAL,0,MEDIUM,1,"Iran forging network/service page; applications visible but no relationship-bound buyer demand"
+APPLICATION_FIRST,B2,IRRELEVANT_FOREIGN_RESULT,0,LOW,1,"Foreign gear-shaft manufacturer; rejected for Iran hidden-demand objective"
+APPLICATION_FIRST,B3,IRRELEVANT_FOREIGN_RESULT,0,LOW,1,"Foreign forged gear-shaft supplier; rejected"
+PROCUREMENT_FIRST,C1,NO_QUALIFYING_RESULT,0,LOW,1,"No current Iran procurement evidence surfaced"
+PROCUREMENT_FIRST,C2,NO_QUALIFYING_RESULT,0,LOW,1,"No current Iran procurement evidence surfaced"
+PROCUREMENT_FIRST,C3,NO_QUALIFYING_RESULT,0,LOW,1,"No current Iran procurement evidence surfaced"

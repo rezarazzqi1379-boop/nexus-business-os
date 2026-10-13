@@ -1,0 +1,40 @@
+{
+  "version": "nexus.dlt-probe.v1",
+  "runs": [
+    {
+      "scope": "eb5174e6582a45a8cdc5c5c1",
+      "input_rows": 1,
+      "emitted_rows": 1,
+      "maturity": "SANDBOX",
+      "dlt_version": "1.31.0"
+    },
+    {
+      "scope": "eb5174e6582a45a8cdc5c5c1",
+      "input_rows": 1,
+      "emitted_rows": 0,
+      "maturity": "SANDBOX",
+      "dlt_version": "1.31.0"
+    },
+    {
+      "scope": "eb5174e6582a45a8cdc5c5c1",
+      "input_rows": 1,
+      "emitted_rows": 1,
+      "maturity": "SANDBOX",
+      "dlt_version": "1.31.0"
+    },
+    {
+      "scope": "cdd6c05a10f56d13c4be65d6",
+      "input_rows": 1,
+      "emitted_rows": 1,
+      "maturity": "SANDBOX",
+      "dlt_version": "1.31.0"
+    }
+  ],
+  "negative_checks": [
+    "cross_scope_blocked",
+    "lineage_required",
+    "automatic_promotion_blocked"
+  ],
+  "model_calls": 0,
+  "production": false
+}

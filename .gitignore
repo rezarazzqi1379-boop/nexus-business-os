@@ -9,9 +9,15 @@ dist/
 data/nexus_system/backups/
 data/nexus_system/activation_status.json
 data/nexus_system/portfolio_watch.json
+data/nexus_system/capability_status.json
 
 # --- Ruflo (claude-flow) local secrets and runtime data ---
 .claude-flow/data/
 .claude-flow/logs/
 .claude-flow/sessions/
 node_modules/
+
+# Isolated intelligence experiment runtime and local extraction state
+.venv-intelligence/
+.nexus/intelligence-runtime/
+data/research/intelligence-install-plan.json

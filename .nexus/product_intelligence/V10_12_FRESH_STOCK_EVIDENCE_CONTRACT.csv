@@ -1,0 +1,12 @@
+field,required,state
+observed_at,YES,MISSING
+grade,YES,"SNAPSHOT_ONLY"
+standard,YES,"PARTIAL_SNAPSHOT"
+diameter,YES,"SNAPSHOT_ONLY"
+length,YES,"SNAPSHOT_ONLY"
+tonnage,YES,"SNAPSHOT_ONLY"
+condition,YES,MISSING
+heat_lot,YES,MISSING
+certificate_ref,YES,MISSING
+availability_window,YES,MISSING
+source_owner,YES,MISSING

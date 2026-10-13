@@ -11,7 +11,8 @@ import fnmatch
 import sys
 from pathlib import Path
 
-from . import bilingual_parity, git_health, superseded_values, vendor_hygiene
+from . import (bilingual_parity, boot, git_health, state_freshness, superseded_values,
+               transmission, vendor_hygiene)
 
 
 def _collect(items: list[str]) -> list[Path]:
@@ -32,6 +33,17 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--repo", help="also run git health on this repo")
     ap.add_argument("--exclude", action="append", default=[],
                     help="glob on file name to skip (e.g. superseded archives); repeatable")
+    ap.add_argument("--state", action="store_true",
+                    help="check governed state/kernel file freshness and broken path "
+                         "references (.nexus/state/STATE_GOVERNANCE.json); repo = --repo or .")
+    ap.add_argument("--boot", action="store_true",
+                    help="duplicate-work guard and resume digest (FM-013): worktrees, local-only "
+                         "branches, remote branches ahead of main, open PRs; repo = --repo or .")
+    ap.add_argument("--project", action="append", default=[],
+                    help="with --boot: keyword or PROJECT-ID to look for in unmerged work; repeatable")
+    ap.add_argument("--transmission", action="store_true",
+                    help="check docs/procurement RFI numbers against slab_line_design "
+                         "(nexus_checks/transmission.py); repo = --repo or .")
     a = ap.parse_args(argv)
 
     files = [f for f in _collect(a.paths)
@@ -43,6 +55,12 @@ def main(argv: list[str] | None = None) -> int:
     findings += bilingual_parity.check_paths(vendor)
     if a.repo:
         findings += git_health.check_repo(Path(a.repo))
+    if a.state:
+        findings += state_freshness.check_repo(Path(a.repo or "."))
+    if a.transmission:
+        findings += transmission.check_repo(Path(a.repo or "."))
+    if a.boot:
+        findings += boot.check_repo(Path(a.repo or "."), a.project)
 
     for f in findings:
         print(f.fmt())

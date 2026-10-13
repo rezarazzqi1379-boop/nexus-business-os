@@ -1,0 +1,12 @@
+candidate,field,value,classification,fit_state,reason
+BHEL-E5563018,buyer,"BHEL Bhopal",FACT,VERIFIED,"official BHEL tender"
+BHEL-E5563018,status,"OPEN to 2026-10-10 14:00 local tender time",FACT,VERIFIED,"official BHEL tender"
+BHEL-E5563018,diameter_mm,200,FACT,CAPABILITY_GEOMETRY_MATCH,"inside EICO capability 120-1600mm; capability is not stock"
+BHEL-E5563018,length,"1.2m multiples; +10/-0mm; max 3.6m",FACT,CAPABILITY_GEOMETRY_MATCH,"inside EICO capability max length; exact production feasibility still engineering review"
+BHEL-E5563018,material_spec,"AA19331 Rev11 / IS 2004 Class 2 OR AA10119 Rev15",FACT,ENGINEERING_REVIEW,"no source-backed EICO equivalence established"
+BHEL-E5563018,condition,Normalized,FACT,ENGINEERING_REVIEW,"must verify EICO can supply exact controlling spec/condition"
+BHEL-E5563018,ndt,"UT AA0850118 Category II",FACT,ENGINEERING_REVIEW,"acceptance criteria/spec text not yet resolved"
+BHEL-E5563018,quantity,UNKNOWN,UNKNOWN,UNRESOLVED,"public BOQ text exposes description but not quantity"
+BHEL-E5563018,current_stock,UNKNOWN,UNKNOWN,BLOCKED,"0/8 fresh auditable EICO stock rows"
+BHEL-E5563018,relationship,UNKNOWN,UNKNOWN,UNRESOLVED,"no EICO/BHEL relationship evidence established"
+BHEL-E5563018,overall,"TECHNICAL_REVIEW_READY",MEASUREMENT,NOT_EVIDENCE_READY,"spec/UT/stock/relationship/eligibility unresolved"

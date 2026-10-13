@@ -160,3 +160,18 @@ def test_memory_entry_from_json_round_trip():
     )
     restored = MemoryEntry.from_json(entry.to_json())
     assert restored == entry
+
+
+def test_supersede_is_append_only_and_preserves_original_entry_bytes(tmp_path):
+    store = make_store(tmp_path)
+    old = store.record("decision", "Original immutable decision.", decided_by="claude")
+    before = (store.path / "decision.jsonl").read_bytes()
+    new = store.record("decision", "Replacement decision.", decided_by="reza")
+    after_record = (store.path / "decision.jsonl").read_bytes()
+    assert after_record.startswith(before)
+    store.supersede("decision", old.entry_id, superseded_by=new.entry_id)
+    assert (store.path / "decision.jsonl").read_bytes() == after_record
+    events = (store.path / "supersession_events.jsonl").read_text(encoding="utf-8")
+    assert old.entry_id in events and new.entry_id in events
+    current = store.query(namespace="decision", include_superseded=False)
+    assert [x.entry_id for x in current] == [new.entry_id]

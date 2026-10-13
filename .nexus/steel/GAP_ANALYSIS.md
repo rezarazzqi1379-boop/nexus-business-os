@@ -9,9 +9,9 @@
 | CONTRADICTION_REGISTER | intake → `open_contradictions` | ۶ مورد با evidence class، منبع، و روش حل. |
 | SUPERSESSION_LOG | intake → وضعیت ادعاها + `_reconciliation_note` | هر ۹ ادعای ۱۴ سپتامبر با وضعیت صادقانه نگه داشته شده. |
 | EVIDENCE_INDEX | intake → `evidence_log` + پوشه‌ی evidence | |
-| FAILURE_MEMORY | `registers/ENGINEERING_FAILURE_MEMORY.md` | FM-001 تا FM-004 با تست رگرسیون. |
-| SOURCE_REGISTRY · MILL_BENCHMARK | `registers/PRIOR_ART_AND_BENCHMARK_REGISTER.md` | |
-| MARKET_EVIDENCE · TECHNOLOGY_RADAR | `registers/TECHNOLOGY_RADAR_AND_MARKET_EVIDENCE.md` | |
+| FAILURE_MEMORY | `.nexus/expert_foundry/registers/ENGINEERING_FAILURE_MEMORY.md` | FM-001 تا FM-004 با تست رگرسیون. |
+| SOURCE_REGISTRY · MILL_BENCHMARK | `.nexus/expert_foundry/registers/PRIOR_ART_AND_BENCHMARK_REGISTER.md` | |
+| MARKET_EVIDENCE · TECHNOLOGY_RADAR | `.nexus/expert_foundry/registers/TECHNOLOGY_RADAR_AND_MARKET_EVIDENCE.md` | |
 | AUTHORITY_MAP | `docs/authority/AUTHORITY_STATUS.md` | تاپل حاکم v1.4+v1.1، با تناقض ثبت‌شده و حل‌نشده. |
 | DECISION_REGISTER | `.nexus/memory/decision.jsonl` | موجود، سطح ریپو. |
 | EXPERIMENT_REGISTER | اسناد IC-02 v0.1 و v0.2 | هنوز رجیستر مستقل نشده — نیازش ثابت نشده. |

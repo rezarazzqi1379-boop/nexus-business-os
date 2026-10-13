@@ -1,0 +1,2 @@
+buyer,shipment_date,grade,geometry,weight_kg,supplier,binding_state,evidence_note
+"voestalpine High Performance Metals del Ecuador S.A.",2026-01-29,"42CrMo4 QT / 1.7225","forged pre-machined round Ø400 x ~6m",1978,"DEW STAHLTRADE GMBH & CO KG","SHIPMENT_SUPPLIER_BOUND","independent public trade result binds supplier+buyer+date+weight; product/geometry visible across matching public records"

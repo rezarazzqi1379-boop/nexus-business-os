@@ -12,6 +12,7 @@ from pathlib import Path
 
 from portfolio_watchdog import watch_portfolio
 from projects import PROJECTS
+from system_capability_registry import activation_payload
 from unified_data_environment import BackupManager, DataAsset, UnifiedDataHub
 
 
@@ -69,6 +70,12 @@ def activate(root: Path, *, snapshot_id: str | None = None) -> dict:
                             "data/nexus_system/portfolio_watch.json", "derived-read-model")
     hub.register_asset(watch_asset)
 
+    capabilities = activation_payload()
+    capabilities["generated_at"] = datetime.now(timezone.utc).isoformat()
+    _atomic_json(system_root / "capability_status.json", capabilities)
+    hub.register_asset(DataAsset("capability-status", "NEXUS_CORE", "json",
+                                 "data/nexus_system/capability_status.json", "derived-read-model"))
+
     chosen_snapshot = snapshot_id or datetime.now(timezone.utc).strftime("bootstrap-%Y%m%dT%H%M%SZ")
     snapshot = BackupManager(hub, system_root / "backups").create_snapshot(chosen_snapshot)
     verified = BackupManager.verify_snapshot(snapshot)
@@ -81,6 +88,8 @@ def activate(root: Path, *, snapshot_id: str | None = None) -> dict:
         "registered_assets": registered,
         "portfolio_projects": len(PROJECTS),
         "portfolio_coverage": len(watch.coverage),
+        "capabilities": len(capabilities["capabilities"]),
+        "live_network_capabilities": capabilities["live_network_capabilities"],
         "snapshot": str(snapshot.relative_to(root).as_posix()),
         "snapshot_verified": True,
         "external_actions_enabled": False,
@@ -99,4 +108,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

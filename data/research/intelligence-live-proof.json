@@ -1,0 +1,23 @@
+{
+  "observed_at": "2026-10-08T06:54:43.526012+00:00",
+  "source": "https://pypi.org/pypi/dlt/1.31.0/json",
+  "bytes_read": 22426,
+  "content_sha256": "a9794232919c895883d1eb13cb7f07f97ad71d98887e8f45e4b47ffc4484d3dc",
+  "loading": {
+    "scope": "a5c364ec9b35e54088540905",
+    "input_rows": 1,
+    "emitted_rows": 0,
+    "maturity": "SANDBOX",
+    "dlt_version": "1.31.0"
+  },
+  "edge": {
+    "src": "dlt:1.31.0",
+    "dst": "Apache-2.0",
+    "relation": "DECLARES_LICENSE",
+    "source_id": "https://pypi.org/pypi/dlt/1.31.0/json#sha256=a9794232919c895883d1eb13cb7f07f97ad71d98887e8f45e4b47ffc4484d3dc",
+    "state": "HYPOTHESIS"
+  },
+  "model_calls": 0,
+  "queries": 1,
+  "commercial_outcome": "UNPROVEN"
+}

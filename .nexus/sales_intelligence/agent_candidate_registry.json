@@ -1,0 +1,102 @@
+{
+  "schema_version": "nexus.agent-candidate-registry.v1",
+  "promotion_stages": [
+    "DISCOVERED",
+    "LICENSE_CHECKED",
+    "SECURITY_REVIEWED",
+    "PRIVACY_TOS_REVIEWED",
+    "SANDBOXED",
+    "BENCHMARKED",
+    "EXPERIMENT_ONLY",
+    "APPROVED_ADAPTER",
+    "ACTIVE"
+  ],
+  "candidates": [
+    {
+      "repo": "cyanheads/un-comtrade-mcp-server",
+      "capability": "trade_intelligence",
+      "stage": "DISCOVERED",
+      "risk": [
+        "credential handling",
+        "UN redistribution terms"
+      ],
+      "strategy": "local adapter; no public proxy"
+    },
+    {
+      "repo": "openenrich/openenrich",
+      "capability": "enrichment_waterfall",
+      "stage": "DISCOVERED",
+      "risk": [
+        "AGPL",
+        "SMTP/network behavior",
+        "ToS"
+      ],
+      "strategy": "sandbox only before any adoption"
+    },
+    {
+      "repo": "aria-agentworks/sales-intelligence-mcp",
+      "capability": "sales_patterns",
+      "stage": "DISCOVERED",
+      "risk": [
+        "young project",
+        "external providers"
+      ],
+      "strategy": "adapt patterns; do not trust as core"
+    },
+    {
+      "repo": "langchain-ai/langgraph",
+      "capability": "durable_execution",
+      "stage": "DISCOVERED",
+      "risk": [
+        "dependency weight",
+        "framework lock-in"
+      ],
+      "strategy": "benchmark only if native NEXUS memory/orchestration fails requirements"
+    },
+    {
+      "repo": "DaizeDong/self-evolve",
+      "capability": "eval_gated_self_improvement",
+      "stage": "DISCOVERED",
+      "risks": [
+        "young project",
+        "open-domain judge quality",
+        "external pattern not yet sandboxed"
+      ],
+      "strategy": "Benchmark deterministic accept/reject/rollback patterns; do not vendor."
+    },
+    {
+      "repo": "future-agi/future-agi",
+      "capability": "observability_evals_guardrails",
+      "stage": "DISCOVERED",
+      "risks": [
+        "large dependency surface",
+        "telemetry/network review required",
+        "integration complexity"
+      ],
+      "strategy": "Benchmark trace/eval contracts against native NEXUS observability before adoption."
+    },
+    {
+      "repo": "saberapp/skills",
+      "capability": "revenue_signal_skills",
+      "stage": "DISCOVERED",
+      "risks": [
+        "vendor coupling",
+        "external service/privacy/ToS review",
+        "sales patterns may not fit industrial trade"
+      ],
+      "strategy": "Adapt signal/deal-coaching patterns only after license/security/privacy review."
+    },
+    {
+      "repo": "alipouw13/sales-agent-foundation",
+      "capability": "shared_sales_agent_contracts",
+      "stage": "DISCOVERED",
+      "risks": [
+        "pattern-only framework",
+        "quality/activity must be verified",
+        "domain adaptation required"
+      ],
+      "strategy": "Benchmark shared-contract validator pattern; prefer pattern adaptation."
+    }
+  ],
+  "rule": "No candidate may become ACTIVE without recorded license, security, privacy/ToS, sandbox, benchmark and rollback evidence."
+}

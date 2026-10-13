@@ -1,0 +1,6 @@
+entity,entity_type,direction,product_signal,evidence_state,commercial_hypothesis,next_validation
+Gunes Metallurgy and Chemical Trade Limited Company,TRADER/SUPPLIER,TO_EICO,"HS7228; round steel bar 10-80mm; public trade record names EICO",TRADE_DATA_NAMED_RELATIONSHIP,"Upstream trader/supplier node; possible route/origin intelligence","resolve dates, grades, manufacturers/origin and recurrence"
+Sun Metallurgical and Chemistry Trade Limited Company,BUYER_CANDIDATE,FROM_EICO,"listed among EICO export buyers",SECONDARY_TRADE_DATA,"Historical export buyer candidate","bind shipment/product/date"
+Marmara Metal Products Trade Joint Stock Company,BUYER_AND_SUPPLIER_CANDIDATE,BIDIRECTIONAL,"listed as EICO buyer; older import relationship also visible",SECONDARY_TRADE_DATA,"Bidirectional commercial intermediary candidate","separate export buyer shipments from import supplier shipments"
+Kibar Industry Co,BUYER_CANDIDATE,FROM_EICO,"named by one trade-data source as export customer",CONFLICT_PRONE_SECONDARY,"Potential downstream/customer node","identity + shipment-level binding required"
+Azin Forge,FORGE_ADJACENCY,ECOSYSTEM,"forged-parts producer in Esfarayen",PUBLIC_COMPANY_SIGNAL,"Intermediate processor / ecosystem node","verify raw-material grades, sourcing and customer applications"

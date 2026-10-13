@@ -1,0 +1,5 @@
+entity,relationship,demand,technical,currentness,conversion_state,evidence_gap
+Gunes Metalurji,"Iranian producer sourcing network; relationship-bound imports",UNKNOWN,"alloy/forged/rolled steel merchant-service capability","RECENT_PROFILE / shipment dates partly unresolved",RELATIONSHIP_TECHNICAL_ONLY,"named downstream buyer + current buyer-side demand"
+AzinForge,UNKNOWN,UNKNOWN,"official alloy-steel forged drive-shaft slip-yoke application","CURRENT_OFFICIAL_PRODUCT",INSUFFICIENT_BINDING,"raw-material supplier/procurement + demand"
+Jam Steel,NA,"SALE_TENDER 35,000MT alloy billet","alloy billet grade 9403I","2026-08-29 tender",INSUFFICIENT_BINDING,"not buyer demand; excluded from opportunity conversion"
+Iran industrial gear targets,UNKNOWN,UNKNOWN,"gear/shaft manufacturing signals","UNKNOWN",INSUFFICIENT_BINDING,"material procurement + current demand + relationship"

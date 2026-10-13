@@ -197,3 +197,28 @@ Q_p        ×۱٫۰۴۴۷   (تپه‌ی اصطکاک با L/h بالا می‌�
 ### FM-010 · مقایسه با خروجی خودم به‌جای مبنای پروژه — **قاعدهٔ فرایندی**
 - **چه شد:** سه دور بازبینی، RFQ را با نسخه‌های قبلی خودش مقایسه کردند و هیچ‌کدام با Package A مقایسه نکرد. در نتیجه مبنای طراحی، دو توان موتور و duty spectrum از RFQ جا افتاد، و «۲۰۰۰ kW = حداقل بی‌حاشیه» برداشتی نادرست از منبع بود.
 - **قاعده:** هر سند خرید یک جدول «منبع هر عدد» دارد (برگهٔ Dispatch §۴)، و بازبینی باید در برابر آن جدول انجام شود، نه در برابر نسخهٔ قبلی.
+
+### FM-011 · تکیه بر ref محلی کهنه دربارهٔ محتوای یک برنچ remote — **قاعدهٔ فرایندی و گام CI**
+- **چه شد (۲۰۲۶-۰۹-۲۴):** در commit و سند کنترل نوشتم «v0.1 روی ۵ کامیت برنچ governance سوار است». منبع این ادعا `origin/feat/unified-system-governance-v0.1` روی لپ‌تاپ بود که به `8af87eb` اشاره می‌کرد. نسخهٔ واقعی remote فقط `2451722` را داشت. خطا وقتی پیدا شد که یک clone تازه از GitHub گرفتم.
+- **قاعده:** هر ادعا دربارهٔ اینکه «برنچ X روی remote چه دارد» باید از یک `git fetch --prune` تازه یا clone تازه بیاید، و SHA نوک برنچ کنار ادعا ثبت شود.
+- **گام همراه:** همین بازبینی نشان داد که ۱۹ فایل تست pytest در `evals/` هرگز در CI اجرا نمی‌شدند. این شکل دیگری از همین خطر است: «تست داریم» در حالی که آن تست اجرا نمی‌شود. CI اکنون `pytest evals` را اجرا می‌کند.
+
+### FM-012 · آزمایش روی working tree و گزارش آن به‌جای کامیت — **قاعدهٔ فرایندی**
+- **چه شد (۲۰۲۶-۰۹-۲۴):** برای گرفتن خط مبنای تست‌ها `git stash` و بعد `git stash pop` زدم. `pop` بدون `--index` تغییرها را به working tree برگرداند، ولی نه به index. کامیت بعدی فقط تنها فایل staged (یک فایل تست جدید) را گرفت. پیام کامیت ۱۵ فایل را توصیف می‌کرد و عددهای تست (۶۸۲ و ۵۰۱) از working tree آمده بود. PR با CI سبز باز شد، چون CI فقط کد موجود را آزمایش می‌کند و نبودِ تغییر ادعاشده را نمی‌بیند. بازبین مستقل با شمارش فایل‌های باز پیدایش کرد.
+- **قاعده:** (۱) پیش از گزارش، `git show --stat HEAD` را با پیام کامیت مقایسه کن. (۲) عددهای تست را از یک worktree تازهٔ همان SHA بگیر، نه از working tree. (۳) برای کنار گذاشتن موقت تغییرها از stash استفاده نکن؛ یک کامیت WIP یا یک worktree جدا بساز.
+- **درس کلی:** CI سبز یعنی «کدی که هست خراب نیست»، نه «کدی که ادعا شده اینجاست».
+
+### FM-013 · اجرای دوبارهٔ یک مطالعهٔ تمام‌شده، چون برنچ‌های محلی بررسی نشد — **قاعدهٔ فرایندی**
+- **چه شد (۲۰۲۶-۰۹-۲۹):** مطالعهٔ PRJ-STEEL-REROLL-01 روز ۰۹-۲۸ کامل شده بود، روی برنچ محلیِ push‌نشدهٔ `feat/steel-reroll-01`. جلسهٔ بعد بدون نگاه‌کردن به `git worktree list` و برنچ‌های محلی، از روی یک برنچ دیگر شروع کرد. نتیجه: ~۷۸۰ هزار توکن زیرعامل صرف تکرار همان کار شد، تا اینکه Reza دامنه را محدود کرد.
+- **قاعده:** پیش از شروع هر پروژه این سه فرمان اجرا شود: `git worktree list`، `git branch -a --list '*<کلیدواژه>*'` و `git log --all --oneline --grep '<PROJECT-ID>'`. هیچ کاری فقط روی ماشین ابری نمی‌ماند: همان چرخه bundle به لپ‌تاپ برود، و برای push و PR فرمان به مالک داده شود.
+- **درس کلی:** حافظه‌ای که فقط روی یک برنچ push‌نشده است، از نظر جلسهٔ بعدی وجود ندارد.
+
+- **Recurrence (2026-09-30, CASE FM-013-b):** the Constitution v4.0 audit was also done twice on the same day:
+  - once on `feat/nexus-v4-audit` (13:17), which added the manual rule to CLAUDE.md;
+  - once again in another run, on `docs/constitution-v4-audit`.
+
+  The second run's checkout was based on a branch that did not contain the rule, so the rule never reached it.
+  - **Missed signal:** `git worktree list` showed `wtA4 [feat/nexus-v4-audit]`, but nobody ran it.
+  - **Detection method:** `python -m nexus_checks --boot --project <ID>`, now executable (`nexus_checks/boot.py`). It has 4 tests and is required first in CLAUDE.md §2.
+  - **Permanent rule:** push the rule itself to every live branch (consolidation branch `nexus/consolidated-2026-09-30`), and push state-bearing work the same day.
+  - **Limit:** the guard only sees refs present in the current clone. Unpushed work on another machine stays invisible, so pushing is the real fix.

@@ -1,0 +1,6 @@
+entity,signal_type,product_or_application,date_or_freshness,quantity,evidence_state,commercial_interpretation,next_validation
+Gunes Metalurji,CURRENTISH_IMPORT_NETWORK,"HS7228/7225/7208; hot rolled round steel bar","trade profile updated 2026-09-25","sample 23150 kg",RELATIONSHIP_NETWORK,"active-looking multi-supplier Iranian sourcing hub","bind individual 2025/26 shipments and exact legal entity"
+Gunes Metalurji,OFFICIAL_CAPABILITY,"forged/rolled alloy steel; 6-1500mm; service center","site current",,OFFICIAL_SELF_CLAIM,"strong merchant/service-center fit","named downstream customer still unresolved"
+AzinForge,APPLICATION_PRODUCT,"drive shaft slip yoke; alloy steel forging","site current",,OFFICIAL_PRODUCT_EVIDENCE,"automotive/heavy vehicle application adjacency","raw-material supplier and current procurement unresolved"
+ArasRise,IRAN_FORGING_NETWORK,"forged components for mining/oil-gas/machinery/heavy equipment","site current",,SERVICE_NETWORK_SIGNAL,"application-first ecosystem node, not proven buyer","named workshops/factories and procurement relationships"
+Jam Steel,DIRECT_TENDER_TRIGGER,"CC-alloy steel billet grade 9403I","2026-08-29","35000 MT ±10%",CURRENT_TENDER_EVIDENCE,"direct procurement-source pattern validated; export sale, not EICO buyer demand","use direct tender sources for trigger engine; do not treat as buyer"

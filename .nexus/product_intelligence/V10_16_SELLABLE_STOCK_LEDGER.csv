@@ -1,0 +1,9 @@
+grade,historical_diameter_mm,historical_length_m,historical_tonnage,current_stock_state,missing_current_evidence,conversion_state
+20MnCrS5,280-500,3-10,700,UNKNOWN,"observed_at;standard;condition;heat_lot;certificate_ref;availability_window;source_owner",BLOCKED_CURRENT_STOCK
+42CrMo4,290-760,2-7,80,UNKNOWN,"observed_at;standard;condition;heat_lot;certificate_ref;availability_window;source_owner",BLOCKED_CURRENT_STOCK
+8620,350-450,3-7,140,UNKNOWN,"observed_at;standard;condition;heat_lot;certificate_ref;availability_window;source_owner",BLOCKED_CURRENT_STOCK
+C15,300-450,3-8,1141,UNKNOWN,"observed_at;standard;condition;heat_lot;certificate_ref;availability_window;source_owner",BLOCKED_CURRENT_STOCK
+C45,290-980,2-8,156,UNKNOWN,"observed_at;standard;condition;heat_lot;certificate_ref;availability_window;source_owner",BLOCKED_CURRENT_STOCK
+S355J2G3,300-500,3-7,419,UNKNOWN,"observed_at;standard;condition;heat_lot;certificate_ref;availability_window;source_owner",BLOCKED_CURRENT_STOCK
+St52,300-500,3-8,64,UNKNOWN,"observed_at;standard;condition;heat_lot;certificate_ref;availability_window;source_owner",BLOCKED_CURRENT_STOCK
+CK Series,100-980,2-10,1100,UNKNOWN,"observed_at;standard;condition;heat_lot;certificate_ref;availability_window;source_owner",BLOCKED_CURRENT_STOCK

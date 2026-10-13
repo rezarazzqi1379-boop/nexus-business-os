@@ -1,0 +1,12 @@
+field,request
+observed_at,"When was stock physically/system-verified?"
+grade,"Exact grade designation"
+standard,"Applicable EN/DIN/AISI/GOST standard"
+diameter,"Available diameter(s) in mm"
+length,"Available length(s) in m"
+tonnage,"Net available tonnage by size"
+condition,"As-forged/QT/annealed/etc."
+heat_lot,"Heat/lot identifiers"
+certificate_ref,"MTC/3.1 or certificate reference"
+availability_window,"Earliest dispatch/valid-until date"
+source_owner,"Named internal owner/system producing confirmation"

@@ -1,0 +1,8 @@
+date,buyer,grade_or_family,form,quantity,status,recurrence_scope
+2024,PAO ZVEZDA,45Х14Н14В2М,round high-alloy steel,4.4 t,ARCHIVED,SPECIAL_ALLOY_ROUND_STEEL
+2026-05,PAO ZVEZDA,18Х2Н4МА/18Х2Н4ВА/18Х2Н4МА-Ш,alloy structural rolled steel,22.76 t,ARCHIVED,SPECIAL_ALLOY_ROUND_STEEL
+2026-06,PAO ZVEZDA,high-speed steel GOST 19265-73,round,260 t,FAILED_NO_APPLICATIONS,SPECIAL_ALLOY_ROUND_STEEL
+2026-08,PAO ZVEZDA,12ХН3А,alloy structural rolled steel,,CLOSED,SPECIAL_ALLOY_ROUND_STEEL
+2026-08,PAO ZVEZDA,38ХА,alloy structural rolled steel,14.03 t,CLOSED,SPECIAL_ALLOY_ROUND_STEEL
+2026-08,PAO ZVEZDA,40ХН2МА,round rolled steel,5.4 t (conflicted by 5.04 secondary),CLOSED_UNKNOWN,40ХН2МА
+2026-09,PAO ZVEZDA,high-speed steel GOST 19265-73,round,741 kg,OPEN_AT_OBSERVATION,SPECIAL_ALLOY_ROUND_STEEL

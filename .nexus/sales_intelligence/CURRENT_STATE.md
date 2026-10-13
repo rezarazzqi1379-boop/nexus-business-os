@@ -1,0 +1,237 @@
+# NEXUS Steel Sales Intelligence — Current State
+
+Updated: 2026-10-05
+Owner: ASAK TEJARAT FATER
+Execution owner: chatgpt-nexus
+Status: ACTIVE_RESEARCH
+
+## Mission
+Build an evidence-led sales/export engine for Esfarayen-origin forged/alloy steel products. Discover and qualify buyers, channels, competitors, trade flows, decision makers, customs/compliance constraints, and sales opportunities without treating unverified claims as facts.
+
+## Active markets
+Turkey, Iran, Kazakhstan, Russia, Belarus, Tajikistan, Armenia, Oman.
+
+## Product families in scope
+20MnCr5/related case-hardening grades; 42CrMo4/related Q&T grades; 8620; C15; C45/CK series; S355J2G3; St52; other forged/alloy steel only when canonical product evidence supports it.
+Grade equivalence is never assumed. Standard, condition, chemistry/mechanical properties, dimensions and MTC must be checked.
+
+## Pipeline
+live discovery -> company evidence -> material/application evidence -> trade evidence -> product/dimension fit -> competitor/channel classification -> compliance gate -> Apollo free organization resolution -> buyer score -> spend gate -> contact enrichment -> human-approved outreach -> RFQ -> quote -> negotiation -> PO.
+
+## Current evidence-backed operating decisions
+- Apollo is a resolver/enrichment/CRM layer, not the sole discovery engine.
+- Free Apollo organization lookup is preferred before paid enrichment.
+- Paid enrichment requires a spend gate.
+- Russia and Belarus require an additional entity/bank/goods/end-use/route/carrier/payment compliance gate before consequential outreach or transaction work.
+- End users with explicit material/application evidence outrank generic steel traders for buyer qualification.
+- Buyer Fit and Enrichment Spend Confidence are separate scores.
+- No external message, quote, order, payment, signature, deployment, merge, or irreversible action is authorized by this file.
+
+## Apollo validation
+Organization enrichment validated for Naci Uyar Demir Celik and Salda Metal.
+Free organization resolution validated for Erkal Haddecilik, Efor Celik, Hur Celik, Modulsan and ReWeld.
+Generic industry phrases produced false negatives; discover names/domains elsewhere first.
+
+## Known candidate patterns
+Turkey: gear/gearbox users (8620/20MnCr5), shaft/heavy machinery users (42CrMo4/C45), stockists/distributors, heavy forging.
+Oman: machine shops/end users plus material suppliers for oil & gas/industrial maintenance.
+Kazakhstan: mining/heavy machinery/repair/shaft/gear focus.
+Armenia and Tajikistan: qualify with product-specific trade evidence before scale.
+Russia/Belarus: technically relevant markets but compliance-separated from commercial attractiveness.
+
+## Agent/repository adoption policy
+External repositories are evidence/implementation candidates, not trusted dependencies. Review license, maintenance, credentials handling, network behavior, scraping/ToS risk, tests and rollback before adoption. Prefer adapters over copying whole systems.
+
+## Continuity protocol
+At the start of every substantial steel-sales task:
+1. Read this file plus AGENTS.md and project memory.
+2. Recover unresolved blockers and the last completed stage.
+3. Do not re-run paid enrichment or outreach merely because context is missing.
+4. Append durable evidence-backed progress to project memory/UnifiedDataHub where available.
+5. Update this state when a material project decision or milestone changes.
+
+## Next work
+Build country candidate universes; add provider/capability registry for sales/trade; add deterministic buyer-fit/spend/compliance gates; qualify Tier-A companies; evaluate public agent repos in sandbox; connect approved adapters to existing NEXUS control plane; add tests; then prepare outreach packages for explicit approval.
+
+
+## 2026-10-05 QA / agent-discovery checkpoint
+- Draft PR #103 opened against nexus/consolidated-2026-09-30; GitHub now reports mergeable=true.
+- No GitHub Actions workflow/status is currently attached to PR head 2595e3d6fd8b3e01813582fb8821e99bed9604db; do not claim tests passed until a runner executes them.
+- UN Comtrade MCP candidate: cyanheads/un-comtrade-mcp-server. Strong fit for country/HS lookup and bilateral flows. Keep EXPERIMENT_ONLY until local license/credential/runtime review; UN data redistribution restrictions mean local user-key use is preferred over a hosted proxy.
+- OpenEnrich candidate: openenrich/openenrich. Potential low-cost/local enrichment waterfall; AGPL-3.0 and SMTP/network behavior require license/security/ToS review before adoption.
+- sales-intelligence-mcp and LeadPipe MCP are pattern candidates for scoring/CRM adapters, not trusted production dependencies.
+- Provider selection principle: native/official data and existing connected tools first; public repos provide adapters/patterns only after measured sandbox evaluation.
+
+
+## 2026-10-05 autonomous cycle checkpoint
+- PR #103 head d7cdef5 was CI-tested by GitHub Actions run 37283892058: compile, canonical unittest, failure-derived eval suites and pytest regression all succeeded.
+- ProjectMemoryStore contract is now restored at nexus_core/project_memory.py and the incompatible root duplicate was removed.
+- Evidence-aware buyer scoring is implemented and covered by repository tests.
+- Conservative HS candidate engine added: 722840 is only a candidate for alloy-steel bars/rods not further worked than forged; 722830 is only a candidate for other bars/rods not further worked than hot-rolled/hot-drawn/extruded. Grade alone never yields final classification.
+- Country discovery is now application-first: gears/gearboxes -> case-hardening grades such as 20MnCr5/8620; shafts/heavy engineering -> 42CrMo4/C45; every lead still needs company-specific evidence.
+- Merge/production remains gated; Apollo paid enrichment and external outreach remain unspent/unsent.
+
+
+## Operating contract v2 activation
+- .nexus/OPERATING_CONTRACT_V2.md is now the feature-branch operating contract for autonomous NEXUS cycles.
+- AGENTS.md bootstraps substantial autonomous work from that contract.
+- Contract codifies evidence-native scoring, agent promotion funnel, improvement/eval flywheel, anti-stall behavior, durable continuity, cost optimization and human gates.
+- This is IMPLEMENTED on feat/steel-sales-intelligence-v1; ACTIVE/PRODUCTION status requires the normal merge/promotion gate.
+
+
+## 2026-10-05 v2 evidence-quality cycle
+- FACT: Operating Contract v2 head b238230 passed GitHub Actions tests run 37284820844 (#956).
+- IMPLEMENTED after that tested head: steel_evidence_quality.py adds deterministic domain-based lead identity and evidence freshness states FRESH/STALE/UNKNOWN/INVALID_FUTURE, with regression tests.
+- IMPLEMENTED after that tested head: nexus_milestone.py requires evidence refs for DONE/TESTED/IMPROVED machine-readable milestones, with regression tests.
+- VERIFIED EXTERNAL EVIDENCE: UN Comtrade currently documents a free registered tier with up to 500 API calls/day and up to 100,000 records/call; use official Comtrade as the preferred trade-data provider before paid aggregators where coverage is sufficient.
+- VERIFIED EXTERNAL EVIDENCE: EAEU official material lists HS 7228 30 for other alloy-steel bars/rods not further worked than hot-rolled/hot-drawn/extruded and 7228 40 for not further worked than forged. NEXUS still treats these as candidates until product/jurisdiction evidence is complete.
+- NEXT: wait for CI on the new evidence-quality/milestone head, then wire freshness/dedup into country lead validation and create normalized trade-query adapter schema.
+
+
+## RED TEAM MAX checkpoint
+- TESTED FACT: head e1562c0 passed GitHub Actions run 37285002206 (#959).
+- DEFECT FOUND/FIXED: country lead validation accepted evidence without freshness metadata. Validator now requires observed_at and rejects stale/future/unknown dates from supporting Tier-A; regression tests added.
+- ARCHITECTURE DEFECT FOUND: ProjectMemoryStore describes itself as append-first but supersede() rewrites a namespace JSONL file. This preserves logical history in normal operation but is not a true append-only audit log and has weaker crash/concurrency semantics. Do not claim append-only durability until redesigned/tested.
+- NEXT: implement append-only supersession events with backward-compatible query semantics and regression tests; then add normalized trade-query/result records with provenance and source timestamp.
+
+
+## 2026-10-05 NEXUS v3 activation checkpoint
+- IMPLEMENTED: Operating Contract v3, machine-readable operating policy v3, and v3 capability roadmap on feature branch.
+- v3 supersedes v2 for future autonomous cycles; v2 retained as immutable historical contract.
+- VERIFIED FAILURE: GitHub Actions run 37285877122 (#967) failed with 9 ProjectMemory tests because _supersessions() was referenced but missing. This invalidated the prior claim that append-only Memory was tested.
+- FIX IMPLEMENTED: missing append-only supersession helpers added in commit c03f1543; requires new CI before TESTED status.
+- v3 core additions: three-engine architecture, Opportunity Graph, Demand Signal Radar, Reverse Buyer Discovery, Commercial Genome, Deal Room, Lost Deal Autopsy, NEXUS Scientist, experience distillation, held-out eval discipline and cost-to-accepted-outcome.
+- NEXT: require green CI, then implement Opportunity Graph + Demand Signal schemas and machine-validate v3 agent promotion stages.
+
+
+## 2026-10-05 RED TEAM MAX v3
+- CI run #976 was still in progress at bootstrap; no TESTED claim made for the latest Memory/Graph changes.
+- STATE DRIFT FIXED: agent candidate registry now includes PRIVACY_TOS_REVIEWED required by Operating Contract v3.
+- SCHEMA DRIFT FIXED: country lead evidence now declares type/ref/observed_at requirements and claim-only evidence cannot qualify Tier A.
+- FALSE-POSITIVE LOOPHOLE FIXED: steel_country_leads now separates current evidence from current qualifying (non-CLAIM) evidence; validation clock is injectable for deterministic tests.
+- GRAPH HARDENING IMPLEMENTED: FACT/VERIFIED_EVIDENCE graph edges require evidence and fresh observed_at; malformed/undated evidence is rejected.
+- MEMORY FAILURE LESSON: persistence-format regressions require multi-event parse tests; prior CI #970 exposed literal newline serialization. Fix is implemented but remains untested until a green subsequent CI.
+- NEXT: close CI; then implement reverse-buyer discovery contract and persist Opportunity Graph/Demand Signals into UnifiedDataHub with deterministic IDs.
+
+
+## 2026-10-05 NEXUS v3 commercial/evolution cycle
+- FAILED CI EVIDENCE: run #985 preserved the legacy suite at 1266 passed but new tests had 2 failures: Python banker rounding made 86.5 -> 86, and UnifiedDataHub rejected timezone-naive observed_at.
+- FIX IMPLEMENTED: opportunity queue now uses deterministic Decimal ROUND_HALF_UP; v3 evidence adapter normalizes date/datetime input to timezone-aware ISO at the hub boundary.
+- IMPLEMENTED: Commercial Genome baseline with explicit DNA dimensions, evidence-required historical outcomes, deterministic Jaccard feature similarity and comparable-case ranking.
+- IMPLEMENTED: Deal Room contract with evidence-gated advanced stages and mandatory next action for open deals.
+- IMPLEMENTED: NEXUS Scientist experiment contract; no evidence -> reject, no held-out eval -> human review, measured held-out gain with non-increased cost -> PROMOTE_CANDIDATE only, never production deployment.
+- AGENT DISCOVERY: added self-evolve, Future AGI, Saber skills and sales-agent-foundation as DISCOVERED only. No external code integrated; promotion funnel still applies.
+- NEXT: await CI; on green mark these capabilities TESTED, then add Lost Deal Autopsy/Experience Distillation and Agent Health observability.
+
+
+## 2026-10-05 RED TEAM MAX v3 — commercial learning
+- BOOTSTRAP FACT: PR #103 head 00663f6 was mergeable=true; CI #991 was pending, so previous commercial/evolution additions were not promoted to TESTED.
+- BLIND SPOT FIXED: Commercial Genome now rejects unknown outcomes and blank opportunity IDs; evidenced outcome is still mandatory.
+- BLIND SPOT FIXED: NEXUS Scientist rejects out-of-range metrics and negative costs before any promotion recommendation.
+- BLIND SPOT FIXED: LOST Deal Room state requires a loss reason.
+- IMPLEMENTED: lost_deal_autopsy with controlled reason taxonomy; specific loss reasons require evidence. Repeated identical evidenced patterns become LESSON only at >=3 cases; smaller samples remain HYPOTHESIS.
+- OPEN DESIGN ISSUE: v3 evidence adapter currently normalizes date-only observed_at to UTC midnight. This is convenient but can imply precision not present in source evidence. Next evolution should separate observed_date/source_precision from retrieved_at timestamp instead of silently manufacturing precision.
+- NEXT: await CI; implement explicit evidence temporal precision + Agent Health observability; then connect distilled patterns to ProjectMemory only after evidence refs and threshold validation.
+
+
+## 2026-10-05 NEXUS v3 evidence/observability cycle
+- BOOTSTRAP: head 8234dc8; PR #103 mergeable=true; CI #995 pending. No premature TESTED promotion.
+- IMPLEMENTED: EvidenceTime separates source observed_value + temporal precision from timezone-aware retrieved_at; avoids manufacturing source precision.
+- IMPLEMENTED: AgentTrace + deterministic Agent Health Score covering success, evidence use, silent failure and retry penalty; invalid negative cost/latency/retry traces fail closed.
+- IMPLEMENTED: Experience Distillation memory gate. Promoted knowledge requires evidence and >=3 cases; single-case observations may persist only as HYPOTHESIS.
+- IMPLEMENTED: Commercial Genome historical outcome aggregation ignores UNKNOWN/unevidenced outcomes and reports deterministic comparable-case counts/outcome distribution.
+- NEXT: CI closure; integrate EvidenceTime into v3 hub adapter without breaking existing source dates; then wire eligible distilled knowledge into append-only ProjectMemory and add cost-to-accepted-outcome metrics.
+
+
+## 2026-10-05 NEXUS v3 memory/cost cycle
+- BOOTSTRAP: head 34fafe1, PR #103 mergeable=true, CI #999 in_progress; prior additions remain unpromoted until CI completes.
+- STATE DRIFT FIXED: ProjectMemoryStore now has a distinct hypothesis namespace. Weak inference no longer needs to masquerade as context/lesson.
+- MEMORY INTEGRATION IMPLEMENTED: gated DistilledKnowledge persists HYPOTHESIS separately from LESSON; ineligible promoted knowledge is rejected before append.
+- MEMORY QUERY CLEANUP: removed premature superseded filter; supersession events are materialized before active-only filtering.
+- IMPLEMENTED: Cost-to-Accepted-Outcome metrics for qualified lead, verified decision maker, RFQ, accepted opportunity and order. Zero outcomes return UNKNOWN/None rather than fake zero cost.
+- NEXT: close CI; add evidence temporal precision to hub observations without mutating source dates; provider/agent health comparison and country digital-twin baseline.
+
+
+## 2026-10-05 RED TEAM MAX v3 — trade/spend certainty
+- BOOTSTRAP: head 3745a8a, PR #103 mergeable=true, CI #1003 in_progress; no TESTED promotion yet.
+- FALSE CERTAINTY FIXED: TradeResult now carries explicit source_type. UnifiedDataHub confidence is no longer hardcoded 1.0: official customs > official government > trade dataset > commercial aggregator.
+- CREDIT WASTE GUARDRAIL HARDENED: Apollo Spend Gate validates buyer_fit 0..100 and requires evidence refs for current evidence, free-resolution attempt and expected commercial value. Boolean assertions alone cannot make a paid enrichment eligible.
+- IMPORTANT: eligible remains distinct from authorized; this change does not spend Apollo credits.
+- REGRESSION TESTS added for commercial-aggregator confidence and evidence-free Apollo spend eligibility.
+- NEXT: close CI; migrate older trade-result tests/callers if constructor compatibility breaks; then add provider health/cost comparison and Market Digital Twin baseline.
+
+
+## 2026-10-05 whole-project backlog / RED TEAM cycle
+- CI #1007 FAILED only in pytest regression: legacy Apollo spend test still expected boolean-only eligibility after the new evidence-ref guardrail. Canonical unittest, evals (1266 passed) and NEXUS checks passed. Legacy regression updated to require evidence/current-free-resolution/value refs; no guardrail rollback.
+- Opportunity Graph was discovered already implemented (not missing). Added regression coverage that company→material FACT requires evidence and stale evidence cannot remain verified; HYPOTHESIS remains non-asserted.
+- Market Digital Twin baseline IMPLEMENTED: country ranking is evidence-gated, rejects invalid 0..1 factors, and returns UNKNOWN/None when evidence or sufficient dimensions are missing instead of fabricating a ranking.
+- Historical backlog reconciled: prior Apollo 'permanently blocked' state is SUPERSEDED for connector availability only; current policy still treats Apollo as resolver/enrichment and paid credit as human-gated. Older vertical blockers (Hydrotester, Can Forming, KCl) remain separate projects and must not contaminate Steel Sales evidence.
+- PR #103 remains Draft and unmerged. Merge/production/external send/paid credit remain human gates.
+- NEXT: close CI on current head; then provider/agent health-cost benchmark, country-twin evidence population, exact-source refresh for seed leads, and integration of accepted Opportunity outcomes into Genome/Distillation.
+
+
+## 2026-10-05 NEXUS v4 Discovery Fabric implementation
+- CI #1011 diagnosed: 1266 evals passed and 612/613 regression tests passed; sole failure was the new Opportunity Graph test passing a string instead of datetime.date into an intentionally typed test seam. Test fixed without weakening freshness guardrails.
+- IMPLEMENTED: .nexus/OPERATING_CONTRACT_V4.md extends v3 with measured discovery strategy, coverage, contradiction, ablation, failure-autopsy and Discovery Scientist contracts. AGENTS.md now bootstraps v4 first while retaining v3 as historical foundation.
+- IMPLEMENTED: Discovery Method Registry measures precision, recall proxy, cost-per-accepted and baseline-vs-candidate promotion. Search volume alone cannot promote a method.
+- IMPLEMENTED: Discovery Coverage Map distinguishes NOT_CHECKED from NO_EVIDENCE and exposes blind cells.
+- IMPLEMENTED: Contradiction Engine keeps supporting, negative, contradictory, stale/unavailable/no-evidence semantics distinct.
+- IMPLEMENTED: Discovery Failure taxonomy converts evidenced misses into structured regression candidates.
+- REGRESSION TESTS added for outcome economics, unsearched cells, contradiction priority and evidence-backed failure labels.
+- STATUS: current v4 code is IMPLEMENTED, not TESTED until CI on the current head succeeds. No merge/deploy/paid credit/external send.
+- NEXT: CI closure; then Discovery Strategy Generator + source/provider benchmark records + populate evidence-backed coverage cells for Turkey/Iran/Kazakhstan/Oman before expanding sensitive markets.
+
+
+## 2026-10-05 NEXUS v4 evolution/economics continuation
+- BOOTSTRAP: head 0a4235f, PR #103 draft+mergeable; CI #1020 was in_progress at reconciliation. No TESTED promotion before completion.
+- IMPLEMENTED: AgentEconomics measures acceptance/failure and cost-per-accepted across token/API/credit cost; zero accepted outputs produce UNKNOWN cost rather than fake zero.
+- IMPLEMENTED: Capability Ablation compares baseline vs candidate under a configurable comparable-budget envelope and blocks promotion on unfair budget comparisons.
+- IMPLEMENTED: Query Evolution baseline generates multilingual industrial query candidates for application-first discovery; generated queries are explicitly CANDIDATE, never Evidence.
+- REGRESSION TESTS added for accepted-output denominator, zero-outcome economics, unfair-budget ablation, and query/evidence separation.
+- NEXT: close CI on current head; build source/provider benchmark record tied to Evidence refs; populate first real coverage cells from refreshed official evidence; extend multilingual industrial ontology only from validated terminology.
+
+
+## 2026-10-05 RED TEAM MAX — v4 continuity
+- BOOTSTRAP VERIFIED: PR #103 head 998b396 was draft+mergeable and CI #1023 completed SUCCESS. Therefore v4 Discovery Fabric plus AgentEconomics/CapabilityAblation/QueryEvolution through that head are TESTED by GitHub CI.
+- RED TEAM FIX: repeated lost-deal observations no longer auto-promote to LESSON at a count threshold. >=3 unique opportunities with complete context and distinct evidence can form FAILURE_PATTERN; LESSON additionally requires replicated eval evidence.
+- RED TEAM FIX: duplicate records for the same opportunity cannot inflate pattern case count; contextless repetition remains HYPOTHESIS.
+- REGRESSION TESTS updated for duplicate inflation, missing context, FAILURE_PATTERN status and evidence-gated LESSON promotion.
+- STATUS: lost-deal hardening after 998b396 is IMPLEMENTED awaiting CI. No merge/deploy/external send/paid credit.
+- NEXT SAFE ACTION: close CI; harden Commercial Genome feature provenance and Scientist sample/effect semantics before using historical outcomes for recommendations.
+
+
+## 2026-10-05 Commercial Genome + Scientist hardening
+- BOOTSTRAP: PR #103 head fce83d6 was draft+mergeable; CI #1026 was still in_progress at reconciliation, so post-998b lost-deal hardening was not promoted to TESTED yet.
+- IMPLEMENTED: Commercial Genome features are now first-class GenomeFeature records requiring dimension, value, evidence_refs and observed_at. Outcome evidence is separate. Comparable history requires >=2 shared evidenced dimensions by default, reducing sparse-similarity inflation.
+- IMPLEMENTED: NEXUS Scientist experiments now require sample_size, explicit metric direction and minimum practical effect; invalid/zero samples cannot produce promotion candidates. PROMOTE_CANDIDATE remains recommendation, never deployment authority.
+- REGRESSION TESTS migrated to evidence-bound Genome and measured Scientist samples.
+- STATUS: these changes are IMPLEMENTED awaiting CI on current head. No merge/deploy/external send/paid credit.
+- NEXT: CI closure; then temporal evidence precision and source-authority binding, followed by real evidence-backed country coverage/discovery execution.
+
+
+## 2026-10-05 CI failure autopsy + temporal precision
+- CI #1030 on dea431a FAILED only in pytest regression: 1 failed / 624 passed; canonical unittest 682 OK and eval suite 1266 passed. Root cause: tests/test_commercial_outcomes.py still constructed the superseded dict-style CommercialGenome and was not migrated with the new evidence-bound feature schema.
+- FIX IMPLEMENTED: migrated commercial outcome regression fixture to GenomeFeature records with evidence refs + observed date.
+- IMPLEMENTED: evidence_time now preserves source temporal precision (DATE/DATETIME/PERIOD/UNKNOWN) separately from timezone-aware retrieval audit time; DATE is not silently converted to fabricated midnight.
+- REGRESSION TEST added to prove date precision preservation and reject naive DATETIME observations.
+- STATUS: fixes are IMPLEMENTED awaiting CI on current head. Previous failure is classified schema-migration regression, not evidence that canonical/eval suites failed.
+- NEXT: close CI; bind source authority/independence to evidence; then execute refreshed country coverage and buyer discovery with real current evidence.
+
+
+## 2026-10-05 CI #1034 autopsy + triangulation guard
+- CI #1034 on de19a31: canonical unittest/evals remained green (682 unittest OK; 1266 eval passed); pytest had 626 passed / 1 failed.
+- ROOT CAUSE: commercial_outcomes still referenced removed CommercialGenome.evidence_refs after outcome evidence was split into outcome_evidence_refs.
+- FIX IMPLEMENTED: outcome_summary now consumes outcome_evidence_refs only, preventing feature evidence from being mistaken for outcome evidence.
+- IMPLEMENTED: evidence_triangulation.py adds explicit source authority, source-family independence, stale exclusion and contradiction blocking. Mirrored/copied evidence from one family cannot manufacture independent corroboration.
+- REGRESSION TESTS added for copied-source non-independence, independent strong-source verification, and contradiction veto.
+- STATUS: current fixes IMPLEMENTED, awaiting CI; no production/merge/external send/paid Apollo action.
+- NEXT SAFE ACTION: close CI, then wire triangulation into Tier-A/Opportunity Graph promotion and build evidence-backed Discovery Coverage cells.
+
+
+## 2026-10-05 v6 / Red Team Max v5 integration checkpoint
+- TESTED: GitHub Actions #1051 on head 4d7f982 completed SUCCESS; 1266 canonical/eval checks passed and pytest regression reported 646 passed.
+- REGRESSION FOUND/FIXED: v6 discovery_coverage initially replaced the v4 CoverageCell/blind_cells/evidence_state API and broke test collection. Backward-compatible v4 primitives were restored without weakening the v6 mandatory-layer guard.
+- TESTED through #1051: mandatory market-layer coverage guard; NOT_SEARCHED and SOURCE_UNAVAILABLE remain blind; NO_EVIDENCE and NEGATIVE_EVIDENCE remain distinct; manufacturer-only discovery cannot be complete; trader/stockist channel is separated from economic lead role.
+- TESTED through #1051: Historical Decision Autopsy + State Drift primitives preserve prior claims and require explicit supersession when stale/contradicted.
+- CHANGE-SET RISK: PR #103 is intentionally still Draft and has grown large; merge/production remain gated. Future work should prefer small reversible commits and compatibility-preserving integration rather than replacing existing control-plane APIs.
+- NEXT: integrate state-drift/supersession signals with Opportunity Graph and ProjectMemory using adapters; audit Contract↔Code drift and stale CURRENT_STATE assertions; then run full CI again.

@@ -336,3 +336,218 @@ def test_hold_points_are_declared():
     joined = " ".join(HOLD_POINTS)
     for must in ("bearing", "housing", "reversing", "grade", "bay length"):
         assert must in joined
+
+
+# ===========================================================================
+# REGRESSION TESTS FOR THE THREE ERRORS FOUND BY EXTERNAL REVIEW, 2026-09-21
+# ===========================================================================
+from slab_line_design import (
+    stand_stretch_mm, roll_centre_distance_mm, roll_centre_range_mm,
+    optimal_pinion_centre_mm, inertia_at_motor_kgm2, motor_duty,
+    MILL_MODULUS_MN_PER_MM, mass_balance as _mb,
+)
+
+
+def test_stand_stretch_dwarfs_barrel_bending():
+    """ERROR 1. The first issue called this stand 'unusually stiff' on the
+    strength of 0.09 mm barrel bending alone. The whole stand - housing,
+    screws, chocks, bearings, Hertzian flattening - deflects an order of
+    magnitude more, and that is what governs thickness control."""
+    F = 5.12e6
+    bending = barrel_deflection_mm(F)
+    for M in MILL_MODULUS_MN_PER_MM:
+        assert stand_stretch_mm(F, M) > 5 * bending
+    assert stand_stretch_mm(F, 4.0) == pytest.approx(1.28, abs=0.01)
+
+
+def test_mill_modulus_must_be_positive():
+    with pytest.raises(ValueError):
+        stand_stretch_mm(1e6, 0.0)
+
+
+def test_roll_centre_range_includes_the_roughing_passes():
+    """ERROR 2. The first issue tabulated only the finishing gaps (6-30 mm)
+    and concluded the spindle angle stayed below 1 degree. The roughing gaps
+    of 80-125 mm were omitted, and there it reaches 1.6-2 degrees."""
+    s = build_schedule(12.0, "balanced")
+    lo, hi = roll_centre_range_mm(s)
+    assert hi > 700.0, "the first pass must be inside the range"
+    assert spindle_angle_deg(618.0, hi, 1500.0) > 1.5
+
+
+def test_618_is_not_the_optimal_pinion_centre():
+    """The optimum minimises the WORST offset, which puts it near the midpoint
+    of the full range - not near the finishing end of it."""
+    s = build_schedule(12.0, "balanced")
+    r = optimal_pinion_centre_mm(s)
+    assert r["optimal_centre_mm"] > 640.0
+    worst_at_618 = max(spindle_angle_deg(618.0, c, 1500.0)
+                       for c in (r["range_low_mm"], r["range_high_mm"]))
+    worst_at_opt = max(spindle_angle_deg(r["optimal_centre_mm"], c, 1500.0)
+                       for c in (r["range_low_mm"], r["range_high_mm"]))
+    assert worst_at_opt < worst_at_618
+
+
+def test_roll_wear_widens_the_centre_range_and_moves_the_optimum():
+    s = build_schedule(12.0, "balanced")
+    new_only = optimal_pinion_centre_mm(s)
+    with_wear = optimal_pinion_centre_mm(s, diameter_worn_mm=560.0)
+    assert with_wear["max_offset_mm"] > new_only["max_offset_mm"]
+    assert with_wear["optimal_centre_mm"] < new_only["optimal_centre_mm"]
+
+
+def test_roll_centre_distance_is_diameter_plus_gap():
+    assert roll_centre_distance_mm(12.0) == pytest.approx(612.0)
+    with pytest.raises(ValueError):
+        roll_centre_distance_mm(-1.0)
+
+
+def test_acceleration_torque_is_comparable_to_rolling_torque():
+    """ERROR 3. The first issue checked the motor pass by pass on torque only.
+    At 200+ reversals an hour the acceleration of the rotating masses is not a
+    rounding error - it turns out to be the LARGER of the two terms."""
+    s = build_schedule(12.0, "balanced", grade="S355JR")
+    d = motor_duty(s, 1600.0, 400.0, 12.5, cycle_summary(s)["cycle_s"],
+                   _mb().slabs_per_hour, max_rpm=1200.0)
+    peak_rolling_at_motor = max(p.torque_roll_nm for p in s) / (12.5 * 0.97 * 0.98 * 0.99)
+    assert d.accel_torque_nm > peak_rolling_at_motor
+
+
+def test_motor_duty_is_reported_on_both_thermal_and_peak_criteria():
+    s = build_schedule(20.0, "balanced", grade="S355JR")
+    d = motor_duty(s, 1600.0, 400.0, 12.5, cycle_summary(s)["cycle_s"],
+                   _mb().slabs_per_hour, max_rpm=1200.0)
+    assert 0.0 < d.thermal_utilisation < 1.0
+    assert d.peak_utilisation > d.thermal_utilisation
+    assert "acceptable" in d.verdict
+
+
+def test_a_smaller_motor_is_peak_limited_not_thermally_limited():
+    """1250 kW passes thermally with room to spare but sits near the 200 %
+    commutation ceiling - which is the criterion that actually decides."""
+    s = build_schedule(20.0, "balanced", grade="S355JR")
+    small = motor_duty(s, 1250.0, 450.0, 11.2, cycle_summary(s)["cycle_s"],
+                       _mb().slabs_per_hour, max_rpm=1125.0)
+    big = motor_duty(s, 1600.0, 400.0, 12.5, cycle_summary(s)["cycle_s"],
+                     _mb().slabs_per_hour, max_rpm=1200.0)
+    assert small.thermal_utilisation < 0.75
+    assert small.peak_utilisation > big.peak_utilisation
+
+
+def test_faster_acceleration_drives_the_peak_toward_the_overload_ceiling():
+    s = build_schedule(12.0, "balanced", grade="S355JR")
+    c = cycle_summary(s)["cycle_s"]
+    fast = motor_duty(s, 1600.0, 400.0, 12.5, c, _mb().slabs_per_hour,
+                      accel_time_s=1.0, max_rpm=1200.0)
+    slow = motor_duty(s, 1600.0, 400.0, 12.5, c, _mb().slabs_per_hour,
+                      accel_time_s=3.0, max_rpm=1200.0)
+    assert fast.peak_utilisation > 1.8 > slow.peak_utilisation
+
+
+def test_rotor_inertia_is_the_dominant_unknown_in_the_peak():
+    s = build_schedule(12.0, "balanced", grade="S355JR")
+    c = cycle_summary(s)["cycle_s"]
+    lo = motor_duty(s, 1600.0, 400.0, 12.5, c, _mb().slabs_per_hour,
+                    motor_rotor_j=200.0, max_rpm=1200.0)
+    hi = motor_duty(s, 1600.0, 400.0, 12.5, c, _mb().slabs_per_hour,
+                    motor_rotor_j=700.0, max_rpm=1200.0)
+    assert hi.peak_utilisation > 1.5 * lo.peak_utilisation
+
+
+def test_inertia_referred_to_motor_falls_with_the_square_of_the_ratio():
+    a = inertia_at_motor_kgm2(6.25, motor_rotor_j=0.0, drivetrain_j=0.0)
+    b = inertia_at_motor_kgm2(12.5, motor_rotor_j=0.0, drivetrain_j=0.0)
+    assert a / b == pytest.approx(4.0)
+
+
+def test_single_stage_12_5_to_1_would_need_an_absurd_wheel():
+    """ERROR 4 (consistency). The first issue specified a SINGLE-STAGE 12.5:1
+    gearbox and, separately, estimated its weight at 8-16 t. A single stage at
+    that ratio needs a 4 m wheel; the two statements cannot both be true."""
+    z1, module = 18, 18.0
+    wheel_pitch_dia = module * 12.5 * z1
+    assert wheel_pitch_dia > 4000.0
+    two_stage = gearbox_centre_distance_mm(3.55, 12.0, 22)
+    assert two_stage < gearbox_centre_distance_mm(12.5, 18.0, 18) / 2.0
+
+
+# ===========================================================================
+# OWNER REVIEW 2026-09-21 - unit discipline and traceability
+# ===========================================================================
+from slab_line_design import (
+    braking_per_stop, braking_hourly_average_kw, reversals_per_slab,
+    gearbox_rating_trace, motor_at_operating_point,
+)
+
+
+def test_braking_energy_and_power_are_separate_quantities():
+    """A previous issue wrote 'each reversal returns 284-945 kW of energy'.
+    kW is power. Energy per stop, instantaneous power and hourly average power
+    are three different numbers in three different units."""
+    b = braking_per_stop(450.0, 678.0, 3.0)
+    assert b["energy_per_stop_mj"] == pytest.approx(1.134, abs=0.01)
+    assert b["energy_per_stop_kwh"] == pytest.approx(b["energy_per_stop_mj"] / 3.6, rel=1e-9)
+    assert b["instantaneous_power_kw"] == pytest.approx(
+        b["energy_per_stop_mj"] * 1e6 / 3.0 / 1000.0, rel=1e-9)
+
+
+def test_hourly_average_braking_is_far_below_the_instantaneous_peak():
+    inst = braking_per_stop(450.0, 678.0, 3.0)["instantaneous_power_kw"]
+    avg = braking_hourly_average_kw(450.0, 678.0, 136.0)
+    assert avg < inst / 5
+
+
+def test_reversal_count_differs_by_thickness():
+    """Not one common number: 5 at 30 mm, 10 at 6 mm."""
+    thick = reversals_per_slab(build_schedule(30.0, "balanced"))
+    thin = reversals_per_slab(build_schedule(6.0, "balanced"))
+    assert thin > thick
+    assert thick == 5 and thin == 10
+
+
+def test_gearbox_rating_is_traceable_to_the_computed_torque():
+    s = build_schedule(30.0, "balanced", grade="S355JR")
+    tr = gearbox_rating_trace(s, 7.1, cycle_summary(s)["cycle_s"])
+    assert tr["governing_criterion"].startswith("B")
+    assert tr["criterion_b_peak_nm"] == pytest.approx(tr["bite_shock_3x_nm"] / 2.0)
+    assert tr["rated_requirement_nm"] == pytest.approx(
+        max(tr["criterion_a_fatigue_nm"], tr["criterion_b_peak_nm"]))
+    assert tr["rated_recommendation_nm"] > tr["rated_requirement_nm"]
+
+
+def test_the_s355_basis_gives_a_higher_gearbox_requirement_than_s235():
+    """The 285 kN.m figure in the previous issue came from the S235JR case.
+    With S355JR as the stated design basis the requirement is higher, and the
+    package must not carry the S235 number under an S355 basis."""
+    c235 = build_schedule(30.0, "balanced", grade="S235JR")
+    c355 = build_schedule(30.0, "balanced", grade="S355JR")
+    r235 = gearbox_rating_trace(c235, 7.1, cycle_summary(c235)["cycle_s"])
+    r355 = gearbox_rating_trace(c355, 7.1, cycle_summary(c355)["cycle_s"])
+    assert r235["rated_requirement_nm"] == pytest.approx(284.7e3, rel=0.02)
+    assert r355["rated_requirement_nm"] == pytest.approx(327.4e3, rel=0.02)
+    assert r355["rated_requirement_nm"] > r235["rated_requirement_nm"]
+
+
+def test_1600kw_needs_short_time_overload_at_the_peak_power_pass():
+    """The package must say plainly whether the motor covers the peak on its
+    continuous rating or only with overload. 1600 kW does not; 2000 kW does."""
+    best = None
+    for t in THICKNESS_TARGETS_MM:
+        s = build_schedule(t, "balanced", grade="S355JR")
+        p = worst_cases(s)["max_power"]
+        if best is None or p.power_kw > best.power_kw:
+            best = p
+    small = motor_at_operating_point(best, 1600.0, 350.0, 7.1)
+    big = motor_at_operating_point(best, 2000.0, 350.0, 7.1)
+    assert small["needs_overload"] is True
+    assert small["fraction_of_continuous"] > 1.2
+    assert big["fraction_of_continuous"] < 1.10
+    for m in (small, big):
+        assert m["fraction_of_envelope"] < 1.0
+
+
+def test_motor_shaft_power_follows_the_stated_overall_efficiency():
+    s = build_schedule(30.0, "balanced", grade="S355JR")
+    p = worst_cases(s)["max_power"]
+    m = motor_at_operating_point(p, 1600.0, 350.0, 7.1, eta_overall=0.899)
+    assert m["motor_shaft_power_kw"] == pytest.approx(p.power_kw / 0.899, rel=1e-9)

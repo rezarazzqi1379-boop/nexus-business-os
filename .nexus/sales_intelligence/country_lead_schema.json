@@ -1,0 +1,46 @@
+{
+  "schema_version": "nexus.steel-country-lead.v1",
+  "required": [
+    "lead_id",
+    "country",
+    "company",
+    "role",
+    "applications",
+    "grade_candidates",
+    "evidence",
+    "status"
+  ],
+  "role_values": [
+    "END_USER",
+    "BUYER",
+    "IMPORTER",
+    "DISTRIBUTOR",
+    "COMPETITOR",
+    "STRATEGIC_PARTNER",
+    "UNKNOWN"
+  ],
+  "evidence_types": [
+    "OFFICIAL_COMPANY",
+    "OFFICIAL_CUSTOMS",
+    "TRADE_DATA",
+    "STANDARD",
+    "REGULATOR",
+    "INDEPENDENT",
+    "CLAIM"
+  ],
+  "rules": {
+    "tier_a_requires_referenced_evidence": true,
+    "grade_equivalence_assumed": false,
+    "hs_is_candidate_until_jurisdiction_review": true,
+    "russia_belarus_compliance_separate": true,
+    "apollo_paid_requires_spend_gate": true,
+    "outreach_requires_approval": true,
+    "tier_a_requires_current_qualifying_evidence": true,
+    "claim_only_cannot_support_tier_a": true
+  },
+  "evidence_required_fields": [
+    "type",
+    "ref",
+    "observed_at"
+  ]
+}

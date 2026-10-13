@@ -1,0 +1,5 @@
+project,owner,last_live_check,role_for_nexus,state,reason
+kingfisher-collect,open-contracting,2026-10-07,"collect OCDS datasets",CANDIDATE_ADAPTER,"active upstream; useful only if target procurement publishers expose OCDS"
+ocdskit,open-contracting,2026-10-07,"compile/merge/transform OCDS",CANDIDATE_ADAPTER,"normalization candidate; benchmark before integration"
+cardinal-rs,open-contracting,2026-10-07,"procurement red flags/indicators",CANDIDATE_ADAPTER,"valuable after normalized OCDS corpus exists; not a discovery source itself"
+notebooks-ocds,open-contracting,2026-10-07,"analysis patterns for OCDS datasets",REFERENCE_ONLY,"research patterns; no runtime need proven"

@@ -48,7 +48,8 @@ def count_pending_opportunities(db_path: Optional[Path]) -> Optional[int]:
     if db_path is None or not db_path.exists():
         return None
     import sqlite3
-    with sqlite3.connect(db_path) as db:
+    from contextlib import closing
+    with closing(sqlite3.connect(db_path)) as db:
         row = db.execute(
             "SELECT COUNT(*) FROM opportunity_drafts WHERE review_status='draft_pending_review'"
         ).fetchone()
@@ -59,7 +60,8 @@ def count_pending_approvals(db_path: Optional[Path]) -> Optional[int]:
     if db_path is None or not db_path.exists():
         return None
     import sqlite3
-    with sqlite3.connect(db_path) as db:
+    from contextlib import closing
+    with closing(sqlite3.connect(db_path)) as db:
         row = db.execute("SELECT COUNT(*) FROM approvals WHERE status='pending'").fetchone()
         return row[0] if row else 0
 

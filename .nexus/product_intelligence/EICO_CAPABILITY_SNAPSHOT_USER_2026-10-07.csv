@@ -1,0 +1,4 @@
+category,grade_or_family,diameter_or_size,length,source_state,notes
+FORGED_PRODUCTS,"C/CK incl CK45 CK55 C40; St/A incl A105 A694 S355 St52; 42CrMo4 family incl 41Cr4 4130 4140 4145; 16/20MnCr5 family incl 40Mn4 7131 7147; tool steel; stainless","diameter 120-1600 mm","up to 10 m proportional to piece weight",USER_DOCUMENT_CAPABILITY,"round, square, hexagonal, octagonal sections"
+CAST_PRODUCTS,"same listed principal European families","250;365;420;460;530 mm","3.3-6 m",USER_DOCUMENT_CAPABILITY,"cast product table"
+RUSSIAN_REFERENCE,"40X;09G2S;65G;25X1MФ;5XHM;40XMФA;30XMA",,,USER_DOCUMENT_REFERENCE,"treat as reference mapping only; equivalence not proven"

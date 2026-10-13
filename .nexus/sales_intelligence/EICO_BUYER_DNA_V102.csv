@@ -1,0 +1,6 @@
+entity,relationship_to_eico_or_competitor,trade_role,product,hs,form,quantity_signal,country,supplier_diversity,recency,evidence_state,next_question
+Gunes Metalurji ve Kimya Ticaret Ltd,EICO historical buyer + multi-producer hub,TRADER_SERVICE_CENTER,"forged/rolled alloy steel",7228,"bar/rod","EICO sample 23,960 kg; SRSC sample 48,080 kg",Turkey,"EICO; South Rouhina; Iran Alloy Steel; Azinforge observed",2024+,RELATIONSHIP_BOUND,"downstream named customers and exact grades"
+MFA Domestic and Foreign Trade Ltd,Iran Alloy Steel buyer,MERCHANT_CANDIDATE,"alloy steel",7228,,,Unknown,"Iran Alloy Steel observed",2026,CANDIDATE,"legal identity; product/shipment detail; other suppliers"
+Omur Celik AS,Iran Alloy Steel buyer,MERCHANT_OR_ENDUSER_CANDIDATE,"steel",7214/7228/7227,,,Turkey,"Iran Alloy Steel observed",2026,CANDIDATE,"role; alloy product; other suppliers; applications"
+Sun Metallurgical and Chemistry Trade Ltd,Iran Alloy Steel buyer + network node,TRADER_CANDIDATE,"alloy steel",7228/7225/7208,,,Unknown,"Iran Alloy Steel observed",2026,CANDIDATE,"identity resolution vs Gunes; shipment-level edges"
+Sadikoglu Metallurgy Industry and Trade JSC,South Rouhina buyer,MERCHANT_CANDIDATE,"hot rolled round steel",7214,,,Turkey,"South Rouhina observed",2026,CANDIDATE,"other Iranian suppliers; alloy/forged scope"

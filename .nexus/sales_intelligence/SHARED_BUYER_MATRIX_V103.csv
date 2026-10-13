@@ -1,0 +1,9 @@
+producer,buyer_or_hub,relationship_state,product_evidence,recency,current_demand,notes
+EICO,Gunes Metalurji,VERIFIED_HISTORICAL,"forged alloy steel bar/rod; HS722840",2023+,UNKNOWN,"merchant/service-center hub"
+Azinforge,Gunes Metalurji,VERIFIED_HISTORICAL,"HS722840 forged-bar relationship",2023,UNKNOWN,"shared hub with EICO"
+South Rouhina,Gunes Metalurji,VERIFIED_HISTORICAL,"hot-rolled round steel rod",2024+,UNKNOWN,"shared hub; different product evidence"
+Iran Alloy Steel,Gunes Metalurji,OBSERVED_BUYER_NETWORK,"alloy steel buyer-directory relationship",2026-source,UNKNOWN,"shipment binding still required"
+Iran Alloy Steel,MFA Domestic and Foreign Trade,CANDIDATE,"buyer-directory relationship",2026-source,UNKNOWN,"identity/product binding required"
+Iran Alloy Steel,Omur Celik AS,CANDIDATE,"buyer-directory relationship",2026-source,UNKNOWN,"role/product binding required"
+Iran Alloy Steel,Sun Metallurgical and Chemistry Trade,CANDIDATE,"buyer-directory relationship",2026-source,UNKNOWN,"possible merchant; identity resolution"
+South Rouhina,Sadikoglu Metallurgy,CANDIDATE,"buyer-directory relationship",2026-source,UNKNOWN,"merchant role validation"

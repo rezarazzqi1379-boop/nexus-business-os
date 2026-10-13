@@ -49,3 +49,16 @@ Before any of v1.6/v1.8/v1.9/v2.1 can be promoted: retrieve and hash-verify the 
 ## Operational effect
 
 Generic discovery, Persian normalization, market-intelligence, coordination-kit, and lane-isolation infrastructure that does not depend on disputed source-specific facts are unaffected by any of the above and may continue normally.
+
+## Decision record, 2026-09-30 (owner-delegated)
+
+The owner delegated decisions to Claude on 2026-09-30 ("decide on my behalf").
+
+A Constitution v4.0 activation text from ChatGPT states that Source Registry v1.8 and Master Context v2.1 are active. Nothing in this repo or the Claude project corroborates that, and v2.1's internal contradiction (recorded above) is still unresolved. **Decision: the promoted tuple stays Master Context v1.4 + Source Registry v1.1.** The ChatGPT statement is recorded as a CLAIM.
+
+To promote v1.8/v2.1, three things are needed:
+1. the source binaries placed in `docs/authority/sources/`, with their hashes;
+2. the v2.1 self-contradiction removed in a new version;
+3. an owner approval bound to that exact version.
+
+This is reversible: a later owner decision naming a specific version supersedes this record.

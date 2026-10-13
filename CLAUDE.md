@@ -21,8 +21,15 @@ existed under another name).
 
 ## 2. Session boot (cheap first)
 
+0. Memory check, first: `python -m nexus_checks --state --repo .`. A STALE state file or a
+   broken pointer means the written memory is behind the repo: fix the state file before
+   relying on it (`.nexus/state/STATE_GOVERNANCE.json` says which file governs what).
+   Then the duplicate-work guard (FM-013, recurred twice): `python -m nexus_checks --boot --project <PROJECT-ID>
+   --project <keyword>`. Any B5 hit outside main is finished or running work: resume it, never redo it.
+   Push state-bearing branches the same day; a local-only branch is invisible to the next session.
 1. Identify the project. Steel rolling line: read `.nexus/steel/KERNEL.md` and
    `.nexus/steel/CHECKPOINT.md`, then `docs/expert_foundry/PROJECT_CONTROL_PRJ-STEEL-ROLLING-LINE-01.md`.
+   Re-roll study (thick pieces → 6/8/10 mm, PRJ-STEEL-REROLL-01): `docs/reroll/README.md`.
    Procurement: `docs/procurement/README.md`. Repo-wide state: `.nexus/state/CURRENT_STATE.md`.
 2. Authority: `docs/authority/AUTHORITY_STATUS.md`. A newer file name is not authority;
    match Source ID, status, effective date and supersession rule.
@@ -30,6 +37,8 @@ existed under another name).
    `.nexus/steel/TOKEN_BUDGET_POLICY.yaml`). Never reload whole chat histories.
 4. Then do the work. Do not ask "what next?" when the objective follows from the state
    files; stop only at an approval gate (AGENTS.md §7, §Owner-delegated) or a real blocker.
+   An explicit owner scope limit ("Phase 1 only", "no new agents", "stop after X") overrides every
+   autonomy default, including Constitution v4.0 §VII (see `docs/system/NEXUS_V4_CONSTITUTION_AUDIT_2026-09-30.md`).
 
 ## 3. Truth and maturity (two vocabularies, never mixed)
 
@@ -43,6 +52,21 @@ existed under another name).
 - Compare new work against the project's engineering basis, not only against your own
   earlier outputs (FM-010).
 
+Constitution v4.0 deltas (the full text and its audit are in `docs/system/`; only these rules are new):
+- Shadow Scientist: before any consequential recommendation, name the hidden constraint most likely to
+  invalidate it, and check that constraint first.
+- Agreement between agents or models is not evidence. Resolve disagreement by measurement, test, physical
+  constraint, independent calculation, or authoritative source. "Independent" means different inputs or
+  method, not only different code.
+- Outbound gate: a non-Persian message to any third party is prepared as the exact recipient, subject,
+  attachments and payload, plus a faithful Persian rendering, and is sent only after an exact approval
+  for that recipient. A blanket "all approvals" does not cover sending.
+- Capability ladder: AVAILABLE, CONNECTED, AUTHENTICATED, READ_VERIFIED, WRITE_ENABLED, TESTED,
+  PRODUCTION_APPROVED. Report the level actually reached.
+- Report outcomes, not activity: no agent counts, search counts or line counts as achievements.
+- Arena: 1 worker by default; 2-4 for a contradiction or a consequential number; 5 or more only with
+  the owner's explicit opt-in (each agent costs about 150-380k tokens, measured).
+
 ## 4. Token economy — concrete levers, not intentions
 
 - Subagents inherit the parent model unless told otherwise. Set the Agent tool `model`:
@@ -51,10 +75,22 @@ existed under another name).
   resolution, novel engineering and independent red-team review. Measured: research
   agents cost ~70k–230k tokens per run; the independent reviewer (~63k) was the cheapest
   and highest-yield role (`.nexus/steel/TOKEN_BUDGET_POLICY.yaml`).
+- Measured 2026-09-24/26 (subagent tokens → yield):
+  - red-team PR review 177k → 2 blocking defects: a PR without its code, and a stale record;
+  - transmission audit 367k → 4 wrong numbers in vendor RFIs;
+  - sonnet builders on a precise spec (state check 240k, transmission check 219k,
+    merge batch 146k) → done first time, verified;
+  - literature check 226k → no constant out of range, 5 unsourced;
+  - branch inventory and triage 228k + 197k.
+
+  Rules drawn from these runs:
+  - Before any merge or vendor release, spend on one independent reviewer that did not
+    write the work. It has been the best value every time.
+  - Hand well-specified building to `sonnet`.
+  - Never let the author verify their own claim.
 - Numbers are computed with code, never with long prose reasoning.
 - Parallelise independent research in one message; stop searching when marginal yield is low.
-- Unused MCP connectors cost tokens through cache invalidation (`docs/system/SYSTEM_AUDIT_2026-09-22.md`,
-  on branch `feat/steel-recovery-v0.1`, not yet on main).
+- Unused MCP connectors cost tokens through cache invalidation (`docs/system/SYSTEM_AUDIT_2026-09-22.md`).
 
 ## 5. Failure memory is executable
 
@@ -66,12 +102,23 @@ Run before releasing any vendor-facing document, and after any batch of document
 ```
 python -m nexus_checks docs/procurement --repo . --exclude '*_2026-09-22.md'   # drafts (v4 archives excluded)
 python -m nexus_checks --release <outgoing copies>          # release gate (banner must be gone)
-pytest -q evals/test_nexus_checks.py
+python -m nexus_checks --transmission --state   # RFI numbers == model; state files current
+pytest -q evals
 ```
 
-Checks: vendor-facing hygiene (FM-005), EN/ZH structural parity (FM-006), superseded
-values in documents (FM-007; complements `steel_action_gates.detect_obsolete_values`
-which guards the intake JSON), git health (FM-008).
+Checks:
+- vendor-facing hygiene (FM-005);
+- EN/ZH structural parity (FM-006);
+- superseded values in documents (FM-007; complements `steel_action_gates.detect_obsolete_values`,
+  which guards the intake JSON);
+- git health (FM-008);
+- **transmission** (FM-010): every checked RFI number is recomputed from `slab_line_design`
+  on its stated basis. A model change that moves a vendor-facing number turns CI red;
+- **state freshness and broken pointers** (FM-011): the written memory must keep up with the repo.
+
+Verification discipline (FM-012): report test counts only from a fresh worktree of the
+committed SHA, and compare `git show --stat` with the commit message. Never use `git stash`
+to set work aside.
 
 ## 6. Git on the bridged Windows mount
 
@@ -94,5 +141,10 @@ documents, CAPTCHA.
 
 ## 8. End of a work cycle
 
-Report only: what now works (with test evidence), discoveries, failures converted to
+A cycle is not finished until the memory is written: update `.nexus/state/CURRENT_STATE.md`
+and the project's checkpoint and control doc, then make `python -m nexus_checks --state --repo .`
+pass. Report only: what now works (with test evidence), discoveries, failures converted to
 checks, open decisions for the owner, next safe action, exact approval required.
+
+## Agent-Reach
+Use the acquisition preflight in AGENTS.md. Load docs/system/AGENT_REACH_INTEGRATION.md only for external research. Local edits skip internet retrieval.

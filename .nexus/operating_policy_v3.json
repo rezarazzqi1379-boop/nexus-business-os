@@ -1,0 +1,67 @@
+{
+  "schema_version": "nexus.operating-policy.v3",
+  "status": "IMPLEMENTED_ON_FEATURE_BRANCH",
+  "supersedes": "v2",
+  "engines": [
+    "COMMERCIAL",
+    "INTELLIGENCE",
+    "EVOLUTION"
+  ],
+  "evidence_labels": [
+    "FACT",
+    "VERIFIED_EVIDENCE",
+    "CLAIM",
+    "ESTIMATE",
+    "ASSUMPTION",
+    "HYPOTHESIS",
+    "UNKNOWN",
+    "SUPERSEDED"
+  ],
+  "scores": [
+    "BUYER_FIT",
+    "STRATEGIC_VALUE",
+    "ENRICHMENT_SPEND_CONFIDENCE"
+  ],
+  "country_agents": [
+    "Iran",
+    "Turkey",
+    "Kazakhstan",
+    "Russia",
+    "Belarus",
+    "Tajikistan",
+    "Armenia",
+    "Oman"
+  ],
+  "promotion_stages": [
+    "DISCOVERED",
+    "LICENSE_CHECKED",
+    "SECURITY_REVIEWED",
+    "PRIVACY_TOS_REVIEWED",
+    "SANDBOXED",
+    "BENCHMARKED",
+    "EXPERIMENT_ONLY",
+    "APPROVED_ADAPTER",
+    "ACTIVE"
+  ],
+  "human_gates": [
+    "EXTERNAL_SEND",
+    "PAID_CREDIT_SPEND",
+    "PAYMENT",
+    "ORDER",
+    "CONTRACT_SIGNATURE",
+    "KYC_TERMS",
+    "CREDENTIAL_PERMISSION_CHANGE",
+    "DESTRUCTIVE_ACTION",
+    "PRODUCTION_DEPLOYMENT",
+    "MERGE"
+  ],
+  "done_states": [
+    "DESIGNED",
+    "IMPLEMENTED",
+    "TESTED",
+    "INTEGRATED",
+    "DEPLOYED",
+    "ACTIVE",
+    "PRODUCTION"
+  ]
+}

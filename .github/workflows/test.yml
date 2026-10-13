@@ -47,6 +47,25 @@ jobs:
             python -m nexus_checks docs/procurement --exclude '*_2026-09-22.md'
           fi
 
+      - name: NEXUS synthetic cloud health smoke and negative injection
+        run: |
+          python - <<'PY'
+          from nexus_lab_health import LabHealth, evaluate_lab_health, self_test
+          from nexus_windows_lab_readiness import WindowsLabReadiness, readiness_errors
+          report = self_test()
+          assert report == {
+              "ci_checks_passed": True,
+              "local_install_verified": False,
+              "persistent_service_verified": False,
+              "production_ready": False,
+          }, report
+          failed = evaluate_lab_health(LabHealth(False, True))
+          assert failed["ci_checks_passed"] is False
+          assert failed["production_ready"] is False
+          assert len(readiness_errors(WindowsLabReadiness())) == 10
+          print("SYNTHETIC_CLOUD_SMOKE_PASS; NEGATIVE_INJECTION_PASS; NO_PRODUCTION_CLAIM")
+          PY
+
       - name: Run pytest regression suite
         env:
           PYTHONPATH: src

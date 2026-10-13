@@ -27,3 +27,24 @@
 - HS 7208 covers hot-rolled non-alloy flat products width >=600mm; do NOT silently use it for narrower 400mm strip or alloy grades.
 - Never equate a freight forwarder, supplier, or company_total shipment count with a steel-consuming buyer.
 - No contacts, emails, outbound messages, paid enrichment, CRM writes, or live deployments authorized by this register.
+
+
+## Additional discovery batch — 2026-10-13
+
+| ID | Country / organization | Product | Primary or secondary evidence | Date/status | Assessment |
+|---|---|---|---|---|---|
+| KZ-STEEL-005 | Kazakhstan / Mangistaumunaygas JSC | Hot rolled sheet | https://www.kazakhtenders.com/tender/hot-rolled-sheet-8fa86ba.php ; aggregator ref 150636218 | Deadline 2026-10-13; official time unknown | CLAIM, BUY_TENDER / OPEN_STATUS_UNVERIFIED |
+| KZ-STEEL-006 | Kazakhstan / Ulan-C LLP | Galvanized tin sheet, 0.3 mm, 1x2m, 20 sheets | https://old.goszakup.gov.kz/ru/announce/index/17721136?tab=lots ; official notice 17721136-1, lot 87876718-ОИ4 | Published 2026-10-02, ended 2026-10-07, notice completed; lot marked procurement not held | FACT from official portal snippet; BUY_TENDER / CLOSED_UNSUCCESSFUL, not open |
+| KZ-STEEL-007 | Kazakhstan / Intergas Central Asia | Steel sheet | https://tenderimpulse.com/government-tenders/kazakhstan/steel-sheet-14590395 ; source notice 4502329 | Published 2026-08-28; expired 2026-09-08 | CLAIM, historic BUY_TENDER |
+| OM-STEEL-001 | Oman / OQ Tawreed | Steel plates, insulation, refractory items | https://tenderimpulse.com/government-tenders/oman/6000061380-once-off-procurement-for-supply-of-material-steel-plates-insulation-r-14463801 ; notice 9900048329 | Published/expired 2026-08-20 | CLAIM, historic BUY_TENDER |
+| OM-STEEL-002 | Oman / OQ Exploration & Production SAOG | Structural steel materials, mild steel and special steel | https://www.globaltenders.com/tender-detail/structural-steel-materials-ms-special-stee-4uPOFVlwTg1dbTB3 ; GT ref 147792321 | Released 2026-10-07; deadline 2026-10-15 | CLAIM, BUY_TENDER / OPEN_STATUS_UNVERIFIED; original tender/eligibility not checked |
+| OM-STEEL-003 | Oman / OQ Tawreed | SS plate ALLEIMA 353 MA UNS S35315 | https://tenderimpulse.com/government-tenders/oman/6000061637-once-off-procurement-for-supply-of-material-ss-plate-alleima-353-ma-u-14597489 ; notice 9900048591 | Aggregator publication 2026-08-31 but deadline 2026-08-30 | CLAIM / DATE_CONTRADICTION / EXPIRED; require original document before using |
+
+## Evidence integrity / tool comparison follow-up
+
+- Official Kazakhstan procurement portal returned named buyer, exact lot, quantity, status and date: **stronger than third-party aggregator snippets**. Official evidence concerns galvanized tin and cannot be silently converted into hot-rolled coil demand.
+- Exa retrieved two countries' named procurement signals; sample does not establish exhaustive coverage or reliable active status.
+- ABRAMS HS 7214 Kazakhstan-filter query returned Canadian and Aruban companies; combined with the earlier HS 7208 mismatch this is a **reproduced geographic-filter problem**. Do not promote these companies as Kazakh buyers. The tool labels shipments `company_total`, not product-specific. 2024 snapshot is not proof of 2026 purchasing.
+- Apollo people-search schema was discovered, but no company/contact prospecting result was verified; availability of tool != verified contacts.
+- Source classification: original government notice = FACT about published record, not necessarily current purchase; third-party notices = CLAIM pending official validation.
+- 'Does not buy steel' remains UNKNOWN without affirmative, dated and product-scoped exclusion evidence.

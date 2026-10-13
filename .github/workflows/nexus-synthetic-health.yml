@@ -1,0 +1,37 @@
+name: NEXUS synthetic health
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 4 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nexus-synthetic-health
+  cancel-in-progress: false
+
+jobs:
+  synthetic-health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Verify synthetic-only health
+        run: |
+          python - <<'PY'
+          import json
+          from nexus_lab_health import self_test
+          report = self_test()
+          print(json.dumps(report, sort_keys=True))
+          if not report["ci_checks_passed"]:
+              raise SystemExit(1)
+          if report["local_install_verified"] or report["persistent_service_verified"] or report["production_ready"]:
+              raise SystemExit("unexpected activation claim")
+          PY

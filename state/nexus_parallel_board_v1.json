@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "authority": "Source Registry and project masters; this board is an index, not a canonical replacement",
+  "last_reconciled_head": "93f12d6610bd5df63bc8218c8ba4b2478fa8edae",
+  "lanes": [
+    {
+      "id": "STEEL_COMMERCIAL",
+      "status": "OPEN",
+      "next": "Recover current buyer-demand and relationship evidence; do not infer current demand from shipments",
+      "evidence": []
+    },
+    {
+      "id": "INDUSTRIAL_PROJECTS",
+      "status": "OPEN",
+      "next": "Recover canonical master separately for Hydrotester, KCl/SOP, Can Forming and Heat Treatment",
+      "evidence": []
+    },
+    {
+      "id": "FREELANCE_DEALS",
+      "status": "IMPLEMENTED_UNVERIFIED_LIVE",
+      "next": "Authenticate reviewer receipt before any real customer promotion",
+      "evidence": [
+        "freelance_vertical_proof.py"
+      ]
+    },
+    {
+      "id": "ADAPTER_RESEARCH",
+      "status": "RESEARCHED_NOT_INSTALLED",
+      "next": "Benchmark one read-only marketplace adapter with synthetic data",
+      "evidence": [
+        "docs/NEXUS_REUSE_REBUILD_INSTALL_DECISION_2026-10-13.md"
+      ]
+    },
+    {
+      "id": "ENGINEERING_QA",
+      "status": "OPEN",
+      "next": "Run deterministic synthetic simulation and regression tests",
+      "evidence": []
+    },
+    {
+      "id": "GOVERNANCE_STATE",
+      "status": "OPEN",
+      "next": "Readback and reconcile source registry, branch, CI and board",
+      "evidence": []
+    }
+  ],
+  "protected_actions_enabled": false,
+  "global_chat_activation_verified": false,
+  "continuous_scheduler_verified": false
+}

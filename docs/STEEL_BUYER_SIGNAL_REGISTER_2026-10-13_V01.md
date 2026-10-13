@@ -48,3 +48,26 @@
 - Apollo people-search schema was discovered, but no company/contact prospecting result was verified; availability of tool != verified contacts.
 - Source classification: original government notice = FACT about published record, not necessarily current purchase; third-party notices = CLAIM pending official validation.
 - 'Does not buy steel' remains UNKNOWN without affirmative, dated and product-scoped exclusion evidence.
+
+
+## Cross-country discovery batch — 2026-10-13
+
+| ID | Buyer and country | Product / evidence | URL | Status and classification |
+|---|---|---|---|---|
+| RU-STEEL-001 | Norilsktransgaz JSC, Russia | Procurement of metal products: galvanized sheet 33t, hot-rolled I-beam 27.27t, expanded metal sheet 0.84t; initial price RUB 5,959,636.27; notice 32616452647 | https://www.b2b-center.ru/search/number/l32616452647-1/ | Buyer procurement portal listing, deadline 2026-10-19 12:00 Moscow; OPEN_STATUS_UNVERIFIED; buyer eligibility and primary tender to check |
+| RU-STEEL-002 | KMZ PJSC, Russia | Stainless steel 12Х18Н10Т sheets, 8000kg and 6500kg; Rosatom tender 4636989 | https://www.rosatom.rts-tender.ru/market/listy-stalnye/tender-4636989/ | Procurement portal, published 2026-10-12; deadline UNKNOWN; product mismatch if only carbon steel offered |
+| RU-STEEL-003 | OKBM Afrikantov JSC, Russia | Price monitoring for sheets of grades St3/20 up to 16mm; Rosatom 4629694 | https://www.rosatom.rts-tender.ru/market/postavka-listovogo-metalloprokata-tolshchinoi-do-16mm-iz-stalei-3-i-20/tender-4629694/ | MARKET_PRICE_MONITORING, NOT verified direct BUY_TENDER; published 2026-10-06 |
+| BY-STEEL-001 | Olsa OJSC, Belarus | Cold rolled coil grades 20PS/08PS, GOST 19904-90; tender ref 341981705 | https://goszakaz.bt.su/tender/341981705.html | Third-party tender; 2026-10-02 to 2026-10-07; EXPIRED; official source not verified |
+| BY-STEEL-002 | Integral OJSC, Belarus | Galvanized steel air duct (finished fabricated item), procurement 2026-1389080 | https://zakupki.kartoteka.by/tender/icetrade/2026-1389080 | Deadline 2026-10-15; **FINISHED_GOOD_NOT_RAW_STEEL**; do not count as raw steel buyer |
+| AM-STEEL-001 | Yerevan Municipality, Armenia | Profiled galvanized steel sheet, auction 43087 | https://eauction.armeps.am/en/public/tender_details/tid/43087/ | OFFICIAL procurement; status Finished; bid deadline 2026-03-06; historic buyer evidence |
+| AM-STEEL-002 | Armenian Nuclear Power Plant CJSC, Armenia | Metal sheet, round bar, pipe, auction 43042 | https://eauction.armeps.am/en/public/tender_details/by_status/1/tid/43042/ | OFFICIAL procurement; status Finished; bid deadline 2026-03-02; historic buyer evidence |
+| AM-STEEL-003 | Areni Municipality, Armenia | Steel sheets tender GT 142605641 | https://www.globaltenders.com/tender-detail/acquisition-of-steel-sheets-for-the-needs-of-G6iXnhBbUHiYQGVg | Third-party listing; deadline 2026-08-05; EXPIRED |
+
+### False-positive checks
+
+- Belarus Integral: procuring fabricated galvanized air ducts is **not proof of purchasing raw steel sheet**.
+- Russian OKBM Afrikantov: market price monitoring is not equivalent to a confirmed purchase order.
+- Russia KMZ: stainless 12Х18Н10Т is not interchangeable with carbon steel strip or plate.
+- Armenia auction participants/bidders are **not automatically steel buyers**.
+- Search did not produce a verified Tajikistan buyer in this batch. State UNKNOWN rather than no demand.
+- All live deadlines must be checked on the original platform, including local time, before qualification or outreach.

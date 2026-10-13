@@ -1,4 +1,16 @@
 # NEXUS CURRENT STATE
+## Commercial relationship sandbox continuation, 2026-10-13
+
+Continued existing local mission `caf7956` on `codex/intelligence-commercial-proof`;
+GitHub main observed at `49ba5a0`. Added source-to-reviewed-relationship adapter
+over existing ingestion/graph/commercial gate, and blocked unrelated endpoint
+evidence in current_demand_ready. Fictional eight-case ablation: accuracy 3/8 ->
+8/8, false accepts 5 -> 0, true verified yield unchanged at 1/8, model tokens 0.
+No live commercial value established. Registry/Master conflict remains unresolved.
+See docs/research/NEXUS_COMMERCIAL_RELATIONSHIP_PROOF_2026-10-13.md and
+data/research/commercial-relationship-benchmark.json for measured scope and limits.
+Remote exact-commit CI requires development-branch publication authority.
+
 ## Codex intelligence sandbox, 2026-10-08
 
 Local draft branch: draft/nexus-intelligence-proof-2026-10-08, based on PR #105.

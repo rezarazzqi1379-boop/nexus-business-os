@@ -1,0 +1,108 @@
+{
+  "schema": "nexus.commercial-proof-benchmark.v1",
+  "baseline_sha": "caf79562197c24f6f061defb3c40a7f5031a9bdd",
+  "baseline_module_sha256": "5e7cb8d6ee89230d5efad0206e27904ed2af097b81687971dce5052d22988682",
+  "proof": {
+    "graph": [
+      {
+        "src": "buyer-fixture",
+        "dst": "forged-shaft",
+        "relation": "CURRENT_RFQ",
+        "source_id": "fixture://source/0#sha256=3844dffe2a008557de6d13030d07038d1471de3fd66b9be020ec498ab927a389;origin=publisher-0;extractor=structured-v1",
+        "state": "VERIFIED"
+      },
+      {
+        "src": "buyer-fixture",
+        "dst": "forged-shaft",
+        "relation": "CURRENT_RFQ",
+        "source_id": "fixture://source/1#sha256=3844dffe2a008557de6d13030d07038d1471de3fd66b9be020ec498ab927a389;origin=publisher-1;extractor=structured-v1",
+        "state": "VERIFIED"
+      }
+    ],
+    "evidence_digests": [
+      "3844dffe2a008557de6d13030d07038d1471de3fd66b9be020ec498ab927a389",
+      "3844dffe2a008557de6d13030d07038d1471de3fd66b9be020ec498ab927a389"
+    ],
+    "extraction_bytes": 220,
+    "extraction_count": 2,
+    "ready_for_research": true
+  },
+  "corpus": "fictional structured fixtures; eight cases, not a market sample",
+  "as_of": "2026-10-13T00:00:00+00:00",
+  "cases": [
+    {
+      "case": "reviewed-current",
+      "expected": true,
+      "baseline": true,
+      "candidate": true
+    },
+    {
+      "case": "no-review",
+      "expected": false,
+      "baseline": true,
+      "candidate": false
+    },
+    {
+      "case": "stale",
+      "expected": false,
+      "baseline": true,
+      "candidate": false
+    },
+    {
+      "case": "wrong-legal-id",
+      "expected": false,
+      "baseline": true,
+      "candidate": false
+    },
+    {
+      "case": "changed-digest",
+      "expected": false,
+      "baseline": true,
+      "candidate": false
+    },
+    {
+      "case": "copied-publisher",
+      "expected": false,
+      "baseline": true,
+      "candidate": false
+    },
+    {
+      "case": "duplicate",
+      "expected": false,
+      "baseline": false,
+      "candidate": false
+    },
+    {
+      "case": "cross-project",
+      "expected": false,
+      "baseline": false,
+      "candidate": false
+    }
+  ],
+  "baseline": {
+    "decision_accuracy": 0.375,
+    "true_accepted": 1,
+    "false_accepted": 5,
+    "verified_relationship_precision": 0.16666666666666666,
+    "verified_relationship_yield": 0.125,
+    "model_tokens": 0
+  },
+  "candidate": {
+    "decision_accuracy": 1.0,
+    "true_accepted": 1,
+    "false_accepted": 0,
+    "verified_relationship_precision": 1.0,
+    "verified_relationship_yield": 0.125,
+    "model_tokens": 0
+  },
+  "extraction": {
+    "correct_fields": 8,
+    "total_fields": 8,
+    "accuracy": 1.0,
+    "method": "deterministic JSON; no unstructured extraction evaluated"
+  },
+  "provider_token_usage": null,
+  "agent_session_token_usage": null,
+  "commercial_outcomes": 0,
+  "maturity": "EXPERIMENT_ONLY"
+}

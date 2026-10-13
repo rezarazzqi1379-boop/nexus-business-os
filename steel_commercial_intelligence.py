@@ -11,7 +11,8 @@ def validate_edge(e:IntelEdge)->bool:
  if e.kind!=EvidenceKind.OBSERVED and e.current: return False
  return True
 def current_demand_ready(edges:tuple[IntelEdge,...],project_id:str,buyer:str,product:str)->bool:
- relevant=[e for e in edges if e.project_id==project_id and e.kind==EvidenceKind.OBSERVED and e.current]
+ relevant=[e for e in edges if validate_edge(e) and e.project_id==project_id and e.kind==EvidenceKind.OBSERVED and e.current
+           and ((e.left,e.right)==(buyer,product) or (e.left,e.right)==(product,buyer))]
  has_buyer=any(e.left==buyer or e.right==buyer for e in relevant)
  has_product=any(e.left==product or e.right==product for e in relevant)
  has_trigger=any(e.relation in {"CURRENT_RFQ","CURRENT_TENDER","CURRENT_PROCUREMENT_NEED","CURRENT_STOCK_NEED"} for e in relevant)

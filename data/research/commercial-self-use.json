@@ -1,0 +1,64 @@
+{
+  "exercise": {
+    "exercise_id": "commercial-proof-2026-10-13",
+    "system_id": "intelligence-platform",
+    "project_id": "SANDBOX",
+    "task_id": "commercial-proof",
+    "procedural_family": "evidence-to-commercial",
+    "evidence_refs": [
+      "docs/research/NEXUS_COMMERCIAL_RELATIONSHIP_PROOF_2026-10-13.md",
+      "data/research/commercial-relationship-benchmark.json"
+    ],
+    "actions": [
+      "recover existing mission",
+      "fix endpoint binding",
+      "run negative tests",
+      "measure synthetic baseline"
+    ],
+    "test_commands": [
+      "python -m pytest -q tests/test_commercial_relationship_proof.py tests/test_steel_commercial_intelligence.py",
+      "python tools/benchmark_commercial_relationship.py"
+    ],
+    "acceptance_checks": [
+      "no false accepts in eight fixture cases",
+      "no external action executed"
+    ],
+    "outcome": "PARTIAL",
+    "human_corrections": 0,
+    "reusable_lessons": [],
+    "observed_at": "2026-10-13T07:44:49.308449+00:00"
+  },
+  "cycle": {
+    "project_id": "SANDBOX",
+    "accepted_exercises": [],
+    "ineligible_exercises": [
+      "commercial-proof-2026-10-13"
+    ],
+    "candidates": [],
+    "production_changes_applied": false
+  },
+  "delegation": {
+    "mandate_id": "commercial-proof-2026-10-13",
+    "results": [
+      {
+        "decision_id": "publish-commercial-proof",
+        "state": "WAITING_APPROVAL",
+        "reason": "action_not_delegated"
+      },
+      {
+        "decision_id": "verify-commercial-proof",
+        "state": "SELECTED",
+        "reason": "highest_safe_expected_value"
+      }
+    ],
+    "schedule": {
+      "running": [
+        "verify-commercial-proof"
+      ],
+      "queued": [],
+      "waiting": []
+    },
+    "external_actions_executed": false,
+    "authority_expanded": false
+  }
+}

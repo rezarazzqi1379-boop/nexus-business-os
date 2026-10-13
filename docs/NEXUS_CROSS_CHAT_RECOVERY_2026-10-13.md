@@ -38,3 +38,9 @@ Paste:
 
 ## Continuity limitations
 GitHub stores this handoff file; it cannot itself modify the instructions or context of all ChatGPT conversations. The user can paste the resume instruction in any chat with GitHub access, or reference the file. Changes on Draft PR #111 are not canonical until reviewed and approved for merge.
+
+
+## Continuity update — evidence intake, 2026-10-13
+- Added `docs/NEXUS_STEEL_EVIDENCE_INTAKE_PROTOCOL_V1.md` in Draft PR #111: required fields, source ranking, duplicate handling, deadline contradictions, qualification gates and platform acceptance criteria.
+- Latest observed CI before this documentation commit: run `38387102727` SUCCESS on prior HEAD `862b41cb424d155e927aff5275590416dc9b724f`. Re-check CI for any newer HEAD; do not carry forward a green status automatically.
+- Source Registry and canonical master still require revalidation before promotion. No new external outreach, merge, CRM write or deployment.

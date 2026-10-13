@@ -41,3 +41,15 @@ def test_unreviewed_source_family_claim_is_insufficient():
     receipt["decision"] = "PENDING"
     assert promote_reviewed(edge, receipt=receipt, project_id="PRJ-TEST",
                             evidence_digests=("sha256:a", "sha256:b")).state == "CANDIDATE"
+
+def test_duplicate_evidence_digests_fail_closed():
+    edge, receipt = _case()
+    receipt["evidence_digests"] = ("sha256:a", "sha256:a")
+    assert promote_reviewed(edge, receipt=receipt, project_id="PRJ-TEST",
+                            evidence_digests=("sha256:a", "sha256:a")).state == "CANDIDATE"
+
+def test_malformed_evidence_digests_fail_closed():
+    edge, receipt = _case()
+    receipt["evidence_digests"] = ("a", "b")
+    assert promote_reviewed(edge, receipt=receipt, project_id="PRJ-TEST",
+                            evidence_digests=("a", "b")).state == "CANDIDATE"

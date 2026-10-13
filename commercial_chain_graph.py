@@ -31,6 +31,7 @@ def candidate_edge(*,source_id:str,relation:str,target_id:str,evidence_refs=(),s
  return ChainEdge(source_id,relation,target_id,"CANDIDATE",tuple(evidence_refs),observed_at,tuple(source_families))
 
 def promote_verified(edge:ChainEdge)->ChainEdge:
+ """Legacy structural promotion only; not an authenticated review decision."""
  candidate=ChainEdge(edge.source_id,edge.relation,edge.target_id,"VERIFIED",edge.evidence_refs,edge.observed_at,edge.source_families,edge.contradiction_refs)
  if candidate.validate():return edge
  return candidate
@@ -61,6 +62,10 @@ def promote_reviewed(edge:ChainEdge, *, receipt:dict, project_id:str, evidence_d
  if receipt.get("project_id")!=project_id:
   return edge
  if receipt.get("source_id")!=edge.source_id or receipt.get("target_id")!=edge.target_id or receipt.get("relation")!=edge.relation:
+  return edge
+ if not all(isinstance(d,str) and d.startswith("sha256:") and len(d)>7 for d in evidence_digests):
+  return edge
+ if len(set(evidence_digests))!=len(evidence_digests):
   return edge
  if tuple(receipt.get("evidence_digests",()))!=tuple(evidence_digests):
   return edge

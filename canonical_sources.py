@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from contextlib import closing
+
 import hashlib
 import re
 import sqlite3
@@ -123,7 +125,7 @@ class CanonicalStore:
     def __init__(self, path: Path):
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             db.execute("PRAGMA journal_mode=WAL")
             db.execute("""CREATE TABLE IF NOT EXISTS canonical_sources (
                 source_id TEXT PRIMARY KEY, project_id TEXT, title TEXT NOT NULL, version TEXT,
@@ -164,7 +166,7 @@ class CanonicalStore:
     def ingest(self, path: Path) -> tuple[CanonicalSource, bool]:
         source = parse_source(path.resolve())
         version_key = _version_storage_key(source.version)
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             db.execute("BEGIN IMMEDIATE")
             existing = db.execute(
                 "SELECT sha256 FROM canonical_source_versions WHERE source_id=? AND version_key=?",
@@ -193,7 +195,7 @@ class CanonicalStore:
         return result
 
     def _all_rows(self) -> list[sqlite3.Row]:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             return db.execute(
                 "SELECT source_id,project_id,title,version,status,effective_date,sha256,content,ingested_at "
                 "FROM canonical_source_versions"

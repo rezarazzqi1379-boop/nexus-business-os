@@ -1,4 +1,20 @@
 # NEXUS CURRENT STATE
+## Local execution/durability verification — 2026-10-14
+
+Isolated branch codex/execution-verification-2026-10-14 based on refreshed main
+59f5fb386c023b1f04deaae15709c371e9bfd6d7. Requested Work/Codex handoff read;
+accepted Registry/Master binaries remain unavailable and actual chat bootstrap
+returns BLOCK for missing authority. Synthetic runtime testing continued only.
+Baseline main: 1584 passed / 35 failed. Reproduced concurrent memory corruption,
+supersession rewrite and missing atomic crash boundary; added OS locking, atomic
+replace and append-preserving supersession journal. Closed existing SQLite
+connections and corrected Git-stderr false positive. Final full local run:
+1628 passed, 1 upstream warning. Nine process/lease/isolation/approval tests pass.
+No packages installed, production data modified, push, publish, merge or deploy.
+See docs/research/NEXUS_EXECUTION_VERIFICATION_2026-10-14.md for commands,
+evidence hashes, limits and rollback. Next: review portability/patch and recover
+canonical authority before real steel qualification. New-commit remote CI NOT_RUN.
+
 Last updated: 2026-09-19 by Claude Code (via Reza) -- reconciled the second main/feat divergence (see MAIN/FEAT MERGE #2 section at the end); rest unchanged
 RULE: Read this file FIRST in any new session before doing anything
 else. Overwrite stale sections when updating — do not just append.

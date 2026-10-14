@@ -34,6 +34,20 @@ class BuyerSignalGateTests(unittest.TestCase):
         self.assertEqual(classify_signal(replace(self.signal, evidence_type="AWARD"),
                                          today=self.today), "AWARD")
 
+    def test_price_monitoring_is_not_an_open_buy_tender(self):
+        # Rosatom 4636989 explicitly disclaims a contract obligation.
+        for deadline in ("", "2026-10-21", "2026-10-12"):
+            with self.subTest(deadline=deadline):
+                signal = replace(self.signal, evidence_type="MARKET_PRICE_MONITORING",
+                                 deadline=deadline)
+                self.assertEqual(classify_signal(signal, today=date(2026, 10, 14)),
+                                 "MARKET_PRICE_MONITORING")
+
+    def test_previous_day_deadline_rolls_to_expired(self):
+        signal = replace(self.signal, deadline="2026-10-13")
+        self.assertEqual(classify_signal(signal, today=date(2026, 10, 14)),
+                         "BUY_TENDER_EXPIRED")
+
     def test_invalid_sources_and_evidence_fail_closed(self):
         for update in ({"source_url": ""}, {"source_url": "not-a-url"},
                        {"buyer_name": ""}, {"evidence_type": "CONFIRMED_BUYER"},

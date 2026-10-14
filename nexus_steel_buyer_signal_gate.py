@@ -21,7 +21,7 @@ def classify_signal(signal: BuyerSignal, *, today: date) -> str:
         raise ValueError("missing_evidence")
     if not signal.source_url.startswith(("https://", "http://")):
         raise ValueError("invalid_source_url")
-    if signal.evidence_type not in {"BUY_TENDER", "SALE_TENDER", "RFQ", "AWARD", "UNKNOWN"}:
+    if signal.evidence_type not in {"BUY_TENDER", "SALE_TENDER", "RFQ", "AWARD", "UNKNOWN", "MARKET_PRICE_MONITORING"}:
         raise ValueError("invalid_evidence_type")
     if signal.evidence_type != "BUY_TENDER":
         return signal.evidence_type

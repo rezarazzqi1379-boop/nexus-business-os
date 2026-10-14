@@ -72,3 +72,15 @@ GitHub stores this handoff file; it cannot itself modify the instructions or con
 
 ### Coordination caveat
 This protocol does not edit old chats, automatically load into all conversations, install a persistent agent, or guarantee a connector will be available in a new chat. Paste the resume text or explicitly reference this GitHub file in a new conversation.
+
+## Work continuation audit — 2026-10-14
+
+- Independently verified main: 59f5fb386c023b1f04deaae15709c371e9bfd6d7. PR #111 remains open Draft, not merged.
+- Verified pre-audit HEAD: 9b0286eda75bde0ca1c2b7627ed0567c9eab7fce; its CI run 38388684585 SUCCESS. Reported run 38386374895 is historical SUCCESS on f60d7a55, not the current-head proof.
+- New review: docs/STEEL_SIGNAL_AUDIT_2026-10-14.md and .json; all 18 source URLs refreshed through Exa. Zero records promoted to verified active buyers.
+- Material correction: RU-STEEL-002 / Rosatom 4636989 is nonbinding MARKET_PRICE_MONITORING; operator states no contract obligation. KZ-002/005 deadline claims are now past. RU-001 prior deadline conflict retained with possible related-notice contamination, not silently erased.
+- Exact latest authority binaries and canonical steel project ID remain unresolved. Bootstrap actually executed: BLOCK / missing accepted registry/master authority. Historical local authority claims disagree with a connected reconciliation record; no canonical promotion.
+- Apollo callable catalog is not operational access proof; access evidence unresolved. ABRAMS fresh HS7208 Kazakhstan probe again returned only non-Kazakhstan examples from a compact 2024 snapshot with company-total counts.
+- Local focused tests: 9 buyer-gate + 3 offline admission passed in isolated review directory. Full repository CI for the resulting audit commit must be checked after this update; do not carry baseline green forward.
+- Dirty local mirror preserved (two existing research JSON modifications); separately reported host checkout was not reset, cleaned or overwritten.
+- Next: reconcile exact binaries/hashes; recover original OM-002 ITT and RU-001 amendments, then current supply/MTC fit. No send/spend/CRM mutation/merge/deployment authorized or performed.

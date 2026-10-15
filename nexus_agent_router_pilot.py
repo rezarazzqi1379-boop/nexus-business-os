@@ -65,11 +65,17 @@ def run_parallel(
                     name, request.project_id, request.task_id
                 ):
                     raise ValueError("Worker result scope mismatch")
+                if result.status != "COMPLETE" or not result.evidence or any(
+                    not isinstance(ref, str) or not ref.startswith(
+                        f"synthetic://{request.project_id}/{request.task_id}/"
+                    ) for ref in result.evidence
+                ):
+                    raise ValueError("Invalid synthetic evidence")
                 outcomes[name] = result
             except Exception as exc:
                 outcomes[name] = WorkerResult(
                     name, request.project_id, request.task_id, "FAILED", (),
-                    f"{type(exc).__name__}: {exc}",
+                    type(exc).__name__,
                 )
     return {
         "run_id": str(uuid.uuid4()),

@@ -11,7 +11,7 @@ from nexus_agent_router_pilot import WorkRequest as PilotWork, run_parallel, syn
 def run_planned_synthetic(work_id: str, project_id: str, objective: str,
                           *, problem_tags: tuple[str, ...],
                           required_capabilities: tuple[str, ...],
-                          lane: str = 'qa') -> dict:
+                          lane: str = 'engineering') -> dict:
     """Require qualified existing catalog agent and no blocked/approval work."""
     if not work_id or not project_id or not objective:
         raise ValueError('missing identity')

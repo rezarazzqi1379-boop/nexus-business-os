@@ -84,7 +84,8 @@ class AutonomyStore:
         except sqlite3.IntegrityError:
             return False
 
-    def claim_next(self, worker_id: str, *, lease_seconds: int = 60, now: datetime | None = None) -> ClaimedWork | None:
+    def claim_next(self, worker_id: str, *, lease_seconds: int = 60, now: datetime | None = None,
+                   project: str | None = None, action: str | None = None) -> ClaimedWork | None:
         if not worker_id.strip() or lease_seconds <= 0:
             raise ValueError("invalid_lease")
         current_dt = now or utc_now()
@@ -95,7 +96,8 @@ class AutonomyStore:
             row = db.execute(
                 "SELECT * FROM work_items WHERE attempts < max_attempts AND not_before <= ? "
                 "AND (status='queued' OR (status='leased' AND lease_until < ?)) "
-                "ORDER BY priority DESC, not_before ASC LIMIT 1", (current, current),
+                "AND (? IS NULL OR project=?) AND (? IS NULL OR action=?) "
+                "ORDER BY priority DESC, not_before ASC LIMIT 1", (current, current, project, project, action, action),
             ).fetchone()
             if row is None:
                 db.execute("COMMIT")

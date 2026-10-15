@@ -1,0 +1,41 @@
+{
+  "exercise": {
+    "exercise_id": "router-foundation-20261015",
+    "system_id": "existing-autonomy-router",
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "task_id": "router-proof",
+    "procedural_family": "durable-synthetic-execution",
+    "evidence_refs": [
+      "docs/research/NEXUS_AGENT_ROUTER_VERIFIED_2026-10-15.md",
+      "data/research/agent-router-benchmark-2026-10-15.json"
+    ],
+    "actions": [
+      "repair bridge",
+      "reuse queue",
+      "forced crash/restart",
+      "benchmark"
+    ],
+    "test_commands": [
+      "python -m pytest -q tests evals",
+      "python benchmark_agent_router.py --output data/research/agent-router-benchmark-2026-10-15.json"
+    ],
+    "acceptance_checks": [
+      "1660 passed",
+      "20 synthetic runs",
+      "no external effects"
+    ],
+    "outcome": "PARTIAL",
+    "human_corrections": 0,
+    "reusable_lessons": [],
+    "observed_at": "2026-10-15T05:44:49.153247+00:00"
+  },
+  "cycle": {
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "accepted_exercises": [],
+    "ineligible_exercises": [
+      "router-foundation-20261015"
+    ],
+    "candidates": [],
+    "production_changes_applied": false
+  }
+}

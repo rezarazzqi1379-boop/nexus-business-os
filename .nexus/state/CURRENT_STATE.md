@@ -1,4 +1,20 @@
 # NEXUS CURRENT STATE
+## Synthetic agent-router verification — 2026-10-15
+
+Branch codex/agent-router-verification-2026-10-15, baseline 7b4c899668fdc461dc2974bebf191df000ecf9bb.
+PR #113 refreshed OPEN/DRAFT/NOT_MERGED; its db94bc7 fixes are ancestors of this pilot.
+Fixed invalid bridge lane, partial-capability acceptance and API startup SQLite leak.
+Existing queue now drives three fixed synthetic roles with attempt-fenced checkpoints,
+retry limits, cancel/stop, restart recovery and authenticated read-only console.
+Final local full suite 1660 passed, one upstream warning. Ten runs per mode:
+sequential median 0.066811s / concurrent 0.095651s, no speedup; completion and
+synthetic evidence completeness 100%, errors/retries/replay 0. No model/API cost;
+actual session tokens UNKNOWN. Fresh missing-authority bootstrap BLOCK.
+No new dependencies, push, deploy or registered runtime upgrade. Restartable CLI
+verified, persistent daemon NOT installed. Existing unrelated worktrees preserved.
+See docs/research/NEXUS_AGENT_ROUTER_VERIFIED_2026-10-15.md for commands, failure,
+manifest, security limits, rollback and next milestone. New-commit remote CI NOT_RUN.
+
 ## Local execution/durability verification — 2026-10-14
 
 Isolated branch codex/execution-verification-2026-10-14 based on refreshed main

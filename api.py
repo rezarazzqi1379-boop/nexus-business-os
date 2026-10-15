@@ -148,7 +148,10 @@ def router_status() -> dict:
     if not path:
         return {"status": "NOT_CONFIGURED", "execution_enabled": False}
     try:
-        return SyntheticRuntime.read_snapshot(Path(path))
+        from nexus_public_research_agent import PublicResearchRuntime
+        payload = SyntheticRuntime.read_snapshot(Path(path))
+        payload["public_research"] = PublicResearchRuntime.read_snapshot(Path(path))
+        return payload
     except (OSError, sqlite3.Error):
         raise HTTPException(status_code=503, detail="router_state_unavailable") from None
 

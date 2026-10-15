@@ -28,6 +28,9 @@ ROLES = ("research", "reconciliation", "qa")
 
 
 class SyntheticRuntime:
+    action = ACTION
+    roles = ROLES
+
     def __init__(self, path: Path):
         self.store = AutonomyStore(path)
         with closing(self.store._connect()) as db:
@@ -60,9 +63,7 @@ class SyntheticRuntime:
             raise PermissionError("scope_or_authority_blocked")
         if type(budget_units) is not int or not 3 <= budget_units <= 30:
             raise ValueError("budget_exhausted_or_unbounded")
-        request = WorkRequest(task_id, PROJECT, "Synthetic research/reconciliation/QA",
-                              ("agent-runtime",), ("agents",), lane="engineering", risk="read")
-        plan = build_coordination_plan((request,), (), concurrency=3)
+        plan = self.coordination(task_id)
         if plan.blocked or plan.approval_required or len(plan.assignments) != 1:
             raise PermissionError("no_qualified_agent")
         # Catalog recommendation is provenance; implementation is the fixed
@@ -83,16 +84,29 @@ class SyntheticRuntime:
                     db.commit()
                     return False
                 self._event(db, task_id, "submitted", {"digest": digest, **manifest}, now)
-                for role in ROLES:
+                for role in self.roles:
                     payload = json.dumps({**manifest, "role": role}, sort_keys=True)
                     db.execute("INSERT INTO work_items VALUES(?,?,?,?,?,'queued',0,?,?,NULL,NULL,NULL)",
-                               (f"router:{task_id}:{role}", PROJECT, ACTION, payload, 50,
-                                min(3, budget_units // 3), now.isoformat()))
+                               (f"router:{task_id}:{role}", PROJECT, self.action, payload, 50,
+                                min(3, budget_units // len(self.roles)), now.isoformat()))
                 db.commit()
             except Exception:
                 db.rollback()
                 raise
         return True
+
+    def coordination(self, task_id):
+        request = WorkRequest(task_id, PROJECT, "Synthetic research/reconciliation/QA",
+                              ("agent-runtime",), ("agents",), lane="engineering", risk="read")
+        return build_coordination_plan((request,), (), concurrency=3)
+
+    def execute(self, payload):
+        return asdict(synthetic_worker(payload["role"])(
+            PilotRequest(PROJECT, payload["task_id"], "Synthetic proof")))
+
+    def validate_result(self, payload, result):
+        if result != self.execute(payload):
+            raise ValueError("malformed_or_cross_scope_evidence")
 
     def claim(self, owner, *, now=None, lease_seconds=30):
         self._identity(owner)
@@ -104,14 +118,14 @@ class SyntheticRuntime:
             # Exhausted crashed leases must become visible terminal failures.
             db.execute("UPDATE work_items SET status='dead_letter' WHERE project=? AND action=? "
                        "AND status='leased' AND lease_until<? AND attempts>=max_attempts",
-                       (PROJECT, ACTION, current.isoformat()))
-        return self.store.claim_next(owner, project=PROJECT, action=ACTION,
+                       (PROJECT, self.action, current.isoformat()))
+        return self.store.claim_next(owner, project=PROJECT, action=self.action,
                                      lease_seconds=lease_seconds, now=current)
 
     def _fence(self, db, item, owner, now):
         row = db.execute("SELECT * FROM work_items WHERE work_id=? AND project=? AND action=? "
                          "AND status='leased' AND lease_owner=? AND attempts=? AND lease_until>?",
-                         (item.work_id, PROJECT, ACTION, owner, item.attempt, now.isoformat())).fetchone()
+                         (item.work_id, PROJECT, self.action, owner, item.attempt, now.isoformat())).fetchone()
         stopped = db.execute("SELECT stopped FROM router_control WHERE project=?", (PROJECT,)).fetchone()
         if row is None or (stopped and stopped[0]) or item.project != PROJECT:
             raise PermissionError("stale_lease_or_stopped")
@@ -138,11 +152,7 @@ class SyntheticRuntime:
             db.execute("BEGIN IMMEDIATE")
             try:
                 payload = self._fence(db, item, owner, current)
-                expected = asdict(synthetic_worker(payload["role"])(
-                    PilotRequest(PROJECT, payload["task_id"], "Synthetic proof")))
-                # Full output binding; untrusted provider data is never accepted.
-                if result != expected:
-                    raise ValueError("malformed_or_cross_scope_evidence")
+                self.validate_result(payload, result)
                 self._event(db, payload["task_id"], "checkpoint", result, current)
                 db.execute("UPDATE work_items SET status='completed',lease_owner=NULL,lease_until=NULL WHERE work_id=?",
                            (item.work_id,))
@@ -157,7 +167,7 @@ class SyntheticRuntime:
             db.execute("BEGIN IMMEDIATE")
             db.execute("UPDATE work_items SET status='cancelled',lease_owner=NULL,lease_until=NULL "
                        "WHERE project=? AND action=? AND json_extract(payload_json,'$.task_id')=? "
-                       "AND status IN ('queued','leased')", (PROJECT, ACTION, task_id))
+                       "AND status IN ('queued','leased')", (PROJECT, self.action, task_id))
             self._event(db, task_id, "cancelled", {}, utc_now())
             db.commit()
 
@@ -168,7 +178,7 @@ class SyntheticRuntime:
             self._event(db, "control", "emergency_stop", {}, utc_now())
             db.commit()
 
-    def drain(self, concurrency=3):
+    def drain(self, concurrency=1):
         if type(concurrency) is not int or not 1 <= concurrency <= 3:
             raise ValueError("invalid_concurrency")
         def worker(index):
@@ -178,8 +188,8 @@ class SyntheticRuntime:
             count = 0
             while (item := self.claim(owner)) is not None:
                 payload = item.payload
-                result = synthetic_worker(payload["role"])(PilotRequest(PROJECT, payload["task_id"], "Synthetic proof"))
-                self.finish(item, owner, asdict(result))
+                result = self.execute(payload)
+                self.finish(item, owner, result)
                 count += 1
             return count
         with ThreadPoolExecutor(max_workers=concurrency) as pool:
@@ -188,13 +198,13 @@ class SyntheticRuntime:
     def snapshot(self):
         return self.read_snapshot(self.store.path)
 
-    @staticmethod
-    def read_snapshot(path):
+    @classmethod
+    def read_snapshot(cls, path):
         # Console reads do not create databases, tables, leases or work.
         with closing(sqlite3.connect(Path(path).resolve().as_uri() + "?mode=ro", uri=True)) as db:
             db.row_factory = sqlite3.Row
             rows = db.execute("SELECT work_id,status,attempts,lease_owner,lease_until FROM work_items "
-                              "WHERE project=? AND action=? ORDER BY work_id LIMIT 300", (PROJECT, ACTION)).fetchall()
+                              "WHERE project=? AND action=? ORDER BY work_id LIMIT 300", (PROJECT, cls.action)).fetchall()
             events = db.execute("SELECT seq,task,kind,body,observed_at FROM router_events WHERE project=? "
                                 "ORDER BY seq DESC LIMIT 300", (PROJECT,)).fetchall()
             stopped = db.execute("SELECT stopped FROM router_control WHERE project=?", (PROJECT,)).fetchone()

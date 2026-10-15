@@ -1,4 +1,18 @@
 # NEXUS CURRENT STATE
+## Real-source deterministic researcher — 2026-10-15
+
+Branch codex/real-research-agent-2026-10-15, baseline bd2568fc6bea59d2f8913b277cf012c925dfe584.
+Baseline log hash checked and 32 focused tests reproduced. Current full suite:
+1677 passed / one upstream warning. Existing queue/checkpoints/Supervisor support
+one fixed public GitHub metadata worker, with sequential default, fixed URLs,
+response bounds, provenance hashes, stale/tampered-result rejection and replay.
+One live task succeeded: two GETs, 1.3789565s; ten frozen repetitions 60/60 schema
+fields, zero completed replay reads. Single-source CLAIM; commercial yield zero.
+This is NOT an LLM reasoning agent. No usable free local model verified; LLM
+integration awaits exact model/data/budget scope. Registry/Master bootstrap BLOCK.
+No new framework/service/credentials, paid calls, push, merge or deployment.
+See docs/research/NEXUS_REAL_SOURCE_AGENT_2026-10-15.md for limitations/rollback.
+
 ## Synthetic agent-router verification — 2026-10-15
 
 Branch codex/agent-router-verification-2026-10-15, baseline 7b4c899668fdc461dc2974bebf191df000ecf9bb.

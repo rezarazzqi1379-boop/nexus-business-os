@@ -1,6 +1,6 @@
 """Runner-agnostic, evidence-gated task supervision for NEXUS.
 
-Runner state is treated as an observation only.  In particular, ``done`` and
+Runner state is treated as an observation only. In particular, ``done`` and
 ``idle`` never prove that a task is acceptable.
 """
 
@@ -40,6 +40,7 @@ class ArtifactClaim:
     artifact: bytes
     evidence: tuple[str, ...]
     passed_tests: tuple[str, ...]
+    # Compatibility-only diagnostic field. A mutable boolean is never authority.
     human_approved: bool = False
 
     @property
@@ -100,7 +101,12 @@ class Supervisor:
         return task.phase
 
     def verify(self, task: TaskRecord, claim: ArtifactClaim) -> Phase:
-        """Accept only a complete claim bound to the exact task contract."""
+        """Accept only a complete claim bound to the exact task contract.
+
+        Human approval is deliberately not represented by ``claim.human_approved``.
+        Until this supervisor consumes the canonical exact-action approval authority,
+        any contract requiring human approval must fail closed.
+        """
         failures: list[str] = []
         c = task.contract
         if task.phase is not Phase.PRODUCED:
@@ -115,8 +121,8 @@ class Supervisor:
             failures.append("missing_evidence")
         if not set(c.required_tests).issubset(claim.passed_tests):
             failures.append("missing_or_failed_tests")
-        if c.requires_human_approval and not claim.human_approved:
-            failures.append("human_approval_missing")
+        if c.requires_human_approval:
+            failures.append("exact_human_approval_consumer_not_implemented")
 
         if failures:
             task.phase = Phase.REJECTED

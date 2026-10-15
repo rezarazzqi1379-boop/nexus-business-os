@@ -5,6 +5,7 @@ import os
 import sqlite3
 import time
 import uuid
+from contextlib import closing
 from pathlib import Path
 from urllib.parse import parse_qs
 
@@ -40,9 +41,9 @@ _LOGIN_ATTEMPTS: dict[str, list[float]] = {}
 def _startup_checks() -> dict[str, bool]:
     checks = {"auth": auth_config_valid(), "state": False, "canonical": False, "vault": False}
     try:
-        with sqlite3.connect(STORE.path) as db:
+        with closing(sqlite3.connect(STORE.path)) as db:
             checks["state"] = db.execute("SELECT 1").fetchone()[0] == 1
-        with sqlite3.connect(CANONICAL.path) as db:
+        with closing(sqlite3.connect(CANONICAL.path)) as db:
             checks["canonical"] = db.execute("SELECT 1").fetchone()[0] == 1
         probe = VAULT.root / f".readiness-{uuid.uuid4().hex}"
         probe.write_text("ok", encoding="utf-8")

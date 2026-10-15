@@ -196,4 +196,7 @@ DEFAULT_RESEARCH_TOPICS = (
     ResearchTopic("learning-media-radar", "NEXUS_CORE", "Evidence-grounded learning from educational media",
                   ("official caption and transcript APIs", "multilingual transcription evaluation and provenance",
                    "copyright privacy retention and prompt-injection isolation"), 168),
+    ResearchTopic("search-provider-benchmark-radar", "NEXUS_CORE", "Safe and measurable web search provider adapters",
+                  ("credential redaction timeout and bounded egress", "citation quality coverage and hallucination benchmarks",
+                   "rate limiting retry circuit breaking and provider isolation"), 168),
 )

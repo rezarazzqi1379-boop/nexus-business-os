@@ -6,6 +6,7 @@ import json
 import os
 import sqlite3
 import tarfile
+from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -19,9 +20,10 @@ def backup(data_dir: Path, output_dir: Path) -> dict:
     files = []
     for source in sorted(data_dir.glob("*.db")):
         destination = target / source.name
-        with sqlite3.connect(source) as source_db, sqlite3.connect(destination) as destination_db:
-            source_db.backup(destination_db)
-            integrity = destination_db.execute("PRAGMA integrity_check").fetchone()[0]
+        with closing(sqlite3.connect(source)) as source_db, closing(sqlite3.connect(destination)) as destination_db:
+            with source_db, destination_db:
+                source_db.backup(destination_db)
+                integrity = destination_db.execute("PRAGMA integrity_check").fetchone()[0]
         if integrity != "ok":
             raise RuntimeError("backup_integrity_failed")
         files.append(destination)
@@ -64,10 +66,11 @@ def restore_backup(path: Path, destination: Path) -> dict:
     restored = []
     for database in sorted(path.glob("*.db")):
         target = destination / database.name
-        with sqlite3.connect(database) as source_db, sqlite3.connect(target) as target_db:
-            source_db.backup(target_db)
-            if target_db.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
-                raise RuntimeError("restored_database_integrity_failed")
+        with closing(sqlite3.connect(database)) as source_db, closing(sqlite3.connect(target)) as target_db:
+            with source_db, target_db:
+                source_db.backup(target_db)
+                if target_db.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+                    raise RuntimeError("restored_database_integrity_failed")
         restored.append(target.name)
     archive = path / "nexus_vault.tar.gz"
     if archive.is_file():

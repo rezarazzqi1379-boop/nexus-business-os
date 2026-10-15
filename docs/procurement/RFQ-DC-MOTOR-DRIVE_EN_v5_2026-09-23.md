@@ -26,9 +26,9 @@ These are our own engineering estimates, given so that you can size and comment.
 | Peak rolling torque at motor shaft | ≈34 kN·m |
 | Governing pass | ≈2040 kW at motor shaft, ≈647 rpm, for ≈2.9 s |
 | Overload at base speed | ≥1.5 × rated torque for ≥30 s |
-| Duty | 85–170 reversals per hour depending on product thickness (accelerations plus brakings up to ≈238 per hour); duty type S6 or S9 |
+| Duty | 85–170 reversals per hour depending on product thickness (accelerations plus brakings about 204–374 per hour over the same thickness range); duty type S6 or S9 |
 | Speed control range | ≥1:20 |
-| Drive | Four-quadrant thyristor converter, 12-pulse, regenerative; peak regenerative power ≥650 kW instantaneous |
+| Drive | Four-quadrant thyristor converter, 12-pulse, regenerative; peak regenerative power ≥680 kW instantaneous at a 3 s braking ramp (about 1,010 kW if the ramp is 2 s; please state the ramp your drive uses) |
 | Insulation / protection | Class F insulation with class B temperature rise; IP23 with filters, or IP54 with air-to-water cooler |
 | Cooling | Separately driven cooling fan (full torque at low speed) |
 | Encoders | On the motor shaft, plus one on the roll for diameter compensation |

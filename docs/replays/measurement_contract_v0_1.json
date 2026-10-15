@@ -1,0 +1,46 @@
+{
+  "schema_version": "0.1",
+  "purpose": "Measure NEXUS workflow quality and business outcomes without inventing counterfactual gains.",
+  "minimum_comparable_runs_before_promotion": 5,
+  "required_fields": [
+    "run_id",
+    "project_id",
+    "workflow_name",
+    "workflow_version",
+    "signal_at",
+    "first_decision_at",
+    "state_before",
+    "state_after",
+    "evidence_links",
+    "authority_gap_count",
+    "duplicate_block_count",
+    "unsupported_claim_block_count",
+    "clarification_count",
+    "rework_count",
+    "human_correction_count",
+    "external_action_approved",
+    "external_action_at",
+    "supplier_response",
+    "qualified_offer",
+    "commercial_outcome",
+    "outcome_at"
+  ],
+  "derived_metrics": [
+    "signal_to_decision_seconds",
+    "decision_to_approved_action_seconds",
+    "duplicate_blocks_per_run",
+    "unsupported_claim_blocks_per_run",
+    "clarifications_per_run",
+    "rework_per_run",
+    "human_corrections_per_run",
+    "qualified_offer_rate",
+    "response_rate"
+  ],
+  "promotion_rules": {
+    "requires_no_safety_regression": true,
+    "requires_evidence_links": true,
+    "requires_at_least_five_comparable_runs": true,
+    "requires_human_review": true,
+    "roi_claim_requires_actual_commercial_outcomes": true
+  }
+}

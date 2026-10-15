@@ -1,4 +1,18 @@
 # NEXUS CURRENT STATE
+## v3.5 independent safety review and pinned model manifest — 2026-10-15
+
+Branch codex/local-llm-manifest-review-2026-10-15 from 5a2c36c. Independently
+reproduced 1687 baseline tests; final full run 1692 pass. All 19 original hash
+findings audited; five adversarial tests show digest integrity is not secret-free
+content certification. Secret Guard and ownership/approval gates unchanged/BLOCK.
+Codex Security scan 8ec71d27-7da4-4aae-b6a2-d98b41a9d2aa completed for immutable
+127edca..5a2c36c diff with 10 inventory items, no new reportable bypass; scope limits apply.
+Pinned Qwen3-0.6B Q8 GGUF + llama.cpp Windows CPU manifest is REVIEW_ONLY, no
+weights/binaries downloaded or executed. Exact approval request includes hashes,
+disposable root, 4GiB RSS cap/6GiB free RAM prerequisite, 2048/128 tokens and
+single-worker offline plan. Drive handoff/mirror refreshed; accepted Registry/Master
+still unavailable in bounded search. Fresh bootstrap BLOCK. See docs/research/NEXUS_V35_LOCAL_LLM_REVIEW_FA.md.
+
 ## v3.2 evidence safety and model feasibility — 2026-10-15
 
 Local branch codex/evidence-safety-llm-feasibility-2026-10-15; code commit c99fc7e.

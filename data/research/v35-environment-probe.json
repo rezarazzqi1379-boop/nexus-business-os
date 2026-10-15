@@ -1,0 +1,24 @@
+{
+  "ram_bytes": 16791048192,
+  "free_ram_kib": 6881480,
+  "cpu": [
+    {
+      "Name": "13th Gen Intel(R) Core(TM) i5-13420H",
+      "NumberOfCores": 8,
+      "NumberOfLogicalProcessors": 12
+    }
+  ],
+  "disk_free": 35077025792,
+  "vc_runtime": [
+    {
+      "present": true,
+      "path": "C:/Windows/System32/vcruntime140.dll"
+    },
+    {
+      "present": true,
+      "path": "C:/Windows/System32/msvcp140.dll"
+    }
+  ],
+  "gpu": "NVIDIA GeForce RTX 4050 Laptop GPU, 6141 MiB",
+  "python": "Python 3.14.7"
+}

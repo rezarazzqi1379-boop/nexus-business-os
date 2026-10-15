@@ -1,0 +1,112 @@
+{
+  "schema": "nexus.evidence-digest-review.v1",
+  "mode": "EXPERIMENT_ONLY",
+  "original_findings": [
+    "secret_pattern_6"
+  ],
+  "generic_matches": 19,
+  "recomputed_digest_matches": 19,
+  "unexplained_generic_matches": 0,
+  "guard_decision": "BLOCK",
+  "suppressed_findings": 0,
+  "authorizes_handoff": false,
+  "requires_security_review": true,
+  "occurrences": [
+    {
+      "index": 0,
+      "length": 64,
+      "provenance": "source_body:https://api.github.com/repos/openai/openai-agents-python"
+    },
+    {
+      "index": 1,
+      "length": 64,
+      "provenance": "source_body:https://api.github.com/repos/openai/openai-agents-python/releases/latest"
+    },
+    {
+      "index": 2,
+      "length": 64,
+      "provenance": "source_body:https://api.github.com/repos/openai/openai-agents-python"
+    },
+    {
+      "index": 3,
+      "length": 64,
+      "provenance": "source_body:https://api.github.com/repos/openai/openai-agents-python/releases/latest"
+    },
+    {
+      "index": 4,
+      "length": 64,
+      "provenance": "canonical_submission_manifest:public_agent_live_001"
+    },
+    {
+      "index": 5,
+      "length": 64,
+      "provenance": "file_manifest:api.py"
+    },
+    {
+      "index": 6,
+      "length": 64,
+      "provenance": "file_manifest:nexus_router_runtime.py"
+    },
+    {
+      "index": 7,
+      "length": 64,
+      "provenance": "file_manifest:nexus_public_research_agent.py"
+    },
+    {
+      "index": 8,
+      "length": 64,
+      "provenance": "file_manifest:benchmark_public_research_agent.py"
+    },
+    {
+      "index": 9,
+      "length": 64,
+      "provenance": "file_manifest:tests/test_public_research_agent.py"
+    },
+    {
+      "index": 10,
+      "length": 64,
+      "provenance": "file_manifest:docs/research/NEXUS_REAL_SOURCE_AGENT_2026-10-15.md"
+    },
+    {
+      "index": 11,
+      "length": 64,
+      "provenance": "file_manifest:.nexus/state/CURRENT_STATE.md"
+    },
+    {
+      "index": 12,
+      "length": 64,
+      "provenance": "file_manifest:.nexus/memory/context.jsonl"
+    },
+    {
+      "index": 13,
+      "length": 64,
+      "provenance": "evidence_hashes:public-agent-authority-2026-10-15.json"
+    },
+    {
+      "index": 14,
+      "length": 64,
+      "provenance": "evidence_hashes:public-agent-benchmark-2026-10-15.json"
+    },
+    {
+      "index": 15,
+      "length": 64,
+      "provenance": "evidence_hashes:public-agent-exercise-2026-10-15.json"
+    },
+    {
+      "index": 16,
+      "length": 64,
+      "provenance": "evidence_hashes:public-agent-final-2026-10-15.txt"
+    },
+    {
+      "index": 17,
+      "length": 64,
+      "provenance": "evidence_hashes:public-agent-frozen-rerun-2026-10-15.json"
+    },
+    {
+      "index": 18,
+      "length": 64,
+      "provenance": "evidence_hashes:public-agent-live-2026-10-15.json"
+    }
+  ],
+  "original_commit": "127edca49be8b0584019dd6acf683669135c89b5"
+}

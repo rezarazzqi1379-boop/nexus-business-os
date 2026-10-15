@@ -1,0 +1,82 @@
+{
+  "status": "PENDING_OWNER_APPROVAL",
+  "manifest_sha256": "2f4f3901277e3cb48219b0a09d58293a8543599251dbd6cb0d842f0eed7a8d52",
+  "manifest": "data/research/v35-local-llm-manifest.json",
+  "scope": "Download only exact pinned Qwen GGUF and llama.cpp CPU runtime; verify SHA256, inspect and safely extract in named disposable root; implement one bounded offline read-only router experiment with existing queue/Supervisor; no persistent service or paid API",
+  "disposable_root": "C:/Users/AvallPc/.codex/worktrees/8cdc/nexus-business-os/data/local-llm-experiments/v35-qwen-cpu",
+  "model": {
+    "publisher": "Qwen",
+    "repository": "Qwen/Qwen3-0.6B-GGUF",
+    "revision": "23749fefcc72300e3a2ad315e1317431b06b590a",
+    "filename": "Qwen3-0.6B-Q8_0.gguf",
+    "size_bytes": 639446688,
+    "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+    "hash_provenance": "publisher LFS metadata; artifact bytes NOT downloaded/verified",
+    "gated": false,
+    "license": "Apache-2.0",
+    "license_url": "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/23749fefcc72300e3a2ad315e1317431b06b590a/LICENSE",
+    "license_sha256": "5de36594c10839788a8c589443a8ef9d8b8d17c65a1b5807206ae037fc36c6bd",
+    "url": "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/23749fefcc72300e3a2ad315e1317431b06b590a/Qwen3-0.6B-Q8_0.gguf"
+  },
+  "runtime": {
+    "publisher": "ggml-org",
+    "repository": "ggml-org/llama.cpp",
+    "tag": "b11429",
+    "commit": "d81235049384534c167caea52b85a694f6103d14",
+    "asset_id": 613152134,
+    "filename": "llama-b11429-bin-win-cpu-x64.zip",
+    "size_bytes": 19398918,
+    "sha256": "1283323272b04cd07905816a597a0da810918102de958f4ff6f7bbaa70ed2efe",
+    "hash_provenance": "GitHub release asset digest; binary NOT downloaded/verified",
+    "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11429/llama-b11429-bin-win-cpu-x64.zip",
+    "license": "MIT",
+    "license_url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/d81235049384534c167caea52b85a694f6103d14/LICENSE",
+    "license_sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+    "platform": "Windows x64 CPU",
+    "cli_flags_in_pinned_source": {
+      "--offline": true,
+      "--no-conversation": true,
+      "--ctx-size": true,
+      "--n-predict": true,
+      "--threads": true,
+      "--n-gpu-layers": true,
+      "--seed": true,
+      "--temp": true
+    }
+  },
+  "limits": {
+    "context_tokens": 2048,
+    "output_tokens": 128,
+    "threads": 4,
+    "concurrency": 1,
+    "gpu_layers": 0,
+    "process_timeout_seconds": 120,
+    "total_benchmark_seconds": 1200,
+    "max_rss_bytes": 4294967296,
+    "required_disk_free_bytes": 3221225472,
+    "provider_cost_usd": 0,
+    "api_calls": 0,
+    "fixtures": "public captured GitHub evidence only",
+    "max_cases": 8,
+    "recovery_replays": 2,
+    "required_available_ram_bytes": 6442450944,
+    "abort_if_limits_not_enforceable": true
+  },
+  "deny": [
+    "production",
+    "permission changes",
+    "credentials",
+    "services",
+    "paid charges",
+    "push",
+    "merge",
+    "deploy"
+  ],
+  "prerequisites": [
+    "safe archive review",
+    "verified hashes",
+    "enforceable RSS/timeout/offline boundary",
+    "fresh disk/RAM check"
+  ],
+  "authorization_received": false
+}

@@ -38,3 +38,25 @@ def test_embedded_body_tampering_not_explained():
     record={'documents':[{'body':'modified','sha256':digest}]}
     payload={'snapshot':{'events':[{'body':json.dumps(record),'kind':'checkpoint'}]}}
     assert not verified_digests(payload,lambda path:b'')
+
+
+@pytest.mark.parametrize('prefix', ['sk-', 'AKIA', 'ghp_', 'xoxb-'])
+def test_digest_does_not_certify_secret_free_body(prefix):
+    # Deliberately synthetic credential shapes, never actual credentials.
+    suffix='1'*16 if prefix=='AKIA' else 'A'*36
+    body=prefix+suffix
+    digest=hashlib.sha256(body.encode()).hexdigest()
+    payload={'snapshot':{'events':[{'kind':'checkpoint','body':json.dumps({
+        'documents':[{'body':body,'sha256':digest}]})}]}}
+    report=review_diff(json.dumps(payload),[payload],lambda path:b'')
+    assert report['recomputed_digest_matches']>=1
+    assert report['guard_decision']=='BLOCK' and not report['authorizes_handoff']
+    assert any(x!='secret_pattern_6' for x in report['original_findings'])
+
+
+def test_recomputed_hash_in_password_context_still_blocks():
+    body=b'public evidence'; digest=hashlib.sha256(body).hexdigest()
+    report=review_diff(json.dumps({'password':digest}),[{'file_manifest':{'public.txt':digest}}],lambda path:body)
+    assert report['recomputed_digest_matches']==1
+    assert 'secret_pattern_5' in report['original_findings']
+    assert report['guard_decision']=='BLOCK' and report['suppressed_findings']==0

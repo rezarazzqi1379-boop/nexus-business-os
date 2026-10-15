@@ -1,0 +1,121 @@
+{
+  "delta_id": "NEXUS-AGENT-CATALOG-DELTA-2026-08-31-v0.1",
+  "observed_at": "2026-08-31",
+  "authority": "RESEARCH_INPUT_NOT_EXECUTION_AUTHORITY",
+  "baseline": "feature/agent-catalog-v0-1@e19a896547da79951dc2635d796183c94fe88008",
+  "candidates": [
+    {
+      "catalog_id": "AGT-MCP-SPEC-2026-07-28",
+      "name": "Model Context Protocol 2026-07-28",
+      "kind": "PROTOCOL",
+      "source_url": "https://blog.modelcontextprotocol.io/posts/2026-07-28/",
+      "observed_at": "2026-08-31",
+      "lifecycle": "RESEARCHED",
+      "problem_tags": ["mcp-compatibility", "tool-interoperability", "authorization"],
+      "capabilities": ["stateless-core", "mrtr", "header-routing", "cacheable-lists", "tasks-extension"],
+      "risks": ["breaking-session-removal", "deprecated-roots-sampling-logging", "auth-migration"],
+      "revisit_triggers": ["any-mcp-sdk-upgrade", "remote-mcp-pilot"],
+      "acceptance_test": "Replay legacy and 2026-07-28 fixtures; identify every session, initialize, roots, sampling and logging dependency; zero silent compatibility fallbacks.",
+      "rollback": "Delete the compatibility checker and retain the existing static connector path."
+    },
+    {
+      "catalog_id": "AGT-CODEX-APP-SERVER",
+      "name": "Codex App Server",
+      "kind": "PROTOCOL",
+      "source_url": "https://github.com/openai/codex/blob/main/codex-rs/app-server/README.md",
+      "observed_at": "2026-08-31",
+      "lifecycle": "EXPERIMENT",
+      "problem_tags": ["structured-runner-events", "coding-agent", "approval-boundary"],
+      "capabilities": ["thread-lifecycle", "turn-lifecycle", "typed-items", "approval-events", "json-rpc"],
+      "risks": ["evolving-protocol", "approval-wait-deadlock", "runner-completion-is-not-correctness"],
+      "revisit_triggers": ["herdr-state-ambiguity", "codex-runner-pilot"],
+      "acceptance_test": "On a recorded fixture, map at least 95% of events, map completion only to PRODUCED, block every approval/unknown event, and preserve exact project and packet binding.",
+      "rollback": "Remove the event adapter and continue using Herdr observations through the NEXUS Supervisor."
+    },
+    {
+      "catalog_id": "AGT-OTEL-GENAI-SEMCONV",
+      "name": "OpenTelemetry GenAI Semantic Conventions",
+      "kind": "EVAL_OBSERVABILITY",
+      "source_url": "https://github.com/open-telemetry/semantic-conventions-genai",
+      "observed_at": "2026-08-31",
+      "lifecycle": "SANDBOX_READY",
+      "problem_tags": ["cross-runner-observability", "latency", "cost", "tool-tracing"],
+      "capabilities": ["genai-spans", "agent-spans", "mcp-spans", "metrics", "events"],
+      "risks": ["development-status", "content-capture-data-leak", "schema-churn"],
+      "revisit_triggers": ["trace-envelope-normalization", "multi-runner-arena"],
+      "acceptance_test": "Emit metadata-only spans for one frozen NEXUS task with content capture disabled; preserve project and packet correlation; compare latency, tool calls and token/cost fields without secrets.",
+      "rollback": "Disable the exporter/adapter and retain the existing NEXUS trace envelope."
+    },
+    {
+      "catalog_id": "AGT-QWEN-CODE",
+      "name": "Qwen Code",
+      "kind": "CODING_AGENT",
+      "source_url": "https://github.com/QwenLM/qwen-code",
+      "observed_at": "2026-08-31",
+      "lifecycle": "WATCH",
+      "problem_tags": ["coding-agent", "multi-provider", "windows-runner"],
+      "capabilities": ["mcp-2026", "sandbox", "worktrees", "headless", "herdr-detection"],
+      "risks": ["recent-release-ci-failures", "provider-policy", "large-overlap"],
+      "revisit_triggers": ["stable-release-ci-green", "coding-arena-capacity"],
+      "acceptance_test": "Run the identical frozen repository repair used by the Codex baseline and compare correctness, tests, security, maintainability, debugging, recovery, latency, cost and operator intervention.",
+      "rollback": "Discard the isolated worktree and remove the runner manifest."
+    },
+    {
+      "catalog_id": "AGT-AGENTSCOPE-2",
+      "name": "AgentScope 2.0",
+      "kind": "FRAMEWORK",
+      "source_url": "https://github.com/agentscope-ai/agentscope",
+      "observed_at": "2026-08-31",
+      "lifecycle": "WATCH",
+      "problem_tags": ["agent-runtime", "sandbox", "serving"],
+      "capabilities": ["agents", "tool-sandboxing", "session-state", "observability"],
+      "risks": ["high-control-plane-overlap", "framework-migration", "unmeasured-project-fit"],
+      "revisit_triggers": ["existing-sandbox-gap", "agent-serving-volume"],
+      "acceptance_test": "Benchmark one read-only NEXUS vertical against the current runtime; require materially better recovery or lower operator burden with no authority regression.",
+      "rollback": "Discard the benchmark environment and retain the existing control plane."
+    },
+    {
+      "catalog_id": "AGT-AGENTSCOPE-RUNTIME",
+      "name": "AgentScope Runtime",
+      "kind": "FRAMEWORK",
+      "source_url": "https://github.com/agentscope-ai/agentscope-runtime",
+      "observed_at": "2026-08-31",
+      "lifecycle": "SUPERSEDED",
+      "problem_tags": ["agent-runtime", "sandbox", "serving"],
+      "capabilities": ["agent-as-api", "sandbox", "state", "observability"],
+      "risks": ["upstream-archive", "migration-required"],
+      "revisit_triggers": [],
+      "acceptance_test": "Do not start a new evaluation; use AgentScope 2.0 for any future benchmark.",
+      "rollback": "No action; retain this record for provenance.",
+      "superseded_by": "AGT-AGENTSCOPE-2"
+    },
+    {
+      "catalog_id": "AGT-ANTHROPIC-SANDBOX-RUNTIME",
+      "name": "Anthropic Sandbox Runtime",
+      "kind": "SANDBOX",
+      "source_url": "https://www.anthropic.com/engineering/claude-code-sandboxing",
+      "observed_at": "2026-08-31",
+      "lifecycle": "DEFERRED",
+      "problem_tags": ["local-sandbox", "filesystem-isolation", "network-isolation"],
+      "capabilities": ["os-level-isolation", "domain-allowlist", "process-sandboxing"],
+      "risks": ["research-preview", "linux-macos-focus", "overlap-with-existing-sandbox-path"],
+      "revisit_triggers": ["controlled-linux-worker", "existing-sandbox-fails-acceptance"],
+      "acceptance_test": "On a credential-free Linux host, block filesystem escape and network exfiltration for child processes and MCP servers; verify clean uninstall.",
+      "rollback": "Remove runtime policy and package from the disposable host."
+    }
+  ],
+  "existing_candidate_updates": [
+    {
+      "catalog_id": "AGT-HERDR",
+      "decision": "UNCHANGED_EXPERIMENT",
+      "fact": "v0.8.2 remains latest; Qwen Code detection exists; live Windows compatibility remains unmeasured.",
+      "source_url": "https://github.com/herdrdev/herdr/releases/tag/v0.8.2"
+    },
+    {
+      "catalog_id": "AGT-MCP-OFFICIAL-REGISTRY",
+      "decision": "UNCHANGED_SANDBOX_READY",
+      "fact": "Registry remains discovery metadata, not execution authority; run MCP compatibility audit before ingestion pilot.",
+      "source_url": "https://registry.modelcontextprotocol.io/docs"
+    }
+  ]
+}

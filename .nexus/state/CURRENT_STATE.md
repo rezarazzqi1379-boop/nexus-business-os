@@ -1,4 +1,15 @@
 # NEXUS CURRENT STATE
+## v3.2 evidence safety and model feasibility — 2026-10-15
+
+Local branch codex/evidence-safety-llm-feasibility-2026-10-15; code commit c99fc7e.
+Baseline 64 tests, focused 74, final full suite 1687 passed. Secret Guard is byte-
+identical to 127edca and still BLOCK; diagnostic recomputes 19/19 hashes without
+suppression. Original evidence/logs and CRLF byte bindings preserved. Researcher
+rejects query/accounting forgery. Ten frozen runs 60/60 fields, zero replay work.
+Hardware 15.64GiB RAM/RTX4050 6141MiB VRAM; no operational local LLM confirmed.
+No paid API calls, installs, services or publication. Authority bootstrap BLOCK.
+See docs/research/NEXUS_V32_EVIDENCE_SAFETY_LLM_FEASIBILITY_2026-10-15.md.
+
 ## Real-source deterministic researcher — 2026-10-15
 
 Branch codex/real-research-agent-2026-10-15, baseline bd2568fc6bea59d2f8913b277cf012c925dfe584.

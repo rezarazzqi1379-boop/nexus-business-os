@@ -1,0 +1,37 @@
+{
+  "exercise": {
+    "exercise_id": "v32-evidence-safety",
+    "system_id": "existing-router",
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "task_id": "v32",
+    "procedural_family": "evidence-safety",
+    "evidence_refs": [
+      "docs/research/NEXUS_V32_EVIDENCE_SAFETY_LLM_FEASIBILITY_2026-10-15.md"
+    ],
+    "actions": [
+      "diagnose guard",
+      "verify hardware",
+      "reject accounting forgery"
+    ],
+    "test_commands": [
+      "python -m pytest -q tests evals"
+    ],
+    "acceptance_checks": [
+      "1687 passed",
+      "guard unchanged/BLOCK"
+    ],
+    "outcome": "PARTIAL",
+    "human_corrections": 0,
+    "reusable_lessons": [],
+    "observed_at": "2026-10-15T06:10:01.225993+00:00"
+  },
+  "cycle": {
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "accepted_exercises": [],
+    "ineligible_exercises": [
+      "v32-evidence-safety"
+    ],
+    "candidates": [],
+    "production_changes_applied": false
+  }
+}

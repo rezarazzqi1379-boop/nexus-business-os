@@ -1,0 +1,18 @@
+{
+  "code_commit": "127edca49be8b0584019dd6acf683669135c89b5",
+  "mechanism": "coordination_kit.generate_handoff_package",
+  "status": "BLOCKED",
+  "finding": "secret_pattern_6",
+  "observed_matches": {
+    "count": 19,
+    "length": 64,
+    "all_hex": true,
+    "files": [
+      "data/research/public-agent-live-2026-10-15.json",
+      "data/research/public-agent-verification-2026-10-15.json"
+    ]
+  },
+  "exact_head_focused_passed": 49,
+  "guard_bypassed": false,
+  "next_safe_action": "Review typed provenance-hash false positives with secret-regression tests; preserve existing gate. Separately choose approved local model or exact model/data/cost scope for LLM reasoning."
+}

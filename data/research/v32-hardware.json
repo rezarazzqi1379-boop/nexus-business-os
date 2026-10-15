@@ -1,0 +1,28 @@
+{
+  "ram_bytes": 16791048192,
+  "free_ram_kib": 6976628,
+  "cpu": [
+    {
+      "Name": "13th Gen Intel(R) Core(TM) i5-13420H",
+      "NumberOfCores": 8,
+      "NumberOfLogicalProcessors": 12
+    }
+  ],
+  "gpu_wmi": [
+    {
+      "Name": "NVIDIA GeForce RTX 4050 Laptop GPU",
+      "AdapterRAM": 4293918720
+    },
+    {
+      "Name": "Intel(R) UHD Graphics",
+      "AdapterRAM": 2147479552
+    }
+  ],
+  "caveat": "WMI AdapterRAM is not a verified VRAM capacity",
+  "runtime_found": [],
+  "nvidia_smi": {
+    "name": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "memory_total_mib": 6141,
+    "command": "C:/Windows/System32/nvidia-smi.exe --query-gpu=name,memory.total --format=csv,noheader"
+  }
+}

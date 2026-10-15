@@ -31,7 +31,7 @@ def test_real_contract_frozen_checkpoint_and_replay(tmp_path):
     assert SyntheticRuntime(tmp_path / "queue.db").drain() == 0
 
 
-@pytest.mark.parametrize("mutation", ["project", "hash", "url", "value", "evidence", "stale"])
+@pytest.mark.parametrize("mutation", ["project", "hash", "url", "value", "evidence", "stale", "query", "metricsbool", "metricscount"])
 def test_evidence_fail_closed(tmp_path, mutation):
     runtime = PublicResearchRuntime(tmp_path / "queue.db", transport=lambda url: fixture()[URLS.index(url)])
     runtime.submit("real")
@@ -43,6 +43,9 @@ def test_evidence_fail_closed(tmp_path, mutation):
     if mutation == "value": output["values"]["release_tag"] = "invented"
     if mutation == "evidence": output["evidence"] = []
     if mutation == "stale": output["observed_at"] = (datetime.now(timezone.utc)-timedelta(hours=1)).isoformat()
+    if mutation == "query": output['query'] = 'unrelated'
+    if mutation == "metricsbool": output['model_tokens'] = False
+    if mutation == "metricscount": output['http_reads'] = 0
     with pytest.raises(ValueError): runtime.finish(item, "owner", output)
     assert runtime.review("real") == "rejected"
 

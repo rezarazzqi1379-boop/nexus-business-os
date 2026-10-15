@@ -129,6 +129,11 @@ class PublicResearchRuntime(SyntheticRuntime):
                 "model_tokens": 0, "api_cost_usd": 0, "http_reads": 2}
 
     def validate_result(self, payload, result):
+        if result.get('query') != f'repository:{REPO}':
+            raise ValueError('query_binding_mismatch')
+        for key, expected in (('model_tokens', 0), ('api_cost_usd', 0), ('http_reads', 2)):
+            if type(result.get(key)) is not int or result[key] != expected:
+                raise ValueError('execution_metrics_mismatch')
         if (result.get("project_id"), result.get("task_id"), result.get("worker"),
             result.get("status"), result.get("evidence_class")) != (
                 PROJECT, payload["task_id"], self.roles[0], "COMPLETE", "CLAIM"):

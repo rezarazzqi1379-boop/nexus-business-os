@@ -12,7 +12,7 @@ Ran `python -m nexus_checks` unchanged over real historical files. Nothing was r
 |---|---|---|---|
 | v3 combined RFQ (EN+ZH) | the files round 3 reviewed | parity gap + leaks | **29 errors** (2 parity: the gap a human found by hand; 27 hygiene: the leaks three rounds approved) |
 | v4 split RFQs (8 files) | after round-3 fixes | leaks | **41 errors**, all FM-005 |
-| v5-pre (2 files) | first v5 draft, before the independent review | the reviewer's I1 and I7 | **3/3 caught** (238 twice, 1000 kW once) |
+| v5-pre (2 files) | first v5 draft, before the independent review | the reviewer's I1 and I7 | **3/3 caught** (the 238 accelerations+brakings figure twice, 1000 kW once) |
 | v5 final (8 files) | current drafts | clean | **0 errors** |
 | v5 final, `--release` | release gate | draft banner must block | **8 errors** (one banner per file) |
 | 22 internal documents (audits, reports, control) | history-heavy prose | no false positives | first run **4 false positives** → rule fixed (a line naming old AND current value describes the change) → **0** |

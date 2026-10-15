@@ -1,7 +1,12 @@
 import pytest
 
 from nexus_core.future_agent_lab import FutureCapability, decide, portfolio, ranked_build_queue
-from nexus_core.openai_api_adapter import OpenAIAPIConfig, live_call_ready, redacted_config_snapshot
+from nexus_core.openai_api_adapter import (
+    OpenAIAPIConfig,
+    build_openai_client,
+    live_call_ready,
+    redacted_config_snapshot,
+)
 
 
 def test_api_adapter_fails_closed_without_key_and_live_policy():
@@ -10,6 +15,17 @@ def test_api_adapter_fails_closed_without_key_and_live_policy():
     assert ready is False
     assert "OPENAI_API_KEY missing" in reasons
     assert "live API calls are disabled by policy" in reasons
+    assert "exact approval-gated executor is not implemented" in reasons
+
+
+def test_boolean_and_key_cannot_bypass_exact_approval_gate():
+    config = OpenAIAPIConfig(allow_live_calls=True)
+    env = {"OPENAI_API_KEY": "sk-secret", "NEXUS_OPENAI_MODEL": "test-model"}
+    ready, reasons = live_call_ready(config, env)
+    assert ready is False
+    assert reasons == ("exact approval-gated executor is not implemented",)
+    with pytest.raises(RuntimeError, match="exact approval-gated executor is not implemented"):
+        build_openai_client(config, env)
 
 
 def test_api_snapshot_never_returns_raw_key():

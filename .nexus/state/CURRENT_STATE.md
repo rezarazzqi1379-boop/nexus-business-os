@@ -1,4 +1,17 @@
 # NEXUS CURRENT STATE
+## Read-only maintenance preflight — 2026-10-18
+
+Branch codex/maintenance-preflight-2026-10-18 from 1afa2c5. Existing allocator and
+control plane reused for skill/tool/manifest inventory. PowerShell wrapper actually
+executed: 136 SKILL files across five roots, one divergent Notion name collision,
+no inventory truncation. File presence does not establish loaded/active/authenticated.
+Prefer qualified Notion plugin name in NEXUS; do not delete owner skill automatically.
+Three focused and 1695 full tests pass. Two official GitHub metadata reads refreshed;
+latest metadata never auto-upgrades pinned runtime or grants permission. Pending v35
+manifest unchanged; download/inference approval still absent. No global skill edits,
+installs, deletes, services, credentials, permission changes or publication. Source
+Registry/Master HOLD retained. See docs/research/NEXUS_MAINTENANCE_2026-10-18_FA.md.
+
 ## v3.5 independent safety review and pinned model manifest — 2026-10-15
 
 Branch codex/local-llm-manifest-review-2026-10-15 from 5a2c36c. Independently

@@ -1,0 +1,30 @@
+[
+  {
+    "query": "repository:ggml-org/llama.cpp",
+    "source_url": "https://api.github.com/repos/ggml-org/llama.cpp",
+    "retrieved_at": "2026-10-18T08:53:26.149800+00:00",
+    "source_sha256": "508213cec92b739d8fe3f8050690bfc9d646b26066807ff2d221109b58d789bc",
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "lane_id": "engineering",
+    "evidence_class": "CLAIM",
+    "name": "ggml-org/llama.cpp",
+    "archived": false,
+    "pushed_at": "2026-10-18T08:48:15Z",
+    "license": "MIT",
+    "adoption": "EXPERIMENT_ONLY_NOT_INSTALLED"
+  },
+  {
+    "query": "repository:QwenLM/Qwen-Agent",
+    "source_url": "https://api.github.com/repos/QwenLM/Qwen-Agent",
+    "retrieved_at": "2026-10-18T08:53:26.942235+00:00",
+    "source_sha256": "31b47a6c83d286ea24e11ecaa5cf37ceb6aa9ec1f9e9085a727b8f388eb0aa24",
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "lane_id": "engineering",
+    "evidence_class": "CLAIM",
+    "name": "QwenLM/Qwen-Agent",
+    "archived": false,
+    "pushed_at": "2026-03-04T08:15:07Z",
+    "license": "Apache-2.0",
+    "adoption": "EXPERIMENT_ONLY_NOT_INSTALLED"
+  }
+]

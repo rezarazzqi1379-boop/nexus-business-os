@@ -1,0 +1,222 @@
+......................FFF...FFFF                                         [100%]
+================================== FAILURES ===================================
+_______________ test_worker_failure_does_not_starve_other_tasks _______________
+
+runtime = <nexus_router_runtime.SyntheticRuntime object at 0x000002431ACC8710>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002431AB30FC0>
+
+    def test_worker_failure_does_not_starve_other_tasks(runtime, monkeypatch):
+        runtime.submit('bad'); runtime.submit('good')
+        original=runtime.execute
+        def execute(payload):
+            if payload['task_id']=='bad' and payload['role']=='research':
+                raise RuntimeError('PRIVATE_PROVIDER_RESPONSE_MUST_NOT_BE_RELAYED')
+            return original(payload)
+        monkeypatch.setattr(runtime,'execute',execute)
+>       assert runtime.drain()==5
+               ^^^^^^^^^^^^^^^
+
+tests\test_router_runtime.py:190: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+nexus_router_runtime.py:196: in drain
+    return sum(pool.map(worker, range(concurrency)))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\concurrent\futures\_base.py:645: in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\concurrent\futures\_base.py:312: in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\concurrent\futures\_base.py:454: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\concurrent\futures\_base.py:396: in __get_result
+    raise self._exception
+..\..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\concurrent\futures\thread.py:86: in run
+    result = ctx.run(self.task)
+             ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\concurrent\futures\thread.py:73: in run
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+nexus_router_runtime.py:191: in worker
+    result = self.execute(payload)
+             ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payload = {'authority': 'SYNTHETIC_ONLY', 'budget_units': 9, 'catalog': 'AGT-GOOGLE-ADK', 'lane': 'engineering', ...}
+
+    def execute(payload):
+        if payload['task_id']=='bad' and payload['role']=='research':
+>           raise RuntimeError('PRIVATE_PROVIDER_RESPONSE_MUST_NOT_BE_RELAYED')
+E           RuntimeError: PRIVATE_PROVIDER_RESPONSE_MUST_NOT_BE_RELAYED
+
+tests\test_router_runtime.py:187: RuntimeError
+_______________ test_failure_fenced_to_attempt_and_retry_limit ________________
+
+runtime = <nexus_router_runtime.SyntheticRuntime object at 0x000002431ACCBE90>
+
+    def test_failure_fenced_to_attempt_and_retry_limit(runtime):
+        runtime.submit('proof')
+        now=datetime.now(timezone.utc)+timedelta(seconds=1)
+        old=runtime.claim('owner',now=now,lease_seconds=1)
+        later=now+timedelta(seconds=2)
+        current=runtime.claim('owner',now=later)
+>       with pytest.raises(PermissionError): runtime.fail(old,'owner',now=later)
+                                             ^^^^^^^^^^^^
+E       AttributeError: 'SyntheticRuntime' object has no attribute 'fail'
+
+tests\test_router_runtime.py:205: AttributeError
+___________________ test_cancel_prevents_failure_overwrite ____________________
+
+runtime = <nexus_router_runtime.SyntheticRuntime object at 0x000002431AEC0050>
+
+    def test_cancel_prevents_failure_overwrite(runtime):
+        runtime.submit('proof'); item=runtime.claim('owner'); runtime.cancel('proof')
+>       with pytest.raises(PermissionError): runtime.fail(item,'owner')
+                                             ^^^^^^^^^^^^
+E       AttributeError: 'SyntheticRuntime' object has no attribute 'fail'
+
+tests\test_router_runtime.py:215: AttributeError
+______ test_unusable_metadata_is_blocked_not_raised[malformed_approval] _______
+
+tmp_path = WindowsPath('C:/Users/AvallPc/.codex/worktrees/8cdc/nexus-business-os/data/research/pytest-gaps-red/test_unusable_metadata_is_bloc0')
+kind = 'malformed_approval'
+
+    @pytest.mark.parametrize('kind',['malformed_approval','array_approval','malformed_manifest','oversized_manifest'])
+    def test_unusable_metadata_is_blocked_not_raised(tmp_path,kind):
+        root=tmp_path/'data/research'; root.mkdir(parents=True)
+        raw=b'{}'
+        if kind=='malformed_manifest': raw=b'not-json'
+        if kind=='oversized_manifest': raw=b' '*131073
+        (root/'v35-local-llm-manifest.json').write_bytes(raw)
+        approval=json.dumps({'manifest_sha256':hashlib.sha256(raw).hexdigest()})
+        if kind=='malformed_approval': approval='not-json'
+        if kind=='array_approval': approval='[]'
+        (root/'v35-approval-request.json').write_text(approval)
+>       report=check_pending_manifest(tmp_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_maintenance_preflight.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+maintenance_preflight.py:56: in check_pending_manifest
+    expected=json.loads(approval.read_text(encoding='utf-8-sig'))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\json\__init__.py:352: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\json\decoder.py:345: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <json.decoder.JSONDecoder object at 0x00000243180781A0>, s = 'not-json'
+idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+..\..\..\..\AppData\Local\Python\pythoncore-3.14-64\Lib\json\decoder.py:363: JSONDecodeError
+________ test_unusable_metadata_is_blocked_not_raised[array_approval] _________
+
+tmp_path = WindowsPath('C:/Users/AvallPc/.codex/worktrees/8cdc/nexus-business-os/data/research/pytest-gaps-red/test_unusable_metadata_is_bloc1')
+kind = 'array_approval'
+
+    @pytest.mark.parametrize('kind',['malformed_approval','array_approval','malformed_manifest','oversized_manifest'])
+    def test_unusable_metadata_is_blocked_not_raised(tmp_path,kind):
+        root=tmp_path/'data/research'; root.mkdir(parents=True)
+        raw=b'{}'
+        if kind=='malformed_manifest': raw=b'not-json'
+        if kind=='oversized_manifest': raw=b' '*131073
+        (root/'v35-local-llm-manifest.json').write_bytes(raw)
+        approval=json.dumps({'manifest_sha256':hashlib.sha256(raw).hexdigest()})
+        if kind=='malformed_approval': approval='not-json'
+        if kind=='array_approval': approval='[]'
+        (root/'v35-approval-request.json').write_text(approval)
+>       report=check_pending_manifest(tmp_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_maintenance_preflight.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+repo = WindowsPath('C:/Users/AvallPc/.codex/worktrees/8cdc/nexus-business-os/data/research/pytest-gaps-red/test_unusable_metadata_is_bloc1')
+
+    def check_pending_manifest(repo):
+        repo=Path(repo)
+        path=repo/'data/research/v35-local-llm-manifest.json'
+        approval=repo/'data/research/v35-approval-request.json'
+        if not path.is_file() or not approval.is_file():
+            return {'status':'UNKNOWN_MISSING_FILES','authorized':False}
+        expected=json.loads(approval.read_text(encoding='utf-8-sig'))
+        digest=hashlib.sha256(path.read_bytes()).hexdigest()
+>       if digest!=expected.get('manifest_sha256'):
+                   ^^^^^^^^^^^^
+E       AttributeError: 'list' object has no attribute 'get'
+
+maintenance_preflight.py:58: AttributeError
+______ test_unusable_metadata_is_blocked_not_raised[malformed_manifest] _______
+
+tmp_path = WindowsPath('C:/Users/AvallPc/.codex/worktrees/8cdc/nexus-business-os/data/research/pytest-gaps-red/test_unusable_metadata_is_bloc2')
+kind = 'malformed_manifest'
+
+    @pytest.mark.parametrize('kind',['malformed_approval','array_approval','malformed_manifest','oversized_manifest'])
+    def test_unusable_metadata_is_blocked_not_raised(tmp_path,kind):
+        root=tmp_path/'data/research'; root.mkdir(parents=True)
+        raw=b'{}'
+        if kind=='malformed_manifest': raw=b'not-json'
+        if kind=='oversized_manifest': raw=b' '*131073
+        (root/'v35-local-llm-manifest.json').write_bytes(raw)
+        approval=json.dumps({'manifest_sha256':hashlib.sha256(raw).hexdigest()})
+        if kind=='malformed_approval': approval='not-json'
+        if kind=='array_approval': approval='[]'
+        (root/'v35-approval-request.json').write_text(approval)
+        report=check_pending_manifest(tmp_path)
+>       assert report['status'].startswith('BLOCK_') and not report['authorized']
+E       AssertionError: assert (False)
+E        +  where False = <built-in method startswith of str object at 0x000002431AD8E650>('BLOCK_')
+E        +    where <built-in method startswith of str object at 0x000002431AD8E650> = 'REVIEW_ONLY_EXACT_APPROVAL_REQUIRED'.startswith
+
+tests\test_maintenance_preflight.py:51: AssertionError
+______ test_unusable_metadata_is_blocked_not_raised[oversized_manifest] _______
+
+tmp_path = WindowsPath('C:/Users/AvallPc/.codex/worktrees/8cdc/nexus-business-os/data/research/pytest-gaps-red/test_unusable_metadata_is_bloc3')
+kind = 'oversized_manifest'
+
+    @pytest.mark.parametrize('kind',['malformed_approval','array_approval','malformed_manifest','oversized_manifest'])
+    def test_unusable_metadata_is_blocked_not_raised(tmp_path,kind):
+        root=tmp_path/'data/research'; root.mkdir(parents=True)
+        raw=b'{}'
+        if kind=='malformed_manifest': raw=b'not-json'
+        if kind=='oversized_manifest': raw=b' '*131073
+        (root/'v35-local-llm-manifest.json').write_bytes(raw)
+        approval=json.dumps({'manifest_sha256':hashlib.sha256(raw).hexdigest()})
+        if kind=='malformed_approval': approval='not-json'
+        if kind=='array_approval': approval='[]'
+        (root/'v35-approval-request.json').write_text(approval)
+        report=check_pending_manifest(tmp_path)
+>       assert report['status'].startswith('BLOCK_') and not report['authorized']
+E       AssertionError: assert (False)
+E        +  where False = <built-in method startswith of str object at 0x000002431AD8E650>('BLOCK_')
+E        +    where <built-in method startswith of str object at 0x000002431AD8E650> = 'REVIEW_ONLY_EXACT_APPROVAL_REQUIRED'.startswith
+
+tests\test_maintenance_preflight.py:51: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_router_runtime.py::test_worker_failure_does_not_starve_other_tasks
+FAILED tests/test_router_runtime.py::test_failure_fenced_to_attempt_and_retry_limit
+FAILED tests/test_router_runtime.py::test_cancel_prevents_failure_overwrite
+FAILED tests/test_maintenance_preflight.py::test_unusable_metadata_is_blocked_not_raised[malformed_approval]
+FAILED tests/test_maintenance_preflight.py::test_unusable_metadata_is_blocked_not_raised[array_approval]
+FAILED tests/test_maintenance_preflight.py::test_unusable_metadata_is_blocked_not_raised[malformed_manifest]
+FAILED tests/test_maintenance_preflight.py::test_unusable_metadata_is_blocked_not_raised[oversized_manifest]
+7 failed, 25 passed in 3.79s

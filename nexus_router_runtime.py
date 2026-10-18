@@ -161,6 +161,34 @@ class SyntheticRuntime:
                 db.rollback()
                 raise
 
+    def fail(self, item, owner, *, now=None):
+        """Record a redacted failure with the SAME attempt/expiry fence as finish.
+
+        Provider exception text is deliberately not accepted as an argument.
+        Queue transition and failure evidence share one transaction.
+        """
+        current = now or utc_now()
+        with closing(self.store._connect()) as db:
+            db.execute('BEGIN IMMEDIATE')
+            try:
+                payload = self._fence(db, item, owner, current)
+                maximum = db.execute('SELECT max_attempts FROM work_items WHERE work_id=?',
+                                     (item.work_id,)).fetchone()[0]
+                terminal = item.attempt >= maximum
+                status = 'dead_letter' if terminal else 'queued'
+                delay = 0 if terminal else min(3600, 30 * 2 ** (item.attempt - 1))
+                db.execute("UPDATE work_items SET status=?,not_before=?,lease_owner=NULL,lease_until=NULL,"
+                           "last_error='worker_execution_failed' WHERE work_id=?",
+                           (status, (current + timedelta(seconds=delay)).isoformat(), item.work_id))
+                self._event(db, payload['task_id'], 'failed',
+                            {'work_id': item.work_id, 'attempt': item.attempt, 'status': status,
+                             'reason': 'worker_execution_failed'}, current)
+                db.commit()
+                return status
+            except Exception:
+                db.rollback()
+                raise
+
     def cancel(self, task_id):
         self._identity(task_id)
         with closing(self.store._connect()) as db:
@@ -188,8 +216,17 @@ class SyntheticRuntime:
             count = 0
             while (item := self.claim(owner)) is not None:
                 payload = item.payload
-                result = self.execute(payload)
-                self.finish(item, owner, result)
+                try:
+                    result = self.execute(payload)
+                    self.finish(item, owner, result)
+                except Exception:
+                    try:
+                        self.fail(item, owner)
+                    except PermissionError:
+                        # Cancellation, stop or a reclaimed/expired lease wins.
+                        # Never overwrite the new owner's state with a failure.
+                        pass
+                    continue
                 count += 1
             return count
         with ThreadPoolExecutor(max_workers=concurrency) as pool:

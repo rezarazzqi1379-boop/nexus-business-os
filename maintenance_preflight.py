@@ -31,9 +31,13 @@ def inventory_skills(roots, *, limit=200):
             if len(rows)>=limit:
                 truncated=True; break
             seen.add(resolved)
-            if path.stat().st_size>131072:
+            try:
+                with path.open('rb') as stream:
+                    body=stream.read(131073)
+            except OSError:
+                rows.append({'path':str(resolved),'status':'NOT_READ_IO_ERROR'}); continue
+            if len(body)>131072:
                 rows.append({'path':str(resolved),'status':'NOT_READ_SIZE_LIMIT'}); continue
-            body=path.read_bytes()
             match=re.search(r'^name:\s*(.+)$',body.decode('utf-8-sig',errors='replace'),re.MULTILINE)
             rows.append({'path':str(resolved),'name':match.group(1).strip() if match else path.parent.name,
                          'sha256':hashlib.sha256(body).hexdigest(),'status':'FILE_PRESENT',
@@ -44,7 +48,8 @@ def inventory_skills(roots, *, limit=200):
     collisions=[{'name':name,'copies':len(group),'content_drift':len({r['sha256'] for r in group})>1,
                  'paths':[r['path'] for r in group]} for name,group in sorted(groups.items()) if len(group)>1]
     return {'skills':rows,'collisions':collisions,'missing_roots':missing,'coverage_truncated':truncated,
-            'automatic_changes':False}
+            'automatic_changes':False,
+            'coverage_note':'Enumerated files only; missing/inaccessible roots and unenumerated directories are not proof of absence.'}
 
 
 def check_pending_manifest(repo):
@@ -53,8 +58,20 @@ def check_pending_manifest(repo):
     approval=repo/'data/research/v35-approval-request.json'
     if not path.is_file() or not approval.is_file():
         return {'status':'UNKNOWN_MISSING_FILES','authorized':False}
-    expected=json.loads(approval.read_text(encoding='utf-8-sig'))
-    digest=hashlib.sha256(path.read_bytes()).hexdigest()
+    try:
+        with path.open('rb') as stream:
+            body=stream.read(131073)
+        with approval.open('rb') as stream:
+            approval_body=stream.read(131073)
+        if len(body)>131072 or len(approval_body)>131072:
+            return {'status':'BLOCK_METADATA_SIZE_LIMIT','authorized':False}
+        expected=json.loads(approval_body.decode('utf-8-sig'))
+        manifest=json.loads(body.decode('utf-8-sig'))
+        if not isinstance(expected,dict) or not isinstance(manifest,dict):
+            return {'status':'BLOCK_INVALID_METADATA','authorized':False}
+    except (OSError,ValueError,UnicodeError,RecursionError):
+        return {'status':'BLOCK_UNREADABLE_METADATA','authorized':False}
+    digest=hashlib.sha256(body).hexdigest()
     if digest!=expected.get('manifest_sha256'):
         return {'status':'BLOCK_MANIFEST_DRIFT','authorized':False}
     # Caller-declared metadata, including authorization_received=true, is never

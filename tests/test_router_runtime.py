@@ -177,3 +177,60 @@ def test_killed_transaction_rolls_back(runtime):
     assert process.returncode == 24
     assert runtime.snapshot() == before
     assert runtime.drain() == 3
+
+
+def test_worker_failure_does_not_starve_other_tasks(runtime, monkeypatch):
+    runtime.submit('bad'); runtime.submit('good')
+    original=runtime.execute
+    def execute(payload):
+        if payload['task_id']=='bad' and payload['role']=='research':
+            raise RuntimeError('PRIVATE_PROVIDER_RESPONSE_MUST_NOT_BE_RELAYED')
+        return original(payload)
+    monkeypatch.setattr(runtime,'execute',execute)
+    assert runtime.drain()==5
+    assert runtime.review('good')=='accepted'
+    bad=next(row for row in runtime.snapshot()['tasks'] if row['work_id']=='router:bad:research')
+    assert bad['status']=='queued' and bad['attempts']==1
+    failures=[event for event in runtime.snapshot()['events'] if event['kind']=='failed']
+    assert len(failures)==1
+    assert 'PRIVATE_PROVIDER_RESPONSE' not in str(runtime.snapshot())
+
+
+def test_failure_fenced_to_attempt_and_retry_limit(runtime):
+    runtime.submit('proof')
+    now=datetime.now(timezone.utc)+timedelta(seconds=1)
+    old=runtime.claim('owner',now=now,lease_seconds=1)
+    later=now+timedelta(seconds=2)
+    current=runtime.claim('owner',now=later)
+    with pytest.raises(PermissionError): runtime.fail(old,'owner',now=later)
+    assert runtime.fail(current,'owner',now=later)=='queued'
+    later+=timedelta(seconds=61)
+    final=runtime.claim('owner',now=later)
+    # Older untouched siblings fairly precede the delayed retry.
+    while final.work_id!=old.work_id:
+        runtime.finish(final,'owner',result(final),now=later)
+        final=runtime.claim('owner',now=later)
+    assert final.attempt==3 and final.work_id==old.work_id
+    assert runtime.fail(final,'owner',now=later)=='dead_letter'
+
+
+def test_cancel_prevents_failure_overwrite(runtime):
+    runtime.submit('proof'); item=runtime.claim('owner'); runtime.cancel('proof')
+    with pytest.raises(PermissionError): runtime.fail(item,'owner')
+    assert all(row['status']=='cancelled' for row in runtime.snapshot()['tasks'])
+
+
+def test_expired_failure_cannot_commit(runtime):
+    runtime.submit('proof'); now=datetime.now(timezone.utc)+timedelta(seconds=1)
+    item=runtime.claim('owner',now=now,lease_seconds=1)
+    with pytest.raises(PermissionError): runtime.fail(item,'owner',now=now+timedelta(seconds=2))
+    assert not any(e['kind']=='failed' for e in runtime.snapshot()['events'])
+
+
+def test_failure_audit_and_transition_are_atomic(runtime,monkeypatch):
+    runtime.submit('proof'); item=runtime.claim('owner')
+    before=runtime.snapshot()
+    def broken_event(*args): raise RuntimeError('simulated journal failure')
+    monkeypatch.setattr(runtime,'_event',broken_event)
+    with pytest.raises(RuntimeError): runtime.fail(item,'owner')
+    assert runtime.snapshot()==before

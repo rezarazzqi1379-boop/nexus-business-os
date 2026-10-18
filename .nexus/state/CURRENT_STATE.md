@@ -1,4 +1,16 @@
 # NEXUS CURRENT STATE
+## Reproduced reliability gaps and local fixes — 2026-10-18
+
+Branch codex/reliability-gaps-2026-10-18 from 690b9c8. Existing 45 tests passed;
+seven new cases reproduced failures before edits. Fixed worker-error isolation,
+attempt-fenced atomic failure/retry, malformed bounded metadata and unreadable skill
+inventory. 57 focused tests and 1706 full tests pass. Ten paired injected-fault
+runs: independent healthy task completion 0/10 baseline -> 10/10 fixed; more work,
+no speedup claim. Gap register has 4 fixed-local groups and 7 unresolved/draft items.
+Guard/approvals unchanged; Registry/Master HOLD and model approval boundary retained.
+No global skills/permissions/services/purchases/publication. Agent QA coverage gap
+recorded as adaptation draft, not a learned global policy. See docs/research/NEXUS_RELIABILITY_GAPS_2026-10-18_FA.md.
+
 ## Read-only maintenance preflight — 2026-10-18
 
 Branch codex/maintenance-preflight-2026-10-18 from 1afa2c5. Existing allocator and

@@ -245,8 +245,16 @@ class SyntheticRuntime:
             events = db.execute("SELECT seq,task,kind,body,observed_at FROM router_events WHERE project=? "
                                 "ORDER BY seq DESC LIMIT 300", (PROJECT,)).fetchall()
             stopped = db.execute("SELECT stopped FROM router_control WHERE project=?", (PROJECT,)).fetchone()
+            tasks_total = db.execute("SELECT COUNT(*) FROM work_items WHERE project=? AND action=?",
+                                     (PROJECT, cls.action)).fetchone()[0]
+            events_total = db.execute("SELECT COUNT(*) FROM router_events WHERE project=?",
+                                      (PROJECT,)).fetchone()[0]
         return {"project_id": PROJECT, "maturity": "SYNTHETIC_NOT_PRODUCTION",
                 "tasks": [dict(row) for row in rows], "events": [dict(row) for row in events],
+                "coverage": {"limit": 300, "tasks_total": tasks_total, "events_total": events_total,
+                             "tasks_truncated": tasks_total > len(rows),
+                             "events_truncated": events_total > len(events),
+                             "event_scope": "project", "task_scope": "project_and_action"},
                 "stopped": bool(stopped and stopped[0]), "api_cost_usd": 0, "model_tokens": 0,
                 "approval_policy": "DENY_EXTERNAL", "connector_health": "NOT_USED"}
 
@@ -270,7 +278,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", type=Path, required=True)
     parser.add_argument("--submit")
-    parser.add_argument("--workers", type=int, default=3)
+    parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--drain", action="store_true")
     args = parser.parse_args()
     runtime = SyntheticRuntime(args.db)

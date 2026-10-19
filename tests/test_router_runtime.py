@@ -234,3 +234,58 @@ def test_failure_audit_and_transition_are_atomic(runtime,monkeypatch):
     monkeypatch.setattr(runtime,'_event',broken_event)
     with pytest.raises(RuntimeError): runtime.fail(item,'owner')
     assert runtime.snapshot()==before
+
+
+@pytest.mark.parametrize('explicit,expected', [(False, 1), (True, 3)])
+def test_cli_defaults_to_sequential_execution(tmp_path, monkeypatch, capsys, explicit, expected):
+    import nexus_router_runtime as module
+    calls = []
+    monkeypatch.setattr(module.SyntheticRuntime, 'drain', lambda self, workers: calls.append(workers))
+    argv = ['router', '--db', str(tmp_path / 'cli.db'), '--drain']
+    if explicit:
+        argv += ['--workers', '3']
+    monkeypatch.setattr(sys, 'argv', argv)
+    module.main()
+    capsys.readouterr()
+    assert calls == [expected]
+
+
+def test_snapshot_reports_bounded_coverage(runtime):
+    for index in range(101):
+        runtime.submit(f'task_{index}')
+    snapshot = runtime.snapshot()
+    assert len(snapshot['tasks']) == 300
+    assert snapshot['coverage']['tasks_total'] == 303
+    assert snapshot['coverage']['tasks_truncated'] is True
+    assert snapshot['coverage']['events_total'] == 101
+    assert snapshot['coverage']['events_truncated'] is False
+
+
+def test_empty_snapshot_coverage(runtime):
+    assert runtime.snapshot()['coverage'] == {
+        'limit': 300, 'tasks_total': 0, 'events_total': 0,
+        'tasks_truncated': False, 'events_truncated': False,
+        'event_scope': 'project', 'task_scope': 'project_and_action'}
+
+
+def test_snapshot_counts_exclude_foreign_projects_and_other_actions(runtime):
+    runtime.store.enqueue(WorkItem('foreign', 'OTHER', runtime.action, {}))
+    runtime.store.enqueue(WorkItem('other_action', PROJECT, 'SEND', {}))
+    runtime.submit('visible')
+    snapshot = runtime.snapshot()
+    assert snapshot['coverage']['tasks_total'] == 3
+    assert len(snapshot['tasks']) == 3
+    assert {row['work_id'] for row in snapshot['tasks']}.isdisjoint({'foreign', 'other_action'})
+
+
+def test_snapshot_reports_event_truncation_without_foreign_events(runtime):
+    with runtime.store._connect() as db:
+        for index in range(301):
+            runtime._event(db, str(index), 'coverage_probe', {}, datetime.now(timezone.utc))
+        db.execute("INSERT INTO router_events(project,task,kind,body,observed_at) "
+                   "VALUES(?,?,?,?,?)", ('OTHER', 'private', 'private', '{}', '2026-10-19'))
+    snapshot = runtime.snapshot()
+    assert len(snapshot['events']) == 300
+    assert snapshot['coverage']['events_total'] == 301
+    assert snapshot['coverage']['events_truncated'] is True
+    assert all(event['task'] != 'private' for event in snapshot['events'])

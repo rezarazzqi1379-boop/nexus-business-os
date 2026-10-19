@@ -1,0 +1,25 @@
+{
+  "baseline": "1afa2c53e4ad81f625023d02b36d93b9b46aaab1",
+  "remote_main_observed": "59f5fb386c023b1f04deaae15709c371e9bfd6d7",
+  "focused_passed": 3,
+  "full_passed": 1695,
+  "full_seconds": 40.63,
+  "skill_files": 136,
+  "collision_groups": 1,
+  "powershell_wrapper": "EXECUTED",
+  "global_edits": false,
+  "model_downloads": false,
+  "remote_ci": "NOT_RUN",
+  "session_tokens": null,
+  "file_manifest": {
+    "maintenance_preflight.py": "f4b8cd533d313801b62a62536291d6955a11c8bb217b862c43921eec661c605a",
+    "scripts/nexus_maintenance_preflight.ps1": "38e2d8c329d1c58b0324e0943e12cf93ff1065c8b0deda51627ceaeedee14c5e",
+    "tests/test_maintenance_preflight.py": "b75e195bcb9e9db03999142390e39a07c4cfa406d4b05d0328134a766716d860",
+    "docs/research/NEXUS_MAINTENANCE_2026-10-18_FA.md": "290da6bc7504866140cc33a5d1129e35b2b1e9aae4ba33a89d925cc6f9f7cc08"
+  },
+  "evidence_hashes": {
+    "maintenance-inventory-2026-10-18.json": "2a94864462c959120505c5986f9be34ce5affcba5b6dfaaa2993ee7c34b5aab7",
+    "maintenance-source-refresh-2026-10-18.json": "b81f6d782b3fa91bb6c51df559ca845e02b590cbd7124e4207aa797e1905f576",
+    "maintenance-final-2026-10-18.txt": "c038bc416ff1d1d87a35d6f21c3bc8842fefcdefe02d1b43def210e594fe07fc"
+  }
+}

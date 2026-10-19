@@ -1,0 +1,28 @@
+{
+  "baseline": "bd2568fc6bea59d2f8913b277cf012c925dfe584",
+  "full_passed": 1677,
+  "full_seconds": 67.06,
+  "baseline_focused_passed": 32,
+  "source_authority": "BLOCK",
+  "llm_agent": "NOT_IMPLEMENTED_MODEL_GATE",
+  "remote_ci": "NOT_RUN",
+  "file_manifest": {
+    "api.py": "5bb9122864dd394e86cfa8caf9f4bc2f129ecd1120d23de7435bf2986a72f7a9",
+    "nexus_router_runtime.py": "405946554fbcb6400658ae34e2aa46ff8d09443c7e35cff51e70d43b335f8981",
+    "nexus_public_research_agent.py": "d8b362e71ade657ef43c5863757d2bd24371b0fc25a2464cfd43922b87d122b6",
+    "benchmark_public_research_agent.py": "9306353e89283d33722edc00a1ad726b125ab1b0b8fad4f658d1dab9dcfd9784",
+    "tests/test_public_research_agent.py": "2ece248d15e4d80e656e59038be3042ba4fbd44d4305b306ea337077df3ef636",
+    "docs/research/NEXUS_REAL_SOURCE_AGENT_2026-10-15.md": "a6ff1b45de75c21df901a598b8dd05aaf4239452158c3cf13009a2625d7a5d97",
+    ".nexus/state/CURRENT_STATE.md": "461a32858a68dbdd8e7e5bd097dfb43b4f3ec56b8d0a39cba60c2ca8170a4af3",
+    ".nexus/memory/context.jsonl": "2d353d5108c9a1fb1564efecc6d73b2c73215b2f6004710fca18c694bdd4b351"
+  },
+  "evidence_hashes": {
+    "public-agent-authority-2026-10-15.json": "a1e2fc434e0f8159f28b4ffa9d3c2aa21d46e2e4394b434d90a3b1afefb99d1f",
+    "public-agent-benchmark-2026-10-15.json": "5832652d83c1412ab6071bc518f3ac75d4f489180334ef083f2702187bba8c06",
+    "public-agent-exercise-2026-10-15.json": "aafd0416c75288743d5e1e1761b068912fd975dc866c6e3d1af27c3d53756317",
+    "public-agent-final-2026-10-15.txt": "3fc4b558af922f303e2c5f1b0c61a13c96065e8c97ab3eb5c0ea003e35b38833",
+    "public-agent-frozen-rerun-2026-10-15.json": "3372f0d4dfb21c1c7628036e3d0cb554985a4d602620bad6cdab1da393e02b58",
+    "public-agent-live-2026-10-15.json": "a7b3bc0fd074238d393e0d567bb9ab3085fee7f2059ebae804916e2a3c356079"
+  },
+  "session_tokens": null
+}

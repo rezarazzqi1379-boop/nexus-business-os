@@ -1,0 +1,41 @@
+{
+  "exercise": {
+    "exercise_id": "reliability-gaps-20261018",
+    "system_id": "existing-router-and-maintenance",
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "task_id": "reliability-gaps",
+    "procedural_family": "failure-isolation",
+    "evidence_refs": [
+      "docs/research/NEXUS_RELIABILITY_GAPS_2026-10-18_FA.md",
+      "data/research/reliability-gaps-benchmark-2026-10-18.json"
+    ],
+    "actions": [
+      "reproduce failures",
+      "minimal local fixes",
+      "paired fault benchmark",
+      "record gap register"
+    ],
+    "test_commands": [
+      "python -m pytest -q tests evals",
+      "python benchmark_router_failure_isolation.py --output data/research/reliability-gaps-benchmark-2026-10-18.json"
+    ],
+    "acceptance_checks": [
+      "1706 tests",
+      "healthy fault workload 10/10",
+      "no raw provider errors"
+    ],
+    "outcome": "PARTIAL",
+    "human_corrections": 0,
+    "reusable_lessons": [],
+    "observed_at": "2026-10-18T09:02:40.049356+00:00"
+  },
+  "cycle": {
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "accepted_exercises": [],
+    "ineligible_exercises": [
+      "reliability-gaps-20261018"
+    ],
+    "candidates": [],
+    "production_changes_applied": false
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "nexus.evidence-digest-review.v1",
+  "mode": "EXPERIMENT_ONLY",
+  "original_findings": [
+    "secret_pattern_6"
+  ],
+  "generic_matches": 19,
+  "recomputed_digest_matches": 19,
+  "unexplained_generic_matches": 0,
+  "guard_decision": "BLOCK",
+  "suppressed_findings": 0,
+  "authorizes_handoff": false,
+  "requires_security_review": true,
+  "original_code_commit": "127edca49be8b0584019dd6acf683669135c89b5",
+  "original_evidence_preserved": {
+    "data/research/public-agent-live-2026-10-15.json": "a7b3bc0fd074238d393e0d567bb9ab3085fee7f2059ebae804916e2a3c356079",
+    "data/research/public-agent-verification-2026-10-15.json": "bffd25e51e3b81b7c7ebf1f1925d063df594b14391e5fb8e92b3b7823b813a5d"
+  },
+  "original_blocker_log_sha256": "95dc75bd6b18bdcabb85a9b4b1d0d59a8f124ca899ffe755dbac98696e2a173e",
+  "byte_binding": "Original commit blobs for edited code; preserved exact original working bytes for unchanged evidence and other files. Three original manifest values bind CRLF working bytes, not normalized LF Git blobs."
+}

@@ -1,0 +1,64 @@
+{
+  "scope": "PRJ-NEXUS-SANDBOX/engineering",
+  "date": "2026-10-19",
+  "head_observed_by_shell": "ed581690909bb6ebe9f3f74a913d511174aaf4fc",
+  "branch": "codex/reliability-gaps-2026-10-18",
+  "status": "LOCALLY_TESTED_WORKING_TREE_NOT_REMOTE_CI",
+  "preexisting_changes": [
+    "nexus_router_runtime.py",
+    "tests/test_router_runtime.py"
+  ],
+  "added_this_cycle": "Two negative tests: foreign project/action exclusion; event truncation with foreign event exclusion.",
+  "sha256": {
+    "nexus_router_runtime.py": "7e62b8ed25151b1e788892a8c83a18136716600d17862cd7ce1a3469025e9a4a",
+    "tests/test_router_runtime.py": "c8424bc3ee18597c808454e9248ff168445b46ec4b03fa74a66f95166498ea1f"
+  },
+  "results": {
+    "initial_focused": "40 passed in 5.18s",
+    "initial_full": "1710 passed, 1 warning in 79.98s",
+    "expanded_router": "33 passed in 14.65s",
+    "final_full": "1712 passed, 1 upstream warning in 102.78s"
+  },
+  "failures": [
+    "New event fixture initially omitted required now argument; corrected; failed log retained.",
+    "Memory bootstrap initially lacked local lock-file write permission; rerun under scoped escalation succeeded.",
+    "Python subprocess git ownership check failed; no global safe.directory change made; shell Git observation retained."
+  ],
+  "authority": "HOLD",
+  "contracts_drift": "New contracts present in 8cdc but absent in legacy development worktree; not silently merged.",
+  "model_authorized": false,
+  "push": false,
+  "commit_created": false,
+  "session_tokens": null,
+  "token_allocation": {
+    "history": 1000,
+    "evidence": 2500,
+    "working": 7000,
+    "output": 1500
+  },
+  "rollback": "Preserve preexisting changes; remove only two tests added in this cycle if reverting.",
+  "next_action": "Reconcile legacy branch with current canonical worktree before promotion. Exact model/environment approval required before download.",
+  "logs": {
+    "C:\\Users\\AvallPc\\.codex\\worktrees\\8cdc\\nexus-business-os\\data\\research\\continue-coverage-20261019.txt": "6393bac570ff212aa2003ce0434878ae2d5d030347781a7486d9174fe5f455e5",
+    "C:\\Users\\AvallPc\\.codex\\worktrees\\8cdc\\nexus-business-os\\data\\research\\continue-coverage-final-20261019.txt": "02cb2fea65c9d29fac97c7ba50841d2fdbbe46341be5d62202ca1ec7cf6c117b",
+    "C:\\Users\\AvallPc\\.codex\\worktrees\\8cdc\\nexus-business-os\\data\\research\\continue-focused-20261019.txt": "923364bc9044b7049839421b92b3c11602dbb6085d07afc61d22c0f243478482",
+    "C:\\Users\\AvallPc\\.codex\\worktrees\\8cdc\\nexus-business-os\\data\\research\\continue-full-20261019.txt": "dc1580e7186770628f7df886b1faf290a16ad072de4edfc40f1c13bdd27a888c",
+    "C:\\Users\\AvallPc\\.codex\\worktrees\\8cdc\\nexus-business-os\\data\\research\\continue-full-final-20261019.txt": "b2d8065676d47746a725dcf970f8a6d808efd52806a8b690cb75a3845a628093"
+  },
+  "reproduce": {
+    "cwd": "C:/Users/AvallPc/.codex/worktrees/agent-router-verification/nexus-business-os",
+    "python": "C:/Users/AvallPc/nexus-business-os/.venv/Scripts/python.exe",
+    "environment": {
+      "PYTHONPATH": "src"
+    },
+    "argv": [
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp",
+      "C:/Users/AvallPc/.codex/worktrees/8cdc/nexus-business-os/data/research/pytest-full-final-20261019"
+    ]
+  }
+}

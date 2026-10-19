@@ -1,4 +1,100 @@
 # NEXUS CURRENT STATE
+## Reproduced reliability gaps and local fixes — 2026-10-18
+
+Branch codex/reliability-gaps-2026-10-18 from 690b9c8. Existing 45 tests passed;
+seven new cases reproduced failures before edits. Fixed worker-error isolation,
+attempt-fenced atomic failure/retry, malformed bounded metadata and unreadable skill
+inventory. 57 focused tests and 1706 full tests pass. Ten paired injected-fault
+runs: independent healthy task completion 0/10 baseline -> 10/10 fixed; more work,
+no speedup claim. Gap register has 4 fixed-local groups and 7 unresolved/draft items.
+Guard/approvals unchanged; Registry/Master HOLD and model approval boundary retained.
+No global skills/permissions/services/purchases/publication. Agent QA coverage gap
+recorded as adaptation draft, not a learned global policy. See docs/research/NEXUS_RELIABILITY_GAPS_2026-10-18_FA.md.
+
+## Read-only maintenance preflight — 2026-10-18
+
+Branch codex/maintenance-preflight-2026-10-18 from 1afa2c5. Existing allocator and
+control plane reused for skill/tool/manifest inventory. PowerShell wrapper actually
+executed: 136 SKILL files across five roots, one divergent Notion name collision,
+no inventory truncation. File presence does not establish loaded/active/authenticated.
+Prefer qualified Notion plugin name in NEXUS; do not delete owner skill automatically.
+Three focused and 1695 full tests pass. Two official GitHub metadata reads refreshed;
+latest metadata never auto-upgrades pinned runtime or grants permission. Pending v35
+manifest unchanged; download/inference approval still absent. No global skill edits,
+installs, deletes, services, credentials, permission changes or publication. Source
+Registry/Master HOLD retained. See docs/research/NEXUS_MAINTENANCE_2026-10-18_FA.md.
+
+## v3.5 independent safety review and pinned model manifest — 2026-10-15
+
+Branch codex/local-llm-manifest-review-2026-10-15 from 5a2c36c. Independently
+reproduced 1687 baseline tests; final full run 1692 pass. All 19 original hash
+findings audited; five adversarial tests show digest integrity is not secret-free
+content certification. Secret Guard and ownership/approval gates unchanged/BLOCK.
+Codex Security scan 8ec71d27-7da4-4aae-b6a2-d98b41a9d2aa completed for immutable
+127edca..5a2c36c diff with 10 inventory items, no new reportable bypass; scope limits apply.
+Pinned Qwen3-0.6B Q8 GGUF + llama.cpp Windows CPU manifest is REVIEW_ONLY, no
+weights/binaries downloaded or executed. Exact approval request includes hashes,
+disposable root, 4GiB RSS cap/6GiB free RAM prerequisite, 2048/128 tokens and
+single-worker offline plan. Drive handoff/mirror refreshed; accepted Registry/Master
+still unavailable in bounded search. Fresh bootstrap BLOCK. See docs/research/NEXUS_V35_LOCAL_LLM_REVIEW_FA.md.
+
+## v3.2 evidence safety and model feasibility — 2026-10-15
+
+Local branch codex/evidence-safety-llm-feasibility-2026-10-15; code commit c99fc7e.
+Baseline 64 tests, focused 74, final full suite 1687 passed. Secret Guard is byte-
+identical to 127edca and still BLOCK; diagnostic recomputes 19/19 hashes without
+suppression. Original evidence/logs and CRLF byte bindings preserved. Researcher
+rejects query/accounting forgery. Ten frozen runs 60/60 fields, zero replay work.
+Hardware 15.64GiB RAM/RTX4050 6141MiB VRAM; no operational local LLM confirmed.
+No paid API calls, installs, services or publication. Authority bootstrap BLOCK.
+See docs/research/NEXUS_V32_EVIDENCE_SAFETY_LLM_FEASIBILITY_2026-10-15.md.
+
+## Real-source deterministic researcher — 2026-10-15
+
+Branch codex/real-research-agent-2026-10-15, baseline bd2568fc6bea59d2f8913b277cf012c925dfe584.
+Baseline log hash checked and 32 focused tests reproduced. Current full suite:
+1677 passed / one upstream warning. Existing queue/checkpoints/Supervisor support
+one fixed public GitHub metadata worker, with sequential default, fixed URLs,
+response bounds, provenance hashes, stale/tampered-result rejection and replay.
+One live task succeeded: two GETs, 1.3789565s; ten frozen repetitions 60/60 schema
+fields, zero completed replay reads. Single-source CLAIM; commercial yield zero.
+This is NOT an LLM reasoning agent. No usable free local model verified; LLM
+integration awaits exact model/data/budget scope. Registry/Master bootstrap BLOCK.
+No new framework/service/credentials, paid calls, push, merge or deployment.
+See docs/research/NEXUS_REAL_SOURCE_AGENT_2026-10-15.md for limitations/rollback.
+
+## Synthetic agent-router verification — 2026-10-15
+
+Branch codex/agent-router-verification-2026-10-15, baseline 7b4c899668fdc461dc2974bebf191df000ecf9bb.
+PR #113 refreshed OPEN/DRAFT/NOT_MERGED; its db94bc7 fixes are ancestors of this pilot.
+Fixed invalid bridge lane, partial-capability acceptance and API startup SQLite leak.
+Existing queue now drives three fixed synthetic roles with attempt-fenced checkpoints,
+retry limits, cancel/stop, restart recovery and authenticated read-only console.
+Final local full suite 1660 passed, one upstream warning. Ten runs per mode:
+sequential median 0.066811s / concurrent 0.095651s, no speedup; completion and
+synthetic evidence completeness 100%, errors/retries/replay 0. No model/API cost;
+actual session tokens UNKNOWN. Fresh missing-authority bootstrap BLOCK.
+No new dependencies, push, deploy or registered runtime upgrade. Restartable CLI
+verified, persistent daemon NOT installed. Existing unrelated worktrees preserved.
+See docs/research/NEXUS_AGENT_ROUTER_VERIFIED_2026-10-15.md for commands, failure,
+manifest, security limits, rollback and next milestone. New-commit remote CI NOT_RUN.
+
+## Local execution/durability verification — 2026-10-14
+
+Isolated branch codex/execution-verification-2026-10-14 based on refreshed main
+59f5fb386c023b1f04deaae15709c371e9bfd6d7. Requested Work/Codex handoff read;
+accepted Registry/Master binaries remain unavailable and actual chat bootstrap
+returns BLOCK for missing authority. Synthetic runtime testing continued only.
+Baseline main: 1584 passed / 35 failed. Reproduced concurrent memory corruption,
+supersession rewrite and missing atomic crash boundary; added OS locking, atomic
+replace and append-preserving supersession journal. Closed existing SQLite
+connections and corrected Git-stderr false positive. Final full local run:
+1628 passed, 1 upstream warning. Nine process/lease/isolation/approval tests pass.
+No packages installed, production data modified, push, publish, merge or deploy.
+See docs/research/NEXUS_EXECUTION_VERIFICATION_2026-10-14.md for commands,
+evidence hashes, limits and rollback. Next: review portability/patch and recover
+canonical authority before real steel qualification. New-commit remote CI NOT_RUN.
+
 Last updated: 2026-09-19 by Claude Code (via Reza) -- reconciled the second main/feat divergence (see MAIN/FEAT MERGE #2 section at the end); rest unchanged
 RULE: Read this file FIRST in any new session before doing anything
 else. Overwrite stale sections when updating — do not just append.

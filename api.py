@@ -5,6 +5,7 @@ import os
 import sqlite3
 import time
 import uuid
+from contextlib import closing
 from pathlib import Path
 from urllib.parse import parse_qs
 
@@ -40,9 +41,9 @@ _LOGIN_ATTEMPTS: dict[str, list[float]] = {}
 def _startup_checks() -> dict[str, bool]:
     checks = {"auth": auth_config_valid(), "state": False, "canonical": False, "vault": False}
     try:
-        with sqlite3.connect(STORE.path) as db:
+        with closing(sqlite3.connect(STORE.path)) as db:
             checks["state"] = db.execute("SELECT 1").fetchone()[0] == 1
-        with sqlite3.connect(CANONICAL.path) as db:
+        with closing(sqlite3.connect(CANONICAL.path)) as db:
             checks["canonical"] = db.execute("SELECT 1").fetchone()[0] == 1
         probe = VAULT.root / f".readiness-{uuid.uuid4().hex}"
         probe.write_text("ok", encoding="utf-8")
@@ -138,6 +139,30 @@ def console_bootstrap() -> dict:
     payload = build_console_bootstrap()
     payload["vault"] = VAULT.status()
     return payload
+
+
+@app.get("/v1/console/router")
+def router_status() -> dict:
+    from nexus_router_runtime import SyntheticRuntime
+    path = os.getenv("NEXUS_ROUTER_SANDBOX_DB")
+    if not path:
+        return {"status": "NOT_CONFIGURED", "execution_enabled": False}
+    try:
+        from nexus_public_research_agent import PublicResearchRuntime
+        payload = SyntheticRuntime.read_snapshot(Path(path))
+        payload["public_research"] = PublicResearchRuntime.read_snapshot(Path(path))
+        return payload
+    except (OSError, sqlite3.Error):
+        raise HTTPException(status_code=503, detail="router_state_unavailable") from None
+
+
+@app.get("/console/router", response_class=HTMLResponse)
+def router_console():
+    # textContent keeps all journal fields inert. No execution endpoint exists.
+    return HTMLResponse('<!doctype html><html lang="en"><meta charset="utf-8">'
+        '<title>NEXUS synthetic runtime</title><h1>Sandbox execution status</h1>'
+        '<p>Read-only; external execution denied.</p><pre id="status">Loading</pre>'
+        '<script src="/assets/router-status.js" defer></script></html>')
 
 
 @app.get("/v1/vault/status")

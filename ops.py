@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from contextlib import closing
+
 import argparse
 import hashlib
 import json
@@ -19,7 +21,7 @@ def backup(data_dir: Path, output_dir: Path) -> dict:
     files = []
     for source in sorted(data_dir.glob("*.db")):
         destination = target / source.name
-        with sqlite3.connect(source) as source_db, sqlite3.connect(destination) as destination_db:
+        with closing(sqlite3.connect(source)) as source_db, source_db, closing(sqlite3.connect(destination)) as destination_db, destination_db:
             source_db.backup(destination_db)
             integrity = destination_db.execute("PRAGMA integrity_check").fetchone()[0]
         if integrity != "ok":
@@ -64,7 +66,7 @@ def restore_backup(path: Path, destination: Path) -> dict:
     restored = []
     for database in sorted(path.glob("*.db")):
         target = destination / database.name
-        with sqlite3.connect(database) as source_db, sqlite3.connect(target) as target_db:
+        with closing(sqlite3.connect(database)) as source_db, source_db, closing(sqlite3.connect(target)) as target_db, target_db:
             source_db.backup(target_db)
             if target_db.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
                 raise RuntimeError("restored_database_integrity_failed")

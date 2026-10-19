@@ -1,0 +1,33 @@
+{
+  "baseline": "7b4c899668fdc461dc2974bebf191df000ecf9bb",
+  "observed_at": "2026-10-15T05:44:49.153247+00:00",
+  "final_tests": 1660,
+  "full_seconds": 56.42,
+  "focused_tests": 32,
+  "cloud_regression_tests": 34,
+  "remote_ci": "NOT_RUN",
+  "source_authority": "BLOCK",
+  "file_manifest": {
+    "api.py": "4e9ab0f464f47d4f091874ecde3c874e7068b2620ffd26e8f4ed21c79302db38",
+    "autonomy.py": "124b22d486f9b237e67e34b4d21095e34e4a14b1c5c4c227b376adf60a56358d",
+    "project_control_plane.py": "1e887a6d3fdf611fc3151973a89b9c87f49a6654ab77c5acd627a92bdfd94852",
+    "nexus_agent_router_bridge.py": "ba7e2c2ad90407efefe1ebd448efa2de10c313f278c655b0f7bf8792402ac37c",
+    "nexus_agent_router_pilot.py": "1aab95f9132a905c139e8bc299394abd30ac3c4ac016a86eb4b748a29c6cc164",
+    "nexus_router_runtime.py": "cf9bd59b9d55afa3d5c3d3b219d3e19be32cac9013254f94f155120db96fef46",
+    "benchmark_agent_router.py": "51fe2774460f5d74a5bf462929a941ca55bdbe382f35bad21fff4dfb60054164",
+    "tests/test_router_runtime.py": "c04edb6cfffd13de23470236628c5de3278f154055a70afa39943f9ad9cb4433",
+    "tests/test_router_console.py": "3405a7e56d3f5ab67c74c27388c95542d37e97bee6ef0cfe0a90e5207dc341af",
+    "ui/router-status.js": "0789202702da5a081a23d3dad97e77369b6ff385fb7863c83a47dfdfb866fbc1",
+    "docs/research/NEXUS_AGENT_ROUTER_VERIFIED_2026-10-15.md": "598faf16359cd2fa95b71715325a1ea0a374bbddc17b0393b5d6906690adb61b",
+    ".nexus/state/CURRENT_STATE.md": "4c31e4844dbe4b6bfbacc236078ef4c2ab706d21747c4902bcdea52a69b9e311",
+    ".nexus/memory/context.jsonl": "b06fa0014c84d34015220471ee9869eba4e7120e92304ac2118e263497c32586"
+  },
+  "evidence_hashes": {
+    "agent-router-authority-preflight-2026-10-15.json": "ef550d8f1dfd85ad2c7219225f85b3dc3c9e00514744ecd45308429a65ae46b3",
+    "agent-router-benchmark-2026-10-15.json": "5359fa190db59bca7f998b3a514170e827b33a543889a78b32062469e60af24d",
+    "agent-router-exercise-2026-10-15.json": "9188cdc359a82242ef748d7d11e48bc3e01e36b9a750ab62280cd1f896adb9dd",
+    "agent-router-final-2026-10-15.txt": "b693d24222726b8b2755797b871c42201b466838fff02c78616666183e40ad6e",
+    "agent-router-first-full-failure-2026-10-15.txt.gz": "b208adc762043492a1ba1b1a9376503efb07b055de7a6de353b34559b1cc65bc"
+  },
+  "session_tokens": null
+}

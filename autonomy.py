@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from contextlib import closing
+
 import json
 import sqlite3
 from dataclasses import dataclass
@@ -43,7 +45,7 @@ class AutonomyStore:
     def __init__(self, path: Path) -> None:
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             db.executescript(
                 """
                 CREATE TABLE IF NOT EXISTS work_items (
@@ -72,7 +74,7 @@ class AutonomyStore:
     def enqueue(self, item: WorkItem, *, now: datetime | None = None) -> bool:
         current = (now or utc_now()).isoformat()
         try:
-            with self._connect() as db:
+            with closing(self._connect()) as db, db:
                 db.execute(
                     "INSERT INTO work_items VALUES (?, ?, ?, ?, ?, 'queued', 0, ?, ?, NULL, NULL, NULL)",
                     (item.work_id, item.project, item.action, json.dumps(item.payload, sort_keys=True),
@@ -82,7 +84,8 @@ class AutonomyStore:
         except sqlite3.IntegrityError:
             return False
 
-    def claim_next(self, worker_id: str, *, lease_seconds: int = 60, now: datetime | None = None) -> ClaimedWork | None:
+    def claim_next(self, worker_id: str, *, lease_seconds: int = 60, now: datetime | None = None,
+                   project: str | None = None, action: str | None = None) -> ClaimedWork | None:
         if not worker_id.strip() or lease_seconds <= 0:
             raise ValueError("invalid_lease")
         current_dt = now or utc_now()
@@ -93,7 +96,8 @@ class AutonomyStore:
             row = db.execute(
                 "SELECT * FROM work_items WHERE attempts < max_attempts AND not_before <= ? "
                 "AND (status='queued' OR (status='leased' AND lease_until < ?)) "
-                "ORDER BY priority DESC, not_before ASC LIMIT 1", (current, current),
+                "AND (? IS NULL OR project=?) AND (? IS NULL OR action=?) "
+                "ORDER BY priority DESC, not_before ASC LIMIT 1", (current, current, project, project, action, action),
             ).fetchone()
             if row is None:
                 db.execute("COMMIT")
@@ -113,7 +117,7 @@ class AutonomyStore:
             db.close()
 
     def complete(self, work_id: str, worker_id: str) -> None:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             changed = db.execute(
                 "UPDATE work_items SET status='completed', lease_owner=NULL, lease_until=NULL "
                 "WHERE work_id=? AND status='leased' AND lease_owner=?", (work_id, worker_id),
@@ -184,7 +188,7 @@ class AutonomyStore:
     def monthly_spend(self, *, year: int, month: int) -> float:
         start = datetime(year, month, 1, tzinfo=timezone.utc)
         end = datetime(year + (month == 12), 1 if month == 12 else month + 1, 1, tzinfo=timezone.utc)
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             value = db.execute(
                 "SELECT COALESCE(SUM(cost_usd),0) FROM usage_ledger WHERE occurred_at>=? AND occurred_at<?",
                 (start.isoformat(), end.isoformat()),
@@ -200,14 +204,14 @@ class AutonomyStore:
     def record_usage(self, usage_id: str, project: str, cost_usd: float, *, now: datetime | None = None) -> None:
         if cost_usd < 0:
             raise ValueError("invalid_cost")
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             db.execute("INSERT INTO usage_ledger VALUES (?, ?, ?, ?)",
                        (usage_id, project, cost_usd, (now or utc_now()).isoformat()))
 
     def record_capability_failure(self, capability: str, *, threshold: int = 3, now: datetime | None = None) -> str:
         if threshold <= 0:
             raise ValueError("invalid_threshold")
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             row = db.execute("SELECT failures FROM circuit_breakers WHERE capability=?", (capability,)).fetchone()
             failures = (row[0] if row else 0) + 1
             state = "open" if failures >= threshold else "closed"

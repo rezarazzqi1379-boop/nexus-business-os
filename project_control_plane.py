@@ -84,6 +84,8 @@ def _select_agent(request: WorkRequest, catalog: tuple[AgentCatalogEntry, ...]) 
         for item in candidates_for_problem(catalog, tag):
             candidates[item.catalog_id] = item
     required = set(request.required_capabilities)
+    candidates = {key: value for key, value in candidates.items()
+                  if required.issubset(value.capabilities)}
     ranked = sorted(
         candidates.values(),
         key=lambda item: (-len(required.intersection(item.capabilities)), item.catalog_id),

@@ -1,0 +1,112 @@
+{
+  "base_sha": "59f5fb386c023b1f04deaae15709c371e9bfd6d7",
+  "baseline": {
+    "passed": 1584,
+    "failed": 35
+  },
+  "durability_before": {
+    "passed": 4,
+    "failed": 3
+  },
+  "durability_after": {
+    "passed": 9,
+    "failed": 0
+  },
+  "logs": {
+    "main-execute-baseline-2026-10-14.txt": {
+      "archive": "data\\research\\main-execute-baseline-2026-10-14.txt.gz",
+      "raw_sha256": "0efff968d6ccb0ea5d79bd3b3105118fe92e435141b258c68271643eb4cdff1f",
+      "bytes": 145216
+    },
+    "durability-before-2026-10-14.txt": {
+      "archive": "data\\research\\durability-before-2026-10-14.txt.gz",
+      "raw_sha256": "3202d32578f8b0064fbc847299739936698859f084abcf6458ba22a3b72b804a",
+      "bytes": 5582
+    },
+    "execute-focused-2026-10-14.txt": {
+      "archive": "data\\research\\execute-focused-2026-10-14.txt.gz",
+      "raw_sha256": "64b4bc6c79290ce4d27937f713504fe56b1ae680bac4cd05b71d32a6c486a1be",
+      "bytes": 282350
+    }
+  },
+  "coordination": {
+    "version": "nexus.project-control-plane.v1",
+    "assignments": [
+      {
+        "work_id": "runtime-verification",
+        "agent_id": "AGT-GOOGLE-ADK",
+        "matched_capabilities": [
+          "agents"
+        ],
+        "lifecycle": "WATCH"
+      }
+    ],
+    "source_routes": {},
+    "schedule": {
+      "running": [
+        "runtime-verification"
+      ],
+      "queued": [],
+      "waiting": []
+    },
+    "approval_required": [],
+    "blocked": []
+  },
+  "exercise": {
+    "exercise_id": "execution-verification-2026-10-14",
+    "system_id": "existing-memory-queue",
+    "project_id": "SANDBOX",
+    "task_id": "runtime-verification",
+    "procedural_family": "durability-regression",
+    "evidence_refs": [
+      "docs/research/NEXUS_EXECUTION_VERIFICATION_2026-10-14.md",
+      "data/research/execution-authority-preflight.json"
+    ],
+    "actions": [
+      "read handoff and recover exact main",
+      "baseline existing tests",
+      "reproduce memory corruption and Windows connection leaks",
+      "minimal fixes and real process regression"
+    ],
+    "test_commands": [
+      "python -m pytest -q -p no:cacheprovider tests/test_execution_durability.py",
+      "python -m pytest -q -p no:cacheprovider tests evals"
+    ],
+    "acceptance_checks": [
+      "150 concurrent records retain unique IDs",
+      "crashed process releases lock and lease",
+      "approval consumed once",
+      "missing authority BLOCK"
+    ],
+    "outcome": "PARTIAL",
+    "human_corrections": 0,
+    "reusable_lessons": [],
+    "observed_at": "2026-10-14T17:57:11.498817+00:00"
+  },
+  "self_improvement": {
+    "project_id": "SANDBOX",
+    "accepted_exercises": [],
+    "ineligible_exercises": [
+      "execution-verification-2026-10-14"
+    ],
+    "candidates": [],
+    "production_changes_applied": false
+  },
+  "model_calls": 0,
+  "session_tokens": null,
+  "promptfoo_installed": false,
+  "final_full_suite": {
+    "passed": 1628,
+    "failed": 0,
+    "warnings": 1,
+    "duration_seconds": 65.71
+  },
+  "versions": {
+    "python": "3.14.7",
+    "pytest": "8.4.2",
+    "fastapi": "0.141.1",
+    "httpx": "0.28.1",
+    "uvicorn": "0.52.4"
+  },
+  "remote_ci_for_new_commit": "NOT_RUN"
+}

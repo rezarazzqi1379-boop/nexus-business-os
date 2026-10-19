@@ -1,0 +1,41 @@
+{
+  "exercise": {
+    "exercise_id": "public-source-worker-20261015",
+    "system_id": "existing-agent-router",
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "task_id": "public-agent-v3",
+    "procedural_family": "bounded-public-research",
+    "evidence_refs": [
+      "docs/research/NEXUS_REAL_SOURCE_AGENT_2026-10-15.md",
+      "data/research/public-agent-live-2026-10-15.json"
+    ],
+    "actions": [
+      "real public GET",
+      "atomic checkpoint",
+      "frozen replay",
+      "supervisor review"
+    ],
+    "test_commands": [
+      "python -m pytest -q tests evals",
+      "python benchmark_public_research_agent.py --capture data/research/public-agent-live-2026-10-15.json --output data/research/public-agent-frozen-rerun-2026-10-15.json"
+    ],
+    "acceptance_checks": [
+      "1677 passed",
+      "60/60 frozen fields",
+      "zero repeat completed acquisition"
+    ],
+    "outcome": "PARTIAL",
+    "human_corrections": 0,
+    "reusable_lessons": [],
+    "observed_at": "2026-10-15T05:56:51.991620+00:00"
+  },
+  "cycle": {
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "accepted_exercises": [],
+    "ineligible_exercises": [
+      "public-source-worker-20261015"
+    ],
+    "candidates": [],
+    "production_changes_applied": false
+  }
+}

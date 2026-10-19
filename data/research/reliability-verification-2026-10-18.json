@@ -1,0 +1,33 @@
+{
+  "baseline": "690b9c84c21f7380f51345d34e63726578a3cb77",
+  "baseline_focused": 45,
+  "new_red_failures": 7,
+  "focused_passed": 57,
+  "full_passed": 1706,
+  "full_seconds": 37.43,
+  "fixed_groups": 4,
+  "unresolved_or_draft": 7,
+  "guard_unchanged": true,
+  "remote_ci": "NOT_RUN",
+  "session_tokens": null,
+  "allocation": {
+    "history": 1000,
+    "evidence": 2500,
+    "working": 7000,
+    "output": 1500
+  },
+  "file_manifest": {
+    "nexus_router_runtime.py": "cb0e3876042cbb1bfc7b16287fb82f8aa0cb9ac44cb20188b1242a115f09005c",
+    "maintenance_preflight.py": "da5464bc5138ab80ee6d51bd6b77197ef11478c0739b1b3e0417369dbdb69261",
+    "tests/test_router_runtime.py": "2478b3a3768d68843036705977c5a7a4c5e38f75967631718102998c92b86ffb",
+    "tests/test_maintenance_preflight.py": "3677593819440112215f3d42c0879ecf478adbac378e0d363e4e5f7ec6775d38",
+    "benchmark_router_failure_isolation.py": "dd66b5d6606d589471b7b601c5c01f2f95e22bb78f8701f4052b19d6b9cf981c",
+    "docs/research/NEXUS_RELIABILITY_GAPS_2026-10-18_FA.md": "653a40f9384536adaf59c137453c08ae7164622ac3da4bdbf56840269c3a416c"
+  },
+  "evidence_hashes": {
+    "gaps-before-2026-10-18.txt": "7a211f9d8cf73e9b00ebea0a44dfa22947019c12b0c56cdb1308b025fb89ca07",
+    "gaps-final-2026-10-18.txt": "51e59c3fdb82a5727add7b4e03e87913d90c2e1ce9d0a40e00924af0d472e2da",
+    "reliability-gaps-register-2026-10-18.json": "4ba06243d5cee83d86032c812677c74cda02a1353854230706d4dd05394c2b9c",
+    "reliability-gaps-benchmark-2026-10-18.json": "a4d859f6f7721404996bf1ec930d4e46b9fd7bf6a004a4eac7545e037115e77d"
+  }
+}

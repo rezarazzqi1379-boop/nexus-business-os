@@ -15,3 +15,7 @@ data/nexus_system/portfolio_watch.json
 .claude-flow/logs/
 .claude-flow/sessions/
 node_modules/
+
+# Local OS lock/orphan staging files; journal and namespace records remain versioned.
+.nexus/memory/.memory.lock
+.nexus/memory/.memory-*.tmp

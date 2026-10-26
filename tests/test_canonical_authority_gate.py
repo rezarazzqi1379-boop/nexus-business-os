@@ -41,7 +41,7 @@ def test_explicit_tuple_requires_store_digest_match(tmp_path):
         "v2.1", hashlib.sha256(master_bytes).hexdigest(),
         "approved-001", "human", "evidence/approved-001",
     )
-    with pytest.raises(KeyError):
+    with pytest.raises(AuthorityBlocked, match="authority_store_tuple_mismatch"):
         store.admit_active_tuple(
             binding, registry_bytes=registry_bytes, master_bytes=master_bytes,
             approval_records={binding.approval_id: binding},

@@ -10,7 +10,7 @@ from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-from authority_admission import AuthorityBinding, AuthorityBlocked, admit_authority
+from authority_admission import AuthorityBinding, AuthorityBlocked, admit_authority, assert_consistent_authority_declarations
 from xml.etree import ElementTree
 
 W_NS = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
@@ -244,6 +244,7 @@ class CanonicalStore:
                                    master_bytes=master_bytes,
                                    approval_records=approval_records,
                                    contradictory=contradictory)
+        assert_consistent_authority_declarations(registry_bytes, master_bytes, approved)
         rows = self._all_rows()
         def matching(source_id: str, version: str, digest: str):
             return [row for row in rows if row["source_id"] == source_id

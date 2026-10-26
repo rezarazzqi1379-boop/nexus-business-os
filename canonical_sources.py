@@ -9,6 +9,8 @@ import zipfile
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+
+from authority_admission import AuthorityBinding, AuthorityBlocked, admit_authority
 from xml.etree import ElementTree
 
 W_NS = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
@@ -235,6 +237,22 @@ class CanonicalStore:
             return _match(canonical_file, r"v([0-9]+(?:\.[0-9]+)+)")
         return None
 
+    def admit_active_tuple(self, binding: AuthorityBinding | None, *, registry_bytes: bytes,
+                           master_bytes: bytes, approval_records, contradictory: bool = False):
+        """Explicitly validate a byte-bound authority tuple; no implicit promotion."""
+        approved = admit_authority(binding, registry_bytes=registry_bytes,
+                                   master_bytes=master_bytes,
+                                   approval_records=approval_records,
+                                   contradictory=contradictory)
+        registry = self.latest_for_source("NEXUS-SOURCE-REGISTRY")
+        master = self.latest_for_source("NEXUS-MASTER-CONTEXT")
+        if (registry["version"] != approved.registry_version or
+                registry["sha256"] != approved.registry_sha256 or
+                master["version"] != approved.master_version or
+                master["sha256"] != approved.master_sha256):
+            raise AuthorityBlocked("authority_store_tuple_mismatch")
+        return approved
+
     def status(self) -> dict:
         rows = self._all_rows()
         sources = []
@@ -242,11 +260,9 @@ class CanonicalStore:
             item = {key: row[key] for key in ("source_id", "project_id", "title", "version", "status",
                                                "effective_date", "sha256")}
             declared = self._registry_declared_version(row["source_id"])
-            item["active"] = bool(declared and row["version"] == declared)
-            if row["source_id"] == "NEXUS-SOURCE-REGISTRY":
-                item["active"] = row["sha256"] == self.latest_for_source("NEXUS-SOURCE-REGISTRY")["sha256"]
-            elif row["source_id"] == "NEXUS-MASTER-CONTEXT" and declared is None:
-                item["active"] = row["sha256"] == self.latest_for_source("NEXUS-MASTER-CONTEXT")["sha256"]
+            # Without an independently admitted tuple, ingestion cannot assert active authority.
+            item["active"] = False
+            item["declared_by_registry"] = bool(declared and row["version"] == declared)
             sources.append(item)
         return {"schema_version": "nexus.canonical-status.v2", "count": len(rows), "sources": sources}
 

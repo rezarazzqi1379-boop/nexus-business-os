@@ -106,10 +106,10 @@ def parse_source(path: Path) -> CanonicalSource:
     status = _line_value(content, "Status") or "UNCLASSIFIED"
     effective = _line_value(content, "Effective date") or _match(content[:500], r"Effective\s+(\d{1,2}\s+\w+\s+\d{4})")
     if title.startswith("NEXUS MASTER CONTEXT"):
-        source_id, status, project_id = "NEXUS-MASTER-CONTEXT", "CANONICAL", None
+        source_id, status, project_id = "NEXUS-MASTER-CONTEXT", "CLAIMED_CANONICAL", None
         effective = effective or _match(content[:500], r"aligned\s+(\d{1,2}\s+\w+\s+\d{4})")
     elif title.startswith("NEXUS SOURCE REGISTRY"):
-        source_id, status, project_id = "NEXUS-SOURCE-REGISTRY", "CANONICAL", None
+        source_id, status, project_id = "NEXUS-SOURCE-REGISTRY", "CLAIMED_CANONICAL", None
     if not source_id:
         raise ValueError("canonical_source_id_missing")
     return CanonicalSource(source_id, project_id, title, version, status, effective,

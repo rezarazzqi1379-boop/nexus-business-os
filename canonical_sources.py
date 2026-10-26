@@ -244,12 +244,14 @@ class CanonicalStore:
                                    master_bytes=master_bytes,
                                    approval_records=approval_records,
                                    contradictory=contradictory)
-        registry = self.latest_for_source("NEXUS-SOURCE-REGISTRY")
-        master = self.latest_for_source("NEXUS-MASTER-CONTEXT")
-        if (registry["version"] != approved.registry_version or
-                registry["sha256"] != approved.registry_sha256 or
-                master["version"] != approved.master_version or
-                master["sha256"] != approved.master_sha256):
+        rows = self._all_rows()
+        def matching(source_id: str, version: str, digest: str):
+            return [row for row in rows if row["source_id"] == source_id
+                    and row["version"] == version and row["sha256"] == digest]
+        if (len(matching("NEXUS-SOURCE-REGISTRY", approved.registry_version,
+                         approved.registry_sha256)) != 1 or
+                len(matching("NEXUS-MASTER-CONTEXT", approved.master_version,
+                             approved.master_sha256)) != 1):
             raise AuthorityBlocked("authority_store_tuple_mismatch")
         return approved
 

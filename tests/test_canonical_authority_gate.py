@@ -1,11 +1,21 @@
 """Regression tests for canonical store's authority admission boundary."""
 import hashlib
 from dataclasses import replace
+from io import BytesIO
+from zipfile import ZipFile
 
 import pytest
 
 from authority_admission import AuthorityBinding, AuthorityBlocked
 from canonical_sources import CanonicalStore
+
+
+def docx(text):
+    buffer = BytesIO()
+    with ZipFile(buffer, "w") as z:
+        z.writestr("word/document.xml", '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>' + text + '</w:t></w:r></w:p></w:body></w:document>')
+    return buffer.getvalue()
+
 
 
 def test_status_never_promotes_ingested_unapproved_registry(tmp_path):
@@ -25,7 +35,7 @@ def test_status_never_promotes_ingested_unapproved_registry(tmp_path):
 
 def test_explicit_tuple_requires_store_digest_match(tmp_path):
     store = CanonicalStore(tmp_path / "sources.db")
-    registry_bytes, master_bytes = b"registry", b"master"
+    registry_bytes, master_bytes = docx("Registry v1.8 governing"), docx("Master Context v2.1 governing")
     binding = AuthorityBinding(
         "v1.8", hashlib.sha256(registry_bytes).hexdigest(),
         "v2.1", hashlib.sha256(master_bytes).hexdigest(),
@@ -55,7 +65,7 @@ def test_contradictory_approved_tuple_is_blocked_before_store_access(tmp_path):
 
 def test_approved_historical_tuple_is_not_rejected_for_newer_version(tmp_path):
     store = CanonicalStore(tmp_path / "sources.db")
-    registry_bytes, master_bytes = b"registry approved", b"master approved"
+    registry_bytes, master_bytes = docx("Registry v1.1 governing"), docx("Master Context v1.4 governing")
     registry_digest = hashlib.sha256(registry_bytes).hexdigest()
     master_digest = hashlib.sha256(master_bytes).hexdigest()
     with store._connect() as db:

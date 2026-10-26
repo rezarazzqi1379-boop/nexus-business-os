@@ -88,7 +88,7 @@ def _docx_text(raw: bytes) -> str:
     except (OSError, KeyError, ValueError, ElementTree.ParseError) as exc:
         raise AuthorityBlocked("authority_document_unreadable") from exc
     ns = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
-    return "\\n".join(
+    return "\n".join(
         "".join(t.text or "" for t in paragraph.iter(ns + "t"))
         for paragraph in root.iter(ns + "p")
     )
@@ -103,13 +103,13 @@ def assert_consistent_authority_declarations(registry_bytes: bytes, master_bytes
     registry_text = _docx_text(registry_bytes)
     master_text = _docx_text(master_bytes)
     for text in (registry_text, master_text):
-        for sentence in re.split(r"[.\\n;]+", text):
-            if not re.search(r"\\b(?:active|governing|governs|canonical|authoritative)\\b", sentence, re.I):
+        for sentence in re.split(r"[.\n;]+", text):
+            if not re.search(r"\b(?:active|governing|governs|canonical|authoritative)\b", sentence, re.I):
                 continue
             registry_versions = re.findall(
-                r"(?:source\\s+registry|registry)\\s*(v\\d+(?:\\.\\d+)+)", sentence, re.I)
+                r"(?:source\s+registry|registry)\s*(v\d+(?:\.\d+)+)", sentence, re.I)
             master_versions = re.findall(
-                r"(?:master\\s+context|master)\\s*(v\\d+(?:\\.\\d+)+)", sentence, re.I)
+                r"(?:master\s+context|master)\s*(v\d+(?:\.\d+)+)", sentence, re.I)
             if any(v.casefold() != binding.registry_version.casefold() for v in registry_versions):
                 raise AuthorityBlocked("authority_registry_declaration_conflict")
             if any(v.casefold() != binding.master_version.casefold() for v in master_versions):

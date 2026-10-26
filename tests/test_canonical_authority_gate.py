@@ -51,3 +51,33 @@ def test_contradictory_approved_tuple_is_blocked_before_store_access(tmp_path):
             binding, registry_bytes=registry_bytes, master_bytes=master_bytes,
             approval_records={binding.approval_id: binding}, contradictory=True,
         )
+
+
+def test_approved_historical_tuple_is_not_rejected_for_newer_version(tmp_path):
+    store = CanonicalStore(tmp_path / "sources.db")
+    registry_bytes, master_bytes = b"registry approved", b"master approved"
+    registry_digest = hashlib.sha256(registry_bytes).hexdigest()
+    master_digest = hashlib.sha256(master_bytes).hexdigest()
+    with store._connect() as db:
+        for source_id, version, digest in (
+            ("NEXUS-SOURCE-REGISTRY", "v1.1", registry_digest),
+            ("NEXUS-MASTER-CONTEXT", "v1.4", master_digest),
+            ("NEXUS-SOURCE-REGISTRY", "v1.8", "a" * 64),
+            ("NEXUS-MASTER-CONTEXT", "v2.1", "b" * 64),
+        ):
+            db.execute(
+                "INSERT INTO canonical_source_versions "
+                "(source_id,version_key,project_id,title,version,status,effective_date,sha256,content,ingested_at) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?)",
+                (source_id, version, None, source_id, version, "UNVERIFIED", None,
+                 digest, "historical fixture", "2026-10-26T00:00:00Z"),
+            )
+    approved = AuthorityBinding(
+        "v1.1", registry_digest, "v1.4", master_digest,
+        "approved-historical", "human", "evidence/historical",
+    )
+    assert store.admit_active_tuple(
+        approved, registry_bytes=registry_bytes, master_bytes=master_bytes,
+        approval_records={approved.approval_id: approved},
+    ) == approved
+    assert not any(row["active"] for row in store.status()["sources"])

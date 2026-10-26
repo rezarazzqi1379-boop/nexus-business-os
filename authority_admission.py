@@ -8,6 +8,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from hashlib import sha256
 from typing import Mapping
+from io import BytesIO
+from zipfile import ZipFile
+from xml.etree import ElementTree
 import re
 
 _HEX64 = re.compile(r"[0-9a-f]{64}\Z")
@@ -69,3 +72,45 @@ def admit_authority(
     if sha256(master_bytes).hexdigest() != binding.master_sha256:
         raise AuthorityBlocked("authority_master_digest_mismatch")
     return binding
+
+
+def _docx_text(raw: bytes) -> str:
+    """Extract bounded paragraph text; malformed/unreadable documents block admission."""
+    if len(raw) > 20 * 1024 * 1024:
+        raise AuthorityBlocked("authority_document_too_large")
+    try:
+        with ZipFile(BytesIO(raw)) as archive:
+            info = archive.getinfo("word/document.xml")
+            if info.file_size > 10 * 1024 * 1024 or info.file_size / max(info.compress_size, 1) > 100:
+                raise AuthorityBlocked("authority_document_expansion_rejected")
+            xml = archive.read(info)
+        root = ElementTree.fromstring(xml)
+    except (OSError, KeyError, ValueError, ElementTree.ParseError) as exc:
+        raise AuthorityBlocked("authority_document_unreadable") from exc
+    ns = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+    return "\\n".join(
+        "".join(t.text or "" for t in paragraph.iter(ns + "t"))
+        for paragraph in root.iter(ns + "p")
+    )
+
+
+def assert_consistent_authority_declarations(registry_bytes: bytes, master_bytes: bytes,
+                                             binding: AuthorityBinding) -> None:
+    """Reject conflicting explicit active/governing pairs in bounded DOCX text.
+
+    This is a conservative guard, not a substitute for human provenance review.
+    """
+    registry_text = _docx_text(registry_bytes)
+    master_text = _docx_text(master_bytes)
+    for text in (registry_text, master_text):
+        for sentence in re.split(r"[.\\n;]+", text):
+            if not re.search(r"\\b(?:active|governing|governs|canonical|authoritative)\\b", sentence, re.I):
+                continue
+            registry_versions = re.findall(
+                r"(?:source\\s+registry|registry)\\s*(v\\d+(?:\\.\\d+)+)", sentence, re.I)
+            master_versions = re.findall(
+                r"(?:master\\s+context|master)\\s*(v\\d+(?:\\.\\d+)+)", sentence, re.I)
+            if any(v.casefold() != binding.registry_version.casefold() for v in registry_versions):
+                raise AuthorityBlocked("authority_registry_declaration_conflict")
+            if any(v.casefold() != binding.master_version.casefold() for v in master_versions):
+                raise AuthorityBlocked("authority_master_declaration_conflict")

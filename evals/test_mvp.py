@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sqlite3
+from contextlib import closing
 import tempfile
 import unittest
 from threading import Barrier, Thread
@@ -95,7 +96,7 @@ class AuditTests(unittest.TestCase):
             log.append("operator", "event.received", {"id": "e1"}, occurred_at=NOW)
             log.append("worker", "draft.created", {"id": "d1"}, occurred_at=NOW)
             self.assertTrue(log.verify())
-            with sqlite3.connect(path) as db:
+            with closing(sqlite3.connect(path)) as db, db:
                 db.execute("UPDATE audit_log SET body_json='{}' WHERE sequence=1")
             self.assertFalse(log.verify())
 

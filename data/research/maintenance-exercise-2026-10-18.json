@@ -1,0 +1,41 @@
+{
+  "exercise": {
+    "exercise_id": "maintenance-preflight-20261018",
+    "system_id": "existing-control-plane",
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "task_id": "maintenance-20261018",
+    "procedural_family": "bounded-maintenance",
+    "evidence_refs": [
+      "docs/research/NEXUS_MAINTENANCE_2026-10-18_FA.md",
+      "data/research/maintenance-inventory-2026-10-18.json"
+    ],
+    "actions": [
+      "skill file inventory",
+      "PowerShell wrapper execution",
+      "manifest integrity check",
+      "fresh official source metadata"
+    ],
+    "test_commands": [
+      "python -m pytest -q tests evals",
+      "scripts/nexus_maintenance_preflight.ps1 -PythonPath <verified> -SkillRoots <bounded roots>"
+    ],
+    "acceptance_checks": [
+      "1695 pass",
+      "136 skill files",
+      "approval not inferred from JSON"
+    ],
+    "outcome": "PARTIAL",
+    "human_corrections": 0,
+    "reusable_lessons": [],
+    "observed_at": "2026-10-18T08:55:00.001088+00:00"
+  },
+  "cycle": {
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "accepted_exercises": [],
+    "ineligible_exercises": [
+      "maintenance-preflight-20261018"
+    ],
+    "candidates": [],
+    "production_changes_applied": false
+  }
+}

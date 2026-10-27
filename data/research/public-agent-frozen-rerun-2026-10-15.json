@@ -1,0 +1,90 @@
+{
+  "schema": "nexus.public-agent-frozen-benchmark.v1",
+  "rows": [
+    {
+      "repeat": 0,
+      "seconds": 0.04312000000209082,
+      "field_matches": 6,
+      "expected_fields": 6,
+      "network_calls": 0,
+      "replay_execution": 0
+    },
+    {
+      "repeat": 1,
+      "seconds": 0.02544099999795435,
+      "field_matches": 6,
+      "expected_fields": 6,
+      "network_calls": 0,
+      "replay_execution": 0
+    },
+    {
+      "repeat": 2,
+      "seconds": 0.029177500000514556,
+      "field_matches": 6,
+      "expected_fields": 6,
+      "network_calls": 0,
+      "replay_execution": 0
+    },
+    {
+      "repeat": 3,
+      "seconds": 0.04106170000159182,
+      "field_matches": 6,
+      "expected_fields": 6,
+      "network_calls": 0,
+      "replay_execution": 0
+    },
+    {
+      "repeat": 4,
+      "seconds": 0.03427650000230642,
+      "field_matches": 6,
+      "expected_fields": 6,
+      "network_calls": 0,
+      "replay_execution": 0
+    },
+    {
+      "repeat": 5,
+      "seconds": 0.032255699996312615,
+      "field_matches": 6,
+      "expected_fields": 6,
+      "network_calls": 0,
+      "replay_execution": 0
+    },
+    {
+      "repeat": 6,
+      "seconds": 0.026902500001597218,
+      "field_matches": 6,
+      "expected_fields": 6,
+      "network_calls": 0,
+      "replay_execution": 0
+    },
+    {
+      "repeat": 7,
+      "seconds": 0.03339060000143945,
+      "field_matches": 6,
+      "expected_fields": 6,
+      "network_calls": 0,
+      "replay_execution": 0
+    },
+    {
+      "repeat": 8,
+      "seconds": 0.030920299999706913,
+      "field_matches": 6,
+      "expected_fields": 6,
+      "network_calls": 0,
+      "replay_execution": 0
+    },
+    {
+      "repeat": 9,
+      "seconds": 0.024326899998413865,
+      "field_matches": 6,
+      "expected_fields": 6,
+      "network_calls": 0,
+      "replay_execution": 0
+    }
+  ],
+  "median_seconds": 0.031587999998009764,
+  "accuracy_scope": "schema extraction from saved payload, not independent truth",
+  "model_calls": 0,
+  "model_tokens": 0,
+  "session_tokens": null
+}

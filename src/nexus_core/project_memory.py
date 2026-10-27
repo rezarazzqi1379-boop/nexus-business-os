@@ -20,8 +20,14 @@ metrics and evidence refs, not raw chat").
 from __future__ import annotations
 
 import json
+import os
 import re
+import tempfile
+import threading
+import time
 import unicodedata
+from contextlib import contextmanager
+from functools import wraps
 from dataclasses import asdict, dataclass, replace
 from datetime import datetime, timezone
 from pathlib import Path
@@ -36,6 +42,14 @@ _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _serialized(method):
+    @wraps(method)
+    def invoke(self, *args, **kwargs):
+        with self._locked():
+            return method(self, *args, **kwargs)
+    return invoke
 
 
 def _reject_unsafe_text(value: str, field: str) -> None:
@@ -103,12 +117,78 @@ class ProjectMemoryStore:
     def __init__(self, root: Path) -> None:
         self.root = root
         self.root.mkdir(parents=True, exist_ok=True)
+        self._thread_lock = threading.RLock()
+        self._local = threading.local()
+
+    @contextmanager
+    def _locked(self):
+        """Serialize readers and read-modify-write transactions across processes.
+
+        OS locks release on process exit; the file itself is not a stale lease.
+        Nested query calls reuse this instance's current thread transaction.
+        """
+        with self._thread_lock:
+            if getattr(self._local, "locked", False):
+                yield
+                return
+            with (self.root / ".memory.lock").open("a+b") as handle:
+                if os.name == "nt":
+                    import msvcrt
+                    if handle.seek(0, os.SEEK_END) == 0:
+                        handle.write(b"0")
+                        handle.flush()
+                    deadline = time.monotonic() + 15
+                    while True:
+                        handle.seek(0)
+                        try:
+                            msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+                            break
+                        except OSError:
+                            if time.monotonic() >= deadline:
+                                raise TimeoutError("memory_lock_timeout")
+                            time.sleep(.01)
+                else:
+                    import fcntl
+                    fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+                self._local.locked = True
+                try:
+                    yield
+                finally:
+                    self._local.locked = False
+                    handle.seek(0)
+                    if os.name == "nt":
+                        msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+                    else:
+                        fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+    def _append_atomic(self, path: Path, payload: dict) -> None:
+        old = path.read_bytes() if path.exists() else b""
+        if old and not old.endswith(b"\n"):
+            raise ValueError("incomplete_memory_record")
+        data = old + (json.dumps(payload, ensure_ascii=False, sort_keys=True) + "\n").encode("utf-8")
+        fd, temporary = tempfile.mkstemp(prefix=".memory-", suffix=".tmp", dir=self.root)
+        try:
+            with os.fdopen(fd, "wb") as handle:
+                handle.write(data)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(temporary, path)
+            if os.name != "nt":
+                directory = os.open(self.root, os.O_RDONLY)
+                try:
+                    os.fsync(directory)
+                finally:
+                    os.close(directory)
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
 
     def _path(self, namespace: Namespace) -> Path:
         if namespace not in _NAMESPACES:
             raise ValueError("invalid_namespace")
         return self.root / f"{namespace}.jsonl"
 
+    @_serialized
     def record(
         self,
         namespace: Namespace,
@@ -137,10 +217,10 @@ class ProjectMemoryStore:
         if any(item.entry_id == entry.entry_id for item in existing):
             raise ValueError("duplicate_entry_id")
         path = self._path(namespace)
-        with path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(entry.to_json(), ensure_ascii=False, sort_keys=True) + "\n")
+        self._append_atomic(path, entry.to_json())
         return entry
 
+    @_serialized
     def supersede(self, namespace: Namespace, entry_id: str, *, superseded_by: str) -> None:
         """Mark an entry outdated without deleting it -- history stays, just no longer current."""
         entries = self.query(namespace=namespace)
@@ -148,15 +228,16 @@ class ProjectMemoryStore:
             raise KeyError("unknown_entry_id")
         if not any(item.entry_id == superseded_by for item in entries):
             raise KeyError("unknown_superseding_entry_id")
-        updated = [
-            replace(item, superseded_by=superseded_by) if item.entry_id == entry_id else item
-            for item in entries
-        ]
-        path = self._path(namespace)
-        with path.open("w", encoding="utf-8") as handle:
-            for item in updated:
-                handle.write(json.dumps(item.to_json(), ensure_ascii=False, sort_keys=True) + "\n")
+        original = next(item for item in entries if item.entry_id == entry_id)
+        replacement = next(item for item in entries if item.entry_id == superseded_by)
+        if (original.project_id, original.lane) != (replacement.project_id, replacement.lane):
+            raise ValueError("cross_project_supersession")
+        self._append_atomic(self.root / "supersession_events.jsonl", {
+            "namespace": namespace, "entry_id": entry_id,
+            "superseded_by": superseded_by, "created_at": _utc_now(),
+        })
 
+    @_serialized
     def query(
         self,
         *,
@@ -167,6 +248,13 @@ class ProjectMemoryStore:
     ) -> tuple[MemoryEntry, ...]:
         namespaces = (namespace,) if namespace else _NAMESPACES
         results: list[MemoryEntry] = []
+        events_path = self.root / "supersession_events.jsonl"
+        supersessions = {}
+        if events_path.exists():
+            for line in events_path.read_text(encoding="utf-8").splitlines():
+                if line.strip():
+                    event = json.loads(line)
+                    supersessions[(event["namespace"], event["entry_id"])] = event["superseded_by"]
         for item_namespace in namespaces:
             path = self._path(item_namespace)
             if not path.exists():
@@ -175,6 +263,9 @@ class ProjectMemoryStore:
                 if not line.strip():
                     continue
                 entry = MemoryEntry.from_json(json.loads(line))
+                target = supersessions.get((entry.namespace, entry.entry_id))
+                if target:
+                    entry = replace(entry, superseded_by=target)
                 if project_id is not None and entry.project_id != project_id:
                     continue
                 if lane is not None and entry.lane != lane:

@@ -1,0 +1,41 @@
+{
+  "exercise": {
+    "exercise_id": "v35-model-manifest-review",
+    "system_id": "existing-agent-router",
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "task_id": "v35",
+    "procedural_family": "evidence-safety-model-review",
+    "evidence_refs": [
+      "docs/research/NEXUS_V35_LOCAL_LLM_REVIEW_FA.md",
+      "data/research/v35-local-llm-manifest.json"
+    ],
+    "actions": [
+      "independent full tests",
+      "audit 19 original findings",
+      "security diff review",
+      "pin official artifact metadata"
+    ],
+    "test_commands": [
+      "python -m pytest -q tests evals",
+      "python audit_v35_evidence.py"
+    ],
+    "acceptance_checks": [
+      "1692 final tests",
+      "19 original occurrences",
+      "no model/binary download"
+    ],
+    "outcome": "PARTIAL",
+    "human_corrections": 0,
+    "reusable_lessons": [],
+    "observed_at": "2026-10-15T08:57:58.308236+00:00"
+  },
+  "cycle": {
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "accepted_exercises": [],
+    "ineligible_exercises": [
+      "v35-model-manifest-review"
+    ],
+    "candidates": [],
+    "production_changes_applied": false
+  }
+}

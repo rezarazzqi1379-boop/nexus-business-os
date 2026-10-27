@@ -1,0 +1,32 @@
+{
+  "baseline": "127edca49be8b0584019dd6acf683669135c89b5",
+  "code_commit": "c99fc7e37cf2e5401587ebf434eeca0d9ca03fb8",
+  "baseline_tests": 64,
+  "focused_tests": 74,
+  "full_tests": 1687,
+  "full_seconds": 71.27,
+  "guard_byte_identical": true,
+  "guard_decision": "BLOCK",
+  "suppressed_findings": 0,
+  "llm": "NOT_RUN",
+  "remote_ci": "NOT_RUN",
+  "session_tokens": null,
+  "file_manifest": {
+    "evidence_digest_review.py": "f94a4d024cfafede7a0cfa2c2f343baa581d848ea693b9000b5bfb53e02a8591",
+    "nexus_public_research_agent.py": "2dd21e8ce395e229a53557113e1f1fd4bed48c9052abbdfaf916774c613fc840",
+    "tests/test_evidence_digest_review.py": "beecfe3f6c844eea8176ccb69c8c37a3e3e483cfc75b29df75d3a98045bdc4cc",
+    "tests/test_public_research_agent.py": "e00284cc18fd815809f5f01fe45b609dc7eaa8acbb0dc90da0cd859600e21954",
+    "docs/research/NEXUS_V32_EVIDENCE_SAFETY_LLM_FEASIBILITY_2026-10-15.md": "080b2b54924c37ce1a0a5356b1e4eb99b25a0d9be653fd5c1929cd246bd2de36"
+  },
+  "evidence_hashes": {
+    "v32-authority-preflight.json": "e62b657c62a89c0008bce6ee0396cd4322b557a08f2d415575afec53ffe1978e",
+    "v32-deterministic-benchmark.json": "ce22ec9bac8d7489512d3bb80844eb79e8a8b41c5d5e24d3f4d9ad30953826bd",
+    "v32-evidence-guard-review.json": "e177ecd533c2b2aea785e6b316fa0256b3d7d42697d2807682b7bd482f45ebee",
+    "v32-exercise.json": "488085734c0ab44aa3b532b06aea70438ed6ca2e3a4aebd4b3eec33fc135bcfa",
+    "v32-final-tests.txt": "59c50f347a01d414723eba5f83cc80a39eb986511ab222ec4271aeeb728b1ddd",
+    "v32-hardware.json": "ba0ea2bc1215a3dd7aae9032af886c58f16c90c9667d8f6d662741c87dbfd3e2",
+    "v32-original-byte-bindings.json": "ad3cf58c026230db7bc834d21df287c0b35a0eacccabe7e36e3e23a74fc914e5",
+    "v32-original-handoff-blocker.json": "95dc75bd6b18bdcabb85a9b4b1d0d59a8f124ca899ffe755dbac98696e2a173e"
+  },
+  "recording_note": "Initial normalized-line-ending assertions failed; exact raw byte comparison to original Git blob confirms unchanged guard."
+}

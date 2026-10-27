@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from contextlib import closing
+
 import hashlib
 import re
 import sqlite3
@@ -7,6 +9,8 @@ import zipfile
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+
+from authority_admission import AuthorityBinding, AuthorityBlocked, admit_authority, assert_consistent_authority_declarations
 from xml.etree import ElementTree
 
 W_NS = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
@@ -102,10 +106,10 @@ def parse_source(path: Path) -> CanonicalSource:
     status = _line_value(content, "Status") or "UNCLASSIFIED"
     effective = _line_value(content, "Effective date") or _match(content[:500], r"Effective\s+(\d{1,2}\s+\w+\s+\d{4})")
     if title.startswith("NEXUS MASTER CONTEXT"):
-        source_id, status, project_id = "NEXUS-MASTER-CONTEXT", "CANONICAL", None
+        source_id, status, project_id = "NEXUS-MASTER-CONTEXT", "CLAIMED_CANONICAL", None
         effective = effective or _match(content[:500], r"aligned\s+(\d{1,2}\s+\w+\s+\d{4})")
     elif title.startswith("NEXUS SOURCE REGISTRY"):
-        source_id, status, project_id = "NEXUS-SOURCE-REGISTRY", "CANONICAL", None
+        source_id, status, project_id = "NEXUS-SOURCE-REGISTRY", "CLAIMED_CANONICAL", None
     if not source_id:
         raise ValueError("canonical_source_id_missing")
     return CanonicalSource(source_id, project_id, title, version, status, effective,
@@ -123,7 +127,7 @@ class CanonicalStore:
     def __init__(self, path: Path):
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             db.execute("PRAGMA journal_mode=WAL")
             db.execute("""CREATE TABLE IF NOT EXISTS canonical_sources (
                 source_id TEXT PRIMARY KEY, project_id TEXT, title TEXT NOT NULL, version TEXT,
@@ -164,7 +168,7 @@ class CanonicalStore:
     def ingest(self, path: Path) -> tuple[CanonicalSource, bool]:
         source = parse_source(path.resolve())
         version_key = _version_storage_key(source.version)
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             db.execute("BEGIN IMMEDIATE")
             existing = db.execute(
                 "SELECT sha256 FROM canonical_source_versions WHERE source_id=? AND version_key=?",
@@ -193,7 +197,7 @@ class CanonicalStore:
         return result
 
     def _all_rows(self) -> list[sqlite3.Row]:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             return db.execute(
                 "SELECT source_id,project_id,title,version,status,effective_date,sha256,content,ingested_at "
                 "FROM canonical_source_versions"
@@ -233,6 +237,25 @@ class CanonicalStore:
             return _match(canonical_file, r"v([0-9]+(?:\.[0-9]+)+)")
         return None
 
+    def admit_active_tuple(self, binding: AuthorityBinding | None, *, registry_bytes: bytes,
+                           master_bytes: bytes, approval_records, contradictory: bool = False):
+        """Explicitly validate a byte-bound authority tuple; no implicit promotion."""
+        approved = admit_authority(binding, registry_bytes=registry_bytes,
+                                   master_bytes=master_bytes,
+                                   approval_records=approval_records,
+                                   contradictory=contradictory)
+        assert_consistent_authority_declarations(registry_bytes, master_bytes, approved)
+        rows = self._all_rows()
+        def matching(source_id: str, version: str, digest: str):
+            return [row for row in rows if row["source_id"] == source_id
+                    and row["version"] == version and row["sha256"] == digest]
+        if (len(matching("NEXUS-SOURCE-REGISTRY", approved.registry_version,
+                         approved.registry_sha256)) != 1 or
+                len(matching("NEXUS-MASTER-CONTEXT", approved.master_version,
+                             approved.master_sha256)) != 1):
+            raise AuthorityBlocked("authority_store_tuple_mismatch")
+        return approved
+
     def status(self) -> dict:
         rows = self._all_rows()
         sources = []
@@ -240,11 +263,9 @@ class CanonicalStore:
             item = {key: row[key] for key in ("source_id", "project_id", "title", "version", "status",
                                                "effective_date", "sha256")}
             declared = self._registry_declared_version(row["source_id"])
-            item["active"] = bool(declared and row["version"] == declared)
-            if row["source_id"] == "NEXUS-SOURCE-REGISTRY":
-                item["active"] = row["sha256"] == self.latest_for_source("NEXUS-SOURCE-REGISTRY")["sha256"]
-            elif row["source_id"] == "NEXUS-MASTER-CONTEXT" and declared is None:
-                item["active"] = row["sha256"] == self.latest_for_source("NEXUS-MASTER-CONTEXT")["sha256"]
+            # Without an independently admitted tuple, ingestion cannot assert active authority.
+            item["active"] = False
+            item["declared_by_registry"] = bool(declared and row["version"] == declared)
             sources.append(item)
         return {"schema_version": "nexus.canonical-status.v2", "count": len(rows), "sources": sources}
 

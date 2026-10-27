@@ -1,0 +1,147 @@
+{
+  "schema": "nexus.reliability-gap-register.v1",
+  "observed_at": "2026-10-18T09:02:40.049356+00:00",
+  "project_id": "PRJ-NEXUS-SANDBOX",
+  "reviewed_paths": [
+    "nexus_router_runtime.py",
+    "maintenance_preflight.py",
+    "nexus_public_research_agent.py",
+    "related focused tests"
+  ],
+  "exhaustive": false,
+  "issues": [
+    {
+      "id": "GAP-RUNTIME-01",
+      "classification": "REPRODUCED_DEFECT",
+      "status": "FIXED_LOCALLY_NOT_PROMOTED",
+      "priority": "P1",
+      "summary": "Unhandled worker exception aborted healthy work",
+      "evidence_refs": [
+        "tests/test_router_runtime.py::test_worker_failure_does_not_starve_other_tasks",
+        "docs/research/NEXUS_RELIABILITY_GAPS_2026-10-18_FA.md",
+        "data/research/gaps-before-2026-10-18.txt"
+      ],
+      "acceptance": "tests/test_router_runtime.py::test_worker_failure_does_not_starve_other_tasks",
+      "next_action": "Review isolated patch; remote CI requires exact publication approval"
+    },
+    {
+      "id": "GAP-RUNTIME-02",
+      "classification": "REPRODUCED_DEFECT",
+      "status": "FIXED_LOCALLY_NOT_PROMOTED",
+      "priority": "P1",
+      "summary": "Missing fenced atomic failure transition",
+      "evidence_refs": [
+        "tests/test_router_runtime.py::test_failure_fenced_to_attempt_and_retry_limit",
+        "docs/research/NEXUS_RELIABILITY_GAPS_2026-10-18_FA.md",
+        "data/research/gaps-before-2026-10-18.txt"
+      ],
+      "acceptance": "tests/test_router_runtime.py::test_failure_fenced_to_attempt_and_retry_limit",
+      "next_action": "Review isolated patch; remote CI requires exact publication approval"
+    },
+    {
+      "id": "GAP-METADATA-01",
+      "classification": "REPRODUCED_DEFECT",
+      "status": "FIXED_LOCALLY_NOT_PROMOTED",
+      "priority": "P1",
+      "summary": "Malformed/unbounded metadata crashed maintenance",
+      "evidence_refs": [
+        "tests/test_maintenance_preflight.py::test_unusable_metadata_is_blocked_not_raised",
+        "docs/research/NEXUS_RELIABILITY_GAPS_2026-10-18_FA.md",
+        "data/research/gaps-before-2026-10-18.txt"
+      ],
+      "acceptance": "tests/test_maintenance_preflight.py::test_unusable_metadata_is_blocked_not_raised",
+      "next_action": "Review isolated patch; remote CI requires exact publication approval"
+    },
+    {
+      "id": "GAP-INVENTORY-01",
+      "classification": "REPRODUCED_DEFECT",
+      "status": "FIXED_LOCALLY_NOT_PROMOTED",
+      "priority": "P1",
+      "summary": "Unreadable/oversized skill disrupted inventory",
+      "evidence_refs": [
+        "tests/test_maintenance_preflight.py::test_unreadable_skill_does_not_hide_readable_siblings",
+        "docs/research/NEXUS_RELIABILITY_GAPS_2026-10-18_FA.md",
+        "data/research/gaps-before-2026-10-18.txt"
+      ],
+      "acceptance": "tests/test_maintenance_preflight.py::test_unreadable_skill_does_not_hide_readable_siblings",
+      "next_action": "Review isolated patch; remote CI requires exact publication approval"
+    },
+    {
+      "id": "HOLD-AUTHORITY",
+      "classification": "AUTHORITY_CONFLICT",
+      "status": "WAITING_AUTHORITY",
+      "priority": "P2",
+      "summary": "Accepted Source Registry/Master binaries/hash/supersession unresolved",
+      "evidence_refs": [
+        "data/research/v35-authority-preflight.json"
+      ],
+      "next_action": "Continue bounded evidence-backed review; no automatic policy or access promotion"
+    },
+    {
+      "id": "HOLD-LLM",
+      "classification": "APPROVAL_BOUNDARY",
+      "status": "WAITING_EXACT_APPROVAL",
+      "priority": "P2",
+      "summary": "Pinned model/runtime download and bounded experiment not approved",
+      "evidence_refs": [
+        "data/research/v35-approval-request.json"
+      ],
+      "next_action": "Continue bounded evidence-backed review; no automatic policy or access promotion"
+    },
+    {
+      "id": "GAP-HANDOFF",
+      "classification": "COVERAGE_LIMITATION",
+      "status": "NEEDS_REVIEW",
+      "priority": "P2",
+      "summary": "Digest integrity is not secret-free certification; guard still BLOCK",
+      "evidence_refs": [
+        "data/research/v35-nineteen-finding-audit.json"
+      ],
+      "next_action": "Continue bounded evidence-backed review; no automatic policy or access promotion"
+    },
+    {
+      "id": "GAP-PROVIDER",
+      "classification": "INCOMPLETE_EVALUATION",
+      "status": "NOT_MEASURED",
+      "priority": "P2",
+      "summary": "Real provider outage reliability beyond injected faults unknown",
+      "evidence_refs": [
+        "data/research/reliability-gaps-benchmark-2026-10-18.json"
+      ],
+      "next_action": "Continue bounded evidence-backed review; no automatic policy or access promotion"
+    },
+    {
+      "id": "GAP-COVERAGE",
+      "classification": "COVERAGE_LIMITATION",
+      "status": "UNREVIEWED",
+      "priority": "P2",
+      "summary": "Other source modules, OS deployments and hidden skill directories not exhaustively audited",
+      "evidence_refs": [
+        "docs/research/NEXUS_RELIABILITY_GAPS_2026-10-18_FA.md"
+      ],
+      "next_action": "Continue bounded evidence-backed review; no automatic policy or access promotion"
+    },
+    {
+      "id": "GAP-NOTION",
+      "classification": "CONFIGURATION_DRIFT",
+      "status": "NEEDS_REVIEW",
+      "priority": "P2",
+      "summary": "Two different skills share Notion research name; no automatic deletion",
+      "evidence_refs": [
+        "data/research/maintenance-inventory-2026-10-18.json"
+      ],
+      "next_action": "Continue bounded evidence-backed review; no automatic policy or access promotion"
+    },
+    {
+      "id": "AGENT-QA-01",
+      "classification": "AGENT_WORKFLOW_GAP",
+      "status": "ADAPTATION_DRAFT",
+      "priority": "P2",
+      "summary": "Prior tests omitted worker-failure healthy-throughput and malformed metadata; require those checks before durability claims",
+      "evidence_refs": [
+        "data/research/gaps-before-2026-10-18.txt"
+      ],
+      "next_action": "Continue bounded evidence-backed review; no automatic policy or access promotion"
+    }
+  ]
+}

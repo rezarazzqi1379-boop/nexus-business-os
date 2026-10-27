@@ -1,0 +1,131 @@
+{
+  "observed_at": "2026-10-15T05:53:52.265321+00:00",
+  "task": "Official repository identity/license/activity/latest-release metadata",
+  "live_samples": 1,
+  "live_seconds": 1.3789564999970025,
+  "live_http_reads": 2,
+  "model_tokens": 0,
+  "api_cost_usd": 0,
+  "baseline_placeholder_public_source_yield": 0,
+  "real_source_document_yield": 2,
+  "independent_source_families": 1,
+  "commercial_verified_yield": 0,
+  "baseline_sequential_seconds": 0.061940399995364714,
+  "frozen_median_seconds": 0.021529400000872556,
+  "live_vs_baseline_latency_comparable": false,
+  "accuracy_scope": "six schema fields against saved original API payload; not held-out semantic accuracy or independent truth",
+  "live_general_reliability": "UNKNOWN; sample size one",
+  "session_tokens": null,
+  "rows": [
+    {
+      "repeat": 0,
+      "seconds": 0.031160800004727207,
+      "field_exact_matches": 6,
+      "expected_fields": 6,
+      "evidence_urls": 2,
+      "supervisor": "accepted",
+      "replay_executions": 0,
+      "transport_calls": 2,
+      "network_calls": 0
+    },
+    {
+      "repeat": 1,
+      "seconds": 0.0273520999980974,
+      "field_exact_matches": 6,
+      "expected_fields": 6,
+      "evidence_urls": 2,
+      "supervisor": "accepted",
+      "replay_executions": 0,
+      "transport_calls": 2,
+      "network_calls": 0
+    },
+    {
+      "repeat": 2,
+      "seconds": 0.02110230000107549,
+      "field_exact_matches": 6,
+      "expected_fields": 6,
+      "evidence_urls": 2,
+      "supervisor": "accepted",
+      "replay_executions": 0,
+      "transport_calls": 2,
+      "network_calls": 0
+    },
+    {
+      "repeat": 3,
+      "seconds": 0.02655830000003334,
+      "field_exact_matches": 6,
+      "expected_fields": 6,
+      "evidence_urls": 2,
+      "supervisor": "accepted",
+      "replay_executions": 0,
+      "transport_calls": 2,
+      "network_calls": 0
+    },
+    {
+      "repeat": 4,
+      "seconds": 0.019790999998804182,
+      "field_exact_matches": 6,
+      "expected_fields": 6,
+      "evidence_urls": 2,
+      "supervisor": "accepted",
+      "replay_executions": 0,
+      "transport_calls": 2,
+      "network_calls": 0
+    },
+    {
+      "repeat": 5,
+      "seconds": 0.01954969999496825,
+      "field_exact_matches": 6,
+      "expected_fields": 6,
+      "evidence_urls": 2,
+      "supervisor": "accepted",
+      "replay_executions": 0,
+      "transport_calls": 2,
+      "network_calls": 0
+    },
+    {
+      "repeat": 6,
+      "seconds": 0.02434920000087004,
+      "field_exact_matches": 6,
+      "expected_fields": 6,
+      "evidence_urls": 2,
+      "supervisor": "accepted",
+      "replay_executions": 0,
+      "transport_calls": 2,
+      "network_calls": 0
+    },
+    {
+      "repeat": 7,
+      "seconds": 0.020319600000220817,
+      "field_exact_matches": 6,
+      "expected_fields": 6,
+      "evidence_urls": 2,
+      "supervisor": "accepted",
+      "replay_executions": 0,
+      "transport_calls": 2,
+      "network_calls": 0
+    },
+    {
+      "repeat": 8,
+      "seconds": 0.017116299997724127,
+      "field_exact_matches": 6,
+      "expected_fields": 6,
+      "evidence_urls": 2,
+      "supervisor": "accepted",
+      "replay_executions": 0,
+      "transport_calls": 2,
+      "network_calls": 0
+    },
+    {
+      "repeat": 9,
+      "seconds": 0.02195650000066962,
+      "field_exact_matches": 6,
+      "expected_fields": 6,
+      "evidence_urls": 2,
+      "supervisor": "accepted",
+      "replay_executions": 0,
+      "transport_calls": 2,
+      "network_calls": 0
+    }
+  ]
+}

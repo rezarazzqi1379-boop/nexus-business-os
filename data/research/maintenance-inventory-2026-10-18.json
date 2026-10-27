@@ -1,0 +1,1154 @@
+{
+  "schema": "nexus.maintenance-preflight.v1",
+  "observed_at": "2026-10-18T08:53:02.552712+00:00",
+  "project_id": "PRJ-NEXUS-SANDBOX",
+  "repository": "C:\\Users\\AvallPc\\.codex\\worktrees\\agent-router-verification\\nexus-business-os",
+  "skill_inventory": {
+    "skills": [
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\worktrees\\agent-router-verification\\nexus-business-os\\.agents\\skills\\nexus-project-operator\\SKILL.md",
+        "name": "nexus-project-operator",
+        "sha256": "8b3acd59309d2ef4cd4a4e5fc3a473dc941e86382b0bd0dffa919a77ad4599de",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\skills\\gh-fix-ci\\SKILL.md",
+        "name": "\"gh-fix-ci\"",
+        "sha256": "7b326b4a2f0f5f85122144628ec02077e48841e0e0e82efce88b3415bcfb7c26",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\skills\\nexus-commercial-proof\\SKILL.md",
+        "name": "nexus-commercial-proof",
+        "sha256": "d599f7d23409111ca9ba86526391f168fe14031a8447e5da9bf159ff03af83d2",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\skills\\nexus-intelligence-runtime\\SKILL.md",
+        "name": "nexus-intelligence-runtime",
+        "sha256": "0aff4026f2c1b7b557468fea5699ff422b57a2dc9ed347a5ddd617cb997cd79d",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\skills\\nexus-steel-sales\\SKILL.md",
+        "name": "nexus-steel-sales",
+        "sha256": "b26fec0921bc1690f4f663fbac85f334b847dfad77e043e7ae201d0f9b5e3148",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\skills\\notion-research-documentation\\SKILL.md",
+        "name": "notion-research-documentation",
+        "sha256": "e88a46da978cf6f088a788fa92ee736df699a355a72f41f14bdc258bf3ef57e7",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\skills\\.system\\imagegen\\SKILL.md",
+        "name": "\"imagegen\"",
+        "sha256": "706d4d96e1d5c9e6023fe3ccabba1bb34b364024d344fd25b8515ec7d28fe3c4",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\skills\\.system\\openai-docs\\SKILL.md",
+        "name": "\"openai-docs\"",
+        "sha256": "8ce8021101bcea594ff92ee6cfd8ca7641a49ee66d7bc6070555f1a33fc239d9",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\skills\\.system\\review-agent\\SKILL.md",
+        "name": "review-agent",
+        "sha256": "bb46315f6bc4b7051c05f807d19b1689b20418ac6c42590406d805c10fa2fd1a",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\skills\\.system\\skill-creator\\SKILL.md",
+        "name": "skill-creator",
+        "sha256": "cccd291077ec57c6f50ca6529f0f3fb93212da09473effb2fcec808e81b21288",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\skills\\.system\\skill-installer\\SKILL.md",
+        "name": "skill-installer",
+        "sha256": "2892d8b2fb11631132118f340aed80ae17e59d5a571fc2c4f4a4a7e73f139d52",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-bundled\\visualize\\1.0.46\\skills\\visualize\\SKILL.md",
+        "name": "visualize",
+        "sha256": "f5a095fb4812ad76369f5d2d476099ab2c30246c0bf80af8d49d593fa2713da8",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-bundled\\computer-use\\26.930.31730\\skills\\computer-use\\SKILL.md",
+        "name": "computer-use",
+        "sha256": "8211e4b11a19a0dc4f0ace91096c74c5b36037ca4cb2c8988f0f535bb209e951",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\zotero\\0.1.2\\skills\\zotero\\SKILL.md",
+        "name": "Zotero",
+        "sha256": "2053f1c8a7dc93265e9e68d51007627e6111567372057607636c2c74f1ab8f72",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\work-pets\\0.1.6\\skills\\create-pet\\SKILL.md",
+        "name": "create-pet",
+        "sha256": "841354fb8116f8fdfd3b643b30828f5180196c594d3fed9b669b948b88892af1",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\work-pets\\0.1.6\\skills\\pets\\SKILL.md",
+        "name": "pets",
+        "sha256": "1bf5d45fd6a6390aab777229293fb05cef7cf898aac882f8955e40c378e52fcd",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\work-pets\\0.1.6\\skills\\update-pet\\SKILL.md",
+        "name": "update-pet",
+        "sha256": "c63c98d67b6ad781a72a8f9837ba1fb5e2d2a8054a2562e4025890a97d8a0e67",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\access-protected-vercel-deployment\\SKILL.md",
+        "name": "access-protected-vercel-deployment",
+        "sha256": "24d295fa893a22b318f19d87fc52865fc0e26fe43abea62ce787769d00a79fc6",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\ai-gateway\\SKILL.md",
+        "name": "ai-gateway",
+        "sha256": "f3e5ad702d8eaafb07fb02db81b24d75added47dad1321c90b0f4996cccb41b6",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\ai-sdk\\SKILL.md",
+        "name": "ai-sdk",
+        "sha256": "9d6dd182e5e61afc94f7d3867012cfdc19ebbb634e4370e4ed7782919fc1038a",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\auth\\SKILL.md",
+        "name": "auth",
+        "sha256": "7a1ccb7beecef0959e224fef7de2bcf460e6f58c6685bd3359ec0e6103e063d4",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\bootstrap\\SKILL.md",
+        "name": "bootstrap",
+        "sha256": "2306dbb1343c5acfdf7aedcc5f27751bd73570e2a615e71c873f15f339616d6b",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\build-agents\\SKILL.md",
+        "name": "build-agents",
+        "sha256": "334a5f42b57d7536fae1971191dce34ad47487a17f21cab1cc6709d4119203fb",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\cdn-caching\\SKILL.md",
+        "name": "cdn-caching",
+        "sha256": "10f91d3abe3378046cffeb214871a9bceab3c3a1128015244f99e76fae283a3e",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\chat-sdk\\SKILL.md",
+        "name": "chat-sdk",
+        "sha256": "65b932858227ff89784636bbdf42e3573397175405397644c37310700ee169b1",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\create-a-backend\\SKILL.md",
+        "name": "create-a-backend",
+        "sha256": "0ac49fd640ce4928588b1f9be65c17540dcec0b51f3a6d5b5fad3e6e1074ba86",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\custom-metrics\\SKILL.md",
+        "name": "custom-metrics",
+        "sha256": "dda9871df28f58001367e6ee923912c3b41d3ed77a4ef665ce0552227760d4f1",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\deployments-cicd\\SKILL.md",
+        "name": "deployments-cicd",
+        "sha256": "61c628114c8703a9dc753ca94ee63f5b3d5cbd70fc5caa2b02d9dfd92ea5fa76",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\domains\\SKILL.md",
+        "name": "domains",
+        "sha256": "48d2b24366dae02b0e8bfe989b30127263f99105308687ab541518e96b613e49",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\env-vars\\SKILL.md",
+        "name": "env-vars",
+        "sha256": "081d79b5b046276631c10b3db6ff07dbff4a59c057fc9bbc64aa364f82bb3045",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\eve\\SKILL.md",
+        "name": "eve",
+        "sha256": "5e8f3f3d79569288918a31381301e55a9a686dc92ec053f10eb5eda93d58d037",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\flags-sdk\\SKILL.md",
+        "name": "flags-sdk",
+        "sha256": "2149f8b2ff5ac44022103cd3f36895504bfc436698bd90fa7fe1bcd9b4e99cb4",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\is-agentic\\SKILL.md",
+        "name": "is-agentic",
+        "sha256": "de940bb2d220866c0172f133bb58ed1c0687a858a5d024ef219781a6653b4ee4",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\knowledge-update\\SKILL.md",
+        "name": "knowledge-update",
+        "sha256": "9849b61e6bf847d9dc1f263ea6c7777f4c248ec53c93af43225e15c03f818aad",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\marketplace\\SKILL.md",
+        "name": "marketplace",
+        "sha256": "580f3cd836488f0c09ff092c498cbdfa04cd15f8404e465ae48845b53294300c",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\microfrontends\\SKILL.md",
+        "name": "microfrontends",
+        "sha256": "9dbe1a3db8bfa3441b1412b019f518e3b6af341564a3e84a7b1d0073af8eba05",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\queues\\SKILL.md",
+        "name": "queues",
+        "sha256": "38ad06c8c9785b944ce887a94bdb60511f4f6e8eda3b2fef01cadd5a1b16342b",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\react-best-practices\\SKILL.md",
+        "name": "react-best-practices",
+        "sha256": "5c1b1512e76413a9706309569c4c88827ed86b00dff9338849bf64caae7d3921",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\routing-middleware\\SKILL.md",
+        "name": "routing-middleware",
+        "sha256": "521821d60f7af332239ffcf896151e9eb625334c14202430ff60a91af3248165",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\runtime-cache\\SKILL.md",
+        "name": "runtime-cache",
+        "sha256": "b05ffa80629040a4a736946346befdc777bc0b67bd65838800f0656aca9fcae7",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\vercel-agent\\SKILL.md",
+        "name": "vercel-agent",
+        "sha256": "8e21f56eff1dea900988fddbd13971d21fb61dc692b9b76a102f02297a245144",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\vercel-cli\\SKILL.md",
+        "name": "vercel-cli",
+        "sha256": "6399a7d4f2fc8b7202c46ae4a63380c32ff8a994bd952985ee3f9b0fbf25b756",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\vercel-connect\\SKILL.md",
+        "name": "vercel-connect",
+        "sha256": "07ad7f7cfe4ebd68cebf66c120086de49900381ba0f42a3a822adb13d922c49c",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\vercel-firewall\\SKILL.md",
+        "name": "vercel-firewall",
+        "sha256": "cc490dddcced6d2db0bdaa59aeebd3f38e9108b97ca8e9baae17afee685b3f7d",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\vercel-functions\\SKILL.md",
+        "name": "vercel-functions",
+        "sha256": "ac162ecba80415929a1c40f65beea13cb25f09baf3bfa87ce6d6e404962040c6",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\vercel-sandbox\\SKILL.md",
+        "name": "vercel-sandbox",
+        "sha256": "db68a13177ba78c3eeabbe61256829c9b801d4332a05c8692e0c728124041d20",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\vercel-services\\SKILL.md",
+        "name": "vercel-services",
+        "sha256": "eb82b6a1aef40230c6a24ba58d7a4377e34c274aa83f910ba326992c93b7c384",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\vercel-storage\\SKILL.md",
+        "name": "vercel-storage",
+        "sha256": "b294915c90706b86edfc4f1dca4c33b519ecf5eee8acdbda2d7466f1b0f35bf4",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\verification\\SKILL.md",
+        "name": "verification",
+        "sha256": "1dd50aa65a4f8a287f8d8e2fbbaf4e52a3998451a9011659ab0ab38d19539932",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\vercel\\0.54.1\\skills\\workflow\\SKILL.md",
+        "name": "workflow",
+        "sha256": "23c2875814cbe17ea2f16f0f80b082a05943f59bb09bcc3631d392f6cbe33de3",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\supabase\\1.0.0\\skills\\supabase\\SKILL.md",
+        "name": "supabase",
+        "sha256": "1171386737b231610fa42485707272765c3516a9bbc0bd2c6c161a8cee3d7d33",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\supabase\\1.0.0\\skills\\supabase-postgres-best-practices\\SKILL.md",
+        "name": "supabase-postgres-best-practices",
+        "sha256": "ccd6e4596bd51cf344fe76c464867c541ccc16b6d90ae7a9db449fb17588613b",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\sites\\1.0.1\\skills\\sites\\SKILL.md",
+        "name": "sites",
+        "sha256": "88b4a1b923f34c77443290e4648a5f4b3e959d7628f02e169d984942d2430187",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\posthog\\2.0.1\\skills\\posthog\\SKILL.md",
+        "name": "posthog",
+        "sha256": "a0b17693e926fd8ff090e87c2483e28016546863b1e2aa54e46a345f2719b29a",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\plugin-management\\0.1.0\\skills\\plugin-management\\SKILL.md",
+        "name": "plugin-management",
+        "sha256": "653841cc21205269f08b0ce135891e1518dac616a766bcfb0b57d788d3f68b10",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-analytics-dashboard\\SKILL.md",
+        "name": "artifact-template-analytics-dashboard",
+        "sha256": "cf5360fd8b197673bb237c52c603c97fa319c875c3dfa2cd8efff52d4422f513",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-business-review\\SKILL.md",
+        "name": "artifact-template-business-review",
+        "sha256": "27721fc1d67d1b41949caa75ac8f94f81952ff124406878af6524047929e60d2",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-design-report\\SKILL.md",
+        "name": "artifact-template-design-report",
+        "sha256": "563722f53854e606f8a9f87e37e72d7ef70a22d46d5836b8e4d6abfb1b79e9e0",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-experiment-analysis\\SKILL.md",
+        "name": "artifact-template-experiment-analysis",
+        "sha256": "0b05effc47df0a14f8e0c3e3597e6722224747435546385d38a2cae279bd20b9",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-financial-budget\\SKILL.md",
+        "name": "artifact-template-financial-budget",
+        "sha256": "c0b6b7a62a15597aaf2b1ec679e21da48f533b756127f0aef957cdfe9f3da738",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-investment-committee-memo\\SKILL.md",
+        "name": "artifact-template-investment-committee-memo",
+        "sha256": "68abd08cfe5e073e3c446a3f675f44c5bf98f57434dba679e8acd8a763379a8b",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-legal-memorandum\\SKILL.md",
+        "name": "artifact-template-legal-memorandum",
+        "sha256": "51fb9d21baf6119c4ccb1903638a6bac0e859210de63460fffa7025d52e997e0",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-market-trends-report\\SKILL.md",
+        "name": "artifact-template-market-trends-report",
+        "sha256": "d58d019b89cb6f292ac3ab991d561489eef477ff53ce05fb024a0c936f5af26a",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-minimal-letterhead\\SKILL.md",
+        "name": "artifact-template-minimal-letterhead",
+        "sha256": "880ef094d4d0c89a7bde5ce9bbe4086625c186651e9e6efc8ba8bdd7cc77f9d5",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-operating-calendar\\SKILL.md",
+        "name": "artifact-template-operating-calendar",
+        "sha256": "33bb660791a0b9a21628a42c34934932220203b6aabd84e98cb1b45327d0384c",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-operating-review\\SKILL.md",
+        "name": "artifact-template-operating-review",
+        "sha256": "6d63c5cd025ffe936e7bab5db3023672bbaec26af55c2bb8b057d38c202c9c32",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-project-kickoff\\SKILL.md",
+        "name": "artifact-template-project-kickoff",
+        "sha256": "aa893ebd89e7c8d1db4261d01cc2b1add35d78d00785871ccaaa5fc8db783ec9",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-project-tracker\\SKILL.md",
+        "name": "artifact-template-project-tracker",
+        "sha256": "d97d5be20189b7f53dd269b6e1c5f694eaf53e5a72f6559fcb1578911b7cda82",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-sales-pipeline\\SKILL.md",
+        "name": "artifact-template-sales-pipeline",
+        "sha256": "15cfeeedf440021f16ed3f3ad8c7c1ef6d48898b9447741e223d2fb41cfc9800",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-simple-dark-mode\\SKILL.md",
+        "name": "artifact-template-simple-dark-mode",
+        "sha256": "b7c8d0c05f75878b9bc21e56a57c41ec1aa29700aca0a24822be0f9f1bd53207",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-simple-light-mode\\SKILL.md",
+        "name": "artifact-template-simple-light-mode",
+        "sha256": "7c68430c6cf57b55b457d4735dbd1a46b889bef135a32222902dd0848b6e1752",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-strategy-memorandum\\SKILL.md",
+        "name": "artifact-template-strategy-memorandum",
+        "sha256": "51d7882ac94e8e57b323394825728c33925af878806e37277217c2dc12a912e5",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-system-design\\SKILL.md",
+        "name": "artifact-template-system-design",
+        "sha256": "87f7b7ed1b0d8410f5e5971cd7f7db9a4165e2f37069e97e52dbfb469b75a57c",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-team-alignment\\SKILL.md",
+        "name": "artifact-template-team-alignment",
+        "sha256": "26d7cafdcd1899a937b325c5d02ac57c162d45002153be33a934d35f81eb6110",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.1\\skills\\artifact-template-three-statement-forecast\\SKILL.md",
+        "name": "artifact-template-three-statement-forecast",
+        "sha256": "74f4a5cccec0107b861548b157e04c51d9b58ec13a990c86394b4c529b8ecf41",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-developers\\1.3.6\\skills\\agents\\SKILL.md",
+        "name": "agents",
+        "sha256": "1918f74c7509ef03916f0a5c6fd85a35c66faba65e26948e41cd2351cf61f334",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-developers\\1.3.6\\skills\\devday-guide\\SKILL.md",
+        "name": "devday-guide",
+        "sha256": "ce990a4ea0a0bdba54c1a361aeedad17809048c862c6ac979333a6fba961d774",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-developers\\1.3.6\\skills\\openai-api-troubleshooting\\SKILL.md",
+        "name": "openai-api-troubleshooting",
+        "sha256": "63d0a10934b6f999aa85fee64ef6086907e2cfeff15e614b5ce5b07d421d6956",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\openai-developers\\1.3.6\\skills\\openai-platform-api-key\\SKILL.md",
+        "name": "openai-platform-api-key",
+        "sha256": "d2f9fddd383f1830fac5b938fe3145fbb7f0b5a93ed923c1a5e9f9f443c6c46c",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\notion\\3.0.1\\skills\\notion-database-designer\\SKILL.md",
+        "name": "notion-database-designer",
+        "sha256": "33a9fc74a08a214fdf229aa5fb12e0fff119219f30e9c1b2a4910a1d417396af",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\notion\\3.0.1\\skills\\notion-meeting-intelligence\\SKILL.md",
+        "name": "notion-meeting-intelligence",
+        "sha256": "73331739b54407000b86cfd546232c7736f33fc1052d4337b3647e4077c87acc",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\notion\\3.0.1\\skills\\notion-research-documentation\\SKILL.md",
+        "name": "notion-research-documentation",
+        "sha256": "6281956c3bcf5934aeb29bfed0e306b98d2f9ef728a5e1f071f647ddc9461b9d",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\notion\\3.0.1\\skills\\notion-spec-to-implementation\\SKILL.md",
+        "name": "notion-spec-to-implementation",
+        "sha256": "0fe3e0e040193836de1898216388e8edf1e02df81ff47d31968190116c051096",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\notion\\3.0.1\\skills\\notion-weekly-project-digest\\SKILL.md",
+        "name": "notion-weekly-project-digest",
+        "sha256": "ed54b98bc6a1294e621446a67ce448e88eccadd22dad00260991d036d619d69a",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\hubspot\\6.0.0\\skills\\hubspot\\SKILL.md",
+        "name": "hubspot",
+        "sha256": "36152d4e1e9ec6994dfb210e8e001f7708cb546d13f76aca3f150224784ef01b",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\hubspot\\6.0.0\\skills\\hubspot-crm-data-hygiene\\SKILL.md",
+        "name": "hubspot-crm-data-hygiene",
+        "sha256": "7f7ee18c4d4e23261d02bc0c54ae77e50525d8f4fbb5bb560f911ba4cb87a3d2",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\hubspot\\6.0.0\\skills\\hubspot-customer-prep\\SKILL.md",
+        "name": "hubspot-customer-prep",
+        "sha256": "5f0d74a1f8a9b5fdfbfe17059cf07dd3513f14856c3fdd7749f69af248e2254b",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\hubspot\\6.0.0\\skills\\hubspot-pipeline-health\\SKILL.md",
+        "name": "hubspot-pipeline-health",
+        "sha256": "f3fe28bb4b8fc76a3f11bcc97a3d2d5f8bfe549d459c3610fb75edd231cfb26a",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\google-drive\\0.1.22\\skills\\google-docs\\SKILL.md",
+        "name": "google-docs",
+        "sha256": "1c4f8e6477a61d45370731143fd926d2b8917594982f9cb39677909d645625c1",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\google-drive\\0.1.22\\skills\\google-drive\\SKILL.md",
+        "name": "google-drive",
+        "sha256": "dabae8a192c861b76cf7b5742bdf14f8ed35e67d8e6cacfd5f746ffbefd6da5c",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\google-drive\\0.1.22\\skills\\google-drive-comments\\SKILL.md",
+        "name": "google-drive-comments",
+        "sha256": "a3077375a8f7558b9e052c98047747b8a4a1a90a9a90b552009c28fcdadfe94a",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\google-drive\\0.1.22\\skills\\google-sheets\\SKILL.md",
+        "name": "google-sheets",
+        "sha256": "1851109d8f2c182236d28db136fb161d30c85287e5bc4fa79cf137673184c58d",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\google-drive\\0.1.22\\skills\\google-slides\\SKILL.md",
+        "name": "google-slides",
+        "sha256": "f85bd1d7080becf8c043a3646b6c3a53fbcd6d2a77c62a15112b8d89e01a4b83",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-code-connect\\SKILL.md",
+        "name": "figma-code-connect",
+        "sha256": "87af3996edb167d6aa3c044cb1bbb6a0d8e2d631c731bb896b1e1e8669640415",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-code-workflows\\SKILL.md",
+        "name": "figma-code-workflows",
+        "sha256": "ac69b52d96a5d1b1832be9f0be99c221cfd861f8aad2260a0508386229982c7c",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-create-new-file\\SKILL.md",
+        "name": "figma-create-new-file",
+        "sha256": "bb7bc48c487f0ad7e738c23d0685bad5ec0bbbca8f5b5bb6295dc0666cc9ddf1",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-design-to-code\\SKILL.md",
+        "name": "figma-design-to-code",
+        "sha256": "a6e852421e4db72260b2ca641929b1f84684e5b067aead081e35111f5b5feee4",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-generate-design\\SKILL.md",
+        "name": "figma-generate-design",
+        "sha256": "f4f05f29f69a5b4628d4574359910fea926735af78c5e264a1c4cd16f69315b0",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-generate-diagram\\SKILL.md",
+        "name": "figma-generate-diagram",
+        "sha256": "7297638dbf2130d1b37bfd85df65d290a4dd0b11a11b54abafcf7d07565922b5",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-generate-library\\SKILL.md",
+        "name": "figma-generate-library",
+        "sha256": "b5277050191d1985f59e162e0acc82523a0a39a8cf614069a3d63753d5990f27",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-generative-plugins\\SKILL.md",
+        "name": "figma-generative-plugins",
+        "sha256": "b97eb184a1f6b6545f3b8266a4d1a1e29304888904db7daed2864b9fd036b124",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-implement-motion\\SKILL.md",
+        "name": "figma-implement-motion",
+        "sha256": "2e26e67284d47c6a74aedf9dca7543f4c8817dafc59a11abb156d4f7feedb2c2",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-shaders\\SKILL.md",
+        "name": "figma-shaders",
+        "sha256": "c7e34c5a4eb316cfe84768cb419fe71b3ce840b29561ecd0f90eb402a72e1adf",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-spec\\SKILL.md",
+        "name": "figma-spec",
+        "sha256": "7bc6c406d19906217724279f254d773193bac45d385b35d5db6b58673c73f7e3",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-swiftui\\SKILL.md",
+        "name": "figma-swiftui",
+        "sha256": "868c4defe2c0854f5a3e27594d3fa0f20347c86a9b15d103483b7488bfa8affe",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-use\\SKILL.md",
+        "name": "figma-use",
+        "sha256": "ac385b80a05c850b5abc6bcae7c56625c4576318510545453a568aa5f21b8a95",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-use-figjam\\SKILL.md",
+        "name": "figma-use-figjam",
+        "sha256": "8d566444a1aaf31c122682a5fbe3d6f14c6a844a4e05164cda3de872752cea24",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-use-motion\\SKILL.md",
+        "name": "figma-use-motion",
+        "sha256": "d74fa8c9435a5260f8a61e3a8fbf11c068f940ae3423e9be2efde8b5e785d78c",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\figma\\16.0.0\\skills\\figma-use-slides\\SKILL.md",
+        "name": "figma-use-slides",
+        "sha256": "0a69a65e686dcc223581afb409a4d31cf318716e2c65cc9c926839a8737e71a4",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\assess-patch-risk\\SKILL.md",
+        "name": "assess-patch-risk",
+        "sha256": "c3b62a8c1d6135945a055134f50329047bb908972fc7b320a592edbc3d38b419",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\attack-path-analysis\\SKILL.md",
+        "name": "attack-path-analysis",
+        "sha256": "9465d2750182acbf6dd8f61e60bb47dc1ca502be5cc3f4a71da7ad39935d1eb1",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\deep-security-scan\\SKILL.md",
+        "name": "deep-security-scan",
+        "sha256": "d6aed0d9b47065a1384a96d0a45c843b0cda8ba48e3d2cbe96c65357c6e55ee3",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\define-security-policy\\SKILL.md",
+        "name": "define-security-policy",
+        "sha256": "2817e1a03980a7ebea478c8d9e6c622e3c6205123e767a1e32f0204c06729cc7",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\finding-discovery\\SKILL.md",
+        "name": "finding-discovery",
+        "sha256": "14cc797e750ca4bdd8b060c4cf96d7d32f25b132aa8f80d0a0837683fe010790",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\fix-finding\\SKILL.md",
+        "name": "fix-finding",
+        "sha256": "ba7311f43b2c0742da0d5c6bdb2f0b26601c09cc59747cf8c62a09f8d0bb86d2",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\propose-security-hardening\\SKILL.md",
+        "name": "propose-security-hardening",
+        "sha256": "ad07d88da7c2bc9e551849cdde686b0daad380ed0aac798e6c06444681d75959",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\security-diff-scan\\SKILL.md",
+        "name": "security-diff-scan",
+        "sha256": "f85962d46f141227d794a25253a39232bc4e1ad756509ecd3d8769b85b735136",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\security-scan\\SKILL.md",
+        "name": "security-scan",
+        "sha256": "104e2f93fc965c34e91970f517a89e330d5b29dbb243dcea5d95d83f14d135cf",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\threat-model\\SKILL.md",
+        "name": "threat-model",
+        "sha256": "42568e50c787c4c0bfb9495ad67e72ab6c1a951bb910ecba2c67cff8961c4d56",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\track-findings\\SKILL.md",
+        "name": "track-findings",
+        "sha256": "a6d2f30e6d5ca7bd9d74d83017f2f5481c5829585941208a1673b82c683d292b",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\triage-finding\\SKILL.md",
+        "name": "triage-finding",
+        "sha256": "83081950bd4b29ff37cf82d137aec164532ae56b03dbaad3f4dd1d5423e758a7",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\validation\\SKILL.md",
+        "name": "validation",
+        "sha256": "3c4660f79b12a92728e6bb25027064c3a911d0960d39aeafc8fda9e42ce517a5",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\verify-fix\\SKILL.md",
+        "name": "verify-fix",
+        "sha256": "3d4530484c7e4c18b6afe7c6527247e96517dce1ebd1bda9d349cd367ecb0ae3",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\codex-security\\0.1.32\\skills\\vulnerability-writeup\\SKILL.md",
+        "name": "vulnerability-writeup",
+        "sha256": "d08582d9963ce3bfbc3fe81b6e85a01e6fe306713d7951bfd8dd2fbc3df75de4",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\base44\\4.0.1\\skills\\base44-cli\\SKILL.md",
+        "name": "base44-cli",
+        "sha256": "fad011d19c65dfc7a841b0e8c4753739dff46922f4725526a9acedfdb336b421",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\base44\\4.0.1\\skills\\base44-remote-dev\\SKILL.md",
+        "name": "base44-remote-dev",
+        "sha256": "633ae3fbc123fd44470342000e5ec0271f111cb57d819749b7e3796e99bcb5f5",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\base44\\4.0.1\\skills\\base44-sandbox\\SKILL.md",
+        "name": "base44-sandbox",
+        "sha256": "6224715e6319e238ab91e6587dd350d2916a124e9058ff26a529ad2b92f7a2f4",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\base44\\4.0.1\\skills\\base44-sdk\\SKILL.md",
+        "name": "base44-sdk",
+        "sha256": "03c02b61e878f5ea4ad9fed2fef5b8196782415e4ea4dc314199070919ccbad6",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\base44\\4.0.1\\skills\\base44-troubleshooter\\SKILL.md",
+        "name": "base44-troubleshooter",
+        "sha256": "2f644ac93fd18a1bbe6322f0d179faeedf0234ffb4e785ff47fc16286c675866",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\app-69ea4ed2cf7c8191b742ef3622479ddd\\4.0.1\\skills\\Search\\SKILL.md",
+        "name": "Search",
+        "sha256": "8197653a4fb9245f0caf7fff3cbc3a0507a28a20814839605e7216ea4f97a58d",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-primary-runtime\\template-creator\\26.1015.12040\\skills\\template-creator\\SKILL.md",
+        "name": "template-creator",
+        "sha256": "244bfef01d3e17c6013952ccf34621a90ddfee9c7828058245c3c46f51114944",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-primary-runtime\\spreadsheets\\26.1015.12040\\skills\\excel-live-control\\SKILL.md",
+        "name": "\"excel-live-control\"",
+        "sha256": "55335802aeb641f8819f0020d4fa172b069376aaa00ab7934f3426d8a121509a",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-primary-runtime\\spreadsheets\\26.1015.12040\\skills\\spreadsheets\\SKILL.md",
+        "name": "\"Spreadsheets\"",
+        "sha256": "b8290a0c6a18182dc1fbb9432aae518a25bf5354978b7d4c60a834d0e79821aa",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-primary-runtime\\presentations\\26.1015.12040\\skills\\presentations\\SKILL.md",
+        "name": "Presentations",
+        "sha256": "97fedde4ba6c9b9aa56e12b05b13acf035c29f9cd2f6906b8f27ceab11aea9a8",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-primary-runtime\\pdf\\26.1015.12040\\skills\\pdf\\SKILL.md",
+        "name": "\"pdf\"",
+        "sha256": "5e14b4b8f944dc5e678ee703dfacf583010431d64d5d829902c5b2541f736c89",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      },
+      {
+        "path": "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-primary-runtime\\documents\\26.1015.12040\\skills\\documents\\SKILL.md",
+        "name": "documents",
+        "sha256": "e3e5486c9e9f8c59ec89dd9de997bb76a4b65db7960d72437df2f5ed26a4df7f",
+        "status": "FILE_PRESENT",
+        "loaded": "UNKNOWN",
+        "active": "UNKNOWN"
+      }
+    ],
+    "collisions": [
+      {
+        "name": "notion-research-documentation",
+        "copies": 2,
+        "content_drift": true,
+        "paths": [
+          "C:\\Users\\AvallPc\\.codex\\skills\\notion-research-documentation\\SKILL.md",
+          "C:\\Users\\AvallPc\\.codex\\plugins\\cache\\openai-curated-remote\\notion\\3.0.1\\skills\\notion-research-documentation\\SKILL.md"
+        ]
+      }
+    ],
+    "missing_roots": [],
+    "coverage_truncated": false,
+    "automatic_changes": false
+  },
+  "tools": {
+    "pwsh": {
+      "path": "C:\\Users\\AvallPc\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.EXE",
+      "health": "NOT_PROBED"
+    },
+    "powershell": {
+      "path": "C:\\windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE",
+      "health": "NOT_PROBED"
+    },
+    "git": {
+      "path": "C:\\Program Files\\Git\\cmd\\git.EXE",
+      "health": "NOT_PROBED"
+    },
+    "rg": {
+      "path": "C:\\Users\\AvallPc\\AppData\\Local\\OpenAI\\Codex\\bin\\f1e5e36960c35938\\rg.EXE",
+      "health": "NOT_PROBED"
+    }
+  },
+  "llm_manifest": {
+    "status": "REVIEW_ONLY_EXACT_APPROVAL_REQUIRED",
+    "authorized": false,
+    "manifest_sha256": "2f4f3901277e3cb48219b0a09d58293a8543599251dbd6cb0d842f0eed7a8d52",
+    "approval_record_status": "PENDING_OWNER_APPROVAL"
+  },
+  "coordination": {
+    "version": "nexus.project-control-plane.v1",
+    "blocked": [],
+    "assignments": [
+      "AGT-GOOGLE-ADK"
+    ],
+    "executor": "READ_ONLY_LOCAL_INVENTORY"
+  },
+  "token_allocation": {
+    "history": 1000,
+    "evidence": 2500,
+    "working": 7000,
+    "output": 1500
+  },
+  "session_tokens": null,
+  "changes_applied": false,
+  "permissions_changed": false,
+  "authority": "HOLD"
+}

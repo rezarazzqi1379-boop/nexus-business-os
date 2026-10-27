@@ -19,7 +19,7 @@ from . import Finding
 def _git(repo: Path, *args: str) -> tuple[int, str]:
     p = subprocess.run(["git", "--no-optional-locks", "-C", str(repo), *args],
                        capture_output=True, text=True)
-    return p.returncode, (p.stdout + p.stderr).strip()
+    return p.returncode, (p.stdout if p.returncode == 0 else p.stdout + p.stderr).strip()
 
 
 def check_repo(repo: Path) -> list[Finding]:

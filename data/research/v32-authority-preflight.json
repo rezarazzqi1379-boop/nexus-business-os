@@ -1,0 +1,43 @@
+{
+  "schema_version": "nexus.connector-preflight.v1",
+  "project_id": "PRJ-NEXUS-SANDBOX",
+  "generated_at": "2026-10-15T06:10:01.225993+00:00",
+  "gate": "BLOCK",
+  "external_action_authorized": false,
+  "required_connectors": [],
+  "evidence_count": 0,
+  "evidence_digests": {},
+  "findings": [
+    {
+      "code": "REQUIRED_AUTHORITY_MISSING",
+      "severity": "BLOCK",
+      "subject": "authority.source_registry"
+    },
+    {
+      "code": "REQUIRED_AUTHORITY_MISSING",
+      "severity": "BLOCK",
+      "subject": "authority.project_master"
+    }
+  ],
+  "chat_bootstrap": {
+    "must_recover_before_answer": true,
+    "fail_closed": true,
+    "project_isolation": "PRJ-NEXUS-SANDBOX",
+    "allowed_without_approval": [
+      "read",
+      "analyze",
+      "draft",
+      "test"
+    ],
+    "blocked_without_exact_approval": [
+      "send",
+      "publish",
+      "pay",
+      "sign",
+      "deploy",
+      "delete"
+    ]
+  },
+  "chat_id": "01a1342f-8544-79c3-a8d1-5f8127e3bc49",
+  "instruction_contract": "Recover authority and live connector snapshots before consequential work; isolate project evidence; stop on BLOCK; never treat availability as correctness."
+}

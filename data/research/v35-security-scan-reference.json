@@ -1,0 +1,22 @@
+{
+  "scan_id": "8ec71d27-7da4-4aae-b6a2-d98b41a9d2aa",
+  "range": "127edca49be8b0584019dd6acf683669135c89b5..5a2c36c2820b4e3840558ce67ed84a87bb2420a7",
+  "status": "COMPLETE",
+  "reviewed_inventory": 10,
+  "reportable_findings": 0,
+  "limitations": [
+    "immutable diff only",
+    "digest integrity is not secret-free certification",
+    "runtime binaries not reviewed or executed"
+  ],
+  "report": "C:/Users/AvallPc/.codex/state/plugins/codex-security/scans/nexus-business-os/5a2c36c2820b4e3840558ce67ed84a87bb2420a7_20261015T071541Z_jjv7qkpy/report.md",
+  "usage": {
+    "coverage": "complete",
+    "source": "codex_rollout",
+    "thread_count": 2,
+    "total_tokens": 3094473,
+    "input_tokens": 3086565,
+    "cached_input_tokens": 2995584
+  },
+  "daybreak": "not_granted"
+}

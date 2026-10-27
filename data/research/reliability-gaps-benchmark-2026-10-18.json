@@ -1,0 +1,219 @@
+{
+  "schema": "nexus.failure-isolation-benchmark.v1",
+  "baseline_commit": "690b9c84c21f7380f51345d34e63726578a3cb77",
+  "synthetic_faults": true,
+  "repetitions_per_version": 10,
+  "rows": [
+    {
+      "repeat": 0,
+      "version": "baseline",
+      "wall_seconds": 0.003883799999812254,
+      "aborted": true,
+      "reported_completed": null,
+      "healthy_children_completed": 0,
+      "failed_item_state": "leased",
+      "failure_events": 0
+    },
+    {
+      "repeat": 0,
+      "version": "fixed",
+      "wall_seconds": 0.041263099999923725,
+      "aborted": false,
+      "reported_completed": 5,
+      "healthy_children_completed": 3,
+      "failed_item_state": "queued",
+      "failure_events": 1
+    },
+    {
+      "repeat": 1,
+      "version": "baseline",
+      "wall_seconds": 0.0036614999999073916,
+      "aborted": true,
+      "reported_completed": null,
+      "healthy_children_completed": 0,
+      "failed_item_state": "leased",
+      "failure_events": 0
+    },
+    {
+      "repeat": 1,
+      "version": "fixed",
+      "wall_seconds": 0.048686899999893285,
+      "aborted": false,
+      "reported_completed": 5,
+      "healthy_children_completed": 3,
+      "failed_item_state": "queued",
+      "failure_events": 1
+    },
+    {
+      "repeat": 2,
+      "version": "baseline",
+      "wall_seconds": 0.003339399999958914,
+      "aborted": true,
+      "reported_completed": null,
+      "healthy_children_completed": 0,
+      "failed_item_state": "leased",
+      "failure_events": 0
+    },
+    {
+      "repeat": 2,
+      "version": "fixed",
+      "wall_seconds": 0.051327899999932924,
+      "aborted": false,
+      "reported_completed": 5,
+      "healthy_children_completed": 3,
+      "failed_item_state": "queued",
+      "failure_events": 1
+    },
+    {
+      "repeat": 3,
+      "version": "baseline",
+      "wall_seconds": 0.003351199999997334,
+      "aborted": true,
+      "reported_completed": null,
+      "healthy_children_completed": 0,
+      "failed_item_state": "leased",
+      "failure_events": 0
+    },
+    {
+      "repeat": 3,
+      "version": "fixed",
+      "wall_seconds": 0.04428069999994477,
+      "aborted": false,
+      "reported_completed": 5,
+      "healthy_children_completed": 3,
+      "failed_item_state": "queued",
+      "failure_events": 1
+    },
+    {
+      "repeat": 4,
+      "version": "baseline",
+      "wall_seconds": 0.005332200000111698,
+      "aborted": true,
+      "reported_completed": null,
+      "healthy_children_completed": 0,
+      "failed_item_state": "leased",
+      "failure_events": 0
+    },
+    {
+      "repeat": 4,
+      "version": "fixed",
+      "wall_seconds": 0.03950459999987288,
+      "aborted": false,
+      "reported_completed": 5,
+      "healthy_children_completed": 3,
+      "failed_item_state": "queued",
+      "failure_events": 1
+    },
+    {
+      "repeat": 5,
+      "version": "baseline",
+      "wall_seconds": 0.004533300000048257,
+      "aborted": true,
+      "reported_completed": null,
+      "healthy_children_completed": 0,
+      "failed_item_state": "leased",
+      "failure_events": 0
+    },
+    {
+      "repeat": 5,
+      "version": "fixed",
+      "wall_seconds": 0.0439965000000484,
+      "aborted": false,
+      "reported_completed": 5,
+      "healthy_children_completed": 3,
+      "failed_item_state": "queued",
+      "failure_events": 1
+    },
+    {
+      "repeat": 6,
+      "version": "baseline",
+      "wall_seconds": 0.003942399999914414,
+      "aborted": true,
+      "reported_completed": null,
+      "healthy_children_completed": 0,
+      "failed_item_state": "leased",
+      "failure_events": 0
+    },
+    {
+      "repeat": 6,
+      "version": "fixed",
+      "wall_seconds": 0.05000999999992928,
+      "aborted": false,
+      "reported_completed": 5,
+      "healthy_children_completed": 3,
+      "failed_item_state": "queued",
+      "failure_events": 1
+    },
+    {
+      "repeat": 7,
+      "version": "baseline",
+      "wall_seconds": 0.00376589999996213,
+      "aborted": true,
+      "reported_completed": null,
+      "healthy_children_completed": 0,
+      "failed_item_state": "leased",
+      "failure_events": 0
+    },
+    {
+      "repeat": 7,
+      "version": "fixed",
+      "wall_seconds": 0.03965850000008686,
+      "aborted": false,
+      "reported_completed": 5,
+      "healthy_children_completed": 3,
+      "failed_item_state": "queued",
+      "failure_events": 1
+    },
+    {
+      "repeat": 8,
+      "version": "baseline",
+      "wall_seconds": 0.004085499999973763,
+      "aborted": true,
+      "reported_completed": null,
+      "healthy_children_completed": 0,
+      "failed_item_state": "leased",
+      "failure_events": 0
+    },
+    {
+      "repeat": 8,
+      "version": "fixed",
+      "wall_seconds": 0.0398682000000008,
+      "aborted": false,
+      "reported_completed": 5,
+      "healthy_children_completed": 3,
+      "failed_item_state": "queued",
+      "failure_events": 1
+    },
+    {
+      "repeat": 9,
+      "version": "baseline",
+      "wall_seconds": 0.003660200000012992,
+      "aborted": true,
+      "reported_completed": null,
+      "healthy_children_completed": 0,
+      "failed_item_state": "leased",
+      "failure_events": 0
+    },
+    {
+      "repeat": 9,
+      "version": "fixed",
+      "wall_seconds": 0.041829499999948894,
+      "aborted": false,
+      "reported_completed": 5,
+      "healthy_children_completed": 3,
+      "failed_item_state": "queued",
+      "failure_events": 1
+    }
+  ],
+  "median_seconds": {
+    "baseline": 0.003824849999887192,
+    "fixed": 0.04291299999999865
+  },
+  "healthy_task_completion": {
+    "baseline": "0/10",
+    "fixed": "10/10"
+  },
+  "model_calls": 0,
+  "api_cost_usd": 0,
+  "latency_note": "Fixed path completes additional work; no speedup claim."
+}

@@ -1,0 +1,40 @@
+[
+  {
+    "mandate_id": "owner-local-reliability-20261018",
+    "results": [
+      {
+        "decision_id": "runtime-failure-fix",
+        "state": "SELECTED",
+        "reason": "highest_safe_expected_value"
+      }
+    ],
+    "schedule": {
+      "running": [
+        "runtime-failure-fix"
+      ],
+      "queued": [],
+      "waiting": []
+    },
+    "external_actions_executed": false,
+    "authority_expanded": false
+  },
+  {
+    "mandate_id": "owner-local-reliability-20261018",
+    "results": [
+      {
+        "decision_id": "metadata-fix",
+        "state": "SELECTED",
+        "reason": "highest_safe_expected_value"
+      }
+    ],
+    "schedule": {
+      "running": [
+        "metadata-fix"
+      ],
+      "queued": [],
+      "waiting": []
+    },
+    "external_actions_executed": false,
+    "authority_expanded": false
+  }
+]

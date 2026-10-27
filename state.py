@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from contextlib import closing
+
 import hashlib
 import json
 import sqlite3
@@ -19,7 +21,7 @@ class EventStore:
     def __init__(self, path: Path) -> None:
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             db.execute("PRAGMA journal_mode=WAL")
             db.execute(
                 "CREATE TABLE IF NOT EXISTS events ("
@@ -38,7 +40,7 @@ class EventStore:
     def begin(self, event: EventRecord) -> str:
         serialized = json.dumps(event.payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
         digest = hashlib.sha256(serialized.encode()).hexdigest()
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             db.execute("BEGIN IMMEDIATE")
             row = db.execute(
                 "SELECT payload_sha256, status FROM events WHERE event_id=?", (event.event_id,)
@@ -58,14 +60,14 @@ class EventStore:
             return "duplicate"
 
     def get_status(self, event_id: str) -> str:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             row = db.execute("SELECT status FROM events WHERE event_id=?", (event_id,)).fetchone()
         if row is None:
             raise KeyError("unknown_event")
         return str(row[0])
 
     def set_status(self, event_id: str, status: str) -> None:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             changed = db.execute("UPDATE events SET status=? WHERE event_id=?", (status, event_id)).rowcount
         if changed != 1:
             raise KeyError("unknown_event")

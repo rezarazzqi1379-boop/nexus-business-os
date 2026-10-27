@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from contextlib import closing
+
 import json
 import sqlite3
 from datetime import datetime, timezone
@@ -14,7 +16,7 @@ class AuditLog:
     def __init__(self, path: Path) -> None:
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with sqlite3.connect(path) as db:
+        with closing(sqlite3.connect(path)) as db, db:
             db.execute("CREATE TABLE IF NOT EXISTS audit_log (sequence INTEGER PRIMARY KEY AUTOINCREMENT, occurred_at TEXT NOT NULL, actor TEXT NOT NULL, kind TEXT NOT NULL, body_json TEXT NOT NULL, previous_hash TEXT NOT NULL, record_hash TEXT NOT NULL UNIQUE)")
 
     def append(self, actor: str, kind: str, body: dict, *, occurred_at: datetime | None = None) -> str:
@@ -22,7 +24,7 @@ class AuditLog:
             raise ValueError("invalid_audit_identity")
         at = (occurred_at or datetime.now(timezone.utc)).isoformat()
         body_json = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
             previous = db.execute("SELECT record_hash FROM audit_log ORDER BY sequence DESC LIMIT 1").fetchone()
             previous_hash = previous[0] if previous else "GENESIS"
             record_hash = canonical_digest({"occurred_at": at, "actor": actor, "kind": kind,
@@ -33,7 +35,7 @@ class AuditLog:
 
     def verify(self) -> bool:
         previous_hash = "GENESIS"
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
             rows = db.execute("SELECT occurred_at,actor,kind,body_json,previous_hash,record_hash FROM audit_log ORDER BY sequence").fetchall()
         for at, actor, kind, body_json, stored_previous, stored_hash in rows:
             expected = canonical_digest({"occurred_at": at, "actor": actor, "kind": kind,

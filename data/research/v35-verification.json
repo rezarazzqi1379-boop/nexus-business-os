@@ -1,0 +1,33 @@
+{
+  "baseline": "5a2c36c2820b4e3840558ce67ed84a87bb2420a7",
+  "baseline_tests": 1687,
+  "baseline_seconds": 69.9,
+  "final_tests": 1692,
+  "final_seconds": 34.51,
+  "adversarial_focused": 32,
+  "guard_unchanged": true,
+  "manifest_sha256": "2f4f3901277e3cb48219b0a09d58293a8543599251dbd6cb0d842f0eed7a8d52",
+  "downloaded_weights_or_executables": false,
+  "llm_benchmark": "NOT_RUN_PENDING_EXACT_APPROVAL",
+  "remote_ci": "NOT_RUN",
+  "file_manifest": {
+    "audit_v35_evidence.py": "b7b14cef28b9ef6c88ac3cbe2204db5855d93b95baefea70998b8c637a41d612",
+    "tests/test_evidence_digest_review.py": "86bd9394b28408f5e5db47f65876f8a087ae5df48f553aedacc157a276942a57",
+    "docs/research/NEXUS_V35_LOCAL_LLM_REVIEW_FA.md": "f4ed8a0d4c9c9f510304563c17306d97e1e9d3411848f3676ce05a002d2b2bc4",
+    "data/research/v35-local-llm-manifest.json": "2f4f3901277e3cb48219b0a09d58293a8543599251dbd6cb0d842f0eed7a8d52"
+  },
+  "evidence_hashes": {
+    "v35-approval-request.json": "ecdd99f33d847731a503183f33caa64ad2dc95775719f80dad0059befc6fc9d5",
+    "v35-artifact-metadata.json": "29c2277fbb4a50ea7eb8b89322b9c0d5a017a33502d04ff74d0c7dbb7f925613",
+    "v35-authority-preflight.json": "ce52101ec0c5c72d2526cdf57fec5e51897d04fe8f6f28297f49240359d2c46e",
+    "v35-environment-probe.json": "1cd4052ae0f34f6d2aedaf8839723ee044d74546be01c6930eb62123e08e4f90",
+    "v35-exercise.json": "92ddac574f95cb838440d8093737bfc03d64aa71287da710f250e0c1a6a955e8",
+    "v35-final-tests.txt": "cac78212d161d767b413ff8986ad17c4381ca81e53c5293ae3876c1ff47e88dd",
+    "v35-independent-tests.txt": "e29f86ee3f9e81e1db9c6657914fe41d11c79e6f6005c666a5b29d278332d15f",
+    "v35-local-llm-manifest.json": "2f4f3901277e3cb48219b0a09d58293a8543599251dbd6cb0d842f0eed7a8d52",
+    "v35-model-LICENSE.txt": "5de36594c10839788a8c589443a8ef9d8b8d17c65a1b5807206ae037fc36c6bd",
+    "v35-nineteen-finding-audit.json": "e299e7690d028bc08aa9fdfbe61ebd0c1f467d5b28a8c77c919b1b4871f66ee8",
+    "v35-runtime-LICENSE.txt": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+    "v35-security-scan-reference.json": "ebcc2401bacb9c5130f156e24652ccda5b8adfe6f60f732c3bf463beb02d502b"
+  }
+}

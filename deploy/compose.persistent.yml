@@ -1,0 +1,31 @@
+services:
+  nexus:
+    image: ${NEXUS_IMAGE:?Set an explicitly reviewed local image}
+    pull_policy: never
+    init: true
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cpus: "1.0"
+    mem_limit: 512m
+    pids_limit: 128
+    stop_grace_period: 30s
+    environment:
+      NEXUS_AUTH_REQUIRED: "1"
+      NEXUS_ACCESS_TOKEN: ${NEXUS_ACCESS_TOKEN:?Supply a generated token outside version control}
+      NEXUS_STATE_DB: /data/state.db
+      NEXUS_CANONICAL_DB: /data/canonical.db
+      NEXUS_VAULT_ROOT: /data/nexus_vault
+      NEXUS_DATA_DIR: /data
+      NEXUS_CANONICAL_SOURCE_DIR: /app/canonical_source_files
+      PORT: "8421"
+    ports:
+      - "127.0.0.1:${NEXUS_HTTP_PORT:-8421}:8421"
+    volumes:
+      - nexus-data:/data
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+
+volumes:
+  nexus-data:

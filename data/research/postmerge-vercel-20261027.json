@@ -1,0 +1,53 @@
+{
+  "observed_at": "2026-10-27T17:40:57.721657+00:00",
+  "host": "nexus-business-os.vercel.app",
+  "source_tree": [
+    "src/index.html"
+  ],
+  "source_file_marker": "Runtime bootstrap checkpoint.",
+  "python_api_sources_present": false,
+  "git_revision_from_provider": "NOT_RETURNED",
+  "public_gets": [
+    {
+      "path": "/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "body_sha256": "c30d8445052d6b25240509aad7fc3e6d35c7805c55e475259c188686a450330c",
+      "bootstrap_marker_present": true,
+      "redirect_present": false
+    },
+    {
+      "path": "/src/index.html",
+      "status": 404,
+      "content_type": "text/plain; charset=utf-8",
+      "body_sha256": "5efd65fd0f2bd8ebea30bf0a357262f7137268df94b028f8b4255c8e560397af",
+      "bootstrap_marker_present": false,
+      "redirect_present": false
+    },
+    {
+      "path": "/health",
+      "status": 404,
+      "content_type": "text/plain; charset=utf-8",
+      "body_sha256": "754e75b907843b7b524054d8a3687e731a79f34c6af27823eb3efc1102a55999",
+      "bootstrap_marker_present": false,
+      "redirect_present": false
+    },
+    {
+      "path": "/ready",
+      "status": 404,
+      "content_type": "text/plain; charset=utf-8",
+      "body_sha256": "0da96cedd84094ade052e55e2e532a5ceba8de35648783340563d5db509d653c",
+      "bootstrap_marker_present": false,
+      "redirect_present": false
+    },
+    {
+      "path": "/v1/system/diagnostics",
+      "status": 404,
+      "content_type": "text/plain; charset=utf-8",
+      "body_sha256": "c314e5cd680f8d0e35e77bad978fe676ad19ee9e5cdc7547f4273258ffc2c796",
+      "bootstrap_marker_present": false,
+      "redirect_present": false
+    }
+  ],
+  "assessment": "Existing deployment contains a static bootstrap placeholder, not the NEXUS Python API; no route/persistence change made."
+}

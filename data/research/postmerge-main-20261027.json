@@ -1,0 +1,93 @@
+{
+  "main_sha": "45ced379e6aa2746dd2fe2f43915110bcf057a9e",
+  "pr116": "MERGED",
+  "observed_at": "2026-10-27 17:42:59 UTC",
+  "runtime_run": {
+    "id": 40494875577,
+    "job_id": 122157684417,
+    "branch": "main",
+    "event": "workflow_dispatch",
+    "conclusion": "success",
+    "summary": {
+      "authority_promoted": false,
+      "checkpoint_integrity": true,
+      "duplicate_execution_prevented": true,
+      "evidence_class": "CLAIM",
+      "external_writes": 0,
+      "http_read_budget": 2,
+      "http_reads_attempted": 2,
+      "model_tokens": 0,
+      "observed_at": "2026-10-27T11:16:30.230660+00:00",
+      "persistent_service": false,
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "schema_version": "nexus.free-research-summary.v1",
+      "source_mode": "REAL_PUBLIC_HTTP",
+      "sources": [
+        {
+          "sha256": "fd6e416c987d17165bac52a0f5795a462e1ec9c344c705acc11df03fbe776a8e",
+          "url": "https://api.github.com/repos/openai/openai-agents-python"
+        },
+        {
+          "sha256": "97827af38961ba5fa416811eb5038f573b839ddce3d2879deb19a40c2de6e4c9",
+          "url": "https://api.github.com/repos/openai/openai-agents-python/releases/latest"
+        }
+      ],
+      "status": "VERIFIED",
+      "supervisor": "accepted",
+      "task_id": "bounded-public-research",
+      "tasks_completed": 1
+    }
+  },
+  "regression_run": {
+    "id": 40494431196,
+    "job_id": 122156168254,
+    "branch": "main",
+    "event": "push",
+    "conclusion": "success"
+  },
+  "local_focused": {
+    "command": "python -m pytest -q tests/test_free_research.py tests/test_public_research_agent.py tests/test_router_runtime.py tests/test_router_console.py tests/test_execution_durability.py evals/test_cloud_hardening.py",
+    "passed": 79,
+    "warnings": 1,
+    "seconds": 18.48
+  },
+  "container_local": {
+    "status": "BLOCKED",
+    "reason": "DOCKER_UNAVAILABLE"
+  },
+  "container_ci": {
+    "run_id": 40557056463,
+    "conclusion": "success",
+    "implementation_sha": "017406114322f69edf2f08c643a604e8ebae9127"
+  },
+  "production_deployment": "NOT_STARTED",
+  "authority_hold": "UNCHANGED",
+  "local_regression": {
+    "command": "python -m pytest -q tests evals",
+    "passed": 1734,
+    "warnings": 1,
+    "seconds": 76.84
+  },
+  "initial_artifact_sha256": {
+    "deploy/compose.persistent.yml": "215a3523fc7a729cdcc845a1626e028307c3fd10e9d16427dba4b6d22cf4c704",
+    "scripts/verify_persistent_container.py": "aae276fdfde9a1ef3a2719f745715efac0ba4e06fbc81056f16f6842df92c666",
+    ".github/workflows/nexus-persistent-container.yml": "6661db9687a60b36f70b93aec9ce004059626347f414e85a37a208ab6fb592b3"
+  },
+  "verified_artifact_sha256": {
+    "deploy/compose.persistent.yml": "215a3523fc7a729cdcc845a1626e028307c3fd10e9d16427dba4b6d22cf4c704",
+    "scripts/verify_persistent_container.py": "5ab8bbb0d0f3ec076ad8b620e90e03a940906225bb11a89f822348c6e685e275",
+    ".github/workflows/nexus-persistent-container.yml": "27dbf0c317ce890c3a1a891a37bb92f943258dacb0e6badfba4b954cd6665404",
+    "tests/test_persistent_container_probe.py": "de1c1ca9dd3a86e17361bb4c29ed201ab096f2a16493da4aa44e696d56e7a189"
+  },
+  "local_regression_final": {
+    "command": "python -m pytest -q tests evals",
+    "passed": 1737,
+    "warnings": 1,
+    "seconds": 79.02
+  },
+  "local_focused_correction": {
+    "command": "python -m pytest -q tests/test_persistent_container_probe.py tests/test_free_research.py tests/test_public_research_agent.py tests/test_router_runtime.py tests/test_execution_durability.py",
+    "passed": 70,
+    "seconds": 14.07
+  }
+}

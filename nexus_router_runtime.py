@@ -30,6 +30,8 @@ ROLES = ("research", "reconciliation", "qa")
 class SyntheticRuntime:
     action = ACTION
     roles = ROLES
+    submission_action = "SYNTHETIC_TEST"
+    submission_authority = "SYNTHETIC_ONLY"
 
     def __init__(self, path: Path):
         self.store = AutonomyStore(path)
@@ -53,13 +55,16 @@ class SyntheticRuntime:
         db.execute("INSERT INTO router_events(project,task,kind,body,observed_at) VALUES(?,?,?,?,?)",
                    (PROJECT, task, kind, json.dumps(body, sort_keys=True), now.isoformat()))
 
-    def submit(self, task_id, *, project_id=PROJECT, thread_id="", action="SYNTHETIC_TEST",
-               authority="SYNTHETIC_ONLY", budget_units=9, approval_id=None):
+    def submit(self, task_id, *, project_id=PROJECT, thread_id="", action=None,
+               authority=None, budget_units=9, approval_id=None):
+        action = self.submission_action if action is None else action
+        authority = self.submission_authority if authority is None else authority
         self._identity(task_id)
         if thread_id:
             self._identity(thread_id)
         # An approval ID can never turn this sandbox into an external runner.
-        if project_id != PROJECT or action != "SYNTHETIC_TEST" or authority != "SYNTHETIC_ONLY" or approval_id:
+        if (project_id != PROJECT or action != self.submission_action
+                or authority != self.submission_authority or approval_id):
             raise PermissionError("scope_or_authority_blocked")
         if type(budget_units) is not int or not 3 <= budget_units <= 30:
             raise ValueError("budget_exhausted_or_unbounded")

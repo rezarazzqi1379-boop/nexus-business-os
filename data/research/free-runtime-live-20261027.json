@@ -1,0 +1,19 @@
+{
+  "authority_promoted": false,
+  "checkpoint_integrity": false,
+  "duplicate_execution_prevented": false,
+  "external_writes": 0,
+  "http_read_budget": 2,
+  "http_reads_attempted": 1,
+  "model_tokens": 0,
+  "observed_at": "2026-10-27T10:59:52.297244+00:00",
+  "persistent_service": false,
+  "project_id": "PRJ-NEXUS-SANDBOX",
+  "reason": "bounded_research_or_verification_failed",
+  "schema_version": "nexus.free-research-summary.v1",
+  "source_mode": "REAL_PUBLIC_HTTP",
+  "status": "BLOCKED",
+  "supervisor": "NOT_VERIFIED",
+  "task_id": "bounded-public-research",
+  "tasks_completed": 0
+}

@@ -1,0 +1,6 @@
+{
+  "snapshot": "data/nexus_system/backups/free-runtime-verified-20261027",
+  "verified": true,
+  "manifest_sha256": "3aecd77c3dbb115f983f2070fcf61813738f51e62701a7411eed04999b01adc8",
+  "raw_test_logs": "Retained locally only; not included in public workflow artifacts."
+}

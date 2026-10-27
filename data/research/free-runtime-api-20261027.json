@@ -1,0 +1,9 @@
+{
+  "startup": "VERIFIED",
+  "ready": 200,
+  "health": 200,
+  "unauthenticated_diagnostics": 401,
+  "authenticated_diagnostics": 200,
+  "temporary_state": true,
+  "secret_exported": false
+}

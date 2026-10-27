@@ -1,0 +1,65 @@
+{
+  "scope": "PRJ-NEXUS-SANDBOX",
+  "implementation_sha": "1f7251cbb0aae18c7bf3023910785f996f697852",
+  "pull_request": 116,
+  "observed_at": "2026-10-27 11:07:10 UTC",
+  "source_mode": "REAL_PUBLIC_HTTP",
+  "runtime_run": {
+    "id": 40493489528,
+    "job_id": 122152978961,
+    "conclusion": "success",
+    "summary": {
+      "authority_promoted": false,
+      "checkpoint_integrity": true,
+      "duplicate_execution_prevented": true,
+      "evidence_class": "CLAIM",
+      "external_writes": 0,
+      "http_read_budget": 2,
+      "http_reads_attempted": 2,
+      "model_tokens": 0,
+      "observed_at": "2026-10-27T11:05:36.322102+00:00",
+      "persistent_service": false,
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "schema_version": "nexus.free-research-summary.v1",
+      "source_mode": "REAL_PUBLIC_HTTP",
+      "sources": [
+        {
+          "sha256": "fd6e416c987d17165bac52a0f5795a462e1ec9c344c705acc11df03fbe776a8e",
+          "url": "https://api.github.com/repos/openai/openai-agents-python"
+        },
+        {
+          "sha256": "97827af38961ba5fa416811eb5038f573b839ddce3d2879deb19a40c2de6e4c9",
+          "url": "https://api.github.com/repos/openai/openai-agents-python/releases/latest"
+        }
+      ],
+      "status": "VERIFIED",
+      "supervisor": "accepted",
+      "task_id": "bounded-public-research",
+      "tasks_completed": 1
+    }
+  },
+  "regression_run": {
+    "id": 40493489560,
+    "job_id": 122152978615,
+    "conclusion": "success",
+    "unittest_count": 680,
+    "pytest_tests_count": 658,
+    "failure_checks_count": 14
+  },
+  "artifact": {
+    "id": 12729620877,
+    "name": "public-research-summary",
+    "size_bytes": 714,
+    "digest": "sha256:997938510d4fdb85e3ca8136e2fdcf16b7c1fd6475235c8229b6228b2d1331eb",
+    "retention_days": 3
+  },
+  "status": {
+    "pr_runtime": "VERIFIED",
+    "main_scheduled_research": "NOT_STARTED",
+    "permanent_service": "NOT_STARTED",
+    "vercel_runtime": "BLOCKED",
+    "authority_promotion": "BLOCKED",
+    "merge": "BLOCKED"
+  },
+  "merge_blocker": "Consequential authority preflight remains BLOCK; successful sandbox CI does not authenticate a governing tuple or clear HOLD. No authority bypass or merge is performed."
+}

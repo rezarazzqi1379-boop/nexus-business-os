@@ -1,3 +1,7 @@
+## Standing owner delegation — 2026-10-27
+
+Owner permits autonomous routine technical work across NEXUS where account access and safety gates allow. **Email sending is excluded and requires separate explicit per-message approval.** No blanket bypass for secrets, payments, irreversible external actions, or production approval gates. Prioritize the free GitHub Actions runtime and independently verify actual runs before claiming operational readiness. Latest runtime workflow: `.github/workflows/nexus-free-runtime.yml`.
+
 # NEXUS CURRENT STATE
 ## Global execution priority — 2026-10-27
 

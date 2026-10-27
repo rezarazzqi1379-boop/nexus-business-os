@@ -4,6 +4,23 @@ Owner permits autonomous routine technical work across NEXUS where account acces
 
 # NEXUS CURRENT STATE
 
+## Post-merge main verification and persistence preparation — 2026-10-27
+
+PR116 is merged at main 45ced379e6aa2746dd2fe2f43915110bcf057a9e.
+Main free-runtime run 40494875577 SUCCESS: one real public task, two GETs,
+accepted supervisor, checkpoint and replay checks. Main tests 40494431196 SUCCESS.
+The earlier pre-merge statement that main research was NOT_STARTED is superseded
+by this observed run, not by inferred scheduler reliability. Existing research
+implementation is retained; focused baseline 79 passed, no new runtime defect.
+Vercel's source tree is a static bootstrap page only; root 200, Python API paths
+404. It is not the production API. Prepared a loopback-only persistent Compose
+configuration and disposable Linux container restart/queue/backup/restore test.
+No target deployment or paid volume was provisioned; authority HOLD unchanged.
+Container acceptance is not locally tested (Docker unavailable); CI evidence is
+recorded separately when observed. Operator: owner. Next step: verify the image
+and volume acceptance on Linux, then obtain exact target/storage/financial gates.
+See docs/PERSISTENT_DEPLOYMENT_ACCEPTANCE.md.
+
 ## Bounded free-runtime public research — 2026-10-27
 
 Work continues from main b46856ea92eb981ddb0dea9f885d740c73418bd9 on

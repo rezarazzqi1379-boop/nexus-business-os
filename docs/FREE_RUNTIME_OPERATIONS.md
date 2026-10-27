@@ -1,5 +1,11 @@
 # Bounded GitHub Actions operation
 
+Post-merge update: #116 is merged at `45ced379e6aa2746dd2fe2f43915110bcf057a9e`.
+Main runtime **40494875577** and main tests **40494431196** succeeded. This
+supersedes the historical pre-merge NOT_STARTED/merge-blocked statements below;
+commercial/canonical authority HOLD and the persistent-service boundary remain.
+See [persistent acceptance handoff](PERSISTENT_DEPLOYMENT_ACCEPTANCE.md).
+
 ## Verified execution — 2026-10-27
 
 PR #116 implementation commit `1f7251cbb0aae18c7bf3023910785f996f697852`:

@@ -40,3 +40,11 @@ def test_consistent_declarations_accepted():
 def test_invalid_docx_blocks():
     with pytest.raises(AuthorityBlocked, match="document_unreadable"):
         assert_consistent_authority_declarations(b"not a docx", docx("Master Context v2.1"), binding())
+
+def test_docx_expansion_limit_preserves_specific_block_reason():
+    from zipfile import ZIP_DEFLATED
+    out = BytesIO()
+    with ZipFile(out, "w", compression=ZIP_DEFLATED) as archive:
+        archive.writestr("word/document.xml", b"A" * 12000)
+    with pytest.raises(AuthorityBlocked, match="document_expansion_rejected"):
+        assert_consistent_authority_declarations(out.getvalue(), docx("Master Context v2.1"), binding())

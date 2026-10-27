@@ -64,7 +64,6 @@ def _login_allowed(client_key: str, now: float) -> bool:
     return len(recent) < LOGIN_MAX_ATTEMPTS
 
 
-READINESS_CHECKS = _startup_checks()
 
 
 @app.get("/", include_in_schema=False)
@@ -118,15 +117,16 @@ def health() -> dict:
 
 @app.get("/ready")
 def ready() -> dict:
-    if not all(READINESS_CHECKS.values()):
+    if not all(_startup_checks().values()):
         raise HTTPException(status_code=503, detail={"status": "not_ready"})
     return {"status": "ready"}
 
 
 @app.get("/v1/system/diagnostics")
 def diagnostics() -> dict:
-    return {"status": "ready" if all(READINESS_CHECKS.values()) else "not_ready",
-            "checks": READINESS_CHECKS, "auth_required": auth_required()}
+    checks = _startup_checks()
+    return {"status": "ready" if all(checks.values()) else "not_ready",
+            "checks": checks, "auth_required": auth_required()}
 
 
 @app.get("/console", include_in_schema=False)

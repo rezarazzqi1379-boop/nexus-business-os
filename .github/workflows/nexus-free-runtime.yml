@@ -39,6 +39,7 @@ jobs:
           export NEXUS_VAULT_ROOT="$RUNNER_TEMP/vault"
           export NEXUS_CANONICAL_SOURCE_DIR="$GITHUB_WORKSPACE/canonical_source_files"
           export PORT=8421
+          export NEXUS_DATA_DIR="$RUNNER_TEMP"
           python start.py > "$RUNNER_TEMP/nexus-startup.log" 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT

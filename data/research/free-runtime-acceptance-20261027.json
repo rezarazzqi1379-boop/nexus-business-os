@@ -1,0 +1,58 @@
+{
+  "stage": "ACTIVATE",
+  "owner": "repository owner",
+  "observed_at": "2026-10-27T11:04:07.202018+00:00",
+  "base_sha": "b46856ea92eb981ddb0dea9f885d740c73418bd9",
+  "baseline_actions": {
+    "run_id": 40478369970,
+    "job_id": 122102152873,
+    "conclusion": "success",
+    "independently_verified": true
+  },
+  "local_tests": [
+    {
+      "command": "python -m pytest -q tests/test_public_research_agent.py tests/test_readiness.py tests/test_execution_durability.py",
+      "passed": 35,
+      "seconds": 5.41
+    },
+    {
+      "command": "python -m pytest -q tests/test_free_research.py tests/test_public_research_agent.py tests/test_readiness.py tests/test_execution_durability.py",
+      "passed": 40,
+      "seconds": 6.59
+    },
+    {
+      "command": "python -m pytest -q tests/test_router_runtime.py tests/test_router_console.py tests/test_free_research.py tests/test_public_research_agent.py tests/test_execution_durability.py tests/test_readiness.py",
+      "passed": 74,
+      "warnings": 1,
+      "seconds": 10.95
+    },
+    {
+      "command": "python -m pytest -q tests evals",
+      "passed": 1734,
+      "warnings": 1,
+      "seconds": 60.15
+    }
+  ],
+  "source_sha256": {
+    ".github/workflows/nexus-free-runtime.yml": "3373de2f6609b88a8b53387dba426a4a1beeb4e395b571105bc532f76384fbf7",
+    "nexus_free_research.py": "942ecd1e3ecb28e4d60d1283a7bf32b77ec2a330c01daf92b3ebc7286bf0d3bb",
+    "nexus_public_research_agent.py": "c1f8a4a00323130ff4bdce8cfa0fa9ce5f9f283676fa16fbb8c0b77d6b1353e4",
+    "nexus_router_runtime.py": "8d66a2f6dbecd26c32b5997a54b851a0e7122bc99519f0972641aa2b5f781eb0",
+    "tests/test_free_research.py": "570079fe9073c87af4dd8b6c6669cbb952910993310c65ba4196a35870a2bad2",
+    "docs/FREE_RUNTIME_OPERATIONS.md": "bc18dbb4c5c401f4f36feca835c0bd85dfd626b22a7947676fbf97e3cfae8871"
+  },
+  "live_summary": "data/research/free-runtime-live-20261027-unrestricted.json",
+  "initial_sandbox_network_block": "data/research/free-runtime-live-20261027.json",
+  "local_api": "data/research/free-runtime-api-20261027.json",
+  "vercel": "data/research/free-runtime-vercel-20261027.json",
+  "new_head_ci": "NOT_STARTED",
+  "authority": "HOLD_UNCHANGED",
+  "production_persistent_service": "NOT_STARTED",
+  "cost_boundary": "No paid models or hosting resources; GitHub account quotas still apply",
+  "limitations": [
+    "Deduplication is queue/run scoped, not cross-run exactly once.",
+    "Full public response checkpoints live only in disposable local queues, not exported artifacts.",
+    "Vercel endpoints return 404; READY does not prove operational NEXUS.",
+    "No Linux runtime success is inferred from Windows local tests."
+  ]
+}

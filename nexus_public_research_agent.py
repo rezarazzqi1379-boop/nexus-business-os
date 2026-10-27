@@ -90,6 +90,8 @@ def extract(bodies, observed_at):
 class PublicResearchRuntime(SyntheticRuntime):
     action = "router.public-research.v1"
     roles = ("repository_research",)
+    submission_action = "PUBLIC_RESEARCH_READ"
+    submission_authority = "UNVERIFIED_PUBLIC"
 
     def __init__(self, path, *, transport=public_get):
         super().__init__(path)

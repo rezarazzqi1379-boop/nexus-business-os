@@ -1,0 +1,29 @@
+{
+  "authority_promoted": false,
+  "checkpoint_integrity": true,
+  "duplicate_execution_prevented": true,
+  "evidence_class": "CLAIM",
+  "external_writes": 0,
+  "http_read_budget": 2,
+  "http_reads_attempted": 2,
+  "model_tokens": 0,
+  "observed_at": "2026-10-27T11:00:08.102996+00:00",
+  "persistent_service": false,
+  "project_id": "PRJ-NEXUS-SANDBOX",
+  "schema_version": "nexus.free-research-summary.v1",
+  "source_mode": "REAL_PUBLIC_HTTP",
+  "sources": [
+    {
+      "sha256": "fd6e416c987d17165bac52a0f5795a462e1ec9c344c705acc11df03fbe776a8e",
+      "url": "https://api.github.com/repos/openai/openai-agents-python"
+    },
+    {
+      "sha256": "97827af38961ba5fa416811eb5038f573b839ddce3d2879deb19a40c2de6e4c9",
+      "url": "https://api.github.com/repos/openai/openai-agents-python/releases/latest"
+    }
+  ],
+  "status": "VERIFIED",
+  "supervisor": "accepted",
+  "task_id": "bounded-public-research",
+  "tasks_completed": 1
+}

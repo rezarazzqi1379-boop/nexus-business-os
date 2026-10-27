@@ -2,6 +2,13 @@ name: NEXUS Free Runtime
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '.github/workflows/nexus-free-runtime.yml'
+      - 'nexus_free_research.py'
+      - 'nexus_public_research_agent.py'
+      - 'nexus_router_runtime.py'
+      - 'tests/test_free_research.py'
   schedule:
     - cron: "17 7 * * 1-5"
 
@@ -23,6 +30,8 @@ jobs:
       NEXUS_ACCESS_TOKEN: "github-actions-sandbox-token-not-for-production-123456789"
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -44,7 +53,7 @@ jobs:
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
           python - <<'PY'
-          import time
+          import time, os
           import urllib.error
           import urllib.request
 
@@ -68,8 +77,41 @@ jobs:
               assert exc.code == 401, f"Expected 401, got {exc.code}"
           else:
               raise AssertionError("Diagnostics exposed without authentication")
+          authenticated = urllib.request.Request(base + "/v1/system/diagnostics",
+              headers={"Authorization": "Bearer " + os.environ["NEXUS_ACCESS_TOKEN"]})
+          with urllib.request.urlopen(authenticated, timeout=3) as response:
+              assert response.status == 200
           print("PASS: isolated startup, readiness, health, protected diagnostics")
           PY
+      - name: Complete one bounded real public research task
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 60s python nexus_free_research.py --summary "$RUNNER_TEMP/public-research-summary.json"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          summary = json.loads((Path(os.environ['RUNNER_TEMP']) / 'public-research-summary.json').read_text())
+          assert summary['source_mode'] == 'REAL_PUBLIC_HTTP'
+          assert summary['status'] == 'VERIFIED' and summary['tasks_completed'] == 1
+          assert summary['supervisor'] == 'accepted' and summary['checkpoint_integrity']
+          assert summary['duplicate_execution_prevented'] and summary['http_reads_attempted'] == 2
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as output:
+              output.write('### NEXUS bounded public research\n'
+                           'VERIFIED: one real-source task, two unauthenticated GETs; '
+                           'checkpoint integrity, supervisor and replay checks passed.\n'
+                           'CLAIM evidence only; authority HOLD unchanged. '
+                           'Ephemeral runner, no persistent production service.\n')
+          PY
+      - name: Preserve only the non-sensitive research summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-research-summary
+          path: ${{ runner.temp }}/public-research-summary.json
+          if-no-files-found: ignore
+          retention-days: 3
       - name: Publish failure diagnostics
         if: failure()
         run: |

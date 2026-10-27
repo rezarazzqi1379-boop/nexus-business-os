@@ -1,0 +1,31 @@
+{
+  "observed_at": "2026-10-27T11:01:34.437255+00:00",
+  "host": "nexus-business-os.vercel.app",
+  "deployment_id": "dpl_34W7YryHDSp5z2UM6yUzy1hp74K3",
+  "provider_state": "READY",
+  "provider_type": "LAMBDAS",
+  "git_sha": "NOT_RETURNED",
+  "observations": [
+    {
+      "path": "/health",
+      "http_status": 404,
+      "content_type": "text/plain; charset=utf-8",
+      "redirect_present": false
+    },
+    {
+      "path": "/ready",
+      "http_status": 404,
+      "content_type": "text/plain; charset=utf-8",
+      "redirect_present": false
+    },
+    {
+      "path": "/v1/system/diagnostics",
+      "http_status": 404,
+      "content_type": "text/plain; charset=utf-8",
+      "redirect_present": false
+    }
+  ],
+  "runtime_operational": "NOT_VERIFIED",
+  "persistent_sqlite": "NOT_VERIFIED",
+  "changes_made": false
+}

@@ -4,6 +4,28 @@ The canonical deployment target is a managed Linux container with persistent
 storage. A Windows installation is **not required**. Local Windows/macOS/Linux
 operation remains a recovery and development option.
 
+## Activation-first execution status
+
+**Primary objective:** ACTIVATE -> DEPLOY -> OPERATE -> STABILIZE -> IMPROVE.
+The deployment entry point is `start.py`, the container is defined in
+`Dockerfile`, and the intended managed target is Railway with a persistent
+`/data` volume. Follow `docs/CLOUD_DEPLOYMENT_RUNBOOK.md`.
+
+**Minimum activation acceptance:** successful image build; startup without
+unapproved external writes; `/ready` health success; protected endpoints
+reject unauthenticated requests; authenticated console and diagnostics work;
+a verified backup and a rollback path exist; one permitted end-to-end workflow
+produces an auditable result. Record the deployed revision and operator.
+
+**Current limitation:** a passing repository CI run does **not** prove a live
+deployment. The repository does not establish a provisioned Railway service,
+persistent volume, configured secret, or approved production target. Do not
+claim the service is running until these checks are observed. Authority
+admission for consequential operations remains fail-closed until independently
+authenticated approval is supplied. Activate independent read-only and
+non-consequential functions wherever allowed rather than waiting on unrelated
+feature work.
+
 ## Cloud quick start
 
 1. Deploy this directory from a private Git repository to Railway.

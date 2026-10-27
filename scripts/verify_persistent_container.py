@@ -110,7 +110,17 @@ def run(image: str) -> dict:
             result = subprocess.run([*command, *args], env=env if environment is None else environment,
                 cwd=ROOT, capture_output=True, text=True, timeout=timeout)
             if check:
-                require(result.returncode == 0)
+                if result.returncode != 0:
+                    # Export only fixed categories, never raw stderr/config/env.
+                    markers = ("permission denied", "read-only file system", "invalid mount",
+                               "port is already allocated", "no such image", "no such file",
+                               "invalid argument", "unknown flag", "operation not permitted",
+                               "mount", "cpus", "memory", "daemon", "address already in use",
+                               "operationalerror", "modulenotfounderror", "runtimeerror")
+                    summary["command_failure"] = {
+                        "operation": args[0], "exit_code": result.returncode,
+                        "categories": [m for m in markers if m in result.stderr.lower()]}
+                    raise RuntimeError("container_command_failed")
             return result
 
         def probe():
@@ -127,12 +137,15 @@ def run(image: str) -> dict:
             no_token = {k: v for k, v in env.items() if k != "NEXUS_ACCESS_TOKEN"}
             require(compose("config", "--quiet", check=False, environment=no_token).returncode != 0)
             compose("config", "--quiet")  # Never print resolved secret values.
-            stage = "STARTUP"
+            stage = "CREATE_CONTAINER"
             started = True
             compose("up", "-d", "--no-build")
+            stage = "READINESS"
             probe()
+            stage = "PUBLIC_HEALTH"
             with urllib.request.urlopen(base + "/health", timeout=3) as response:
                 require(response.status == 200)
+            stage = "UNAUTHENTICATED_DIAGNOSTICS"
             try:
                 urllib.request.urlopen(base + "/v1/system/diagnostics", timeout=3)
             except urllib.error.HTTPError as error:
@@ -141,6 +154,7 @@ def run(image: str) -> dict:
                 raise RuntimeError("authentication_missing")
             request = urllib.request.Request(base + "/v1/system/diagnostics",
                 headers={"Authorization": "Bearer " + env["NEXUS_ACCESS_TOKEN"]})
+            stage = "AUTHENTICATED_DIAGNOSTICS"
             with urllib.request.urlopen(request, timeout=3) as response:
                 require(response.status == 200 and all(json.load(response)["checks"].values()))
             stage = "SEED_CHECKPOINT"

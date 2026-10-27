@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping
+
+from authority_admission import AuthorityBinding, AuthorityBlocked, admit_authority, assert_consistent_authority_declarations
 
 from nexus_connector_control_plane import (
     ActionScope,
@@ -55,6 +57,10 @@ def bootstrap_chat(
     evidence: Iterable[EvidenceEnvelope],
     required_connectors: Iterable[str],
     now: str | None = None,
+    authority_binding: AuthorityBinding | None = None,
+    registry_bytes: bytes | None = None,
+    master_bytes: bytes | None = None,
+    approval_records: Mapping[str, AuthorityBinding] | None = None,
 ) -> dict[str, Any]:
     evidence_items = list(evidence)
     result = ConnectorControlPlane(manifests).preflight(
@@ -71,6 +77,20 @@ def bootstrap_chat(
         item.semantic_key for item in evidence_items if item.project_id == intent.project_id
     }
     if intent.consequential:
+        try:
+            if (authority_binding is None or registry_bytes is None
+                    or master_bytes is None or approval_records is None):
+                raise AuthorityBlocked("authority_binding_required")
+            admitted = admit_authority(
+                authority_binding, registry_bytes=registry_bytes,
+                master_bytes=master_bytes, approval_records=approval_records)
+            assert_consistent_authority_declarations(registry_bytes, master_bytes, admitted)
+        except AuthorityBlocked as exc:
+            result["findings"].append(
+                {"code": "AUTHORITY_ADMISSION_BLOCKED", "severity": "BLOCK", "subject": str(exc)}
+            )
+            result["gate"] = "BLOCK"
+            result["external_action_authorized"] = False
         missing = [key for key in REQUIRED_AUTHORITY_KEYS if key not in available_keys]
         for key in missing:
             result["findings"].append(

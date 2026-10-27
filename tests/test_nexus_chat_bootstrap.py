@@ -56,7 +56,8 @@ class ChatBootstrapTests(unittest.TestCase):
             required_connectors=["github"],
             now=NOW,
         )
-        self.assertEqual(result["gate"], "SAFE")
+        self.assertEqual(result["gate"], "BLOCK")
+        self.assertIn("AUTHORITY_ADMISSION_BLOCKED", [x["code"] for x in result["findings"]])
         self.assertEqual(result["chat_id"], "chat-1")
 
 

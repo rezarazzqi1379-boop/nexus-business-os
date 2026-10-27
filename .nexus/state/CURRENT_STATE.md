@@ -17,7 +17,13 @@ retained as BLOCKED evidence rather than hidden. Frozen tests are labelled.
 Vercel reports READY/LAMBDAS, but all three NEXUS endpoints probed returned 404.
 No persistent service or production readiness is claimed; authority HOLD remains.
 See docs/FREE_RUNTIME_OPERATIONS.md and data/research/free-runtime-*-20261027*.
-New-head CI/PR evidence is recorded separately after publication, not assumed here.
+PR #116 at 1f7251cbb0aae18c7bf3023910785f996f697852 now has verified Linux
+Actions evidence: runtime 40493489528 SUCCESS, one real task/two GETs/accepted
+supervisor/replay suppressed; regression 40493489560 SUCCESS (680 unittest,
+658 pytest tests/, 14 failure checks). Artifact is summary-only, 714 bytes.
+Merge remains BLOCKED by consequential authority admission/HOLD; main scheduled
+research promotion and permanent service are NOT_STARTED. No authority bypass.
+Evidence: data/research/free-runtime-actions-20261027.json.
 ## Global execution priority — 2026-10-27
 
 Owner direction: ACTIVATE > DEPLOY > OPERATE > STABILIZE > IMPROVE. The operating contract in AGENTS.md now requires every task and agent to prioritize the smallest authorized running vertical slice, observable end-to-end output, and critical-path blockers over speculative expansion. This is a planning/operating policy, NOT evidence of deployment. Deployment, production promotion, external writes, credentials and other protected actions still require exact-scope approval. Authority Source Registry / Master Context admission remains HOLD until independently authenticated. Next step: inventory the actual runnable entry point and approved target, then produce a minimal deployment readiness check and execute only authorized sandbox or read-only activation.

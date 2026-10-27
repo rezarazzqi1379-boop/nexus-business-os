@@ -1,5 +1,24 @@
 # Bounded GitHub Actions operation
 
+## Verified execution — 2026-10-27
+
+PR #116 implementation commit `1f7251cbb0aae18c7bf3023910785f996f697852`:
+NEXUS Free Runtime run **40493489528** succeeded on Linux/Python 3.11, including
+the original smoke checks, authenticated diagnostics, one REAL_PUBLIC_HTTP task,
+two GETs, accepted supervisor, checkpoint integrity, suppressed replay and the
+714-byte summary artifact. Regression run **40493489560** succeeded: unittest
+680, pytest tests/ 658, failure-derived checks 14 (overlapping suites).
+Local combined tests/ + evals/ regression: **1734 passed**, one existing warning.
+No raw DB/checkpoint body was exported. Evidence and artifact digest:
+`data/research/free-runtime-actions-20261027.json`.
+
+**VERIFIED:** PR-run activation and one bounded cloud research observation.
+**BLOCKED:** merge/consequential authority admission; the generated preflight
+still BLOCKs and no authenticated governing tuple was manufactured.
+**NOT_STARTED:** promotion of this change into main's scheduled runtime and a
+persistent production service. Green sandbox CI does not clear authority HOLD.
+Keep the PR available for review; do not duplicate ancestor PR integrations.
+
 Owner/operator: repository owner. Scope: PRJ-NEXUS-SANDBOX, public read-only
 engineering research. Authority HOLD is unchanged. No email, paid model call,
 commercial transaction, account onboarding or production-state promotion.

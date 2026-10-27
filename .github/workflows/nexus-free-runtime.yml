@@ -1,0 +1,77 @@
+name: NEXUS Free Runtime
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 7 * * 1-5"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nexus-free-runtime
+  cancel-in-progress: false
+
+jobs:
+  activation-smoke:
+    name: Bounded activation and smoke checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      NEXUS_AUTH_REQUIRED: "1"
+      NEXUS_ACCESS_TOKEN: "github-actions-sandbox-token-not-for-production-123456789"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install runtime and smoke dependencies
+        run: python -m pip install "fastapi>=0.116,<1" "uvicorn[standard]>=0.35,<1" "httpx>=0.28,<1"
+      - name: Compile startup and API modules
+        run: python -m py_compile start.py api.py security.py
+      - name: Start isolated service and probe readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          export NEXUS_STATE_DB="$RUNNER_TEMP/state.db"
+          export NEXUS_CANONICAL_DB="$RUNNER_TEMP/canonical.db"
+          export NEXUS_VAULT_ROOT="$RUNNER_TEMP/vault"
+          export NEXUS_CANONICAL_SOURCE_DIR="$GITHUB_WORKSPACE/canonical_source_files"
+          export PORT=8421
+          python start.py > "$RUNNER_TEMP/nexus-startup.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          python - <<'PY'
+          import time
+          import urllib.error
+          import urllib.request
+
+          base = "http://127.0.0.1:8421"
+          for attempt in range(35):
+              try:
+                  with urllib.request.urlopen(base + "/ready", timeout=2) as response:
+                      assert response.status == 200
+                      break
+              except (urllib.error.URLError, AssertionError):
+                  time.sleep(1)
+          else:
+              raise SystemExit("NEXUS failed readiness within 35 seconds")
+
+          with urllib.request.urlopen(base + "/health", timeout=3) as response:
+              assert response.status == 200
+          request = urllib.request.Request(base + "/v1/system/diagnostics")
+          try:
+              urllib.request.urlopen(request, timeout=3)
+          except urllib.error.HTTPError as exc:
+              assert exc.code == 401, f"Expected 401, got {exc.code}"
+          else:
+              raise AssertionError("Diagnostics exposed without authentication")
+          print("PASS: isolated startup, readiness, health, protected diagnostics")
+          PY
+      - name: Publish failure diagnostics
+        if: failure()
+        run: |
+          if [ -f "$RUNNER_TEMP/nexus-startup.log" ]; then
+            tail -n 80 "$RUNNER_TEMP/nexus-startup.log" | sed -E 's/(token|password|secret|key)=([^ ]+)/\1=[REDACTED]/Ig'
+          fi

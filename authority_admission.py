@@ -85,6 +85,8 @@ def _docx_text(raw: bytes) -> str:
                 raise AuthorityBlocked("authority_document_expansion_rejected")
             xml = archive.read(info)
         root = ElementTree.fromstring(xml)
+    except AuthorityBlocked:
+        raise
     except (OSError, KeyError, ValueError, BadZipFile, ElementTree.ParseError) as exc:
         raise AuthorityBlocked("authority_document_unreadable") from exc
     ns = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"

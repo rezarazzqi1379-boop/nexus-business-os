@@ -6,6 +6,7 @@ not live research; the existing free-runtime workflow supplies live evidence.
 from __future__ import annotations
 
 import argparse
+import http.client
 import json
 import os
 from pathlib import Path
@@ -26,6 +27,17 @@ ROOT = Path(__file__).resolve().parents[1]
 def require(condition):
     if not condition:
         raise RuntimeError("acceptance_check_failed")
+
+
+def wait_for_ready(base, *, attempts=60):
+    for _ in range(attempts):
+        try:
+            with urllib.request.urlopen(base + "/ready", timeout=2) as response:
+                require(response.status == 200)
+                return
+        except (urllib.error.URLError, OSError, http.client.HTTPException, RuntimeError):
+            time.sleep(.5)
+    raise RuntimeError("readiness_failed")
 
 
 SEED = '''
@@ -123,16 +135,6 @@ def run(image: str) -> dict:
                     raise RuntimeError("container_command_failed")
             return result
 
-        def probe():
-            for _ in range(60):
-                try:
-                    with urllib.request.urlopen(base + "/ready", timeout=2) as response:
-                        require(response.status == 200)
-                        return
-                except (urllib.error.URLError, RuntimeError):
-                    time.sleep(.5)
-            raise RuntimeError("readiness_failed")
-
         try:
             no_token = {k: v for k, v in env.items() if k != "NEXUS_ACCESS_TOKEN"}
             require(compose("config", "--quiet", check=False, environment=no_token).returncode != 0)
@@ -141,7 +143,7 @@ def run(image: str) -> dict:
             started = True
             compose("up", "-d", "--no-build")
             stage = "READINESS"
-            probe()
+            wait_for_ready(base)
             stage = "PUBLIC_HEALTH"
             with urllib.request.urlopen(base + "/health", timeout=3) as response:
                 require(response.status == 200)
@@ -162,7 +164,7 @@ def run(image: str) -> dict:
             require("SEED_OK" in result.stdout)
             stage = "RESTART"
             compose("restart", "nexus")
-            probe()
+            wait_for_ready(base)
             stage = "RECOVER_BACKUP_RESTORE"
             result = compose("exec", "-T", "--user", "10001:65534", "nexus", "python", "-c", RECOVER)
             require("RECOVERY_OK" in result.stdout)
@@ -170,8 +172,18 @@ def run(image: str) -> dict:
                 volume_restart_persistence=True, queue_replay_zero_reads=True,
                 checkpoint_and_supervisor=True, backup_manifest_verified=True,
                 restore_into_empty_target=True, restore_overwrite_blocked=True)
-        except Exception:
-            summary.update(status="BLOCKED", reason=stage + "_FAILED")
+        except Exception as error:
+            summary.update(status="BLOCKED", reason=stage + "_FAILED",
+                           failure_type=type(error).__name__)
+            if started:
+                try:
+                    logs = compose("logs", "--no-color", "--tail", "30", "nexus", check=False)
+                    patterns = ("read-only file system", "permission denied", "operationalerror",
+                                "modulenotfounderror", "address already in use", "traceback")
+                    summary["container_failure_categories"] = [p for p in patterns
+                        if p in (logs.stdout + logs.stderr).lower()]
+                except Exception:
+                    pass
         finally:
             if started:
                 try:

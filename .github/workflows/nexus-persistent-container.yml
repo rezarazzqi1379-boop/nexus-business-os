@@ -8,6 +8,7 @@ on:
       - '.dockerignore'
       - 'deploy/compose.persistent.yml'
       - 'scripts/verify_persistent_container.py'
+      - 'tests/test_persistent_container_probe.py'
       - '.github/workflows/nexus-persistent-container.yml'
 
 permissions:

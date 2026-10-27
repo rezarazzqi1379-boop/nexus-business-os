@@ -103,7 +103,7 @@ def assert_consistent_authority_declarations(registry_bytes: bytes, master_bytes
     registry_text = _docx_text(registry_bytes)
     master_text = _docx_text(master_bytes)
     for text in (registry_text, master_text):
-        for sentence in re.split(r"[.\n;]+", text):
+        for sentence in re.split(r"[\n;]+", text):
             if not re.search(r"\b(?:active|governing|governs|canonical|authoritative)\b", sentence, re.I):
                 continue
             registry_versions = re.findall(

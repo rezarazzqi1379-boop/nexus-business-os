@@ -1,0 +1,66 @@
+{
+  "implementation_sha": "017406114322f69edf2f08c643a604e8ebae9127",
+  "pr": 117,
+  "base_main": "45ced379e6aa2746dd2fe2f43915110bcf057a9e",
+  "observed_at": "2026-10-27 18:09:58 UTC",
+  "container_ci": {
+    "run_id": 40557056463,
+    "job_id": 122375809416,
+    "conclusion": "success",
+    "summary": {
+      "auth": true,
+      "authority_promoted": false,
+      "backup_manifest_verified": true,
+      "checkpoint_and_supervisor": true,
+      "disposable_resources_cleaned": true,
+      "external_writes": 0,
+      "production_deployed": false,
+      "queue_replay_zero_reads": true,
+      "queue_source_mode": "FROZEN_TEST_FIXTURE",
+      "readiness": true,
+      "restore_into_empty_target": true,
+      "restore_overwrite_blocked": true,
+      "scope": "DISPOSABLE_CONTAINER_ACCEPTANCE",
+      "server_non_root": true,
+      "status": "VERIFIED",
+      "volume_restart_persistence": true
+    }
+  },
+  "regression_ci": {
+    "run_id": 40557056458,
+    "job_id": 122375809546,
+    "conclusion": "success",
+    "unittest": 680,
+    "pytest_tests": 661,
+    "failure_checks": 14
+  },
+  "retained_failures": [
+    {
+      "run_id": 40553727248,
+      "job_id": 122364045394,
+      "summary_reason": "STARTUP_FAILED"
+    },
+    {
+      "run_id": 40556549708,
+      "job_id": 122374031213,
+      "summary_reason": "READINESS_FAILED"
+    }
+  ],
+  "reproduction": {
+    "command": "python -m pytest -q tests/test_persistent_container_probe.py",
+    "before": {
+      "failed": 2,
+      "passed": 1
+    },
+    "after": "included in 70 focused passes",
+    "finding": "Readiness probe did not retry RemoteDisconnected/ConnectionResetError; bounded retry added, HTTP 200 still required."
+  },
+  "local_container": "BLOCKED_DOCKER_UNAVAILABLE",
+  "production": "NOT_STARTED",
+  "holds": "UNCHANGED",
+  "scope_limitations": [
+    "Queue fixture uses frozen public-response bodies, not live HTTP; independent main runtime proves real public GET execution.",
+    "Snapshot hash integrity covers the registered hub/stores; ops restore test covers root SQLite databases and vault in an empty scratch target.",
+    "No production host, volume, registry push, email, payment or authority promotion."
+  ]
+}

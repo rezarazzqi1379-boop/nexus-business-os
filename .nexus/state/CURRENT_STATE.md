@@ -16,9 +16,14 @@ Vercel's source tree is a static bootstrap page only; root 200, Python API paths
 404. It is not the production API. Prepared a loopback-only persistent Compose
 configuration and disposable Linux container restart/queue/backup/restore test.
 No target deployment or paid volume was provisioned; authority HOLD unchanged.
-Container acceptance is not locally tested (Docker unavailable); CI evidence is
-recorded separately when observed. Operator: owner. Next step: verify the image
-and volume acceptance on Linux, then obtain exact target/storage/financial gates.
+Local Docker remains unavailable; Linux container acceptance 40557056463 and
+regression 40557056458 SUCCESS on implementation 017406114322f69edf2f08c643a604e8ebae9127.
+The new acceptance probe initially failed; two red reset fixtures reproduced
+its bounded-retry gap, now fixed. Final local regression 1737 passed; focused
+correction suite 70 passed. Container proof covers volume restart, non-root API,
+auth, atomic checkpoint, frozen replay, backup integrity and scratch restore.
+No application runtime code was changed or production host activated. Operator:
+owner. Next step: review PR117 and obtain exact target/storage/financial gates.
 See docs/PERSISTENT_DEPLOYMENT_ACCEPTANCE.md.
 
 ## Bounded free-runtime public research — 2026-10-27

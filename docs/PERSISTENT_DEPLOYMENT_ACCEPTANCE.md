@@ -3,6 +3,32 @@
 Stage: STABILIZE / prepare DEPLOY. Operator: repository owner. No production
 deployment, host purchase, credential provisioning, email or authority promotion.
 
+## Verified acceptance on the prepared configuration
+
+PR #117 implementation `017406114322f69edf2f08c643a604e8ebae9127` passed the
+actual Linux Docker workflow **40557056463** (job **122375809416**): auth,
+readiness, UID 10001 API process, named-volume restart persistence, atomic queue
+checkpoint/supervisor, replay with zero reads, verified backup manifest, restore
+of root SQLite stores/vault into an empty target, overwrite refusal and disposal
+of the test resources. The registered hub snapshot's manifest was verified
+separately; this does not claim a complete production-hub disaster recovery drill.
+Regression CI **40557056458** passed: 680 unittest, 661 pytest tests/ and 14
+failure-derived checks (overlapping suites). Final local tests/ + evals/:
+**1737 passed**, one existing warning, 79.02 seconds; focused correction suite:
+**70 passed**, 14.07 seconds. No application runtime code was changed.
+
+Initial container runs **40553727248** and **40556549708** failed in startup/
+readiness, despite successful image builds. The probe's transient loopback-reset
+handling was reproduced locally (2 failed / 1 passed), then fixed with bounded
+retry for RemoteDisconnected/ConnectionResetError. HTTP 200 remains mandatory;
+the negative readiness fixture still exhausts the bound and fails. The succeeding
+container run provides acceptance evidence after this correction, not a claim
+that the failed runs succeeded. Diagnostics export only fixed categories.
+
+Evidence: `data/research/postmerge-container-acceptance-20261027.json`.
+Configuration is VERIFIED in a disposable CI container; production deployment
+and off-host disaster recovery remain NOT_STARTED / approval-gated.
+
 ## Recovered operating baseline
 
 PR #116 is merged at main `45ced379e6aa2746dd2fe2f43915110bcf057a9e`.
@@ -86,9 +112,9 @@ PR changes or manual dispatch; it is not a deployment/scheduler service.
 
 Queue fixtures in this container test are explicitly FROZEN_TEST_FIXTURE. Main
 free-runtime logs supply independent live-public evidence. Local Docker is not
-installed in this session: the local container invocation correctly returned
-BLOCKED / DOCKER_UNAVAILABLE. Linux Actions results must be checked independently
-before calling the container configuration verified.
+installed in this session: the local invocation correctly returned BLOCKED /
+DOCKER_UNAVAILABLE. The Linux Actions result above is independent actual
+container evidence, not a local execution claim.
 
 ## Backup and rollout gate
 

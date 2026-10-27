@@ -33,7 +33,7 @@ class EventPreflightTests(unittest.TestCase):
         self.assertEqual(result["gate"], "BLOCK")
         self.assertEqual(result["findings"][0]["code"], "PREFLIGHT_CONTEXT_MISSING")
 
-    def test_complete_event_context_passes(self):
+    def test_complete_event_context_without_authenticated_authority_blocks(self):
         payload = {"_nexus_preflight": {
             "now": NOW,
             "required_connectors": ["github"],
@@ -47,7 +47,8 @@ class EventPreflightTests(unittest.TestCase):
             ],
         }}
         result = preflight_event(Event("evt-1", "PRJ-HYD-01", payload))
-        self.assertEqual(result["gate"], "SAFE")
+        self.assertEqual(result["gate"], "BLOCK")
+        self.assertIn("AUTHORITY_ADMISSION_BLOCKED", [x["code"] for x in result["findings"]])
 
     def test_malformed_context_fails_closed(self):
         payload = {"_nexus_preflight": {"snapshots": [{"connector_id": "github"}]}}

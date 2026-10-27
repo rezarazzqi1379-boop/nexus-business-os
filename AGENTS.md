@@ -13,6 +13,14 @@ This repository is operated as one governed system. For every substantial task:
 9. If a capability is missing, record it as blocked or propose a sandboxed experiment; never fabricate availability.
 10. Finish with evidence: changed files, tests run, remaining blockers, and any approval required.
 
+## Owner standing delegation — 2026-10-27
+
+The owner authorizes NEXUS to independently perform technically available, lawful, reversible project work within granted account permissions, including repository maintenance, tests, CI workflows, sandbox operation, diagnosis, and preparation of deployments. Do not ask for repeated approval for these ordinary tasks.
+
+**Explicit exception: sending email is NOT delegated.** Drafting and reviewing email is allowed, but sending any email requires the owner's separate, explicit approval of that specific message and recipient(s). Do not use alternate connectors or agents to bypass this rule.
+
+This standing instruction is not a credential, financial instrument, or authorization to override provider permissions, protected-environment approval gates, irreversible external effects, payments, secret access, or legally required consent. Keep independent safe workflows running when protected operations are blocked; request only the narrow missing authorization.
+
 ## Global execution priority: ACTIVATE > DEPLOY > OPERATE > STABILIZE > IMPROVE
 
 This is the default priority for every NEXUS project, agent, supervisor, scheduler, task planner, and implementation handoff. The primary objective is a running, observable, useful system, not an indefinitely perfected design.

@@ -13,6 +13,20 @@ This repository is operated as one governed system. For every substantial task:
 9. If a capability is missing, record it as blocked or propose a sandboxed experiment; never fabricate availability.
 10. Finish with evidence: changed files, tests run, remaining blockers, and any approval required.
 
+## Global execution priority: ACTIVATE > DEPLOY > OPERATE > STABILIZE > IMPROVE
+
+This is the default priority for every NEXUS project, agent, supervisor, scheduler, task planner, and implementation handoff. The primary objective is a running, observable, useful system, not an indefinitely perfected design.
+
+1. ACTIVATE: identify the smallest permitted runnable vertical slice, its dependencies, owner, and readiness evidence; start it in an authorized environment.
+2. DEPLOY: ship that slice to an explicitly approved target; verify the deployed revision, startup, health checks, and rollback route.
+3. OPERATE: demonstrate at least one end-to-end real workflow with logs, measured result, and a named operator.
+4. STABILIZE: fix defects that prevent startup, deployment, core workflow, safety, or reliability before unrelated improvements.
+5. IMPROVE: only after a working baseline, prioritize refactors, broader research, optimization, and nonblocking test expansion by measurable operational value.
+
+For every task, report: current stage, next executable activation/deployment step, blocker (if any), evidence of running status, and owner. Prioritize critical-path blockers over speculative feature expansion. Timebox investigations and avoid repeatedly rewriting plans instead of running the smallest safe slice.
+
+A blocked production capability must not block independent safe capabilities: use read-only, local, sandbox, or dry-run modes with clearly labeled limitations where permitted. Never misrepresent simulation as live deployment. The priority does NOT waive exact-scope human approval for deployments, credentials, external writes, payments, or production promotion, and does not override authority or safety gates. If approval is absent, prepare a deployable artifact and precise approval request, then continue other authorized activation work.
+
 ## Mandatory chat preflight (connector control plane)
 
 Connector data reaches this system through a metadata federation control plane, not a

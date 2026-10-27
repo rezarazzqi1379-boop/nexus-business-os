@@ -1,4 +1,8 @@
 # NEXUS CURRENT STATE
+## Global execution priority — 2026-10-27
+
+Owner direction: ACTIVATE > DEPLOY > OPERATE > STABILIZE > IMPROVE. The operating contract in AGENTS.md now requires every task and agent to prioritize the smallest authorized running vertical slice, observable end-to-end output, and critical-path blockers over speculative expansion. This is a planning/operating policy, NOT evidence of deployment. Deployment, production promotion, external writes, credentials and other protected actions still require exact-scope approval. Authority Source Registry / Master Context admission remains HOLD until independently authenticated. Next step: inventory the actual runnable entry point and approved target, then produce a minimal deployment readiness check and execute only authorized sandbox or read-only activation.
+
 ## Reproduced reliability gaps and local fixes — 2026-10-18
 
 Branch codex/reliability-gaps-2026-10-18 from 690b9c8. Existing 45 tests passed;

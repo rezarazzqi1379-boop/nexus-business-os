@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from hashlib import sha256
 from typing import Mapping
 from io import BytesIO
-from zipfile import ZipFile
+from zipfile import ZipFile, BadZipFile
 from xml.etree import ElementTree
 import re
 
@@ -85,7 +85,7 @@ def _docx_text(raw: bytes) -> str:
                 raise AuthorityBlocked("authority_document_expansion_rejected")
             xml = archive.read(info)
         root = ElementTree.fromstring(xml)
-    except (OSError, KeyError, ValueError, ElementTree.ParseError) as exc:
+    except (OSError, KeyError, ValueError, BadZipFile, ElementTree.ParseError) as exc:
         raise AuthorityBlocked("authority_document_unreadable") from exc
     ns = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
     return "\n".join(

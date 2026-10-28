@@ -342,7 +342,7 @@ def management_report(summary):
             "توان شرکت برای تأمین: نامعلوم؛ تطبیق فنی و ظرفیت اجرایی احراز نشده است.\n\n"
             "مشخصات دقیق، مقدار، قیمت، شرایط تحویل و امکان پرداخت هنوز قابل تأیید نیست.\n\n"
             f"اطلاعات مفقود: {'، '.join(gap_labels[key] for key in item['missing_information']) or 'ندارد'}\n\n"
-            f"ریسک تجاری بالا: {'؛ '.join(risk_labels[key] for key in item['risks'])}.\n\n"
+            f"ریسک تجاری بالا: {'؛ '.join(risk_labels.get(key, 'ریسک ناشناخته نیازمند بررسی انسانی است (کد: ' + plain(key) + ')') for key in item['risks'])}.\n\n"
             f"مهلت ثبت‌شده در منبع: {plain(item['deadline'])}؛ منطقه زمانی محلی تأیید نشده است.\n\n"
             f"تصمیم: {labels[item['decision']]}؛ امتیاز فقط اولویت پژوهش است.\n\n"
             "اقدام بعدی: بررسی فقط‌خواندنی سند اصلی و هویت مستقل؛ بدون تماس، ارسال پیشنهاد یا تعهد.\n\n"

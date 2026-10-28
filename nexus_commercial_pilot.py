@@ -206,7 +206,7 @@ def assess(body, observed_at, *, weights=None):
         opportunity["missing_information"] = [key for key in coverage_fields if opportunity[key] == UNKNOWN]
         completeness = (len(coverage_fields) - len(opportunity["missing_information"])) / len(coverage_fields)
         dimensions = {"source_credibility": 1.0, "entity_verification": UNKNOWN,
-            "technical_fit": float(relevant), "commercial_feasibility": UNKNOWN,
+            "technical_fit": UNKNOWN, "commercial_feasibility": UNKNOWN,
             "completeness": completeness,
             "time_sensitivity": (0.0 if expired else 1.0) if expiry else UNKNOWN,
             "economic_value": UNKNOWN, "operational_complexity": UNKNOWN}
@@ -224,7 +224,8 @@ def assess(body, observed_at, *, weights=None):
     return {"assessments": assessments, "opportunities_discovered": count,
         "records_received": len(rows), "duplicates_removed": len(rows) - count,
         "duplicate_rate": round((len(rows) - count) / len(rows), 4) if rows else 0,
-        "opportunities_verified": 0, "opportunities_rejected": count,
+        "opportunities_verified": 0, "opportunities_rejected": sum(item["decision"] == "REJECT" for item in assessments),
+        "opportunities_pending_investigation": sum(item["decision"] == "INVESTIGATE" for item in assessments),
         "actionable_opportunities": 0, "human_review_ready": 0,
         "decisions": {key: sum(item["decision"] == key for item in assessments)
                       for key in ("PROCEED", "INVESTIGATE", "REJECT")},

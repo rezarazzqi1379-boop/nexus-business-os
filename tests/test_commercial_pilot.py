@@ -319,3 +319,19 @@ def test_missing_deadline_renders_management_report_without_error():
     result = pilot.assess(body(row(submission_deadline_date="")), NOW)
     report = pilot.management_report({"status": "VERIFIED", "source_mode": "FROZEN_TEST_FIXTURE", **result})
     assert "مهلت ارسال پیشنهاد در منبع ثبت نشده است" in report
+
+
+def test_source_gate_rates_partition_sample_and_do_not_claim_verified_demand():
+    result = pilot.assess(body(row(), row(id="OP00476470", notice_type="Contract Award"),
+                               row(id="OP00476471", bid_description="School construction")), NOW)
+    assert result["source_gate_pass_rate"] == pytest.approx(1 / 3, abs=0.0001)
+    assert result["source_gate_reject_rate"] == pytest.approx(2 / 3, abs=0.0001)
+    assert result["source_gate_pass_rate"] + result["source_gate_reject_rate"] == pytest.approx(1, abs=0.0001)
+    assert result["opportunities_verified"] == result["actionable_opportunities"] == 0
+
+
+def test_empty_sample_gate_rates_do_not_divide_by_zero():
+    result = pilot.assess(body(), NOW)
+    assert result["opportunities_discovered"] == 0
+    assert result["source_gate_pass_rate"] == 0
+    assert result["source_gate_reject_rate"] == 0

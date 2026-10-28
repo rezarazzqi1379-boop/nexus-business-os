@@ -231,7 +231,12 @@ def assess(body, observed_at, *, weights=None):
         assessments.append(opportunity)
     assessments.sort(key=lambda item: (-item["score"]["priority"], item["opportunity_id"]))
     count = len(assessments)
+    # Gate yield is screening efficiency, not buyer verification or commercial success.
+    passed = sum(item["source_quality_gate"]["eligible_for_investigation"] for item in assessments)
+    rejected = count - passed
     return {"assessments": assessments, "opportunities_discovered": count,
+        "source_gate_pass_rate": round(passed / count, 4) if count else 0,
+        "source_gate_reject_rate": round(rejected / count, 4) if count else 0,
         "records_received": len(rows), "duplicates_removed": len(rows) - count,
         "duplicate_rate": round((len(rows) - count) / len(rows), 4) if rows else 0,
         "opportunities_verified": 0, "opportunities_rejected": sum(item["decision"] == "REJECT" for item in assessments),

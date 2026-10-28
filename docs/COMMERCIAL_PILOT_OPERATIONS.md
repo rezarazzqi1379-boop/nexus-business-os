@@ -185,3 +185,7 @@ Release status is BLOCKED pending exact-scope integration approval, repository
 policy and a verified commercial workflow on merged main. PR-level Actions is
 candidate evidence only. A final documentation/evidence commit requires its own
 CI refresh; verified results are never inferred from another SHA.
+
+## Post-merge scoring and accounting correction
+
+`technical_relevance` is a lexical search hint only; `score.dimensions.technical_fit` remains `UNKNOWN` until independently supported technical specifications are available. It must not be interpreted as technical qualification. `opportunities_rejected` counts only `REJECT` decisions, while `opportunities_pending_investigation` counts `INVESTIGATE`; `opportunities_verified` and `actionable_opportunities` remain separate evidence-gated metrics. Existing archived historical summaries are immutable snapshots of the earlier scoring contract and must not be silently rewritten. The sandbox and authority HOLD remain unchanged.

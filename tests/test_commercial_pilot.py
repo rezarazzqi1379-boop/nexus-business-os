@@ -32,7 +32,10 @@ def test_unknown_and_unverified_are_not_qualified_or_zero_value():
     assert item["score"]["dimensions"]["economic_value"] == "UNKNOWN"
     assert item["score"]["dimensions"]["entity_verification"] == "UNKNOWN"
     assert item["score"]["dimensions"]["commercial_feasibility"] == "UNKNOWN"
-    assert item["score"]["known_weight"] == pytest.approx(0.6)
+    assert item["score"]["known_weight"] == pytest.approx(0.4)
+    assert item["score"]["dimensions"]["technical_fit"] == "UNKNOWN"
+    assert item["technical_relevance"] is True
+    assert item["technical_match"] == "UNKNOWN"
     assert item["score"]["dimensions"]["completeness"] == 0.5
     assert not item["actionable"] and not item["human_review_ready"]
     assert result["opportunities_verified"] == result["actionable_opportunities"] == 0
@@ -261,3 +264,21 @@ def test_cli_refuses_to_mix_old_source_with_a_new_execution(tmp_path, monkeypatc
     with pytest.raises(SystemExit) as error:
         pilot.main()
     assert error.value.code == 2 and source.read_text() == 'previous verified evidence'
+
+
+def test_decision_accounting_excludes_investigation_from_rejections():
+    result = pilot.assess(body(row(), row(id="OP00476470", bid_description="School construction")), NOW)
+    assert result["decisions"] == {"PROCEED": 0, "INVESTIGATE": 1, "REJECT": 1}
+    assert result["opportunities_rejected"] == 1
+    assert result["opportunities_pending_investigation"] == 1
+    assert sum(result["decisions"].values()) == result["opportunities_discovered"]
+
+
+def test_lexical_relevance_never_establishes_technical_fit():
+    result = pilot.assess(body(row(bid_description="Steel bridge supply invitation")), NOW)
+    item = result["assessments"][0]
+    assert item["technical_relevance"] is True
+    assert item["technical_specifications"] == "UNKNOWN"
+    assert item["technical_match"] == "UNKNOWN"
+    assert item["score"]["dimensions"]["technical_fit"] == "UNKNOWN"
+    assert item["decision"] == "INVESTIGATE"

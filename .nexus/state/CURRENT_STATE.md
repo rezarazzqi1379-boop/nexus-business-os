@@ -4,6 +4,39 @@ Owner permits autonomous routine technical work across NEXUS where account acces
 
 # NEXUS CURRENT STATE
 
+## Commercial read-only release candidate — 2026-10-28
+
+Main remains 5661d5dff60ebb46d0374516212a66cfde089969; PR116 and PR117
+are merged. PR118 adds the smallest source-backed industrial tender pilot,
+reusing the existing public runtime, AutonomyStore/fencing/checkpoints,
+supervisor, deep-search, dedup and Research Lab scoring. No parallel control
+plane or change to existing API/free-runtime/persistent-host components.
+Implementation 531e0fc8977a41b9b7c40a091423d2fde84bf302: 109 focused tests
+and 1788 combined tests+evals pass (one pre-existing Starlette warning).
+Actions 40666273328 commercial pilot and 40666273377 tests SUCCESS on that
+implementation. Final evidence-only head must still be checked independently.
+Live local final baseline: one GET/1275 bytes/0.6388 seconds/0.0625 CPU seconds,
+three notices, one lexical steel match, one INVESTIGATE/two REJECT, zero verified,
+actionable or human-review-ready commercial opportunities; completeness 33.33%.
+Source SHA256 6fae2916feb6b30f5a78b68737cda7db49c0578e6d1561c4ca16282c40d3c2da.
+Full safe source bytes, per-notice Persian report and reproducible KPIs retained.
+High research scores never override unknown entity/technical/feasibility/value
+or authority HOLD; configurable weights are bound to the queue manifest.
+Dedup and replay are queue-scoped only, not across separate ephemeral runners.
+
+Stage: VALIDATE / release candidate. Operator: owner. Registry/Master preflight
+BLOCK/HOLD persists; no approval was fabricated. No email, bids, purchases,
+paid host/API/model, external commercial write, merge or production deployment.
+PR-level success is not main operation. Main commercial workflow NOT_STARTED;
+release BLOCKED until exact-scope merge approval, repository policy gates and
+post-merge main execution. Next executable step: review PR118 exact head, obtain
+integration approval, merge once if policy permits, then verify the same bounded
+workflow on main. Independent primary-document research can remain read-only.
+No performance improvement claim: these runs establish a baseline, not a paired
+comparison. SystemExercise is PARTIAL/learning-ineligible while release is gated.
+See docs/COMMERCIAL_PILOT_OPERATIONS.md and
+data/research/commercial-pilot-acceptance-20261027.json.
+
 ## Post-merge main verification and persistence preparation — 2026-10-27
 
 PR116 is merged at main 45ced379e6aa2746dd2fe2f43915110bcf057a9e.

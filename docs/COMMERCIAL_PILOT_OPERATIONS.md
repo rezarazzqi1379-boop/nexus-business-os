@@ -148,3 +148,40 @@ a separately bounded read-only lane. Do not contact or submit to the buyer.
 
 Acceptance results and exact run IDs are retained in
 `data/research/commercial-pilot-acceptance-20261027.json` when verified.
+
+## Verified candidate, 2026-10-28
+
+PR118 implementation `531e0fc8977a41b9b7c40a091423d2fde84bf302` passed
+109 focused tests (4.52 seconds) and `python -m pytest -q tests evals`:
+1788 passed, one existing Starlette warning (43.83 seconds). Initial Windows
+parameter-ID collection errors and a floating-point exact-equality assertion
+were corrected and rerun; failed attempts are retained in acceptance evidence.
+Actions commercial run 40666273328 and tests 40666273377 succeeded on this SHA.
+Earlier v5 run 40665870980 also verified source/derived/report integrity and
+queue restart replay; 40665870985 passed 680 unittest, 712 tests-only pytest and
+14 failure checks. Those suites overlap and must not be added as unique tests.
+
+Final local real run: one GET, 1275 public bytes, 0.6388 wall seconds, 0.0625 CPU
+seconds, three assessments, one lexical steel-related notice, one INVESTIGATE,
+two REJECT, zero commercially verified/actionable/review-ready opportunities,
+33.33% average populated-field completeness. All three publication dates were
+within 30 days; independent buyer qualification/value remain UNKNOWN. No source
+duplicates occurred in the live sample; duplicate/conflict/concurrency/replay
+behavior is separately demonstrated by frozen tests, not invented live counts.
+
+Full source SHA256:
+`6fae2916feb6b30f5a78b68737cda7db49c0578e6d1561c4ca16282c40d3c2da`.
+See `data/research/commercial-pilot-final-20261028/` for exact source bytes,
+machine summary and Persian per-notice management report. Offline recomputation
+and report comparison passed. The source snapshot is public metadata only.
+
+Scoped Codex Security scan `beba279b-1073-4281-88bb-2baf6a58f826` completed on
+initial implementation 57d2cc3 with no reportable finding. Subsequent delta was
+reviewed in the parent and covered by negative tests; no separate plugin scan
+of that delta or repository-wide security guarantee is claimed. Current trust
+limitations remain documented above. No policy/skill was promoted from this run.
+
+Release status is BLOCKED pending exact-scope integration approval, repository
+policy and a verified commercial workflow on merged main. PR-level Actions is
+candidate evidence only. A final documentation/evidence commit requires its own
+CI refresh; verified results are never inferred from another SHA.

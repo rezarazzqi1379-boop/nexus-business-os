@@ -52,6 +52,8 @@ def source_quality_gate(row, *, age_days, expired, relevant, conflict):
     reasons = []
     if conflict:
         reasons.append("conflicting_source_records")
+    if not row.get("submission_deadline_date"):
+        reasons.append("deadline_missing")
     if expired:
         reasons.append("expired")
     if row.get("notice_type") != "Invitation for Bids" or row.get("notice_status") != "Published":
@@ -65,7 +67,7 @@ def source_quality_gate(row, *, age_days, expired, relevant, conflict):
 
 def recommend_decision(item):
     """Recommendation only. Scores cannot override mandatory evidence/authority gates."""
-    hard_reject = {"conflicting_source_records", "expired", "not_current_invitation",
+    hard_reject = {"conflicting_source_records", "expired", "deadline_missing", "not_current_invitation",
                    "publication_stale_or_unknown", "technical_relevance_not_supported"}
     if hard_reject.intersection(item["risks"]):
         return "REJECT"

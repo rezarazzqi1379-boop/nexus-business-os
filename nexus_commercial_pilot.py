@@ -226,6 +226,8 @@ def assess(body, observed_at, *, weights=None):
         "duplicate_rate": round((len(rows) - count) / len(rows), 4) if rows else 0,
         "opportunities_verified": 0, "opportunities_rejected": count,
         "actionable_opportunities": 0, "human_review_ready": 0,
+        "decisions": {key: sum(item["decision"] == key for item in assessments)
+                      for key in ("PROCEED", "INVESTIGATE", "REJECT")},
         "evidence_completeness": round(sum(o["score"]["dimensions"]["completeness"] for o in assessments) / count, 4) if count else 0,
         "commercial_relevance_count": sum(o["technical_relevance"] for o in assessments),
         "fresh_source_count": sum(isinstance(o["source_age_days"], (int, float)) and 0 <= o["source_age_days"] <= 30 for o in assessments),
@@ -294,6 +296,8 @@ class CommercialRuntime(PublicResearchRuntime):
 def management_report(summary):
     # Escape validated source text as plain Markdown, never links/HTML/instructions.
     def plain(value):
+        if value == UNKNOWN:
+            return "نامعلوم"
         return re.sub(r"([\\`*_{}\[\]()#+.!|>~-])", r"\\\1", str(value)).replace("\n", " ")
     report = ("# گزارش پایلوت تجاری NEXUS\n\n"
         f"وضعیت اجرا: {summary['status']}؛ نوع منبع: {summary['source_mode']}\n\n"
@@ -305,14 +309,23 @@ def management_report(summary):
         "HOLD حفظ شده؛ ایمیل، پیشنهاد تجاری و پرداخت انجام نشده است. "
         "نتیجه فقط دربارهٔ نمونهٔ محدود این اجراست.\n")
     labels = {"INVESTIGATE": "نیازمند بررسی بیشتر", "REJECT": "رد برای پیگیری فعلی", "PROCEED": "پیشنهاد ادامه پس از کنترل مجوزها"}
+    gap_labels = {"identity": "هویت طرف معامله", "country": "کشور", "product_or_equipment": "موضوع درخواست",
+        "technical_specifications": "مشخصات فنی معتبر", "quantity": "مقدار", "commercial_terms": "شرایط تجاری و تحویل",
+        "price_or_budget": "قیمت یا بودجه", "deadline": "مهلت معتبر"}
+    risk_labels = {"independent_entity_and_demand_verification_missing": "هویت و تقاضا مستقلاً تأیید نشده",
+        "commercial_terms_missing": "شرایط معامله ناقص است", "conflicting_source_records": "داده‌های منبع متناقض‌اند",
+        "expired": "مهلت گذشته است", "not_current_invitation": "آگهی دعوت جاری به ارائه پیشنهاد نیست",
+        "publication_stale_or_unknown": "تازگی انتشار قابل اتکا نیست",
+        "technical_relevance_not_supported": "ارتباط فنی با موضوع پایلوت پشتیبانی نشده است"}
     for item in summary.get("assessments", []):
         report += (f"\n## ارزیابی {plain(item['opportunity_id'])}\n\n"
             f"طرف معرفی‌شده در منبع: {plain(item['identity'])}؛ کشور: {plain(item['country'])}.\n\n"
             f"موضوع درخواست: {plain(item['product_or_equipment'])}\n\n"
             "توان شرکت برای تأمین: نامعلوم؛ تطبیق فنی و ظرفیت اجرایی احراز نشده است.\n\n"
             "مشخصات دقیق، مقدار، قیمت، شرایط تحویل و امکان پرداخت هنوز قابل تأیید نیست.\n\n"
-            f"اطلاعات مفقود: {plain(', '.join(item['missing_information']))}\n\n"
-            f"ریسک: {plain(item['risk_classification'])}؛ خریدار و تقاضا مستقل تأیید نشده‌اند.\n\n"
+            f"اطلاعات مفقود: {'، '.join(gap_labels[key] for key in item['missing_information']) or 'ندارد'}\n\n"
+            f"ریسک تجاری بالا: {'؛ '.join(risk_labels[key] for key in item['risks'])}.\n\n"
+            f"مهلت ثبت‌شده در منبع: {plain(item['deadline'])}؛ منطقه زمانی محلی تأیید نشده است.\n\n"
             f"تصمیم: {labels[item['decision']]}؛ امتیاز فقط اولویت پژوهش است.\n\n"
             "اقدام بعدی: بررسی فقط‌خواندنی سند اصلی و هویت مستقل؛ بدون تماس، ارسال پیشنهاد یا تعهد.\n\n"
             f"منبع: {plain(item['source_url'])}؛ بازیابی: {plain(item['retrieved_at'])}\n")

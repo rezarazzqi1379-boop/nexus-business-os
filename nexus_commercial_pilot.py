@@ -327,7 +327,7 @@ def management_report(summary):
         "price_or_budget": "قیمت یا بودجه", "deadline": "مهلت معتبر"}
     risk_labels = {"independent_entity_and_demand_verification_missing": "هویت و تقاضا مستقلاً تأیید نشده",
         "commercial_terms_missing": "شرایط معامله ناقص است", "conflicting_source_records": "داده‌های منبع متناقض‌اند",
-        "expired": "مهلت گذشته است", "not_current_invitation": "آگهی دعوت جاری به ارائه پیشنهاد نیست",
+        "expired": "مهلت گذشته است", "deadline_missing": "مهلت ارسال پیشنهاد در منبع ثبت نشده است", "not_current_invitation": "آگهی دعوت جاری به ارائه پیشنهاد نیست",
         "publication_stale_or_unknown": "تازگی انتشار قابل اتکا نیست",
         "technical_relevance_not_supported": "ارتباط فنی با موضوع پایلوت پشتیبانی نشده است"}
     for item in summary.get("assessments", []):

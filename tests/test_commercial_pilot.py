@@ -313,3 +313,9 @@ def test_missing_deadline_cannot_pass_source_quality_gate():
     assert item["decision"] == "REJECT"
     assert result["source_gate_passed"] == 0
     assert result["opportunities_rejected"] == 1
+
+
+def test_missing_deadline_renders_management_report_without_error():
+    result = pilot.assess(body(row(submission_deadline_date="")), NOW)
+    report = pilot.management_report({"status": "VERIFIED", "source_mode": "FROZEN_TEST_FIXTURE", **result})
+    assert "مهلت ارسال پیشنهاد در منبع ثبت نشده است" in report

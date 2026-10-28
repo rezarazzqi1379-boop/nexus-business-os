@@ -16,7 +16,8 @@ python nexus_commercial_pilot.py --output data/research/commercial-pilot-live --
 
 Run on a clean implementation commit. `--commit-sha` labels the execution; the
 caller must supply the actual revision. The Actions workflow obtains it from
-the checked-out HEAD. Frozen transport injection exists only in Python tests;
+the checked-out HEAD. Use a new/empty output directory; existing evidence is
+never mixed with or overwritten by a later execution. Frozen transport injection exists only in Python tests;
 it is explicitly labelled `FROZEN_TEST_FIXTURE`, never live evidence.
 
 The separate `nexus-commercial-pilot.yml` executes on relevant PR changes and
@@ -103,14 +104,30 @@ quantity, terms, price and deadline (eight equally weighted fields); it measures
 field coverage, not truth. Retrieval time is never substituted for publication
 time. Missing publication/price remains UNKNOWN; prices are never treated as zero.
 
-`research-priority-v1` dimensions/weights: official source credibility .20,
-entity verification .15, lexical technical relevance .20, feasibility .15,
-completeness .10, time sensitivity .10, economic value .10. Unknown dimensions
+`research-priority-v2` dimensions/weights: official source credibility .20,
+entity verification .15, lexical technical relevance .20, feasibility .10,
+completeness .10, time sensitivity .10, economic value .10 and operational
+complexity .05. Unknown dimensions
 are excluded from the denominator and shown with `known_weight`. The score is
 research priority only, not a verification gate, fit certification or probability
 of winning. Current pilot knows source provenance/lexical fit/coverage/deadline
 screening only. Unknown entity/feasibility/value cannot qualify a candidate.
 Raw source and retrieval time reproduce every derived metric and score offline.
+
+Weights can be supplied with `--weights-json <reviewed-local-file>`; all eight
+positive finite weights must sum to one. The weight digest is part of the
+existing queue manifest, so a replay with changed weights is a conflict, not a
+second execution. Scoring configuration is never accepted from a public source.
+The score and baseline Research Lab score do not authorize any action.
+
+Each assessment also has `INVESTIGATE` or `REJECT`, with a Persian explanation of
+the request/counterparty, unknown company capacity, technical/commercial gaps,
+risk and next read-only action. Source text is escaped before Markdown output.
+`PROCEED` is supported by the recommendation function only when independent FACT,
+entity/technical/commercial verification, admitted authority and no missing
+required information all exist. The live adapter cannot produce these states;
+its HOLD/CLAIM result cannot proceed regardless of score. This is a recommendation
+function, not an action executor. No management-ready commercial offer is claimed.
 
 ## Security, rollback and next operation
 

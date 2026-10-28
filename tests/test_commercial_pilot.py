@@ -32,7 +32,7 @@ def test_unknown_and_unverified_are_not_qualified_or_zero_value():
     assert item["score"]["dimensions"]["economic_value"] == "UNKNOWN"
     assert item["score"]["dimensions"]["entity_verification"] == "UNKNOWN"
     assert item["score"]["dimensions"]["commercial_feasibility"] == "UNKNOWN"
-    assert item["score"]["known_weight"] == 0.6
+    assert item["score"]["known_weight"] == pytest.approx(0.6)
     assert item["score"]["dimensions"]["completeness"] == 0.5
     assert not item["actionable"] and not item["human_review_ready"]
     assert result["opportunities_verified"] == result["actionable_opportunities"] == 0
@@ -159,7 +159,8 @@ def test_wrapper_bounds_replay_and_fixture_label():
     assert summary["checkpoint_integrity"] and summary["duplicate_execution_prevented"]
     assert summary["supervisor"] == "accepted" and summary["external_writes"] == 0
     assert evidence["sha256"] == hashlib.sha256(evidence["body"].encode()).hexdigest()
-    assert "Steel bridge" not in pilot.management_report(summary)
+    report = pilot.management_report(summary)
+    assert "Steel bridge" in report and "توان شرکت" in report and "نیازمند بررسی بیشتر" in report
 
 
 @pytest.mark.parametrize("mutation", ["hash", "scope", "value", "metric", "future", "stale", "url", "binding"])
@@ -206,3 +207,57 @@ def test_second_read_is_blocked_by_wrapper_budget(monkeypatch):
     summary, evidence = pilot.run(transport=lambda url: body(row()))
     assert summary["status"] == "BLOCKED" and summary["http_requests"] == 1
     assert evidence is None
+
+
+def test_decisions_cannot_be_promoted_by_a_high_score():
+    item = pilot.assess(body(row()), NOW)["assessments"][0]
+    assert item["decision"] == "INVESTIGATE"
+    item["score"]["priority"] = 1.0
+    assert pilot.recommend_decision(item) == "INVESTIGATE"
+    item.update(verification_status="VERIFIED", evidence_class="FACT", technical_match="VERIFIED",
+                commercial_feasibility="VERIFIED", missing_information=[])
+    assert pilot.recommend_decision(item) == "INVESTIGATE"  # HOLD still blocks PROCEED
+    item["authority_status"] = "ADMITTED"  # synthetic unit input only; no live admission path
+    assert pilot.recommend_decision(item) == "PROCEED"
+    item["risks"].append("expired")
+    assert pilot.recommend_decision(item) == "REJECT"
+
+
+@pytest.mark.parametrize("bad", [{}, {**pilot.WEIGHTS, "technical_fit": -0.1},
+    {**pilot.WEIGHTS, "technical_fit": True}, {**pilot.WEIGHTS, "technical_fit": float('nan')},
+    {**pilot.WEIGHTS, "technical_fit": 0}, {**pilot.WEIGHTS, "extra": 0.1}])
+def test_invalid_weights_fail_closed(bad):
+    with pytest.raises(ValueError, match="invalid_score_weights"):
+        pilot.assess(body(row()), NOW, weights=bad)
+
+
+def test_configurable_weights_are_bound_to_queue_manifest(tmp_path):
+    weights = {**pilot.WEIGHTS, "technical_fit": 0.1, "completeness": 0.2}
+    expected = pilot.assess(body(row()), NOW, weights=weights)
+    assert expected == pilot.assess(body(row()), NOW, weights=weights)
+    assert expected != pilot.assess(body(row()), NOW)
+    runtime = pilot.CommercialRuntime(tmp_path / "queue.db", transport=lambda url: body(row()))
+    assert runtime.submit("task", budget_units=3)
+    recovered = pilot.CommercialRuntime(tmp_path / "queue.db", transport=lambda url: body(row()), weights=weights)
+    with pytest.raises(ValueError, match="duplicate_task_conflict"):
+        recovered.submit("task", budget_units=3)
+
+
+def test_per_notice_report_escapes_untrusted_markdown_and_preserves_decision():
+    summary = pilot.assess(body(row(bid_description="Steel [click](https://invalid.test) **important**")), NOW)
+    report = pilot.management_report({**summary, "status": "VERIFIED", "source_mode": "FROZEN_TEST_FIXTURE"})
+    assert "[click](https://invalid.test)" not in report and "**important**" not in report
+    assert "\\[click\\]" in report and "نیازمند بررسی بیشتر" in report
+    assert "OP00476469" in report and "توان شرکت" in report and "بدون تماس" in report
+
+
+def test_cli_refuses_to_mix_old_source_with_a_new_execution(tmp_path, monkeypatch):
+    target = tmp_path / "previous"
+    target.mkdir()
+    source = target / "public-source.json"
+    source.write_text("previous verified evidence")
+    monkeypatch.setattr('sys.argv', ['pilot', '--output', str(target), '--commit-sha', 'a' * 40])
+    monkeypatch.setattr(pilot, 'run', lambda **kw: pytest.fail('must reject before network'))
+    with pytest.raises(SystemExit) as error:
+        pilot.main()
+    assert error.value.code == 2 and source.read_text() == 'previous verified evidence'

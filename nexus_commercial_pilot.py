@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 import hashlib
 import http.client
 import json
+import math
 from pathlib import Path
 import re
 from tempfile import TemporaryDirectory
@@ -34,8 +35,29 @@ SOURCE = ("https://search.worldbank.org/api/v2/procnotices?format=json&qterm=ste
 MAX_BYTES = 65536
 UNKNOWN = "UNKNOWN"
 WEIGHTS = {"source_credibility": 0.2, "entity_verification": 0.15, "technical_fit": 0.2,
-           "commercial_feasibility": 0.15, "completeness": 0.1, "time_sensitivity": 0.1,
-           "economic_value": 0.1}
+           "commercial_feasibility": 0.1, "completeness": 0.1, "time_sensitivity": 0.1,
+           "economic_value": 0.1, "operational_complexity": 0.05}
+
+
+def validated_weights(weights=None):
+    result = dict(WEIGHTS if weights is None else weights)
+    if set(result) != set(WEIGHTS) or any(type(v) not in (int, float) or not math.isfinite(v)
+        or not 0 < v <= 1 for v in result.values()) or not math.isclose(sum(result.values()), 1, abs_tol=1e-9):
+        raise ValueError("invalid_score_weights")
+    return result
+
+
+def recommend_decision(item):
+    """Recommendation only. Scores cannot override mandatory evidence/authority gates."""
+    hard_reject = {"conflicting_source_records", "expired", "not_current_invitation",
+                   "publication_stale_or_unknown", "technical_relevance_not_supported"}
+    if hard_reject.intersection(item["risks"]):
+        return "REJECT"
+    if (item["verification_status"] == "VERIFIED" and item["evidence_class"] == "FACT"
+        and item.get("technical_match") == "VERIFIED" and item.get("commercial_feasibility") == "VERIFIED"
+        and item.get("authority_status") == "ADMITTED" and not item["missing_information"]):
+        return "PROCEED"
+    return "INVESTIGATE"
 
 
 def utc():
@@ -122,7 +144,8 @@ def notice_url(identity):
     return "https://projects.worldbank.org/en/projects-operations/procurement-detail/" + identity
 
 
-def assess(body, observed_at):
+def assess(body, observed_at, *, weights=None):
+    weights = validated_weights(weights)
     now = datetime.fromisoformat(observed_at)
     if now.tzinfo is None:
         raise ValueError("timezone_required")
@@ -166,6 +189,7 @@ def assess(body, observed_at):
             "source_project_id": value("project_id"), "identity": value("contact_organization"),
             "country": value("project_ctry_name"), "product_or_equipment": value("bid_description"),
             "technical_specifications": UNKNOWN, "quantity": UNKNOWN, "commercial_terms": UNKNOWN,
+            "delivery_terms": UNKNOWN, "technical_match": UNKNOWN, "commercial_feasibility": UNKNOWN,
             "price_or_budget": UNKNOWN, "estimated_value": UNKNOWN, "deadline": deadline,
             "source_url": notice_url(identity), "retrieved_at": observed_at, "published_at": pub or UNKNOWN,
             "evidence_class": "CLAIM", "verification_status": "REJECTED_INSUFFICIENT_EVIDENCE",
@@ -175,6 +199,7 @@ def assess(body, observed_at):
             "technical_relevance": relevant, "source_age_days": round(age, 3) if age is not None else UNKNOWN,
             "deadline_precision": "SOURCE_TIMESTAMP_TIMEZONE_UNCONFIRMED",
             "source_record_sha256": canonical_digest(row), "conflict": conflict,
+            "authority_status": "HOLD", "risk_classification": "HIGH_UNVERIFIED_COMMERCIAL_BASIS",
         }
         coverage_fields = ("identity", "country", "product_or_equipment", "technical_specifications",
                            "quantity", "commercial_terms", "price_or_budget", "deadline")
@@ -184,19 +209,21 @@ def assess(body, observed_at):
             "technical_fit": float(relevant), "commercial_feasibility": UNKNOWN,
             "completeness": completeness,
             "time_sensitivity": (0.0 if expired else 1.0) if expiry else UNKNOWN,
-            "economic_value": UNKNOWN}
-        known_weight = sum(WEIGHTS[key] for key, val in dimensions.items() if val != UNKNOWN)
+            "economic_value": UNKNOWN, "operational_complexity": UNKNOWN}
+        known_weight = sum(weights[key] for key, val in dimensions.items() if val != UNKNOWN)
         # Research priority, not win probability, revenue or commercial qualification.
-        opportunity["score"] = {"version": "research-priority-v1", "dimensions": dimensions,
-            "weights": WEIGHTS, "known_weight": round(known_weight, 3),
-            "priority": round(sum(WEIGHTS[k] * v for k, v in dimensions.items() if v != UNKNOWN) / known_weight, 6),
+        opportunity["score"] = {"version": "research-priority-v2", "dimensions": dimensions,
+            "weights": weights, "known_weight": known_weight,
+            "priority": round(sum(weights[k] * v for k, v in dimensions.items() if v != UNKNOWN) / known_weight, 6),
             "existing_research_lab_score": score_opportunity(group.members[0].to_research_run_record(
                 run_id="commercial-pilot", query_set_version="commercial-pilot-v1", source_type="official_portal"))}
+        opportunity["decision"] = recommend_decision(opportunity)
         assessments.append(opportunity)
     assessments.sort(key=lambda item: (-item["score"]["priority"], item["opportunity_id"]))
     count = len(assessments)
     return {"assessments": assessments, "opportunities_discovered": count,
         "records_received": len(rows), "duplicates_removed": len(rows) - count,
+        "duplicate_rate": round((len(rows) - count) / len(rows), 4) if rows else 0,
         "opportunities_verified": 0, "opportunities_rejected": count,
         "actionable_opportunities": 0, "human_review_ready": 0,
         "evidence_completeness": round(sum(o["score"]["dimensions"]["completeness"] for o in assessments) / count, 4) if count else 0,
@@ -210,6 +237,16 @@ def assess(body, observed_at):
 class CommercialRuntime(PublicResearchRuntime):
     action = "router.commercial-read.v1"
     roles = ("commercial-assessment",)
+
+    def __init__(self, path, *, transport=get_public_notices, weights=None):
+        self.weights = validated_weights(weights)
+        super().__init__(path, transport=transport)
+
+    def submit(self, task_id, **kwargs):
+        # Bind scoring configuration into the existing durable task manifest.
+        if "thread_id" in kwargs:
+            raise PermissionError("caller_thread_override_blocked")
+        return super().submit(task_id, thread_id="weights_" + canonical_digest(self.weights)[:24], **kwargs)
 
     def coordination(self, task_id):
         entry = AgentCatalogEntry("AGT-NEXUS-COMMERCIAL-PILOT", "Bounded tender assessor",
@@ -225,10 +262,11 @@ class CommercialRuntime(PublicResearchRuntime):
             raise PermissionError("scope_mismatch")
         body = self.transport(SOURCE)
         observed = utc()
-        values = assess(body, observed)
+        values = assess(body, observed, weights=self.weights)
         digest = hashlib.sha256(body).hexdigest()
         return {"project_id": PROJECT, "task_id": payload["task_id"], "worker": self.roles[0],
             "status": "COMPLETE", "evidence_class": "CLAIM", "observed_at": observed,
+            "score_weights": self.weights,
             "documents": [{"url": SOURCE, "sha256": digest, "body": body.decode("utf-8")}],
             "evidence": [SOURCE + "#sha256=" + digest], "values": values,
             "model_tokens": 0, "api_cost_usd": 0, "http_reads": 1}
@@ -245,7 +283,8 @@ class CommercialRuntime(PublicResearchRuntime):
         if digest != docs[0]["sha256"] or result["evidence"] != [SOURCE + "#sha256=" + digest]:
             raise ValueError("digest_mismatch")
         age = (datetime.now(timezone.utc) - datetime.fromisoformat(result["observed_at"])).total_seconds()
-        if not 0 <= age <= 300 or result["values"] != assess(body, result["observed_at"]):
+        if (not 0 <= age <= 300 or result.get("score_weights") != self.weights
+            or result["values"] != assess(body, result["observed_at"], weights=self.weights)):
             raise ValueError("stale_or_inaccurate_evidence")
         for key, expected in (("model_tokens", 0), ("api_cost_usd", 0), ("http_reads", 1)):
             if type(result.get(key)) is not int or result[key] != expected:
@@ -253,8 +292,10 @@ class CommercialRuntime(PublicResearchRuntime):
 
 
 def management_report(summary):
-    # Fixed template and measured aggregates only; no provider text can become Markdown.
-    return ("# گزارش پایلوت تجاری NEXUS\n\n"
+    # Escape validated source text as plain Markdown, never links/HTML/instructions.
+    def plain(value):
+        return re.sub(r"([\\`*_{}\[\]()#+.!|>~-])", r"\\\1", str(value)).replace("\n", " ")
+    report = ("# گزارش پایلوت تجاری NEXUS\n\n"
         f"وضعیت اجرا: {summary['status']}؛ نوع منبع: {summary['source_mode']}\n\n"
         f"فرصت‌های ارزیابی‌شده: {summary.get('opportunities_discovered', 0)}؛ "
         f"تأییدشده: {summary.get('opportunities_verified', 0)}؛ "
@@ -263,9 +304,23 @@ def management_report(summary):
         "انتشار آگهی، تأیید خریدار یا امکان معامله نیست. قیمت و ارزش اقتصادی نامعلوم است. "
         "HOLD حفظ شده؛ ایمیل، پیشنهاد تجاری و پرداخت انجام نشده است. "
         "نتیجه فقط دربارهٔ نمونهٔ محدود این اجراست.\n")
+    labels = {"INVESTIGATE": "نیازمند بررسی بیشتر", "REJECT": "رد برای پیگیری فعلی", "PROCEED": "پیشنهاد ادامه پس از کنترل مجوزها"}
+    for item in summary.get("assessments", []):
+        report += (f"\n## ارزیابی {plain(item['opportunity_id'])}\n\n"
+            f"طرف معرفی‌شده در منبع: {plain(item['identity'])}؛ کشور: {plain(item['country'])}.\n\n"
+            f"موضوع درخواست: {plain(item['product_or_equipment'])}\n\n"
+            "توان شرکت برای تأمین: نامعلوم؛ تطبیق فنی و ظرفیت اجرایی احراز نشده است.\n\n"
+            "مشخصات دقیق، مقدار، قیمت، شرایط تحویل و امکان پرداخت هنوز قابل تأیید نیست.\n\n"
+            f"اطلاعات مفقود: {plain(', '.join(item['missing_information']))}\n\n"
+            f"ریسک: {plain(item['risk_classification'])}؛ خریدار و تقاضا مستقل تأیید نشده‌اند.\n\n"
+            f"تصمیم: {labels[item['decision']]}؛ امتیاز فقط اولویت پژوهش است.\n\n"
+            "اقدام بعدی: بررسی فقط‌خواندنی سند اصلی و هویت مستقل؛ بدون تماس، ارسال پیشنهاد یا تعهد.\n\n"
+            f"منبع: {plain(item['source_url'])}؛ بازیابی: {plain(item['retrieved_at'])}\n")
+    return report
 
 
-def run(*, transport=None, commit_sha=UNKNOWN):
+def run(*, transport=None, commit_sha=UNKNOWN, weights=None):
+    weights = validated_weights(weights)
     started = monotonic()
     cpu_started = process_time()
     reads = 0
@@ -289,7 +344,7 @@ def run(*, transport=None, commit_sha=UNKNOWN):
     try:
         with TemporaryDirectory(prefix="nexus-commercial-") as directory:
             path = Path(directory) / "queue.db"
-            runtime = CommercialRuntime(path, transport=bounded_get)
+            runtime = CommercialRuntime(path, transport=bounded_get, weights=weights)
             task = "bounded-commercial-assessment"
             if not runtime.submit(task, budget_units=3) or runtime.drain(concurrency=1) != 1:
                 raise ValueError("task_not_completed")
@@ -301,7 +356,7 @@ def run(*, transport=None, commit_sha=UNKNOWN):
                 raise ValueError("checkpoint_count")
             result = checkpoints[0]
             runtime.validate_result({"task_id": task}, result)
-            recovered = CommercialRuntime(path, transport=bounded_get)
+            recovered = CommercialRuntime(path, transport=bounded_get, weights=weights)
             if recovered.submit(task, budget_units=3) or recovered.drain(concurrency=1) != 0 or recovered.review(task) != "accepted":
                 raise ValueError("replay_failed")
             evidence = result["documents"][0]
@@ -319,10 +374,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--commit-sha", required=True)
+    parser.add_argument("--weights-json", type=Path, help="Reviewed local JSON weights; never loaded from source data")
     args = parser.parse_args()
     if not re.fullmatch(r"[a-f0-9]{40}", args.commit_sha):
         parser.error("exact commit SHA required")
-    summary, evidence = run(commit_sha=args.commit_sha)
+    if args.output.exists() and (not args.output.is_dir() or any(args.output.iterdir())):
+        parser.error("output must be a new or empty directory; preserve prior evidence")
+    weights = json.loads(args.weights_json.read_text(encoding="utf-8")) if args.weights_json else None
+    summary, evidence = run(commit_sha=args.commit_sha, weights=weights)
     args.output.mkdir(parents=True, exist_ok=True)
     (args.output / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (args.output / "management-fa.md").write_text(management_report(summary), encoding="utf-8")

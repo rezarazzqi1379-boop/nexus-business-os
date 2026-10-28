@@ -43,7 +43,7 @@ jobs:
           python - <<'PY'
           import json, os
           from pathlib import Path
-          from nexus_commercial_pilot import assess, SOURCE
+          from nexus_commercial_pilot import assess, management_report, SOURCE
           import hashlib
           root = Path(os.environ['RUNNER_TEMP']) / 'commercial-pilot'
           summary = json.loads((root / 'summary.json').read_text())
@@ -57,6 +57,7 @@ jobs:
           for key, value in assess(body, summary['source_retrieved_at']).items():
               assert summary[key] == value
           assert summary['authority_status'] == 'HOLD' and summary['external_writes'] == 0
+          assert (root / 'management-fa.md').read_text() == management_report(summary)
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as report:
               report.write((root / 'management-fa.md').read_text())
           print(json.dumps({key: summary[key] for key in ('commit_sha', 'opportunities_discovered',

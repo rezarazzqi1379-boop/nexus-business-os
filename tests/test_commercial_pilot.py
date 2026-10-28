@@ -303,3 +303,13 @@ def test_source_quality_gate_missing_freshness_fails_closed():
     assert result["source_gate_passed"] == 0
     assert result["source_gate_rejected"] == 1
     assert "publication_stale_or_unknown" in result["assessments"][0]["source_quality_gate"]["rejection_reasons"]
+
+
+def test_missing_deadline_cannot_pass_source_quality_gate():
+    result = pilot.assess(body(row(submission_deadline_date="")), NOW)
+    item = result["assessments"][0]
+    assert item["source_quality_gate"]["eligible_for_investigation"] is False
+    assert "deadline_missing" in item["risks"]
+    assert item["decision"] == "REJECT"
+    assert result["source_gate_passed"] == 0
+    assert result["opportunities_rejected"] == 1

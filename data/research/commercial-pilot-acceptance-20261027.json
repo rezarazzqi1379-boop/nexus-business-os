@@ -1,0 +1,193 @@
+{
+  "schema_version": "nexus.commercial-acceptance.v1",
+  "observed_at": "2026-10-28T09:43:30.389891+00:00",
+  "base_main": "5661d5dff60ebb46d0374516212a66cfde089969",
+  "implementation_sha": "531e0fc8977a41b9b7c40a091423d2fde84bf302",
+  "pr": "https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/118",
+  "status": "VERIFIED_RELEASE_CANDIDATE_NOT_MAIN_RELEASE",
+  "tests": [
+    {
+      "command": "python -m pytest -q tests/test_commercial_pilot.py tests/test_router_runtime.py tests/test_public_research_agent.py tests/test_free_research.py",
+      "passed": 109,
+      "failed": 0,
+      "seconds": 4.52
+    },
+    {
+      "command": "python -m pytest -q tests evals",
+      "passed": 1788,
+      "failed": 0,
+      "warnings": 1,
+      "seconds": 43.83,
+      "warning": "Existing Starlette/httpx deprecation"
+    }
+  ],
+  "historical_corrections": [
+    "Initial 97 focused passes and two Windows parameter-ID setup errors; explicit bounded parameter IDs fixed collection.",
+    "v5 first focused run:107 pass, one float exact-equality failure; pytest.approx corrected numeric expectation. No security weakening.",
+    "Output-directory reuse refuses before acquisition to prevent stale evidence mixing; negative regression passes."
+  ],
+  "actions": [
+    {
+      "run_id": 40558567902,
+      "sha": "5661d5dff60ebb46d0374516212a66cfde089969",
+      "name": "main tests",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40665337534,
+      "sha": "57d2cc3d1b1a59c93c2a21ada141ca7cbf54a7e8",
+      "name": "commercial pilot",
+      "conclusion": "success",
+      "job_id": 122738284782
+    },
+    {
+      "run_id": 40665337461,
+      "sha": "57d2cc3d1b1a59c93c2a21ada141ca7cbf54a7e8",
+      "name": "tests",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40665870980,
+      "sha": "2abc6bf2211a84a5d80e3fe38d4c8798adff6eb3",
+      "name": "commercial pilot",
+      "conclusion": "success",
+      "job_id": 122740071711,
+      "focused_passed": 109,
+      "live_seconds": 0.1919
+    },
+    {
+      "run_id": 40665870985,
+      "sha": "2abc6bf2211a84a5d80e3fe38d4c8798adff6eb3",
+      "name": "tests",
+      "conclusion": "success",
+      "job_id": 122740071537,
+      "unittest_passed": 680,
+      "pytest_tests_only_passed": 712,
+      "failure_checks_passed": 14,
+      "counts_overlap": true
+    },
+    {
+      "run_id": 40666273328,
+      "sha": "531e0fc8977a41b9b7c40a091423d2fde84bf302",
+      "name": "commercial pilot",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 40666273377,
+      "sha": "531e0fc8977a41b9b7c40a091423d2fde84bf302",
+      "name": "tests",
+      "conclusion": "success"
+    }
+  ],
+  "live_execution": {
+    "commit_sha": "531e0fc8977a41b9b7c40a091423d2fde84bf302",
+    "executed_at": "2026-10-28T09:41:46.991111+00:00",
+    "source_retrieved_at": "2026-10-28T09:41:47.596797+00:00",
+    "source_sha256": "6fae2916feb6b30f5a78b68737cda7db49c0578e6d1561c4ca16282c40d3c2da",
+    "source_bytes": 1275,
+    "http_requests": 1,
+    "execution_duration_seconds": 0.6388,
+    "cpu_seconds": 0.0625,
+    "records_received": 3,
+    "opportunities_discovered": 3,
+    "opportunities_verified": 0,
+    "opportunities_rejected": 3,
+    "actionable_opportunities": 0,
+    "duplicates_removed": 0,
+    "duplicate_rate": 0.0,
+    "decisions": {
+      "INVESTIGATE": 1,
+      "PROCEED": 0,
+      "REJECT": 2
+    },
+    "evidence_completeness": 0.3333,
+    "fresh_source_count": 3,
+    "commercial_relevance_count": 1,
+    "estimated_opportunity_value": "UNKNOWN",
+    "estimated_api_cost_usd": 0,
+    "failure_categories": [],
+    "supervisor": "accepted",
+    "checkpoint_integrity": true,
+    "duplicate_execution_prevented": true,
+    "external_writes": 0
+  },
+  "evidence_reproduction": "Exact public-source bytes verified against summary hash; assess() and Persian report regenerated and compared offline.",
+  "source_scope": "One fixed public API sample, three rows, not whole-market absence or independently verified buyer demand.",
+  "security": {
+    "scan_id": "beba279b-1073-4281-88bb-2baf6a58f826",
+    "reviewed_sha": "57d2cc3d1b1a59c93c2a21ada141ca7cbf54a7e8",
+    "conclusion": "complete; no reportable finding in scoped diff",
+    "later_delta": "Parent source review and negative tests of configurable positive finite weights, manifest binding, mandatory verification/HOLD gates, escaped per-notice report and no output reuse. No separate plugin scan of later commits claimed."
+  },
+  "authority": {
+    "preflight": "BLOCK",
+    "registry_master": "HOLD",
+    "approval_manufactured": false,
+    "promoted": false
+  },
+  "release_gates": {
+    "candidate_pipeline": "VERIFIED",
+    "exact_head_ci": "VERIFIED_IMPLEMENTATION_531e0fc; FINAL_EVIDENCE_COMMIT_REFRESH_REQUIRED",
+    "main_commercial_execution": "NOT_STARTED",
+    "merge": "BLOCKED_EXACT_SCOPE_APPROVAL_REQUIRED",
+    "persistent_deployment": "NOT_STARTED"
+  },
+  "operational_limits": [
+    "No independent buyer, stock, technical qualification, feasibility, price or margin verification.",
+    "Dedup/replay within one queue only; runners have ephemeral separate queues.",
+    "Paid API/model/host not used; account Actions quota/billing availability unknown.",
+    "No recurring commercial schedule or production host activated."
+  ],
+  "next_executable_task": "Review PR118 and exact head; obtain exact-scope merge approval and policy admission, integrate once, then verify same commercial workflow on main. Business HOLD remains; independent primary-document research only.",
+  "safe_artifact": {
+    "run_id": 40666273328,
+    "id": 12805873131,
+    "size_bytes": 4792,
+    "digest": "sha256:abdc7648e6b64abb83e20ceb9b50635b213af39c40be42b08ac9e45c0932e36b",
+    "retention_days": 7,
+    "raw_queue_or_secrets_exported": false
+  },
+  "files_changed": [
+    ".gitattributes",
+    ".github/workflows/nexus-commercial-pilot.yml",
+    ".nexus/memory/context.jsonl",
+    ".nexus/memory/supersession_events.jsonl",
+    ".nexus/state/CURRENT_STATE.md",
+    "data/research/commercial-pilot-acceptance-20261027.json",
+    "data/research/commercial-pilot-final-20261028/management-fa.md",
+    "data/research/commercial-pilot-final-20261028/public-source.json",
+    "data/research/commercial-pilot-final-20261028/summary.json",
+    "data/research/commercial-pilot-live-20261028/management-fa.md",
+    "data/research/commercial-pilot-live-20261028/public-source.json",
+    "data/research/commercial-pilot-live-20261028/summary.json",
+    "data/research/commercial-pilot-local-20261027/management-fa.md",
+    "data/research/commercial-pilot-local-20261027/public-source.json",
+    "data/research/commercial-pilot-local-20261027/summary.json",
+    "data/research/commercial-preflight-20261027.json",
+    "data/research/commercial-preflight-20261028.json",
+    "docs/COMMERCIAL_PILOT_OPERATIONS.md",
+    "nexus_commercial_pilot.py",
+    "tests/test_commercial_pilot.py"
+  ],
+  "file_hashes": {
+    ".gitattributes": "413dfd67dc7d29301297e507d4920987610b42faf66ca9c408ea43878931292d",
+    ".github/workflows/nexus-commercial-pilot.yml": "cab18c7864de4a0b15ef4d43acef96eeb7da8c53e20e31c4027144fdb2e133c4",
+    "nexus_commercial_pilot.py": "9093da8bbd4b7962a060c54f2bc9a492c36238357c15b9582bdc45e5bf99308f",
+    "tests/test_commercial_pilot.py": "46536adb40c649f9339e3a6f21bdd5436de66967310af7e3b31db7889e7aea46",
+    "docs/COMMERCIAL_PILOT_OPERATIONS.md": "b082f3a6a2779153de3da87894fd822c318ccc97dc3f1cc3667ec24379d4570d",
+    ".nexus/state/CURRENT_STATE.md": "452479e5fb7a6c694dc1299be83832e085394851a37415f235440c324c4a0f39",
+    ".nexus/memory/context.jsonl": "488ac8742f415f45d73845a6515ec5ee3fda3bdb8fcc301be33b51f9863720f2",
+    ".nexus/memory/supersession_events.jsonl": "c8b7b828413d9f55d43d5df00741ab1873fb12a72650253ded7468855624aa39",
+    "data/research/commercial-preflight-20261027.json": "e33dea4cb450190d986bb8dff1f42e3059c325030ad17e3dc5a65e50e234b610",
+    "data/research/commercial-preflight-20261028.json": "4539938669edc6c5fd7a02db3bc49dde181c5c528370243fc066cc9cd9577632",
+    "data/research/commercial-pilot-final-20261028/management-fa.md": "c7e14d5d72c751803f3a187e741f538463e538c2ba38c825b373b29929150fae",
+    "data/research/commercial-pilot-final-20261028/public-source.json": "6fae2916feb6b30f5a78b68737cda7db49c0578e6d1561c4ca16282c40d3c2da",
+    "data/research/commercial-pilot-final-20261028/summary.json": "1cc38228c314977c3a565795c2e66d86f96c7eb41ccac1bcc653700c167ddec9",
+    "data/research/commercial-pilot-live-20261028/management-fa.md": "ca3bba969a6ac24df6d979bee0ab7937984a18ec0c0816eb903bb6ea9f72793b",
+    "data/research/commercial-pilot-live-20261028/public-source.json": "6fae2916feb6b30f5a78b68737cda7db49c0578e6d1561c4ca16282c40d3c2da",
+    "data/research/commercial-pilot-live-20261028/summary.json": "d66eccb7b1b96c4355fed094047c2c76f99264627a59da8194d425de8d8137a3",
+    "data/research/commercial-pilot-local-20261027/management-fa.md": "64745425dccefc2046e8ffcc26c552b4a840aa113293b6315c8a2a0397199039",
+    "data/research/commercial-pilot-local-20261027/public-source.json": "6fae2916feb6b30f5a78b68737cda7db49c0578e6d1561c4ca16282c40d3c2da",
+    "data/research/commercial-pilot-local-20261027/summary.json": "9fe84238f3063f7b7f285a4b5507489c8582b28cc665b7ea7a9f144f7f0fad9d"
+  }
+}

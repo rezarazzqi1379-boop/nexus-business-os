@@ -52,6 +52,8 @@ def source_quality_gate(row, *, age_days, expired, relevant, conflict):
     reasons = []
     if conflict:
         reasons.append("conflicting_source_records")
+    if not row.get("submission_deadline_date"):
+        reasons.append("deadline_missing")
     if expired:
         reasons.append("expired")
     if row.get("notice_type") != "Invitation for Bids" or row.get("notice_status") != "Published":
@@ -65,7 +67,7 @@ def source_quality_gate(row, *, age_days, expired, relevant, conflict):
 
 def recommend_decision(item):
     """Recommendation only. Scores cannot override mandatory evidence/authority gates."""
-    hard_reject = {"conflicting_source_records", "expired", "not_current_invitation",
+    hard_reject = {"conflicting_source_records", "expired", "deadline_missing", "not_current_invitation",
                    "publication_stale_or_unknown", "technical_relevance_not_supported"}
     if hard_reject.intersection(item["risks"]):
         return "REJECT"
@@ -325,7 +327,7 @@ def management_report(summary):
         "price_or_budget": "قیمت یا بودجه", "deadline": "مهلت معتبر"}
     risk_labels = {"independent_entity_and_demand_verification_missing": "هویت و تقاضا مستقلاً تأیید نشده",
         "commercial_terms_missing": "شرایط معامله ناقص است", "conflicting_source_records": "داده‌های منبع متناقض‌اند",
-        "expired": "مهلت گذشته است", "not_current_invitation": "آگهی دعوت جاری به ارائه پیشنهاد نیست",
+        "expired": "مهلت گذشته است", "deadline_missing": "مهلت ارسال پیشنهاد در منبع ثبت نشده است", "not_current_invitation": "آگهی دعوت جاری به ارائه پیشنهاد نیست",
         "publication_stale_or_unknown": "تازگی انتشار قابل اتکا نیست",
         "technical_relevance_not_supported": "ارتباط فنی با موضوع پایلوت پشتیبانی نشده است"}
     for item in summary.get("assessments", []):

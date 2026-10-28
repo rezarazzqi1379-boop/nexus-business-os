@@ -47,6 +47,22 @@ def validated_weights(weights=None):
     return result
 
 
+def source_quality_gate(row, *, age_days, expired, relevant, conflict):
+    """Conservative prequalification of a notice; never establishes demand or technical fit."""
+    reasons = []
+    if conflict:
+        reasons.append("conflicting_source_records")
+    if expired:
+        reasons.append("expired")
+    if row.get("notice_type") != "Invitation for Bids" or row.get("notice_status") != "Published":
+        reasons.append("not_current_invitation")
+    if age_days is None or not 0 <= age_days <= 30:
+        reasons.append("publication_stale_or_unknown")
+    if not relevant:
+        reasons.append("technical_relevance_not_supported")
+    return {"eligible_for_investigation": not reasons, "rejection_reasons": reasons}
+
+
 def recommend_decision(item):
     """Recommendation only. Scores cannot override mandatory evidence/authority gates."""
     hard_reject = {"conflicting_source_records", "expired", "not_current_invitation",
@@ -174,16 +190,8 @@ def assess(body, observed_at, *, weights=None):
         expired = expiry is not None and expiry <= now
         relevant = bool(re.search(r"\b(steel|hydrostatic|octg|industrial equipment)\b", value("bid_description"), re.I))
         reasons = ["independent_entity_and_demand_verification_missing", "commercial_terms_missing"]
-        if conflict:
-            reasons.append("conflicting_source_records")
-        if expired:
-            reasons.append("expired")
-        if row.get("notice_type") != "Invitation for Bids" or row.get("notice_status") != "Published":
-            reasons.append("not_current_invitation")
-        if age is None or not 0 <= age <= 30:
-            reasons.append("publication_stale_or_unknown")
-        if not relevant:
-            reasons.append("technical_relevance_not_supported")
+        gate = source_quality_gate(row, age_days=age, expired=expired, relevant=relevant, conflict=conflict)
+        reasons.extend(gate["rejection_reasons"])
         opportunity = {
             "opportunity_id": identity, "project_id": PROJECT, "lane_id": LANE,
             "source_project_id": value("project_id"), "identity": value("contact_organization"),
@@ -196,7 +204,7 @@ def assess(body, observed_at, *, weights=None):
             "actionable": False, "human_review_ready": False, "risks": reasons,
             "next_action": "READ_ONLY_PRIMARY_DOCUMENT_AND_INDEPENDENT_VERIFICATION_REQUIRED",
             "assertion_type": "SOURCE_CLAIM", "assumptions": [], "estimates": [],
-            "technical_relevance": relevant, "source_age_days": round(age, 3) if age is not None else UNKNOWN,
+            "technical_relevance": relevant, "source_quality_gate": gate, "source_age_days": round(age, 3) if age is not None else UNKNOWN,
             "deadline_precision": "SOURCE_TIMESTAMP_TIMEZONE_UNCONFIRMED",
             "source_record_sha256": canonical_digest(row), "conflict": conflict,
             "authority_status": "HOLD", "risk_classification": "HIGH_UNVERIFIED_COMMERCIAL_BASIS",
@@ -226,6 +234,8 @@ def assess(body, observed_at, *, weights=None):
         "duplicate_rate": round((len(rows) - count) / len(rows), 4) if rows else 0,
         "opportunities_verified": 0, "opportunities_rejected": sum(item["decision"] == "REJECT" for item in assessments),
         "opportunities_pending_investigation": sum(item["decision"] == "INVESTIGATE" for item in assessments),
+        "source_gate_passed": sum(item["source_quality_gate"]["eligible_for_investigation"] for item in assessments),
+        "source_gate_rejected": sum(not item["source_quality_gate"]["eligible_for_investigation"] for item in assessments),
         "actionable_opportunities": 0, "human_review_ready": 0,
         "decisions": {key: sum(item["decision"] == key for item in assessments)
                       for key in ("PROCEED", "INVESTIGATE", "REJECT")},

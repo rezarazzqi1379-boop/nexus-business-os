@@ -282,3 +282,24 @@ def test_lexical_relevance_never_establishes_technical_fit():
     assert item["technical_match"] == "UNKNOWN"
     assert item["score"]["dimensions"]["technical_fit"] == "UNKNOWN"
     assert item["decision"] == "INVESTIGATE"
+
+
+def test_source_quality_gate_accepts_only_current_relevant_invitation():
+    result = pilot.assess(body(row(), row(id="OP00476470", notice_type="Contract Award"),
+                               row(id="OP00476471", bid_description="School construction")), NOW)
+    assert result["source_gate_passed"] == 1
+    assert result["source_gate_rejected"] == 2
+    assert result["opportunities_pending_investigation"] == 1
+    assert result["opportunities_rejected"] == 2
+    assert result["source_gate_passed"] + result["source_gate_rejected"] == result["opportunities_discovered"]
+    for item in result["assessments"]:
+        gate = item["source_quality_gate"]
+        assert gate["eligible_for_investigation"] == (item["decision"] == "INVESTIGATE")
+        assert item["technical_match"] == "UNKNOWN"
+
+
+def test_source_quality_gate_missing_freshness_fails_closed():
+    result = pilot.assess(body(row(noticedate="")), NOW)
+    assert result["source_gate_passed"] == 0
+    assert result["source_gate_rejected"] == 1
+    assert "publication_stale_or_unknown" in result["assessments"][0]["source_quality_gate"]["rejection_reasons"]

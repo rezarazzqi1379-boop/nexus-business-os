@@ -4,6 +4,13 @@ Owner permits autonomous routine technical work across NEXUS where account acces
 
 # NEXUS CURRENT STATE
 
+## Commercial main reconciliation and v1.1 sandbox — 2026-10-28
+
+PR118 merged at 71c078907da6def3fca8397f92cba8d874f03237; PR119 merged at 92e971469de48e3370b0042b22c358163964abed. The older "main remains 5661d5" and "PR118 not merged" text below is a historical snapshot, superseded for current GitHub branch state. PR119 exact-head CI commercial 40674839402 and regression 40674839500 succeeded; 111 focused tests passed, live source sample returned three notices, zero verified/actionable and three REJECT decisions, completeness 25%. These PR runs do not establish post-merge main commercial execution. Main manual workflow dispatch remains unverified. Commercial authority HOLD and Registry/Master gate remain unchanged.
+
+v1.1 source-quality experiment is on a separate review branch. It extracts existing conservative freshness, notice status/type, conflict and lexical relevance screening into an auditable gate, exposes passed/rejected counters, and adds focused tests. This is not a new provider, increased crawl budget, technical verification, production release, or commercial improvement claim. Await exact-head CI and independent review; do not promote until approved.
+
+
 ## Commercial read-only release candidate — 2026-10-28
 
 Main remains 5661d5dff60ebb46d0374516212a66cfde089969; PR116 and PR117

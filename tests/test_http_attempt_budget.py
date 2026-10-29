@@ -234,7 +234,7 @@ def test_budget_replacement_during_reservation_fails_before_commit(tmp_path, mon
     def replace_on_final_check():
         nonlocal checks
         checks += 1
-        if checks == 3:
+        if checks == 4:
             path.rename(tmp_path / "original.db")
             other = AttemptBudget(tmp_path / "other.db", scope="guard")
             (tmp_path / "other.db").rename(path)

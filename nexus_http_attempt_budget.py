@@ -76,3 +76,16 @@ class AttemptBudget:
         """Reserve first; a failed or interrupted transport still consumes a slot."""
         self.reserve(tick_id)
         return transport(url)
+
+
+def budgeted_transport(budget: AttemptBudget, *, tick_id: str, transport):
+    """Explicit opt-in transport wrapper for a single bounded source request.
+
+    Callers must bind the returned callable to their existing allowlisted
+    transport. This does not enable a source or alter the runtime mode.
+    """
+    if not callable(transport):
+        raise TypeError("transport_must_be_callable")
+    def guarded(url: str):
+        return budget.read(tick_id, transport, url)
+    return guarded

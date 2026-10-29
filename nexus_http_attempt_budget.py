@@ -61,7 +61,16 @@ class AttemptBudget:
         if self._file_identity() != self._identity:
             raise RuntimeError("replaced_durable_http_budget_requires_recovery")
 
+    def _assert_existing_file_before_connect(self):
+        # Initialization may create a brand-new sidecar, but runtime reads must not.
+        if getattr(self, "_identity", None) is not None:
+            self._assert_identity()
+
     def _connect(self):
+        # Never allow sqlite3.connect to silently create a missing budget database.
+        # Open the existing file first; SQLite then uses the proc-fd pathname on Linux.
+        if hasattr(sqlite3, "connect"):
+            self._assert_existing_file_before_connect()
         db = sqlite3.connect(self.path, timeout=15, isolation_level=None)
         db.execute("PRAGMA busy_timeout=15000")
         db.execute("PRAGMA foreign_keys=ON")
@@ -92,6 +101,7 @@ class AttemptBudget:
             token = uuid.uuid4().hex
             db.execute("INSERT INTO http_budget_reservation VALUES (?,?,?,?)",
                        (token, self.scope, tick_id, datetime.now(timezone.utc).isoformat()))
+            self._assert_identity()
             db.commit()
             return token
 

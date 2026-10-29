@@ -43,8 +43,10 @@ class MonitoringRuntime(CommercialRuntime):
                     if any(json.loads(row[0]).get('source_mode') != 'REAL_PUBLIC_HTTP'
                            for row in modes):
                         raise ValueError('separate_database_required_for_source_mode')
-                except sqlite3.OperationalError:
-                    pass  # Existing queue schema validation remains authoritative.
+                except sqlite3.OperationalError as exc:
+                    # A corrupt or unreadable existing queue must never be treated
+                    # as an empty queue with an unknown source mode.
+                    raise RuntimeError("monitor_mode_preflight_unavailable") from exc
         if transport is None and attempt_budget is not None:
             from pathlib import Path
             expected_path = str(Path(path)) + ".http-attempts.sqlite"

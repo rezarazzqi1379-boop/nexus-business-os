@@ -145,3 +145,20 @@ def test_live_budget_persists_on_runtime_restart(tmp_path):
     second = MonitoringRuntime(path)
     assert second.attempt_budget.count() == 1
     assert second.attempt_budget.scope == first.attempt_budget.scope
+
+
+def test_live_mode_rejects_alternate_budget_scope_or_cap(tmp_path):
+    from source_monitor import MonitoringRuntime
+    path = tmp_path / "queue.db"
+    rogue = AttemptBudget(tmp_path / "other.db", scope="other", max_attempts=1)
+    with pytest.raises(ValueError, match="binding_mismatch"):
+        MonitoringRuntime(path, attempt_budget=rogue)
+
+
+def test_live_mode_rejects_wider_external_budget(tmp_path):
+    from source_monitor import MonitoringRuntime
+    path = tmp_path / "queue.db"
+    budget = AttemptBudget(str(path) + ".http-attempts.sqlite",
+                           scope="nexus:worldbank:bounded-live", max_attempts=5)
+    with pytest.raises(ValueError, match="binding_mismatch"):
+        MonitoringRuntime(path, attempt_budget=budget)

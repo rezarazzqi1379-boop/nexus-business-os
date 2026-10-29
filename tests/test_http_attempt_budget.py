@@ -224,3 +224,21 @@ def test_replaced_budget_file_fails_closed(tmp_path):
     (tmp_path / "replacement.db").rename(path)
     with pytest.raises(RuntimeError, match="replaced_durable_http_budget"):
         budget.reserve("two")
+
+
+def test_budget_replacement_during_reservation_fails_before_commit(tmp_path, monkeypatch):
+    path = tmp_path / "budget.db"
+    budget = AttemptBudget(path, scope="guard")
+    original = budget._assert_identity
+    checks = 0
+    def replace_on_final_check():
+        nonlocal checks
+        checks += 1
+        if checks == 3:
+            path.rename(tmp_path / "original.db")
+            other = AttemptBudget(tmp_path / "other.db", scope="guard")
+            (tmp_path / "other.db").rename(path)
+        original()
+    monkeypatch.setattr(budget, "_assert_identity", replace_on_final_check)
+    with pytest.raises(RuntimeError, match="replaced_durable_http_budget"):
+        budget.reserve("one")

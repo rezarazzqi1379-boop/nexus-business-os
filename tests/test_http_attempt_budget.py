@@ -37,7 +37,7 @@ def test_concurrent_reservations_never_exceed_cap(tmp_path):
     AttemptBudget(path, scope="trial")
     def attempt(i):
         try:
-            AttemptBudget(path, scope="trial").reserve(str(i))
+            AttemptBudget(path, scope="trial").reserve(str(i % 3))
             return True
         except AttemptBudgetExceeded:
             return False

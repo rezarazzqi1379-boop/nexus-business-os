@@ -1,3 +1,16 @@
+## Source monitor slice 2 finite experiment — 2026-10-29
+
+Base main: `0e91724466688d1932b1f6a70cd9661b56cba7d2` (PR125 merged).
+Owner approved one local 3-tick, 6-attempt World Bank/TED experiment. It ended
+after exactly 6 reservations. World Bank yielded 3 records per tick; TED yielded
+0/0/3 notice IDs. The first two TED requests used syntax-only mode by mistake;
+the host restarted with the same DB/ID and corrected the third tick without
+refunding quota. This is PARTIAL acceptance, not a clean three-tick collection
+proof. UNGM remains blocked by provider permission. No permanent service or
+commercial action is active; HOLD persists. See docs/SOURCE_MONITOR_SLICE_2_FA.md
+and evidence/source-monitor-trial-20261029.json. Structural ledger audit is not
+raw-response replay or independent verification of commercial claims.
+
 ## Source monitor sandbox slice — 2026-10-29
 
 Main base verified at `2143868af6372caa531959dbc883b8e288327b8d` (PR #124).

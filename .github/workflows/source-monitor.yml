@@ -3,7 +3,16 @@ on:
   pull_request:
     paths:
       - 'source_monitor.py'
+      - 'source_monitor_trial.py'
+      - 'run_source_trial.py'
+      - 'ted_connector.py'
+      - 'verify_source_trial.py'
+      - 'evidence/source-monitor-trial-20261029.json'
+      - 'autonomy.py'
       - 'tests/test_source_monitor.py'
+      - 'tests/test_source_monitor_trial.py'
+      - 'tests/test_ted_connector.py'
+      - 'tests/test_verify_source_trial.py'
       - 'nexus_commercial_pilot.py'
       - 'nexus_connector_control_plane.py'
       - 'nexus_router_runtime.py'
@@ -26,4 +35,4 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install 'pytest>=8,<9'
-      - run: python -m pytest -q -p no:cacheprovider tests/test_source_monitor.py tests/test_commercial_pilot.py
+      - run: python -m pytest -q -p no:cacheprovider tests/test_verify_source_trial.py tests/test_source_monitor_trial.py tests/test_ted_connector.py tests/test_source_monitor.py tests/test_commercial_pilot.py

@@ -253,7 +253,9 @@ def tick(runtime: MonitoringRuntime, *, now: str, interval_seconds=3600):
     return {"schema_version": "nexus.source-monitor.v1", "project_id": PROJECT, "lane_id": LANE,
             "source_mode": runtime.source_mode,
             "task_id": task, "submitted": submitted, "completed_queue_items": completed,
-            "supervisor": review, "status": "ACCEPTED" if provenance or result and review == "accepted" else "WAITING_OR_BLOCKED",
+            "supervisor": review, "status": ("INVALID_BASELINE" if changes and changes.get("status") == "INVALID_BASELINE"
+                       else "ACCEPTED" if result and review == "accepted"
+                       else "WAITING_OR_BLOCKED"),
             "provenance": provenance, "assessment": result["values"] if review == "accepted" and result else None,
             "source_comparison": comparison, "work_attempted": item is not None,
             "changes": changes,

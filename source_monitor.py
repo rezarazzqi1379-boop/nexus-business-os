@@ -6,6 +6,8 @@ leases, retries, cancellation, checkpoints and supervisor review.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from contextvars import ContextVar
+from nexus_http_attempt_budget import AttemptBudget, budgeted_transport
 from contextlib import closing
 from datetime import datetime, timezone
 from hashlib import sha256
@@ -24,10 +26,24 @@ from nexus_router_runtime import PROJECT
 class MonitoringRuntime(CommercialRuntime):
     action = "router.source-monitor.v1"
 
-    def __init__(self, path, *, transport=None):
+    def __init__(self, path, *, transport=None, attempt_budget: AttemptBudget | None = None):
         from nexus_commercial_pilot import get_public_notices
+        if attempt_budget is not None and not isinstance(attempt_budget, AttemptBudget):
+            raise TypeError("invalid_attempt_budget")
+        self.attempt_budget = attempt_budget
+        self._budget_task = ContextVar("nexus_monitor_budget_task", default=None)
+        underlying = get_public_notices if transport is None else transport
+        if attempt_budget is not None:
+            def guarded(url):
+                task_id = self._budget_task.get()
+                if task_id is None:
+                    raise PermissionError("budgeted_transport_requires_task_context")
+                return budgeted_transport(attempt_budget, tick_id=task_id, transport=underlying)(url)
+            effective_transport = guarded
+        else:
+            effective_transport = underlying
         self.source_mode = "REAL_PUBLIC_HTTP" if transport is None else "FROZEN_TEST_FIXTURE"
-        super().__init__(path, transport=get_public_notices if transport is None else transport)
+        super().__init__(path, transport=effective_transport)
         with closing(self.store._connect()) as db:
             db.execute("BEGIN IMMEDIATE")
             prior = db.execute("SELECT body FROM router_events WHERE project=? AND kind='monitor_mode'",
@@ -40,7 +56,11 @@ class MonitoringRuntime(CommercialRuntime):
             db.commit()
 
     def execute(self, payload):
-        return {**super().execute(payload), "source_mode": self.source_mode}
+        token = self._budget_task.set(payload["task_id"])
+        try:
+            return {**super().execute(payload), "source_mode": self.source_mode}
+        finally:
+            self._budget_task.reset(token)
 
     def validate_result(self, payload, result):
         super().validate_result(payload, result)

@@ -65,3 +65,22 @@ def test_reservation_is_committed_before_transport(tmp_path):
         assert AttemptBudget(path, scope="trial", max_attempts=1).count() == 1
         return b"response"
     assert budget.read("tick", transport, "https://example.org/") == b"response"
+
+
+def test_guarded_transport_is_fail_closed(tmp_path):
+    from nexus_http_attempt_budget import budgeted_transport
+    budget = AttemptBudget(tmp_path / "budget.db", scope="trial", max_attempts=1)
+    calls = []
+    transport = budgeted_transport(budget, tick_id="tick0",
+                                   transport=lambda url: calls.append(url) or b"ok")
+    assert transport("https://example.org/") == b"ok"
+    with pytest.raises(AttemptBudgetExceeded):
+        transport("https://example.org/")
+    assert len(calls) == 1
+
+
+def test_guarded_transport_rejects_non_callable(tmp_path):
+    from nexus_http_attempt_budget import budgeted_transport
+    budget = AttemptBudget(tmp_path / "budget.db", scope="trial")
+    with pytest.raises(TypeError):
+        budgeted_transport(budget, tick_id="tick0", transport=None)

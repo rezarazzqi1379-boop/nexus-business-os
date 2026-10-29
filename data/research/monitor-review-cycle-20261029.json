@@ -1,0 +1,45 @@
+{
+  "exercise": {
+    "exercise_id": "monitor-independent-review-126-20261029",
+    "system_id": "source-monitor",
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "task_id": "monitor-review-126",
+    "procedural_family": "bounded-monitor",
+    "evidence_refs": [
+      "docs/MONITOR_REVIEW_126_FA.md",
+      "data/research/monitor-review-focused-20261029.xml",
+      "data/research/monitor-review-regression-20261029.txt",
+      "data/research/monitor-review-local-20261029.json"
+    ],
+    "actions": [
+      "fix checkpoint ordering",
+      "separate cosmetic changes",
+      "bind environment evidence"
+    ],
+    "test_commands": [
+      ".venv/Scripts/python.exe -m pytest -q -p no:cacheprovider",
+      ".venv/Scripts/python.exe benchmark_source_monitor.py --output data/research/monitor-review-local-20261029.json"
+    ],
+    "acceptance_checks": [
+      "1840 passed with one known deprecation warning",
+      "103 focused passed",
+      "20 accepted / 20 fixture reads / zero external writes"
+    ],
+    "outcome": "SUCCESS",
+    "human_corrections": 3,
+    "reusable_lessons": [],
+    "observed_at": "2026-10-29T06:15:15.337719+00:00"
+  },
+  "cycle": {
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "accepted_exercises": [],
+    "ineligible_exercises": [
+      "monitor-independent-review-126-20261029"
+    ],
+    "candidates": [],
+    "production_changes_applied": false
+  },
+  "review": "https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/126",
+  "local_tests_seconds": 55.55,
+  "learning_note": "Independent review corrections recorded; not a zero-correction trajectory."
+}

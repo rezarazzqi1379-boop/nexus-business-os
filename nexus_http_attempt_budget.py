@@ -69,8 +69,7 @@ class AttemptBudget:
     def _connect(self):
         # Never allow sqlite3.connect to silently create a missing budget database.
         # Open the existing file first; SQLite then uses the proc-fd pathname on Linux.
-        if hasattr(sqlite3, "connect"):
-            self._assert_existing_file_before_connect()
+        self._assert_existing_file_before_connect()
         db = sqlite3.connect(self.path, timeout=15, isolation_level=None)
         db.execute("PRAGMA busy_timeout=15000")
         db.execute("PRAGMA foreign_keys=ON")

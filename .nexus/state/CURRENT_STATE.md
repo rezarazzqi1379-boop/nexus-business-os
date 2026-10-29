@@ -19,6 +19,11 @@ Owner permits autonomous routine technical work across NEXUS where account acces
 # NEXUS CURRENT STATE
 ## Bounded monitor development — 2026-10-29
 
+PR #126 independent-review follow-up: predecessor selection now freezes an earlier
+cadence bucket at the current checkpoint commit cutoff; cosmetic comparisons retain
+raw conflicts. See `docs/MONITOR_REVIEW_126_FA.md` for acceptance and environment
+binding. Draft hold remains; no merge, second-source activation or production claim.
+
 Base main: `2143868af6372caa531959dbc883b8e288327b8d` (PR #124).
 Branch: `codex/public-monitor-completion-20261029`.
 Scope: PRJ-NEXUS-SANDBOX / industrial-tender-pilot only.

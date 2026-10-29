@@ -64,3 +64,6 @@ workflow جدید فقط acceptance آفلاین را در PR اجرا می‌ک
 
 Rollback: host را از فراخوانی tick متوقف کنید؛ journal و DB را نگه دارید.
 هیچ merge، deployment، ایمیل یا اقدام تجاری جزئی از این برش نیست.
+
+اصلاحات بازبینی PR #126، قرارداد ترتیب checkpoint و تفکیک تغییر ظاهری، و معیار
+تطبیق محیط/بنچمارک در `docs/MONITOR_REVIEW_126_FA.md` مستند شده‌اند.

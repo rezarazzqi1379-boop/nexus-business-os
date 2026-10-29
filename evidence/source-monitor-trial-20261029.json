@@ -1,0 +1,270 @@
+{
+  "trial_id": "source-monitor-wb-ted-20261029-approved",
+  "project_id": "PRJ-NEXUS-SANDBOX",
+  "plan": {
+    "interval_seconds": 300,
+    "max_attempts": 6,
+    "source_mode": "REAL_PUBLIC_HTTP",
+    "sources": [
+      "ted",
+      "worldbank"
+    ],
+    "starts_at": "2026-10-29T06:13:06.915167+00:00",
+    "ticks": 3
+  },
+  "attempts": [
+    {
+      "attempt_id": "a6b29432ffdf484ea7957e4686957083",
+      "trial_id": "source-monitor-wb-ted-20261029-approved",
+      "tick": 0,
+      "source": "ted",
+      "reserved_at": "2026-10-29T06:13:06.919958+00:00",
+      "outcome": "RESPONSE_RECEIVED"
+    },
+    {
+      "attempt_id": "e6e72cb1c40643c0ad5003763ccdb43b",
+      "trial_id": "source-monitor-wb-ted-20261029-approved",
+      "tick": 0,
+      "source": "worldbank",
+      "reserved_at": "2026-10-29T06:13:06.919958+00:00",
+      "outcome": "RESPONSE_RECEIVED"
+    },
+    {
+      "attempt_id": "15dc3d81ee254c4d8eaa7abffb522d17",
+      "trial_id": "source-monitor-wb-ted-20261029-approved",
+      "tick": 1,
+      "source": "worldbank",
+      "reserved_at": "2026-10-29T06:18:06.915622+00:00",
+      "outcome": "RESPONSE_RECEIVED"
+    },
+    {
+      "attempt_id": "b425e4b7655f44fcaf159ee81c2a0ac0",
+      "trial_id": "source-monitor-wb-ted-20261029-approved",
+      "tick": 1,
+      "source": "ted",
+      "reserved_at": "2026-10-29T06:18:06.915622+00:00",
+      "outcome": "RESPONSE_RECEIVED"
+    },
+    {
+      "attempt_id": "001c9ba404fa4516b2386f486d76a095",
+      "trial_id": "source-monitor-wb-ted-20261029-approved",
+      "tick": 2,
+      "source": "worldbank",
+      "reserved_at": "2026-10-29T06:23:06.919230+00:00",
+      "outcome": "RESPONSE_RECEIVED"
+    },
+    {
+      "attempt_id": "2274057803fc4881b219da9dbc18e427",
+      "trial_id": "source-monitor-wb-ted-20261029-approved",
+      "tick": 2,
+      "source": "ted",
+      "reserved_at": "2026-10-29T06:23:08.214331+00:00",
+      "outcome": "RESPONSE_RECEIVED"
+    }
+  ],
+  "reserved_attempts": 6,
+  "evidence": [
+    {
+      "attempt_id": "a6b29432ffdf484ea7957e4686957083",
+      "authority_status": "HOLD",
+      "decision": "INVESTIGATE",
+      "evidence_class": "CLAIM",
+      "independence_group": "eu-publications-office",
+      "lane_id": "industrial-tender-pilot",
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "provider": "ted",
+      "query": "FT~steel",
+      "raw_count": 0,
+      "records": [],
+      "request_method": "POST_READ_ONLY_SEARCH",
+      "retrieved_at": "2026-10-29T06:13:09.106363+00:00",
+      "shared_claim_verification": "NOT_ESTABLISHED",
+      "source_mode": "REAL_PUBLIC_HTTP",
+      "source_sha256": "c006a89557974a508c38b48894ad3a389f763747cb4b56f73410d8d9dca02c76",
+      "source_url": "https://api.ted.europa.eu/v3/notices/search",
+      "tick": 0,
+      "trial_id": "source-monitor-wb-ted-20261029-approved",
+      "unique_count": 0
+    },
+    {
+      "attempt_id": "e6e72cb1c40643c0ad5003763ccdb43b",
+      "authority_status": "HOLD",
+      "decision": "INVESTIGATE",
+      "evidence_class": "CLAIM",
+      "independence_group": "worldbank-publication",
+      "lane_id": "industrial-tender-pilot",
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "provider": "worldbank",
+      "query": "steel World Bank",
+      "raw_count": 3,
+      "records": [
+        {
+          "identity": "OP00477388",
+          "url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477388"
+        },
+        {
+          "identity": "OP00477389",
+          "url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477389"
+        },
+        {
+          "identity": "OP00477387",
+          "url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477387"
+        }
+      ],
+      "request_method": "GET",
+      "retrieved_at": "2026-10-29T06:13:08.138528+00:00",
+      "shared_claim_verification": "NOT_ESTABLISHED",
+      "source_mode": "REAL_PUBLIC_HTTP",
+      "source_sha256": "6025b8b79324174906e163174372116c523ff8a9f1dd207e17e5dfa1e3dbf49e",
+      "source_url": "https://search.worldbank.org/api/v2/procnotices?format=json&qterm=steel&rows=3&fl=id,bid_description,project_ctry_name,project_id,contact_organization,submission_deadline_date,noticedate,notice_type,notice_status,procurement_method_name",
+      "tick": 0,
+      "trial_id": "source-monitor-wb-ted-20261029-approved",
+      "unique_count": 3
+    },
+    {
+      "attempt_id": "15dc3d81ee254c4d8eaa7abffb522d17",
+      "authority_status": "HOLD",
+      "decision": "INVESTIGATE",
+      "evidence_class": "CLAIM",
+      "independence_group": "worldbank-publication",
+      "lane_id": "industrial-tender-pilot",
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "provider": "worldbank",
+      "query": "steel World Bank",
+      "raw_count": 3,
+      "records": [
+        {
+          "identity": "OP00477388",
+          "url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477388"
+        },
+        {
+          "identity": "OP00477389",
+          "url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477389"
+        },
+        {
+          "identity": "OP00477387",
+          "url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477387"
+        }
+      ],
+      "request_method": "GET",
+      "retrieved_at": "2026-10-29T06:18:07.577558+00:00",
+      "shared_claim_verification": "NOT_ESTABLISHED",
+      "source_mode": "REAL_PUBLIC_HTTP",
+      "source_sha256": "6025b8b79324174906e163174372116c523ff8a9f1dd207e17e5dfa1e3dbf49e",
+      "source_url": "https://search.worldbank.org/api/v2/procnotices?format=json&qterm=steel&rows=3&fl=id,bid_description,project_ctry_name,project_id,contact_organization,submission_deadline_date,noticedate,notice_type,notice_status,procurement_method_name",
+      "tick": 1,
+      "trial_id": "source-monitor-wb-ted-20261029-approved",
+      "unique_count": 3
+    },
+    {
+      "attempt_id": "b425e4b7655f44fcaf159ee81c2a0ac0",
+      "authority_status": "HOLD",
+      "decision": "INVESTIGATE",
+      "evidence_class": "CLAIM",
+      "independence_group": "eu-publications-office",
+      "lane_id": "industrial-tender-pilot",
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "provider": "ted",
+      "query": "FT~steel",
+      "raw_count": 0,
+      "records": [],
+      "request_method": "POST_READ_ONLY_SEARCH",
+      "retrieved_at": "2026-10-29T06:18:08.477780+00:00",
+      "shared_claim_verification": "NOT_ESTABLISHED",
+      "source_mode": "REAL_PUBLIC_HTTP",
+      "source_sha256": "c006a89557974a508c38b48894ad3a389f763747cb4b56f73410d8d9dca02c76",
+      "source_url": "https://api.ted.europa.eu/v3/notices/search",
+      "tick": 1,
+      "trial_id": "source-monitor-wb-ted-20261029-approved",
+      "unique_count": 0
+    },
+    {
+      "attempt_id": "001c9ba404fa4516b2386f486d76a095",
+      "authority_status": "HOLD",
+      "decision": "INVESTIGATE",
+      "evidence_class": "CLAIM",
+      "independence_group": "worldbank-publication",
+      "lane_id": "industrial-tender-pilot",
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "provider": "worldbank",
+      "query": "steel World Bank",
+      "raw_count": 3,
+      "records": [
+        {
+          "identity": "OP00477388",
+          "url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477388"
+        },
+        {
+          "identity": "OP00477389",
+          "url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477389"
+        },
+        {
+          "identity": "OP00477387",
+          "url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477387"
+        }
+      ],
+      "request_body": null,
+      "request_method": "GET",
+      "retrieved_at": "2026-10-29T06:23:08.207051+00:00",
+      "shared_claim_verification": "NOT_ESTABLISHED",
+      "source_mode": "REAL_PUBLIC_HTTP",
+      "source_sha256": "6025b8b79324174906e163174372116c523ff8a9f1dd207e17e5dfa1e3dbf49e",
+      "source_url": "https://search.worldbank.org/api/v2/procnotices?format=json&qterm=steel&rows=3&fl=id,bid_description,project_ctry_name,project_id,contact_organization,submission_deadline_date,noticedate,notice_type,notice_status,procurement_method_name",
+      "tick": 2,
+      "trial_id": "source-monitor-wb-ted-20261029-approved",
+      "unique_count": 3
+    },
+    {
+      "attempt_id": "2274057803fc4881b219da9dbc18e427",
+      "authority_status": "HOLD",
+      "decision": "INVESTIGATE",
+      "evidence_class": "CLAIM",
+      "independence_group": "eu-publications-office",
+      "lane_id": "industrial-tender-pilot",
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "provider": "ted",
+      "query": "FT~steel",
+      "raw_count": 3,
+      "records": [
+        {
+          "identity": "377681-2016",
+          "url": "https://ted.europa.eu/en/notice/377681-2016/html"
+        },
+        {
+          "identity": "377684-2016",
+          "url": "https://ted.europa.eu/en/notice/377684-2016/html"
+        },
+        {
+          "identity": "377686-2016",
+          "url": "https://ted.europa.eu/en/notice/377686-2016/html"
+        }
+      ],
+      "request_body": {
+        "checkQuerySyntax": false,
+        "fields": [
+          "publication-number"
+        ],
+        "limit": 3,
+        "page": 1,
+        "paginationMode": "PAGE_NUMBER",
+        "query": "FT~steel",
+        "scope": "ALL"
+      },
+      "request_method": "POST_READ_ONLY_SEARCH",
+      "retrieved_at": "2026-10-29T06:23:10.092905+00:00",
+      "shared_claim_verification": "NOT_ESTABLISHED",
+      "source_mode": "REAL_PUBLIC_HTTP",
+      "source_sha256": "9f42ed8ab50ae995f7b43b3284cd6f93c307dc00194ef0710ee72d1bb432ed4d",
+      "source_url": "https://api.ted.europa.eu/v3/notices/search",
+      "tick": 2,
+      "trial_id": "source-monitor-wb-ted-20261029-approved",
+      "unique_count": 3
+    }
+  ],
+  "all_tick_responses_received": true,
+  "multi_source_live_proven": true,
+  "independent_shared_claim_verified": false,
+  "authority_status": "HOLD",
+  "external_commercial_writes": 0,
+  "scheduler_permanent": false
+}

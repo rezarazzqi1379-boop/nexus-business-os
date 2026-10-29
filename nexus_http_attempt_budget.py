@@ -66,6 +66,15 @@ class AttemptBudget:
             if used >= self.max_attempts:
                 db.rollback()
                 raise AttemptBudgetExceeded("http_attempt_budget_exhausted")
+            per_tick = db.execute(
+                "SELECT COUNT(*) FROM http_budget_reservation WHERE scope=? AND tick_id=?",
+                (self.scope, tick_id)).fetchone()[0]
+            distinct_ticks = db.execute(
+                "SELECT COUNT(DISTINCT tick_id) FROM http_budget_reservation WHERE scope=?",
+                (self.scope,)).fetchone()[0]
+            if per_tick >= 2 or (per_tick == 0 and distinct_ticks >= 3):
+                db.rollback()
+                raise AttemptBudgetExceeded("http_tick_budget_exhausted")
             token = uuid.uuid4().hex
             db.execute("INSERT INTO http_budget_reservation VALUES (?,?,?,?)",
                        (token, self.scope, tick_id, datetime.now(timezone.utc).isoformat()))

@@ -202,3 +202,25 @@ def test_budget_blocks_fourth_tick_before_global_cap(tmp_path):
     with pytest.raises(AttemptBudgetExceeded, match="tick_budget"):
         budget.reserve("four")
     assert budget.count() == 3
+
+
+def test_deleted_budget_file_fails_closed(tmp_path):
+    path = tmp_path / "budget.db"
+    budget = AttemptBudget(path, scope="guard")
+    budget.reserve("one")
+    path.unlink()
+    with pytest.raises(RuntimeError, match="missing_durable_http_budget"):
+        budget.reserve("two")
+    assert not path.exists()
+
+
+def test_replaced_budget_file_fails_closed(tmp_path):
+    path = tmp_path / "budget.db"
+    budget = AttemptBudget(path, scope="guard")
+    budget.reserve("one")
+    old = tmp_path / "old.db"
+    path.rename(old)
+    replacement = AttemptBudget(tmp_path / "replacement.db", scope="guard")
+    (tmp_path / "replacement.db").rename(path)
+    with pytest.raises(RuntimeError, match="replaced_durable_http_budget"):
+        budget.reserve("two")

@@ -180,3 +180,25 @@ def test_fixture_to_live_still_reports_source_mode_isolation(tmp_path):
     MonitoringRuntime(path, transport=lambda _: b'fixture')
     with pytest.raises(ValueError, match='separate_database'):
         MonitoringRuntime(path)
+
+
+def test_budget_limits_distinct_ticks_and_per_tick_retries(tmp_path):
+    budget = AttemptBudget(tmp_path / "limited.db", scope="three-ticks")
+    for tick_id in ("one", "two", "three"):
+        budget.reserve(tick_id)
+        budget.reserve(tick_id)
+    assert budget.count() == 6
+    with pytest.raises(AttemptBudgetExceeded):
+        budget.reserve("four")
+    with pytest.raises(AttemptBudgetExceeded):
+        budget.reserve("one")
+
+
+def test_budget_blocks_fourth_tick_before_global_cap(tmp_path):
+    budget = AttemptBudget(tmp_path / "limited.db", scope="three-ticks")
+    for tick_id in ("one", "two", "three"):
+        budget.reserve(tick_id)
+    assert budget.count() == 3
+    with pytest.raises(AttemptBudgetExceeded, match="tick_budget"):
+        budget.reserve("four")
+    assert budget.count() == 3

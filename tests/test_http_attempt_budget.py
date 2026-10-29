@@ -162,3 +162,21 @@ def test_live_mode_rejects_wider_external_budget(tmp_path):
                            scope="nexus:worldbank:bounded-live", max_attempts=5)
     with pytest.raises(ValueError, match="binding_mismatch"):
         MonitoringRuntime(path, attempt_budget=budget)
+
+def test_missing_live_budget_sidecar_fails_closed(tmp_path):
+    from source_monitor import MonitoringRuntime
+    path = tmp_path / 'queue.db'
+    runtime = MonitoringRuntime(path)
+    sidecar = tmp_path / 'queue.db.http-attempts.sqlite'
+    assert sidecar.exists()
+    runtime.attempt_budget.reserve('tick0')
+    sidecar.unlink()
+    with pytest.raises(RuntimeError, match='requires_recovery'):
+        MonitoringRuntime(path)
+
+def test_fixture_to_live_still_reports_source_mode_isolation(tmp_path):
+    from source_monitor import MonitoringRuntime
+    path = tmp_path / 'queue.db'
+    MonitoringRuntime(path, transport=lambda _: b'fixture')
+    with pytest.raises(ValueError, match='separate_database'):
+        MonitoringRuntime(path)

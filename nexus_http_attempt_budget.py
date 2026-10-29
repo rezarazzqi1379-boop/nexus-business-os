@@ -48,6 +48,18 @@ class AttemptBudget:
             if cap != self.max_attempts:
                 raise ValueError("budget_cap_immutable")
             db.commit()
+        self._identity = self._file_identity()
+
+    def _file_identity(self):
+        try:
+            stat = Path(self.path).stat()
+        except FileNotFoundError as exc:
+            raise RuntimeError("missing_durable_http_budget_requires_recovery") from exc
+        return (stat.st_dev, stat.st_ino)
+
+    def _assert_identity(self):
+        if self._file_identity() != self._identity:
+            raise RuntimeError("replaced_durable_http_budget_requires_recovery")
 
     def _connect(self):
         db = sqlite3.connect(self.path, timeout=15, isolation_level=None)
@@ -59,8 +71,10 @@ class AttemptBudget:
         """Commit one irreversible attempt before performing HTTP."""
         if not tick_id or len(tick_id) > 160:
             raise ValueError("invalid_tick_id")
+        self._assert_identity()
         with closing(self._connect()) as db:
             db.execute("BEGIN IMMEDIATE")
+            self._assert_identity()
             used = db.execute("SELECT COUNT(*) FROM http_budget_reservation WHERE scope=?",
                               (self.scope,)).fetchone()[0]
             if used >= self.max_attempts:
@@ -82,6 +96,7 @@ class AttemptBudget:
             return token
 
     def count(self) -> int:
+        self._assert_identity()
         with closing(self._connect()) as db:
             return db.execute("SELECT COUNT(*) FROM http_budget_reservation WHERE scope=?",
                               (self.scope,)).fetchone()[0]

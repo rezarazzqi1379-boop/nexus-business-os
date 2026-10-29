@@ -123,3 +123,25 @@ def test_monitor_replay_does_not_consume_extra_budget(tmp_path):
     tick(runtime, now=now, interval_seconds=86400)
     tick(runtime, now=now, interval_seconds=86400)
     assert budget.count() == 1
+
+
+def test_live_mode_always_installs_durable_budget(tmp_path):
+    from source_monitor import MonitoringRuntime
+    runtime = MonitoringRuntime(tmp_path / "queue.db")
+    assert runtime.source_mode == "REAL_PUBLIC_HTTP"
+    assert isinstance(runtime.attempt_budget, AttemptBudget)
+    assert runtime.attempt_budget.max_attempts == 6
+    assert runtime.attempt_budget.count() == 0
+    with pytest.raises(PermissionError, match="task_context"):
+        runtime.transport("https://example.org/not-allowlisted")
+    assert runtime.attempt_budget.count() == 0
+
+
+def test_live_budget_persists_on_runtime_restart(tmp_path):
+    from source_monitor import MonitoringRuntime
+    path = tmp_path / "queue.db"
+    first = MonitoringRuntime(path)
+    first.attempt_budget.reserve("tick-1")
+    second = MonitoringRuntime(path)
+    assert second.attempt_budget.count() == 1
+    assert second.attempt_budget.scope == first.attempt_budget.scope

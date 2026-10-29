@@ -176,3 +176,21 @@ def test_frozen_benchmark_invariants_and_fixture_reproducibility():
     assert first["fixture_sha256"] == second["fixture_sha256"]
     assert first["fixture_reads"] == first["accepted"] == 1
     assert first["external_writes"] == 0
+
+
+def test_invalid_baseline_blocks_top_level_acceptance(tmp_path, monkeypatch):
+    from datetime import datetime, timezone
+    import source_monitor
+    from source_monitor import MonitoringRuntime, tick
+
+    fixture = snapshot([row()])["documents"][0]["body"].encode()
+    runtime = MonitoringRuntime(tmp_path / "queue.db", transport=lambda _: fixture)
+    def reject_baseline(previous, current):
+        raise ValueError("invalid_previous_checkpoint")
+    monkeypatch.setattr(source_monitor, "compare_snapshots", reject_baseline)
+    result = tick(runtime, now=datetime.now(timezone.utc).isoformat(), interval_seconds=86400)
+    assert result["supervisor"] == "accepted"
+    assert result["changes"]["status"] == "INVALID_BASELINE"
+    assert result["status"] == "INVALID_BASELINE"
+    assert result["authority_status"] == "HOLD"
+    assert result["external_writes"] == 0

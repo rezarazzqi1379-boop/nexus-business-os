@@ -30,6 +30,12 @@ class MonitoringRuntime(CommercialRuntime):
         from nexus_commercial_pilot import get_public_notices
         if attempt_budget is not None and not isinstance(attempt_budget, AttemptBudget):
             raise TypeError("invalid_attempt_budget")
+        # Live mode cannot bypass durable pre-request reservations.
+        # Fixture transports remain isolated and may opt in for tests.
+        if transport is None and attempt_budget is None:
+            from pathlib import Path
+            attempt_budget = AttemptBudget(str(Path(path)) + ".http-attempts.sqlite",
+                                           scope="nexus:worldbank:bounded-live", max_attempts=6)
         self.attempt_budget = attempt_budget
         self._budget_task = ContextVar("nexus_monitor_budget_task", default=None)
         underlying = get_public_notices if transport is None else transport

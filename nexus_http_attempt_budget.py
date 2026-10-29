@@ -33,7 +33,7 @@ class AttemptBudget:
             queue_path = self.path.removesuffix(".http-attempts.sqlite")
             if Path(queue_path).exists() and not Path(self.path).exists():
                 raise RuntimeError("missing_durable_http_budget_requires_recovery")
-        with closing(self._connect()) as db:
+        with closing(self._connect(allow_create=True)) as db:
             db.execute("BEGIN IMMEDIATE")
             db.execute("""CREATE TABLE IF NOT EXISTS http_budget_scope
                 (scope TEXT PRIMARY KEY, max_attempts INTEGER NOT NULL)""")
@@ -49,8 +49,13 @@ class AttemptBudget:
                 raise ValueError("budget_cap_immutable")
             db.commit()
 
-    def _connect(self):
-        db = sqlite3.connect(self.path, timeout=15, isolation_level=None)
+    def _connect(self, *, allow_create=False):
+        # Never silently recreate a lost budget after initial construction.
+        # SQLite URI mode=rw refuses to create a missing database.
+        from urllib.parse import quote
+        mode = "rwc" if allow_create else "rw"
+        uri = "file:" + quote(str(Path(self.path).resolve()), safe="/") + "?mode=" + mode
+        db = sqlite3.connect(uri, uri=True, timeout=15, isolation_level=None)
         db.execute("PRAGMA busy_timeout=15000")
         db.execute("PRAGMA foreign_keys=ON")
         return db

@@ -12,6 +12,7 @@ from hashlib import sha256
 from time import monotonic
 import json
 import uuid
+import unicodedata
 
 from nexus_commercial_pilot import CommercialRuntime, SOURCE, LANE, parse_source, notice_url
 from nexus_connector_control_plane import (
@@ -122,6 +123,80 @@ def source_provenance(result):
             for row in parse_source(body)]
 
 
+def compare_snapshots(previous, current):
+    """Compare bounded samples; absence is never evidence of market removal."""
+    def index(result):
+        if result.get("project_id") != PROJECT or result.get("evidence_class") != "CLAIM":
+            raise ValueError("snapshot_scope_mismatch")
+        source_provenance(result)
+        rows = parse_source(result["documents"][0]["body"].encode())
+        indexed, exact = {}, {}
+        for row in rows:
+            def digest(value):
+                return sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+            exact.setdefault(row["id"], set()).add(digest(row))
+            # Display fields only: preserve case, punctuation, numbers, identities,
+            # dates and status/type values used by the conservative assessment.
+            display_fields = {"bid_description", "contact_organization", "project_ctry_name",
+                              "procurement_method_name"}
+            normalized = {key: " ".join(unicodedata.normalize("NFC", value).split())
+                          if key in display_fields else value for key, value in row.items()}
+            indexed.setdefault(row["id"], set()).add(digest(normalized))
+        return indexed, exact
+    after, exact_after = index(current)
+    before, exact_before = index(previous) if previous is not None else ({}, {})
+    if previous is not None and previous.get("source_mode") != current.get("source_mode"):
+        raise ValueError("snapshot_mode_mismatch")
+    if previous is not None and _time(previous["observed_at"]) >= _time(current["observed_at"]):
+        raise ValueError("snapshot_order_invalid")
+    common = before.keys() & after.keys()
+    return {"status": "BASELINE" if previous is None else "COMPARED",
+            "added": sorted(after.keys() - before.keys()),
+            "changed": sorted(k for k in common if before[k] != after[k]),
+            "unchanged": sorted(k for k in common if before[k] == after[k]),
+            "cosmetic_only": sorted(k for k in common if before[k] == after[k]
+                                    and exact_before[k] != exact_after[k]),
+            "raw_changed": sorted(k for k in common if exact_before[k] != exact_after[k]),
+            "absent_from_sample": sorted(before.keys() - after.keys()),
+            "conflicting_ids": sorted(k for k, v in exact_after.items() if len(v) > 1),
+            "comparison_policy": "display-whitespace-nfc-v1",
+            "removed": [], "evidence_class": "CLAIM", "external_action_authorized": False,
+            "previous_sha256": previous["documents"][0]["sha256"] if previous else None,
+            "current_sha256": current["documents"][0]["sha256"]}
+
+
+def checkpoint_pair(runtime, task, *, mode_key, interval_seconds):
+    """Freeze a predecessor at current commit seq, ordered by cadence bucket.
+
+    A late completion cannot rewrite replay history. Future buckets cannot be
+    predecessors, even when they finish first. Reads share one SQLite snapshot.
+    """
+    prefix = f"monitor_{mode_key}_{interval_seconds}_"
+    bucket = int(task.removeprefix(prefix))
+    with closing(runtime.store._connect()) as db:
+        db.execute("BEGIN")
+        current = db.execute(
+            "SELECT seq,body FROM router_events WHERE project=? AND task=? "
+            "AND kind='checkpoint' ORDER BY seq DESC LIMIT 1", (PROJECT, task)).fetchone()
+        if current is None:
+            return None, None, None
+        prior = db.execute(
+            "SELECT task,seq,body FROM router_events WHERE project=? AND kind='checkpoint' "
+            "AND seq<? AND task GLOB ? AND CAST(substr(task,?) AS INTEGER)<? "
+            "ORDER BY CAST(substr(task,?) AS INTEGER) DESC,seq DESC LIMIT 1",
+            (PROJECT, current[0], prefix + "[0-9]*", len(prefix) + 1, bucket,
+             len(prefix) + 1)).fetchone()
+        if prior:
+            suffix = prior[0][len(prefix):]
+            if not suffix.isascii() or not suffix.isdecimal() or str(int(suffix)) != suffix:
+                raise ValueError("invalid_checkpoint_bucket")
+        return json.loads(current[1]), json.loads(prior[2]) if prior else None, {
+            "current_checkpoint_seq": current[0],
+            "previous_checkpoint_seq": prior[1] if prior else None,
+            "previous_task_id": prior[0] if prior else None,
+            "baseline_policy": "earlier-bucket-committed-before-current-v1"}
+
+
 def tick(runtime: MonitoringRuntime, *, now: str, interval_seconds=3600):
     """Enqueue a UTC bucket once, drain eligible work and review its checkpoint.
 
@@ -156,14 +231,16 @@ def tick(runtime: MonitoringRuntime, *, now: str, interval_seconds=3600):
         review = runtime.review(task)
     except (ValueError, KeyError, TypeError):
         review = "stale_or_invalid"
-    with closing(runtime.store._connect()) as db:
-        checkpoints = [json.loads(row[0]) for row in db.execute(
-            "SELECT body FROM router_events WHERE project=? AND task=? AND kind='checkpoint' ORDER BY seq",
-            (PROJECT, task)).fetchall()]
-    result = checkpoints[-1] if checkpoints else None
+    result, prior, baseline = checkpoint_pair(runtime, task, mode_key=mode_key,
+                                             interval_seconds=interval_seconds)
     provenance = source_provenance(result) if result and review == "accepted" else []
     comparison = None
+    changes = None
     if result and review == "accepted":
+        try:
+            changes = {**compare_snapshots(prior, result), **baseline}
+        except (ValueError, KeyError, TypeError):
+            changes = {"status": "INVALID_BASELINE", "external_action_authorized": False}
         observed = result["observed_at"]
         manifest = ConnectorManifest("worldbank", "World Bank notices", ("read",), (PROJECT,), True, False, 300)
         envelopes = tuple(EvidenceEnvelope(
@@ -176,9 +253,12 @@ def tick(runtime: MonitoringRuntime, *, now: str, interval_seconds=3600):
     return {"schema_version": "nexus.source-monitor.v1", "project_id": PROJECT, "lane_id": LANE,
             "source_mode": runtime.source_mode,
             "task_id": task, "submitted": submitted, "completed_queue_items": completed,
-            "supervisor": review, "status": "ACCEPTED" if provenance or result and review == "accepted" else "WAITING_OR_BLOCKED",
+            "supervisor": review, "status": ("INVALID_BASELINE" if changes and changes.get("status") == "INVALID_BASELINE"
+                       else "ACCEPTED" if result and review == "accepted"
+                       else "WAITING_OR_BLOCKED"),
             "provenance": provenance, "assessment": result["values"] if review == "accepted" and result else None,
             "source_comparison": comparison, "work_attempted": item is not None,
+            "changes": changes,
             "elapsed_seconds": monotonic() - started, "source_count": 1,
             "independent_verification": "INDEPENDENT_SOURCE_MISSING", "external_writes": 0,
             "scheduler_active": False, "authority_status": "HOLD"}

@@ -1,0 +1,163 @@
+{
+  "observed_at": "2026-10-29T06:04:03.907328+00:00",
+  "base": "2143868af6372caa531959dbc883b8e288327b8d",
+  "allocation": {
+    "history": 1000,
+    "evidence": 4900,
+    "working": 8100,
+    "output": 2000
+  },
+  "coordination": {
+    "version": "nexus.project-control-plane.v1",
+    "assignments": [
+      {
+        "work_id": "monitor-completion",
+        "agent_id": "AGT-GOOGLE-ADK",
+        "matched_capabilities": [
+          "agents"
+        ],
+        "lifecycle": "WATCH"
+      }
+    ],
+    "source_routes": {},
+    "schedule": {
+      "running": [
+        "monitor-completion"
+      ],
+      "queued": [],
+      "waiting": []
+    },
+    "approval_required": [],
+    "blocked": []
+  },
+  "coordination_note": "Catalog recommendation only; no Google ADK agent installed or executed. Current main returns WATCH; not treated as tested availability.",
+  "decision": {
+    "mandate_id": "owner-monitor-20261029",
+    "results": [
+      {
+        "decision_id": "monitor-stdlib-20261029",
+        "state": "SELECTED",
+        "reason": "highest_safe_expected_value"
+      }
+    ],
+    "schedule": {
+      "running": [
+        "monitor-stdlib-20261029"
+      ],
+      "queued": [],
+      "waiting": []
+    },
+    "external_actions_executed": false,
+    "authority_expanded": false
+  },
+  "exercise": {
+    "exercise_id": "monitor-validation-20261029",
+    "system_id": "source-monitor",
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "task_id": "monitor-completion",
+    "procedural_family": "bounded-monitor",
+    "evidence_refs": [
+      "docs/MONITOR_DEPENDENCY_AUDIT_FA.md",
+      "tests/test_monitor_changes.py",
+      "benchmark_source_monitor.py"
+    ],
+    "actions": [
+      "fixture acceptance",
+      "full regression",
+      "20-run benchmark"
+    ],
+    "test_commands": [
+      "python -m pytest -q -p no:cacheprovider",
+      "python benchmark_source_monitor.py"
+    ],
+    "acceptance_checks": [
+      "1827 passed",
+      "20 accepted; 20 fixture reads; replay no fetch; zero external writes"
+    ],
+    "outcome": "SUCCESS",
+    "human_corrections": 0,
+    "reusable_lessons": [
+      "sample absence is not market removal"
+    ],
+    "observed_at": "2026-10-29T06:04:03.907328+00:00"
+  },
+  "cycle": {
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "accepted_exercises": [
+      "monitor-validation-20261029"
+    ],
+    "ineligible_exercises": [],
+    "candidates": [],
+    "production_changes_applied": false
+  },
+  "tests": {
+    "passed": 1827,
+    "warning": "Starlette httpx deprecation",
+    "seconds": 66.03
+  },
+  "benchmark": {
+    "iterations": 20,
+    "accepted": 20,
+    "fixture_reads": 20,
+    "elapsed_seconds": 1.3403009,
+    "cpu_seconds": 0.609375,
+    "python": "3.14.7",
+    "external_writes": 0
+  },
+  "isolated_validation": {
+    "exercise": {
+      "exercise_id": "monitor-isolated-validation-20261029",
+      "system_id": "source-monitor",
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "task_id": "monitor-completion",
+      "procedural_family": "bounded-monitor",
+      "evidence_refs": [
+        "data/research/monitor-isolated-tests-20261029.txt",
+        "data/research/monitor-isolated-benchmark-20261029.json",
+        "data/research/monitor-test-environment-20261029.txt"
+      ],
+      "actions": [
+        "isolated pinned install",
+        "full regression",
+        "fixture benchmark"
+      ],
+      "test_commands": [
+        ".venv/Scripts/python.exe -m pytest -q -p no:cacheprovider",
+        ".venv/Scripts/python.exe benchmark_source_monitor.py"
+      ],
+      "acceptance_checks": [
+        "1827 passed; 1 deprecation warning",
+        "20 accepted, 20 fixture reads, zero external writes"
+      ],
+      "outcome": "SUCCESS",
+      "human_corrections": 0,
+      "reusable_lessons": [
+        "sample absence is not market removal"
+      ],
+      "observed_at": "2026-10-29T06:05:39.569777+00:00"
+    },
+    "cycle": {
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "accepted_exercises": [
+        "monitor-isolated-validation-20261029"
+      ],
+      "ineligible_exercises": [],
+      "candidates": [],
+      "production_changes_applied": false
+    },
+    "benchmark": {
+      "iterations": 20,
+      "accepted": 20,
+      "fixture_reads": 20,
+      "elapsed_seconds": 1.1543745000000172,
+      "cpu_seconds": 0.6875,
+      "python": "3.14.7",
+      "fixture_bytes": 518,
+      "external_writes": 0,
+      "mode": "OFFLINE_FIXTURE",
+      "market_accuracy": "UNKNOWN"
+    },
+    "tests_passed": 1827,
+    "tests_seconds": 64.31
+  }
+}

@@ -28,6 +28,11 @@ class AttemptBudget:
         self.path = str(path)
         self.scope = scope
         self.max_attempts = max_attempts
+        # Missing budget after queue creation requires explicit recovery.
+        if self.path.endswith(".http-attempts.sqlite"):
+            queue_path = self.path.removesuffix(".http-attempts.sqlite")
+            if Path(queue_path).exists() and not Path(self.path).exists():
+                raise RuntimeError("missing_durable_http_budget_requires_recovery")
         with closing(self._connect()) as db:
             db.execute("BEGIN IMMEDIATE")
             db.execute("""CREATE TABLE IF NOT EXISTS http_budget_scope

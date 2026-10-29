@@ -1,0 +1,67 @@
+from concurrent.futures import ThreadPoolExecutor
+import sqlite3
+
+import pytest
+
+from nexus_http_attempt_budget import AttemptBudget, AttemptBudgetExceeded
+
+
+def test_three_ticks_six_attempts_across_restart(tmp_path):
+    path = tmp_path / "budget.db"
+    reads = []
+    for tick in range(3):
+        budget = AttemptBudget(path, scope="PRJ-NEXUS-SANDBOX:worldbank:trial", max_attempts=6)
+        for _ in range(2):
+            assert budget.read(str(tick), lambda url: reads.append(url) or b"ok",
+                               "https://example.org/") == b"ok"
+    assert len(reads) == 6
+    with pytest.raises(AttemptBudgetExceeded):
+        AttemptBudget(path, scope="PRJ-NEXUS-SANDBOX:worldbank:trial").read(
+            "3", lambda url: pytest.fail("HTTP must not happen"), "https://example.org/")
+
+
+def test_failure_consumes_slot_and_restart_does_not_refund(tmp_path):
+    path = tmp_path / "budget.db"
+    budget = AttemptBudget(path, scope="trial", max_attempts=1)
+    def broken(_):
+        raise OSError("network failure")
+    with pytest.raises(OSError):
+        budget.read("tick0", broken, "https://example.org/")
+    assert AttemptBudget(path, scope="trial", max_attempts=1).count() == 1
+    with pytest.raises(AttemptBudgetExceeded):
+        AttemptBudget(path, scope="trial", max_attempts=1).reserve("tick0-retry")
+
+
+def test_concurrent_reservations_never_exceed_cap(tmp_path):
+    path = tmp_path / "budget.db"
+    AttemptBudget(path, scope="trial")
+    def attempt(i):
+        try:
+            AttemptBudget(path, scope="trial").reserve(str(i))
+            return True
+        except AttemptBudgetExceeded:
+            return False
+    with ThreadPoolExecutor(max_workers=12) as pool:
+        results = list(pool.map(attempt, range(30)))
+    assert sum(results) == 6
+    assert AttemptBudget(path, scope="trial").count() == 6
+
+
+def test_scope_and_cap_cannot_be_widened(tmp_path):
+    path = tmp_path / "budget.db"
+    AttemptBudget(path, scope="trial", max_attempts=3)
+    with pytest.raises(ValueError, match="immutable"):
+        AttemptBudget(path, scope="trial", max_attempts=6)
+    with pytest.raises(ValueError):
+        AttemptBudget(path, scope="invalid scope")
+    with pytest.raises(ValueError):
+        AttemptBudget(path, scope="trial", max_attempts=7)
+
+
+def test_reservation_is_committed_before_transport(tmp_path):
+    path = tmp_path / "budget.db"
+    budget = AttemptBudget(path, scope="trial", max_attempts=1)
+    def transport(_):
+        assert AttemptBudget(path, scope="trial", max_attempts=1).count() == 1
+        return b"response"
+    assert budget.read("tick", transport, "https://example.org/") == b"response"

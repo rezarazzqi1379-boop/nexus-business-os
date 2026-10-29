@@ -7,6 +7,18 @@ PR120 merged a428e6c3f4de4dc745fca438b422c24739dccbea; PR121 merged 25ab0cf887cc
 Owner permits autonomous routine technical work across NEXUS where account access and safety gates allow. **Email sending is excluded and requires separate explicit per-message approval.** No blanket bypass for secrets, payments, irreversible external actions, or production approval gates. Prioritize the free GitHub Actions runtime and independently verify actual runs before claiming operational readiness. Latest runtime workflow: `.github/workflows/nexus-free-runtime.yml`.
 
 # NEXUS CURRENT STATE
+## Bounded monitor development — 2026-10-29
+
+Base main: `2143868af6372caa531959dbc883b8e288327b8d` (PR #124).
+Branch: `codex/public-monitor-completion-20261029`.
+Scope: PRJ-NEXUS-SANDBOX / industrial-tender-pilot only.
+See `docs/SOURCE_MONITOR_SLICE_FA.md`, `docs/MONITOR_DEPENDENCY_AUDIT_FA.md`
+and `data/research/monitor-validation-20261029.json` for implementation and evidence.
+Public monitor reuses the durable runtime; sampled changes retain CLAIM/HOLD.
+Crawl4AI and dlt are deferred, not installed. No live scheduler/provider activation,
+commercial action, production deployment, or merge is authorized by this note.
+Earlier authority conflicts and project holds below remain unresolved.
+
 
 ## Commercial main reconciliation and v1.1 sandbox — 2026-10-28
 

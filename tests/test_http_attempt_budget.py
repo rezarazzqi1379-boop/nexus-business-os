@@ -242,3 +242,13 @@ def test_budget_replacement_during_reservation_fails_before_commit(tmp_path, mon
     monkeypatch.setattr(budget, "_assert_identity", replace_on_final_check)
     with pytest.raises(RuntimeError, match="replaced_durable_http_budget"):
         budget.reserve("one")
+
+
+def test_live_monitor_rejects_unreadable_existing_queue_mode(tmp_path):
+    import sqlite3
+    from source_monitor import MonitoringRuntime
+    path = tmp_path / "queue.db"
+    with sqlite3.connect(path) as db:
+        db.execute("CREATE TABLE unrelated (value TEXT)")
+    with pytest.raises(RuntimeError, match="monitor_mode_preflight_unavailable"):
+        MonitoringRuntime(path)

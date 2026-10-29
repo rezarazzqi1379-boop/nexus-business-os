@@ -335,3 +335,23 @@ def test_empty_sample_gate_rates_do_not_divide_by_zero():
     assert result["opportunities_discovered"] == 0
     assert result["source_gate_pass_rate"] == 0
     assert result["source_gate_reject_rate"] == 0
+
+
+def test_unknown_risk_code_does_not_crash_or_disappear_from_management_report():
+    result = pilot.assess(body(row()), NOW)
+    item = result["assessments"][0]
+    previous_decision = item["decision"]
+    item["risks"].append("future_unknown_risk")
+    report = pilot.management_report({"status": "VERIFIED", "source_mode": "FROZEN_TEST_FIXTURE", **result})
+    assert "ریسک ناشناخته نیازمند بررسی انسانی است" in report
+    assert "future\\_unknown\\_risk" in report
+    assert item["decision"] == previous_decision
+    assert item["authority_status"] == "HOLD"
+
+
+def test_unknown_risk_code_escapes_untrusted_markdown():
+    result = pilot.assess(body(row()), NOW)
+    result["assessments"][0]["risks"].append("unknown_[link](https://invalid.test)")
+    report = pilot.management_report({"status": "VERIFIED", "source_mode": "FROZEN_TEST_FIXTURE", **result})
+    assert "[link](https://invalid.test)" not in report
+    assert "ریسک ناشناخته نیازمند بررسی انسانی است" in report

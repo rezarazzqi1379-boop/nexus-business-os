@@ -30,6 +30,20 @@ class MonitoringRuntime(CommercialRuntime):
         from nexus_commercial_pilot import get_public_notices
         if attempt_budget is not None and not isinstance(attempt_budget, AttemptBudget):
             raise TypeError("invalid_attempt_budget")
+        if transport is None:
+            from pathlib import Path
+            if Path(path).exists():
+                import sqlite3
+                try:
+                    with closing(sqlite3.connect(str(path))) as existing:
+                        modes = existing.execute(
+                            "SELECT body FROM router_events WHERE project=? AND kind='monitor_mode'",
+                            (PROJECT,)).fetchall()
+                    if any(json.loads(row[0]).get('source_mode') != 'REAL_PUBLIC_HTTP'
+                           for row in modes):
+                        raise ValueError('separate_database_required_for_source_mode')
+                except sqlite3.OperationalError:
+                    pass  # Existing queue schema validation remains authoritative.
         if transport is None and attempt_budget is not None:
             from pathlib import Path
             expected_path = str(Path(path)) + ".http-attempts.sqlite"

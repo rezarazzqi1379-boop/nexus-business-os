@@ -1,3 +1,13 @@
+## Source monitor sandbox slice — 2026-10-29
+
+Main base verified at `2143868af6372caa531959dbc883b8e288327b8d` (PR #124).
+See `docs/SOURCE_MONITOR_SLICE_FA.md` for the bounded slice, reuse map,
+acceptance checks and backlog. `source_monitor.py` reuses the durable queue,
+commercial pilot, connector preflight and supervisor in PRJ-NEXUS-SANDBOX.
+Multi-source convergence is frozen-tested; no second live source or persistent
+host scheduler is active. CLAIM, project/lane isolation and commercial HOLD
+remain intact. Older authority/version disputes are not resolved by this slice.
+
 ## Commercial post-merge reconciliation — 2026-10-28 (verified through PR122)
 
 PR120 merged a428e6c3f4de4dc745fca438b422c24739dccbea; PR121 merged 25ab0cf887cc93908a881207bab7619a90127469; PR122 merged d4418959102641810d894eeb6e1e1adf552d7035. Main SHA was independently verified as PR122 merge SHA after merge. All older statements below claiming these PRs are pending or main remains at an earlier SHA are superseded historical snapshots. PR121 exact-head commercial workflow 40679912147 SUCCESS (115 focused tests, real 1-GET sample, 3 notices, 0 verified/actionable, no external writes); tests workflow 40679912101 SUCCESS. PR122 exact-head commercial workflow 40680403099 SUCCESS (117 focused tests, real 1-GET sample, 3 notices, 0 verified/actionable, no external writes); tests workflow 40680403097 SUCCESS. These are PR-head CI runs, NOT independent post-merge main commercial execution. Main workflow_dispatch is not available via the currently connected GitHub tool. Source screening pass/reject rates are not independent buyer or technical qualification. Authority remains HOLD, no external commercial writes or production deployment. Next: verify exact main workflow run and immutable provenance when dispatch is available.

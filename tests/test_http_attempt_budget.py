@@ -84,3 +84,42 @@ def test_guarded_transport_rejects_non_callable(tmp_path):
     budget = AttemptBudget(tmp_path / "budget.db", scope="trial")
     with pytest.raises(TypeError):
         budgeted_transport(budget, tick_id="tick0", transport=None)
+
+
+def test_monitor_execution_reserves_before_fixture_transport(tmp_path):
+    import json
+    from datetime import datetime, timezone
+    from hashlib import sha256
+    from source_monitor import MonitoringRuntime, tick
+    from nexus_commercial_pilot import SOURCE
+    body = json.dumps({"rows": "0", "total": "0", "os": "0", "page": "1",
+                       "procnotices": []}).encode()
+    budget = AttemptBudget(tmp_path / "budget.db", scope="monitor:trial", max_attempts=1)
+    seen = []
+    def transport(url):
+        assert url == SOURCE
+        assert budget.count() == 1
+        seen.append(url)
+        return body
+    runtime = MonitoringRuntime(tmp_path / "queue.db", transport=transport, attempt_budget=budget)
+    result = tick(runtime, now=datetime.now(timezone.utc).isoformat(), interval_seconds=86400)
+    assert result["supervisor"] == "accepted"
+    assert len(seen) == 1
+    assert budget.count() == 1
+    with pytest.raises(PermissionError):
+        runtime.transport(SOURCE)
+
+
+def test_monitor_replay_does_not_consume_extra_budget(tmp_path):
+    import json
+    from datetime import datetime, timezone
+    from source_monitor import MonitoringRuntime, tick
+    body = json.dumps({"rows": "0", "total": "0", "os": "0", "page": "1",
+                       "procnotices": []}).encode()
+    budget = AttemptBudget(tmp_path / "budget.db", scope="monitor:replay", max_attempts=1)
+    runtime = MonitoringRuntime(tmp_path / "queue.db", transport=lambda _: body,
+                                attempt_budget=budget)
+    now = datetime.now(timezone.utc).isoformat()
+    tick(runtime, now=now, interval_seconds=86400)
+    tick(runtime, now=now, interval_seconds=86400)
+    assert budget.count() == 1

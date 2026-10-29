@@ -202,3 +202,22 @@ def test_budget_blocks_fourth_tick_before_global_cap(tmp_path):
     with pytest.raises(AttemptBudgetExceeded, match="tick_budget"):
         budget.reserve("four")
     assert budget.count() == 3
+
+
+def test_missing_sidecar_during_runtime_fails_closed(tmp_path):
+    path = tmp_path / "budget.db"
+    budget = AttemptBudget(path, scope="sidecar-loss")
+    budget.reserve("tick-1")
+    path.unlink()
+    with pytest.raises(sqlite3.OperationalError):
+        budget.reserve("tick-2")
+    assert not path.exists()
+
+
+def test_missing_sidecar_count_does_not_recreate(tmp_path):
+    path = tmp_path / "budget.db"
+    budget = AttemptBudget(path, scope="sidecar-loss")
+    path.unlink()
+    with pytest.raises(sqlite3.OperationalError):
+        budget.count()
+    assert not path.exists()

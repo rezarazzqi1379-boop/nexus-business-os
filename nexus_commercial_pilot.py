@@ -69,7 +69,9 @@ def recommend_decision(item):
     """Recommendation only. Scores cannot override mandatory evidence/authority gates."""
     hard_reject = {"conflicting_source_records", "expired", "deadline_missing", "not_current_invitation",
                    "publication_stale_or_unknown", "technical_relevance_not_supported"}
-    if hard_reject.intersection(item["risks"]):
+    known_nonblocking = {"independent_entity_and_demand_verification_missing", "commercial_terms_missing"}
+    # A new/unrecognized risk must never silently qualify a synthetic or future candidate.
+    if hard_reject.intersection(item["risks"]) or set(item["risks"]) - hard_reject - known_nonblocking:
         return "REJECT"
     if (item["verification_status"] == "VERIFIED" and item["evidence_class"] == "FACT"
         and item.get("technical_match") == "VERIFIED" and item.get("commercial_feasibility") == "VERIFIED"

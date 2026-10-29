@@ -355,3 +355,22 @@ def test_unknown_risk_code_escapes_untrusted_markdown():
     report = pilot.management_report({"status": "VERIFIED", "source_mode": "FROZEN_TEST_FIXTURE", **result})
     assert "[link](https://invalid.test)" not in report
     assert "ریسک ناشناخته نیازمند بررسی انسانی است" in report
+
+
+def test_unknown_risk_fails_closed_even_with_synthetic_admitted_authority():
+    item = pilot.assess(body(row()), NOW)["assessments"][0]
+    item.update(verification_status="VERIFIED", evidence_class="FACT",
+                technical_match="VERIFIED", commercial_feasibility="VERIFIED",
+                missing_information=[], authority_status="ADMITTED")
+    assert pilot.recommend_decision(item) == "PROCEED"
+    item["risks"].append("future_unknown_risk")
+    assert pilot.recommend_decision(item) == "REJECT"
+    item["risks"].pop()
+    assert pilot.recommend_decision(item) == "PROCEED"
+
+
+def test_unknown_risk_remains_rejected_with_high_research_priority():
+    item = pilot.assess(body(row()), NOW)["assessments"][0]
+    item["risks"].append("unrecognized_source_conflict")
+    item["score"]["priority"] = 1.0
+    assert pilot.recommend_decision(item) == "REJECT"

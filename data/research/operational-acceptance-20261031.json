@@ -1,0 +1,119 @@
+{
+  "schema_version": "nexus.operational-acceptance.v1",
+  "observed_at": "2026-10-31T11:40:58.031955+00:00",
+  "project_id": "PRJ-NEXUS-SANDBOX",
+  "main_sha": "54e0f8242432fb1b07c54584987c01944d1153a5",
+  "implementation_sha": "17e543176f90102a72bd2b8c8382427863fcc079",
+  "pr": 133,
+  "preserved_stash": "c1074f80086035546bfe44ddd8c1b696ab0d0287",
+  "runs": {
+    "main_commercial": 41196727036,
+    "main_free_runtime": 41068854309,
+    "main_container": 41197362654,
+    "candidate_commercial": 41197506204,
+    "candidate_tests": 41197506196,
+    "candidate_monitor_matrix": 41197506206
+  },
+  "all_listed_runs_conclusion": "success",
+  "tests": [
+    {
+      "command": "python -m pytest -q tests/test_http_attempt_budget.py tests/test_source_monitor.py tests/test_monitor_changes.py tests/test_commercial_pilot.py tests/test_commercial_artifact.py tests/test_router_runtime.py tests/test_public_research_agent.py tests/test_free_research.py",
+      "passed": 195,
+      "failed": 0,
+      "seconds": 12.77
+    },
+    {
+      "command": "python -m pytest -q tests evals",
+      "passed": 1874,
+      "failed": 0,
+      "warnings": 1,
+      "seconds": 73.08
+    }
+  ],
+  "ci_counts": {
+    "monitor_each_os": 137,
+    "commercial_focused": 122,
+    "tests_only_pytest": 798,
+    "counts_overlap": true
+  },
+  "before_after": {
+    "restart_replaced_ledger": {
+      "before": "accepted new ledger; red test DID NOT RAISE",
+      "after": "rejected before HTTP; tested across restart and same-inode copy"
+    },
+    "unsupported_wal": {
+      "before": "transport reached",
+      "after": "rejected; WAL bytes unchanged"
+    },
+    "float_reproduction": {
+      "legacy": "explicit float-only1e-12 tolerance; exact ZIP/source/report",
+      "candidate": "strict equality, tolerance0; archive downloaded and verified"
+    },
+    "commercial_outcomes_changed": false
+  },
+  "failure_history": [
+    "Two intentional red tests reproduced missing restart binding and unsupported journal acceptance.",
+    "One Windows rename test failed with OS file-lock denial; assertion now verifies WinError32 or identity rejection AND zero committed reservation.",
+    "Focused/full runs exposed two obsolete synthetic PROCEED assertions; both corrected to stricter INVESTIGATE, unknown risks remain REJECT. Final suites pass.",
+    "Initial legacy artifact exact comparison differed by one float ULP; explicit legacy-only tolerance documented; candidate artifact strictly reproduces."
+  ],
+  "metrics": {
+    "main": {
+      "records_received": 3,
+      "decisions": {
+        "INVESTIGATE": 0,
+        "PROCEED": 0,
+        "REJECT": 3
+      },
+      "opportunities_verified": 0,
+      "actionable_opportunities": 0,
+      "evidence_completeness": 0.5,
+      "http_requests": 1,
+      "execution_duration_seconds": 0.4228,
+      "source_sha256": "d6171a43c748b996de6d3d82d4af78560421faf469a5388bd401c4b31bac9a6b"
+    },
+    "candidate": {
+      "records_received": 3,
+      "decisions": {
+        "INVESTIGATE": 0,
+        "PROCEED": 0,
+        "REJECT": 3
+      },
+      "opportunities_verified": 0,
+      "actionable_opportunities": 0,
+      "insufficient_evidence_count": 3,
+      "buyer_verification_rate": "UNKNOWN",
+      "technical_qualification_rate": "UNKNOWN",
+      "false_positive_rate": "UNKNOWN",
+      "http_requests": 1,
+      "execution_duration_seconds": 0.2749,
+      "source_sha256": "d6171a43c748b996de6d3d82d4af78560421faf469a5388bd401c4b31bac9a6b"
+    },
+    "monitor": {
+      "first_completed": 1,
+      "replay_completed": 0,
+      "durable_attempts": 1,
+      "sqlite_integrity": [
+        "ok",
+        "ok"
+      ]
+    }
+  },
+  "security_assessment": {
+    "scope": "Parent review of changed runtime/queue binding/metadata/artifact verifier plus executed negative tests; no separate security plugin scan claimed",
+    "holds_preserved": true,
+    "archive_path_extraction": false,
+    "secret_inputs_or_exports": false,
+    "provider_budget_increased": false,
+    "hostile_local_db_writer_is_outside_guarantee": true
+  },
+  "acceptance": {
+    "ENGINEERING_VERIFIED": "VERIFIED_CANDIDATE_SCOPE",
+    "PILOT_ACCEPTED": "VERIFIED_CURRENT_MAIN_READ_ONLY_SAMPLE",
+    "COMMERCIAL_RELEASE_ACCEPTED": "BLOCKED_HOLD_QUALIFICATION_AND_INTEGRATION_GATES",
+    "BUSINESS_OUTCOME_VERIFIED": "NOT_VERIFIED_ZERO_QUALIFIED_OPPORTUNITIES"
+  },
+  "deployment": "Sandbox container acceptance VERIFIED; persistent production NOT_STARTED/BLOCKED target and approvals",
+  "recurring_commercial_schedule": "PROPOSAL_ONLY_NOT_ENABLED",
+  "next_authorization": "Exact-head integration approval for PR133; separate cadence/target/authority approval when applicable"
+}

@@ -2,3 +2,5 @@
 {"created_at": "2026-10-27T17:44:18.043522+00:00", "entry_id": "context-free-runtime-ci-20261027", "namespace": "context", "superseded_by": "context-postmerge-persistence-20261027"}
 {"created_at": "2026-10-27T18:11:44.421039+00:00", "entry_id": "context-postmerge-persistence-20261027", "namespace": "context", "superseded_by": "context-postmerge-container-ci-20261027"}
 {"created_at": "2026-10-28T09:43:30.429325+00:00", "entry_id": "context-postmerge-container-ci-20261027", "namespace": "context", "superseded_by": "context-commercial-engineering-20261028"}
+{"created_at": "2026-10-31T11:40:58.142280+00:00", "entry_id": "context-commercial-engineering-20261028", "namespace": "context", "superseded_by": "context-operational-engineering-20261031"}
+{"created_at": "2026-10-31T11:40:58.208843+00:00", "entry_id": "context-commercial-pilot-20261028", "namespace": "context", "superseded_by": "context-operational-pilot-20261031"}

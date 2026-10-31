@@ -1,3 +1,42 @@
+## Verified current-main operation and restart correction candidate — 2026-10-31
+
+Authoritative main independently fetched at 54e0f8242432fb1b07c54584987c01944d1153a5
+(PR132 merged). Supersedes historical notes below that dispatch/main operation
+is unavailable or that PR118-132 are not merged. Current-main commercial run
+41196727036 SUCCESS: one GET/three records/three REJECT/zero verified or actionable,
+50% populated-field completeness. Actual ZIP13040538851 downloaded and hash
+verified; source bytes, assessment and exact Persian report reproduced. Legacy
+float comparison uses an explicit1e-12 tolerance only for floats; bytes and
+decisions remain exact. Current-main free runtime41068854309 and disposable
+container41197362654 SUCCESS independently verify startup/auth and volume restart/
+backup/scratch restore. Neither is permanent production hosting.
+
+PR133 implementation17e543176f90102a72bd2b8c8382427863fcc079 fixes reproduced
+budget-sidecar replacement across restart, rejects unsupported WAL/shm without
+deleting them, binds queue to physical ledger+UUID, and stabilizes float scoring.
+Artifact verifier checks archive bytes/commit/source/derived data/Persian report
+without path extraction. Existing worldbank connector metadata is documented;
+no second provider or commercial schedule activated. Five qualification checks
+remain UNKNOWN and labels/scores cannot emit PROCEED. Old uncommitted work was
+preserved at stash c1074f80086035546bfe44ddd8c1b696ab0d0287, not reapplied blindly.
+
+195 focused and1874 combined tests+evals pass (one existing Starlette warning).
+Candidate commercial41197506204, tests41197506196 and Linux3.11/Windows3.14 monitor
+acceptance41197506206 SUCCESS. Candidate artifact13041555366 strictly reproduces
+with zero numeric tolerance. Actual candidate live monitor tick accepted; reopened
+same-bucket replay made no extra read, durable attempt count1, both SQLite integrity
+checks ok. New evidence-only head requires its own exact-head CI refresh.
+
+Stage: engineering acceptance / read-only pilot. Operator: owner. Registry/Master
+preflight BLOCK/HOLD persists. PR133 is NOT merged; new fix is not yet main evidence.
+Independent buyer/demand/technical/eligibility/feasibility evidence and commercial
+outcome remain absent. No email/bid/contact/payment/paid API/production deployment.
+Next: exact-head PR133 review and approval before integration, then verify merged
+main. Commercial cadence remains a proposal requiring approval. Legacy/moved live
+queues without matching ledger binding need explicit verified recovery, never reset.
+See docs/OPERATIONAL_ACCEPTANCE_2026-10-31_FA.md and
+data/research/operational-acceptance-20261031.json.
+
 ## Source monitor sandbox slice — 2026-10-29
 
 Main base verified at `2143868af6372caa531959dbc883b8e288327b8d` (PR #124).

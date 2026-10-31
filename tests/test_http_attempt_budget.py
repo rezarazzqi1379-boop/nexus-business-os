@@ -240,8 +240,16 @@ def test_budget_replacement_during_reservation_fails_before_commit(tmp_path, mon
             (tmp_path / "other.db").rename(path)
         original()
     monkeypatch.setattr(budget, "_assert_identity", replace_on_final_check)
-    with pytest.raises(RuntimeError, match="replaced_durable_http_budget"):
+    with pytest.raises((RuntimeError, PermissionError)) as failure:
         budget.reserve("one")
+    # Windows can deny rename of the open SQLite file before our identity check.
+    if isinstance(failure.value, PermissionError):
+        assert failure.value.winerror == 32
+    else:
+        assert 'replaced_durable_http_budget' in str(failure.value)
+    original_path = tmp_path / 'original.db'
+    with sqlite3.connect(original_path if original_path.exists() else path) as db:
+        assert db.execute('SELECT COUNT(*) FROM http_budget_reservation').fetchone()[0] == 0
 
 
 def test_live_monitor_rejects_unreadable_existing_queue_mode(tmp_path):
@@ -251,4 +259,56 @@ def test_live_monitor_rejects_unreadable_existing_queue_mode(tmp_path):
     with sqlite3.connect(path) as db:
         db.execute("CREATE TABLE unrelated (value TEXT)")
     with pytest.raises(RuntimeError, match="monitor_mode_preflight_unavailable"):
+        MonitoringRuntime(path)
+
+
+def test_live_budget_replacement_is_rejected_across_restart(tmp_path):
+    from source_monitor import MonitoringRuntime
+    queue = tmp_path / 'queue.db'
+    runtime = MonitoringRuntime(queue)
+    runtime.attempt_budget.reserve('tick0')
+    sidecar = runtime.attempt_budget.path
+    from pathlib import Path
+    Path(sidecar).rename(tmp_path / 'original-budget.db')
+    replacement = tmp_path / 'replacement.db'
+    AttemptBudget(replacement, scope='nexus:worldbank:bounded-live')
+    replacement.rename(sidecar)
+    with pytest.raises(RuntimeError, match='binding.*recovery'):
+        MonitoringRuntime(queue)
+
+
+def test_wal_budget_fails_closed_without_removing_sidecars(tmp_path):
+    path = tmp_path / 'budget.db'
+    budget = AttemptBudget(path, scope='wal-case')
+    with sqlite3.connect(path) as writer:
+        assert writer.execute('PRAGMA journal_mode=WAL').fetchone()[0] == 'wal'
+        writer.execute('PRAGMA wal_autocheckpoint=0')
+        writer.execute('INSERT INTO http_budget_reservation VALUES (?,?,?,?)', ('prior','wal-case','tick0','now'))
+        writer.commit()
+        wal = tmp_path / 'budget.db-wal'
+        before = wal.read_bytes()
+        with pytest.raises(RuntimeError, match='journal.*recovery'):
+            budget.read('tick1', lambda _: pytest.fail('no HTTP'), 'https://example.org/')
+        assert wal.read_bytes() == before
+
+
+def test_live_budget_copy_over_same_inode_is_detected_after_restart(tmp_path):
+    from source_monitor import MonitoringRuntime
+    from pathlib import Path
+    queue = tmp_path / 'queue.db'
+    original = MonitoringRuntime(queue)
+    other = tmp_path / 'other.db'
+    AttemptBudget(other, scope='nexus:worldbank:bounded-live')
+    Path(original.attempt_budget.path).write_bytes(other.read_bytes())
+    with pytest.raises(RuntimeError, match='binding.*recovery'):
+        MonitoringRuntime(queue)
+
+
+def test_legacy_live_queue_without_binding_needs_explicit_recovery(tmp_path):
+    from source_monitor import MonitoringRuntime
+    path = tmp_path / 'queue.db'
+    runtime = MonitoringRuntime(path)
+    with sqlite3.connect(path) as db:
+        db.execute("DELETE FROM router_events WHERE kind='http_budget_binding'")
+    with pytest.raises(RuntimeError, match='binding.*recovery'):
         MonitoringRuntime(path)

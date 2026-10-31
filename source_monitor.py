@@ -31,6 +31,7 @@ class MonitoringRuntime(CommercialRuntime):
         from nexus_commercial_pilot import get_public_notices
         if attempt_budget is not None and not isinstance(attempt_budget, AttemptBudget):
             raise TypeError("invalid_attempt_budget")
+        expected_budget_binding = None
         if transport is None:
             from pathlib import Path
             if Path(path).exists():
@@ -40,9 +41,15 @@ class MonitoringRuntime(CommercialRuntime):
                         modes = existing.execute(
                             "SELECT body FROM router_events WHERE project=? AND kind='monitor_mode'",
                             (PROJECT,)).fetchall()
+                        bindings = existing.execute(
+                            "SELECT body FROM router_events WHERE project=? AND kind='http_budget_binding'",
+                            (PROJECT,)).fetchall()
                     if any(json.loads(row[0]).get('source_mode') != 'REAL_PUBLIC_HTTP'
                            for row in modes):
                         raise ValueError('separate_database_required_for_source_mode')
+                    if not modes or len(bindings) != 1:
+                        raise RuntimeError('http_budget_binding_requires_recovery')
+                    expected_budget_binding = json.loads(bindings[0][0])
                 except sqlite3.OperationalError as exc:
                     # A corrupt or unreadable existing queue must never be treated
                     # as an empty queue with an unknown source mode.
@@ -60,6 +67,9 @@ class MonitoringRuntime(CommercialRuntime):
             from pathlib import Path
             attempt_budget = AttemptBudget(str(Path(path)) + ".http-attempts.sqlite",
                                            scope="nexus:worldbank:bounded-live", max_attempts=6)
+        if transport is None and expected_budget_binding is not None:
+            if attempt_budget.binding() != expected_budget_binding:
+                raise RuntimeError('http_budget_binding_requires_recovery')
         self.attempt_budget = attempt_budget
         self._budget_task = ContextVar("nexus_monitor_budget_task", default=None)
         underlying = get_public_notices if transport is None else transport
@@ -83,6 +93,9 @@ class MonitoringRuntime(CommercialRuntime):
             if not prior:
                 self._event(db, "control", "monitor_mode", {"source_mode": self.source_mode},
                             datetime.now(timezone.utc))
+                if self.source_mode == 'REAL_PUBLIC_HTTP':
+                    self._event(db, 'control', 'http_budget_binding', attempt_budget.binding(),
+                                datetime.now(timezone.utc))
             db.commit()
 
     def execute(self, payload):

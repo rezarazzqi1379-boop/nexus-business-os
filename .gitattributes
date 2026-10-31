@@ -1,2 +1,4 @@
 # Preserve exact public evidence bytes and SHA-256 across Windows/Linux checkouts.
 data/research/commercial-pilot-*/public-source.json -text
+data/research/commercial-postmerge-*/public-source.json -text
+data/research/operational-*/public-source.json -text

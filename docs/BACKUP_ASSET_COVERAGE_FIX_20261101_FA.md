@@ -2,7 +2,7 @@
 
 در تکمیل Universal Activation، نقص واقعی BackupManager پیدا شد: دارایی ثبت‌شده‌ای که فایل یا پوشه‌اش دیگر وجود نداشت، توسط `_expand` به صفر فایل تبدیل می‌شد؛ snapshot ناقص می‌توانست manifest معتبر و نتیجهٔ verify=true داشته باشد.
 
-دو آزمون جدید (فایل و پوشهٔ غایب) پیش از اصلاح شکست خوردند؛ چهار آزمون قبلی پاس بودند. اصلاح پنج‌خطی در همان `unified_data_environment.BackupManager.create_snapshot` پس از فیلتر دارایی secret و پیش از expand، نبودن source را با `registered_backup_asset_missing` متوقف می‌کند. مسیر cleanup موجود temporary را جمع می‌کند و snapshot نهایی ناقص منتشر نمی‌شود. هیچ source، asset، ledger یا بودجه reset/حذف نشد. API/schema/محل DB و رفتار backup کامل موجود حفظ شد.
+دو آزمون جدید (فایل و پوشهٔ غایب) پیش از اصلاح شکست خوردند؛ چهار آزمون قبلی پاس بودند. اصلاح کوچک در همان `unified_data_environment.BackupManager.create_snapshot` پس از فیلتر دارایی secret و پیش از expand، نبودن source را با `registered_backup_asset_missing` متوقف می‌کند. مسیر cleanup موجود temporary را جمع می‌کند و snapshot نهایی ناقص منتشر نمی‌شود. هیچ source، asset، ledger یا بودجه reset/حذف نشد. API/schema/محل DB و رفتار backup کامل موجود حفظ شد.
 
 آزمون متمرکز:16 پاس در5.48s؛ فرمان `PYTHONPATH=src;. python -m pytest -q tests/test_unified_data_environment.py tests/test_execution_durability.py tests/test_nexus_system_bootstrap.py`.
 رگرسیون کامل:1877 پاس، یک هشدار موجود Starlette در50.87s؛ فرمان `PYTHONPATH=src;. python -m pytest -q tests evals`.

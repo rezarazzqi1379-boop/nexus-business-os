@@ -1,0 +1,14 @@
+{
+  "status": "VERIFIED",
+  "commit_sha": "71c078907da6def3fca8397f92cba8d874f03237",
+  "archive_sha256": "cd9fd102a1f01728c4b8eb067f2288460b7ce3c8bb01bf72ad064ffb6bc4d589",
+  "source_sha256": "6fae2916feb6b30f5a78b68737cda7db49c0578e6d1561c4ca16282c40d3c2da",
+  "source_bytes": 1275,
+  "assessment_reproduced": true,
+  "persian_report_reproduced": true,
+  "legacy_float_tolerance": 1e-12,
+  "run_id": 40669639630,
+  "artifact_id": 12806818548,
+  "event": "workflow_dispatch",
+  "branch": "main"
+}

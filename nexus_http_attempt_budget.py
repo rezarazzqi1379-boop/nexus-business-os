@@ -43,6 +43,9 @@ class AttemptBudget:
                  FOREIGN KEY(scope) REFERENCES http_budget_scope(scope))""")
             db.execute("INSERT OR IGNORE INTO http_budget_scope VALUES (?,?)",
                        (self.scope, self.max_attempts))
+            db.execute("CREATE TABLE IF NOT EXISTS http_budget_identity (singleton INTEGER PRIMARY KEY CHECK(singleton=1), ledger_id TEXT NOT NULL)")
+            db.execute("INSERT OR IGNORE INTO http_budget_identity VALUES (1,?)", (uuid.uuid4().hex,))
+            self._ledger_id = db.execute("SELECT ledger_id FROM http_budget_identity WHERE singleton=1").fetchone()[0]
             cap = db.execute("SELECT max_attempts FROM http_budget_scope WHERE scope=?",
                              (self.scope,)).fetchone()[0]
             if cap != self.max_attempts:
@@ -68,12 +71,36 @@ class AttemptBudget:
 
     def _connect(self):
         # Never allow sqlite3.connect to silently create a missing budget database.
-        # Open the existing file first; SQLite then uses the proc-fd pathname on Linux.
         self._assert_existing_file_before_connect()
+        # This small reservation ledger supports rollback journaling only. Never
+        # discard/checkpoint/recreate WAL sidecars implicitly during recovery.
+        if any(Path(self.path + suffix).exists() for suffix in ('-wal', '-shm')):
+            raise RuntimeError("unsupported_budget_journal_requires_recovery")
         db = sqlite3.connect(self.path, timeout=15, isolation_level=None)
-        db.execute("PRAGMA busy_timeout=15000")
-        db.execute("PRAGMA foreign_keys=ON")
+        try:
+            if db.execute("PRAGMA journal_mode").fetchone()[0] != 'delete':
+                raise RuntimeError("unsupported_budget_journal_requires_recovery")
+            db.execute("PRAGMA busy_timeout=15000")
+            db.execute("PRAGMA foreign_keys=ON")
+            self._assert_ledger(db)
+        except Exception:
+            db.close()
+            raise
         return db
+
+    def _assert_ledger(self, db):
+        if getattr(self, '_ledger_id', None) is None:
+            return  # first initialization creates and binds the identity
+        try:
+            row = db.execute('SELECT ledger_id FROM http_budget_identity WHERE singleton=1').fetchone()
+        except sqlite3.DatabaseError:
+            raise RuntimeError('replaced_durable_http_budget_requires_recovery') from None
+        if row is None or row[0] != self._ledger_id:
+            raise RuntimeError('replaced_durable_http_budget_requires_recovery')
+
+    def binding(self):
+        self._assert_identity()
+        return {"device": self._identity[0], "inode": self._identity[1], "ledger_id": self._ledger_id}
 
     def reserve(self, tick_id: str) -> str:
         """Commit one irreversible attempt before performing HTTP."""
@@ -83,6 +110,7 @@ class AttemptBudget:
         with closing(self._connect()) as db:
             db.execute("BEGIN IMMEDIATE")
             self._assert_identity()
+            self._assert_ledger(db)
             used = db.execute("SELECT COUNT(*) FROM http_budget_reservation WHERE scope=?",
                               (self.scope,)).fetchone()[0]
             if used >= self.max_attempts:

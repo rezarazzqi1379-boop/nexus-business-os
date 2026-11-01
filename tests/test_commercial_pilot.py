@@ -221,7 +221,7 @@ def test_decisions_cannot_be_promoted_by_a_high_score():
                 commercial_feasibility="VERIFIED", missing_information=[])
     assert pilot.recommend_decision(item) == "INVESTIGATE"  # HOLD still blocks PROCEED
     item["authority_status"] = "ADMITTED"  # synthetic unit input only; no live admission path
-    assert pilot.recommend_decision(item) == "PROCEED"
+    assert pilot.recommend_decision(item) == "INVESTIGATE"  # labels cannot create independent evidence
     item["risks"].append("expired")
     assert pilot.recommend_decision(item) == "REJECT"
 
@@ -264,6 +264,15 @@ def test_cli_refuses_to_mix_old_source_with_a_new_execution(tmp_path, monkeypatc
     with pytest.raises(SystemExit) as error:
         pilot.main()
     assert error.value.code == 2 and source.read_text() == 'previous verified evidence'
+
+
+def test_independent_commercial_checks_are_explicit_unknowns():
+    item = pilot.assess(body(row()), NOW)['assessments'][0]
+    assert set(item['verification_requirements']) == set(pilot.VERIFICATION_REQUIREMENTS)
+    assert all(v == {'status':'UNKNOWN','evidence_refs':[]} for v in item['verification_requirements'].values())
+    assert item['technical_specification_match'] == item['independent_technical_compatibility'] == 'UNKNOWN'
+    assert item['score']['known_weight'] == 0.4
+    assert pilot.assess(body(row()), NOW)['false_positive_rate'] == 'UNKNOWN'
 
 
 def test_decision_accounting_excludes_investigation_from_rejections():
@@ -362,11 +371,11 @@ def test_unknown_risk_fails_closed_even_with_synthetic_admitted_authority():
     item.update(verification_status="VERIFIED", evidence_class="FACT",
                 technical_match="VERIFIED", commercial_feasibility="VERIFIED",
                 missing_information=[], authority_status="ADMITTED")
-    assert pilot.recommend_decision(item) == "PROCEED"
+    assert pilot.recommend_decision(item) == "INVESTIGATE"
     item["risks"].append("future_unknown_risk")
     assert pilot.recommend_decision(item) == "REJECT"
     item["risks"].pop()
-    assert pilot.recommend_decision(item) == "PROCEED"
+    assert pilot.recommend_decision(item) == "INVESTIGATE"
 
 
 def test_unknown_risk_remains_rejected_with_high_research_priority():

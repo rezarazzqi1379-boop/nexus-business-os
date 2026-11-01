@@ -1,0 +1,503 @@
+{
+  "schema_version": "nexus.source-monitor.v1",
+  "project_id": "PRJ-NEXUS-SANDBOX",
+  "lane_id": "industrial-tender-pilot",
+  "source_mode": "REAL_PUBLIC_HTTP",
+  "task_id": "monitor_live_86400_20757",
+  "submitted": false,
+  "completed_queue_items": 0,
+  "supervisor": "accepted",
+  "status": "ACCEPTED",
+  "provenance": [
+    {
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "lane_id": "industrial-tender-pilot",
+      "provider": "worldbank",
+      "query": "steel World Bank",
+      "source_url": "https://search.worldbank.org/api/v2/procnotices?format=json&qterm=steel&rows=3&fl=id,bid_description,project_ctry_name,project_id,contact_organization,submission_deadline_date,noticedate,notice_type,notice_status,procurement_method_name",
+      "discovered_url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477669",
+      "retrieved_at": "2026-10-31T11:35:04.693030+00:00",
+      "source_sha256": "d6171a43c748b996de6d3d82d4af78560421faf469a5388bd401c4b31bac9a6b",
+      "status": "CANDIDATE_NOT_ACTIVATED"
+    },
+    {
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "lane_id": "industrial-tender-pilot",
+      "provider": "worldbank",
+      "query": "steel World Bank",
+      "source_url": "https://search.worldbank.org/api/v2/procnotices?format=json&qterm=steel&rows=3&fl=id,bid_description,project_ctry_name,project_id,contact_organization,submission_deadline_date,noticedate,notice_type,notice_status,procurement_method_name",
+      "discovered_url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477964",
+      "retrieved_at": "2026-10-31T11:35:04.693030+00:00",
+      "source_sha256": "d6171a43c748b996de6d3d82d4af78560421faf469a5388bd401c4b31bac9a6b",
+      "status": "CANDIDATE_NOT_ACTIVATED"
+    },
+    {
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "lane_id": "industrial-tender-pilot",
+      "provider": "worldbank",
+      "query": "steel World Bank",
+      "source_url": "https://search.worldbank.org/api/v2/procnotices?format=json&qterm=steel&rows=3&fl=id,bid_description,project_ctry_name,project_id,contact_organization,submission_deadline_date,noticedate,notice_type,notice_status,procurement_method_name",
+      "discovered_url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477404",
+      "retrieved_at": "2026-10-31T11:35:04.693030+00:00",
+      "source_sha256": "d6171a43c748b996de6d3d82d4af78560421faf469a5388bd401c4b31bac9a6b",
+      "status": "CANDIDATE_NOT_ACTIVATED"
+    }
+  ],
+  "assessment": {
+    "actionable_opportunities": 0,
+    "approved_commercial_actions": 0,
+    "assessments": [
+      {
+        "actionable": false,
+        "assertion_type": "SOURCE_CLAIM",
+        "assumptions": [],
+        "authority_status": "HOLD",
+        "commercial_feasibility": "UNKNOWN",
+        "commercial_terms": "UNKNOWN",
+        "conflict": false,
+        "country": "Mongolia",
+        "deadline": "2026-12-11T00:00:00Z",
+        "deadline_precision": "SOURCE_TIMESTAMP_TIMEZONE_UNCONFIRMED",
+        "decision": "REJECT",
+        "delivery_terms": "UNKNOWN",
+        "estimated_value": "UNKNOWN",
+        "estimates": [],
+        "evidence_class": "CLAIM",
+        "human_review_ready": false,
+        "identity": "Ministry of Energy, Mongolia",
+        "independent_technical_compatibility": "UNKNOWN",
+        "lane_id": "industrial-tender-pilot",
+        "missing_information": [
+          "technical_specifications",
+          "quantity",
+          "commercial_terms",
+          "price_or_budget"
+        ],
+        "next_action": "READ_ONLY_PRIMARY_DOCUMENT_AND_INDEPENDENT_VERIFICATION_REQUIRED",
+        "opportunity_id": "OP00477669",
+        "price_or_budget": "UNKNOWN",
+        "product_or_equipment": "Construction of Mandalgobi-Arvaikheer 220kV Double-Circuit Transmission Line (287 km) - (Three lots)",
+        "project_id": "PRJ-NEXUS-SANDBOX",
+        "published_at": "2026-10-29T00:00:00+00:00",
+        "quantity": "UNKNOWN",
+        "retrieved_at": "2026-10-31T11:35:04.693030+00:00",
+        "risk_classification": "HIGH_UNVERIFIED_COMMERCIAL_BASIS",
+        "risks": [
+          "independent_entity_and_demand_verification_missing",
+          "commercial_terms_missing",
+          "not_current_invitation",
+          "technical_relevance_not_supported"
+        ],
+        "score": {
+          "dimensions": {
+            "commercial_feasibility": "UNKNOWN",
+            "completeness": 0.5,
+            "economic_value": "UNKNOWN",
+            "entity_verification": "UNKNOWN",
+            "operational_complexity": "UNKNOWN",
+            "source_credibility": 1.0,
+            "technical_fit": "UNKNOWN",
+            "time_sensitivity": 1.0
+          },
+          "existing_research_lab_score": 0.5700000000000001,
+          "known_weight": 0.4,
+          "priority": 0.875,
+          "version": "research-priority-v2",
+          "weights": {
+            "commercial_feasibility": 0.1,
+            "completeness": 0.1,
+            "economic_value": 0.1,
+            "entity_verification": 0.15,
+            "operational_complexity": 0.05,
+            "source_credibility": 0.2,
+            "technical_fit": 0.2,
+            "time_sensitivity": 0.1
+          }
+        },
+        "source_age_days": 2.483,
+        "source_project_id": "P509161",
+        "source_quality_gate": {
+          "eligible_for_investigation": false,
+          "rejection_reasons": [
+            "not_current_invitation",
+            "technical_relevance_not_supported"
+          ]
+        },
+        "source_record_sha256": "9137c5775feedb04f5a0d002624bfda793d3c42465290e470c085438c5911456",
+        "source_url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477669",
+        "technical_match": "UNKNOWN",
+        "technical_relevance": false,
+        "technical_specification_match": "UNKNOWN",
+        "technical_specifications": "UNKNOWN",
+        "verification_requirements": {
+          "commercial_feasibility": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          },
+          "counterparty_identity": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          },
+          "current_demand": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          },
+          "eligibility": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          },
+          "technical_compatibility": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          }
+        },
+        "verification_status": "INSUFFICIENT_EVIDENCE"
+      },
+      {
+        "actionable": false,
+        "assertion_type": "SOURCE_CLAIM",
+        "assumptions": [],
+        "authority_status": "HOLD",
+        "commercial_feasibility": "UNKNOWN",
+        "commercial_terms": "UNKNOWN",
+        "conflict": false,
+        "country": "Sri Lanka",
+        "deadline": "2026-11-18T00:00:00Z",
+        "deadline_precision": "SOURCE_TIMESTAMP_TIMEZONE_UNCONFIRMED",
+        "decision": "REJECT",
+        "delivery_terms": "UNKNOWN",
+        "estimated_value": "UNKNOWN",
+        "estimates": [],
+        "evidence_class": "CLAIM",
+        "human_review_ready": false,
+        "identity": "Department of Education, Western Province",
+        "independent_technical_compatibility": "UNKNOWN",
+        "lane_id": "industrial-tender-pilot",
+        "missing_information": [
+          "technical_specifications",
+          "quantity",
+          "commercial_terms",
+          "price_or_budget"
+        ],
+        "next_action": "READ_ONLY_PRIMARY_DOCUMENT_AND_INDEPENDENT_VERIFICATION_REQUIRED",
+        "opportunity_id": "OP00477964",
+        "price_or_budget": "UNKNOWN",
+        "product_or_equipment": "Maths Tool Kit Program",
+        "project_id": "PRJ-NEXUS-SANDBOX",
+        "published_at": "2026-10-29T00:00:00+00:00",
+        "quantity": "UNKNOWN",
+        "retrieved_at": "2026-10-31T11:35:04.693030+00:00",
+        "risk_classification": "HIGH_UNVERIFIED_COMMERCIAL_BASIS",
+        "risks": [
+          "independent_entity_and_demand_verification_missing",
+          "commercial_terms_missing",
+          "technical_relevance_not_supported"
+        ],
+        "score": {
+          "dimensions": {
+            "commercial_feasibility": "UNKNOWN",
+            "completeness": 0.5,
+            "economic_value": "UNKNOWN",
+            "entity_verification": "UNKNOWN",
+            "operational_complexity": "UNKNOWN",
+            "source_credibility": 1.0,
+            "technical_fit": "UNKNOWN",
+            "time_sensitivity": 1.0
+          },
+          "existing_research_lab_score": 0.5700000000000001,
+          "known_weight": 0.4,
+          "priority": 0.875,
+          "version": "research-priority-v2",
+          "weights": {
+            "commercial_feasibility": 0.1,
+            "completeness": 0.1,
+            "economic_value": 0.1,
+            "entity_verification": 0.15,
+            "operational_complexity": 0.05,
+            "source_credibility": 0.2,
+            "technical_fit": 0.2,
+            "time_sensitivity": 0.1
+          }
+        },
+        "source_age_days": 2.483,
+        "source_project_id": "P163714",
+        "source_quality_gate": {
+          "eligible_for_investigation": false,
+          "rejection_reasons": [
+            "technical_relevance_not_supported"
+          ]
+        },
+        "source_record_sha256": "9ffce0db8250164951ea7e764199315868c0c1fdce5cc5f82e643e5138999c28",
+        "source_url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477964",
+        "technical_match": "UNKNOWN",
+        "technical_relevance": false,
+        "technical_specification_match": "UNKNOWN",
+        "technical_specifications": "UNKNOWN",
+        "verification_requirements": {
+          "commercial_feasibility": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          },
+          "counterparty_identity": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          },
+          "current_demand": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          },
+          "eligibility": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          },
+          "technical_compatibility": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          }
+        },
+        "verification_status": "INSUFFICIENT_EVIDENCE"
+      },
+      {
+        "actionable": false,
+        "assertion_type": "SOURCE_CLAIM",
+        "assumptions": [],
+        "authority_status": "HOLD",
+        "commercial_feasibility": "UNKNOWN",
+        "commercial_terms": "UNKNOWN",
+        "conflict": false,
+        "country": "India",
+        "deadline": "2026-10-28T00:00:00Z",
+        "deadline_precision": "SOURCE_TIMESTAMP_TIMEZONE_UNCONFIRMED",
+        "decision": "REJECT",
+        "delivery_terms": "UNKNOWN",
+        "estimated_value": "UNKNOWN",
+        "estimates": [],
+        "evidence_class": "CLAIM",
+        "human_review_ready": false,
+        "identity": "Public Works Deptt.",
+        "independent_technical_compatibility": "UNKNOWN",
+        "lane_id": "industrial-tender-pilot",
+        "missing_information": [
+          "technical_specifications",
+          "quantity",
+          "commercial_terms",
+          "price_or_budget"
+        ],
+        "next_action": "READ_ONLY_PRIMARY_DOCUMENT_AND_INDEPENDENT_VERIFICATION_REQUIRED",
+        "opportunity_id": "OP00477404",
+        "price_or_budget": "UNKNOWN",
+        "product_or_equipment": "(ACTIVITY-1, Mandi II RF). Motipur Dudar Dhamyana road (Km 2/00 to 6/00, Bari Dhanyari road (Village road) Km 4/00 to 5/300, (SH:- Providing and laying 25 mm thick bituminous concrete and thermoplastic paint lining in curve portion only)",
+        "project_id": "PRJ-NEXUS-SANDBOX",
+        "published_at": "2026-10-28T00:00:00+00:00",
+        "quantity": "UNKNOWN",
+        "retrieved_at": "2026-10-31T11:35:04.693030+00:00",
+        "risk_classification": "HIGH_UNVERIFIED_COMMERCIAL_BASIS",
+        "risks": [
+          "independent_entity_and_demand_verification_missing",
+          "commercial_terms_missing",
+          "expired",
+          "technical_relevance_not_supported"
+        ],
+        "score": {
+          "dimensions": {
+            "commercial_feasibility": "UNKNOWN",
+            "completeness": 0.5,
+            "economic_value": "UNKNOWN",
+            "entity_verification": "UNKNOWN",
+            "operational_complexity": "UNKNOWN",
+            "source_credibility": 1.0,
+            "technical_fit": "UNKNOWN",
+            "time_sensitivity": 0.0
+          },
+          "existing_research_lab_score": 0.5700000000000001,
+          "known_weight": 0.4,
+          "priority": 0.625,
+          "version": "research-priority-v2",
+          "weights": {
+            "commercial_feasibility": 0.1,
+            "completeness": 0.1,
+            "economic_value": 0.1,
+            "entity_verification": 0.15,
+            "operational_complexity": 0.05,
+            "source_credibility": 0.2,
+            "technical_fit": 0.2,
+            "time_sensitivity": 0.1
+          }
+        },
+        "source_age_days": 3.483,
+        "source_project_id": "P513815",
+        "source_quality_gate": {
+          "eligible_for_investigation": false,
+          "rejection_reasons": [
+            "expired",
+            "technical_relevance_not_supported"
+          ]
+        },
+        "source_record_sha256": "079d2c0f4af9e39f8af9cbd40e4a5b7933dab8436600adf2a4a7894b65baf195",
+        "source_url": "https://projects.worldbank.org/en/projects-operations/procurement-detail/OP00477404",
+        "technical_match": "UNKNOWN",
+        "technical_relevance": false,
+        "technical_specification_match": "UNKNOWN",
+        "technical_specifications": "UNKNOWN",
+        "verification_requirements": {
+          "commercial_feasibility": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          },
+          "counterparty_identity": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          },
+          "current_demand": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          },
+          "eligibility": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          },
+          "technical_compatibility": {
+            "evidence_refs": [],
+            "status": "UNKNOWN"
+          }
+        },
+        "verification_status": "INSUFFICIENT_EVIDENCE"
+      }
+    ],
+    "authority_status": "HOLD",
+    "buyer_verification_rate": "UNKNOWN",
+    "commercial_feasibility_rate": "UNKNOWN",
+    "commercial_relevance_count": 0,
+    "completed_commercial_outcomes": 0,
+    "decisions": {
+      "INVESTIGATE": 0,
+      "PROCEED": 0,
+      "REJECT": 3
+    },
+    "duplicate_rate": 0.0,
+    "duplicates_removed": 0,
+    "estimated_opportunity_value": "UNKNOWN",
+    "evidence_completeness": 0.5,
+    "false_positive_rate": "UNKNOWN",
+    "fresh_source_count": 3,
+    "human_review_ready": 0,
+    "human_review_workload": 0,
+    "independently_corroborated_claims": 0,
+    "insufficient_evidence_count": 3,
+    "opportunities_discovered": 3,
+    "opportunities_pending_investigation": 0,
+    "opportunities_rejected": 3,
+    "opportunities_verified": 0,
+    "records_received": 3,
+    "result_scope": "BOUNDED_SOURCE_SAMPLE_ONLY_NOT_MARKET_ABSENCE",
+    "search_stop_reason": "budget_exhausted",
+    "source_gate_pass_rate": 0.0,
+    "source_gate_passed": 0,
+    "source_gate_reject_rate": 1.0,
+    "source_gate_rejected": 3,
+    "technical_qualification_rate": "UNKNOWN",
+    "time_to_actionable_report_seconds": "UNKNOWN"
+  },
+  "source_comparison": {
+    "preflight": {
+      "schema_version": "nexus.connector-preflight.v1",
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "generated_at": "2026-10-31T11:35:06.419163+00:00",
+      "gate": "SAFE",
+      "external_action_authorized": false,
+      "required_connectors": [
+        "worldbank"
+      ],
+      "evidence_count": 3,
+      "evidence_digests": {
+        "OP00477669": "f88a6494cad27ab42dfe5381678452522fc3ffe85b97d70fe54edf2501d4cc45",
+        "OP00477964": "62e25095f42348734b123bc71de7862ea1435ea3b04c040612d84d88b53f4365",
+        "OP00477404": "a460221e1dd024bcde5cd8517a68e08b6c6a2dceec25718f3c5368be9728c6e4"
+      },
+      "findings": [],
+      "chat_bootstrap": {
+        "must_recover_before_answer": true,
+        "fail_closed": true,
+        "project_isolation": "PRJ-NEXUS-SANDBOX",
+        "allowed_without_approval": [
+          "read",
+          "analyze",
+          "draft",
+          "test"
+        ],
+        "blocked_without_exact_approval": [
+          "send",
+          "publish",
+          "pay",
+          "sign",
+          "deploy",
+          "delete"
+        ]
+      }
+    },
+    "claims": [
+      {
+        "semantic_key": "industrial-tender-pilot:notice:OP00477404",
+        "status": "INDEPENDENT_SOURCE_MISSING",
+        "decision": "INVESTIGATE",
+        "evidence_ids": [
+          "OP00477404"
+        ],
+        "independent_groups": 0,
+        "evidence_class": "CLAIM"
+      },
+      {
+        "semantic_key": "industrial-tender-pilot:notice:OP00477669",
+        "status": "INDEPENDENT_SOURCE_MISSING",
+        "decision": "INVESTIGATE",
+        "evidence_ids": [
+          "OP00477669"
+        ],
+        "independent_groups": 0,
+        "evidence_class": "CLAIM"
+      },
+      {
+        "semantic_key": "industrial-tender-pilot:notice:OP00477964",
+        "status": "INDEPENDENT_SOURCE_MISSING",
+        "decision": "INVESTIGATE",
+        "evidence_ids": [
+          "OP00477964"
+        ],
+        "independent_groups": 0,
+        "evidence_class": "CLAIM"
+      }
+    ],
+    "external_action_authorized": false
+  },
+  "work_attempted": false,
+  "changes": {
+    "status": "BASELINE",
+    "added": [
+      "OP00477404",
+      "OP00477669",
+      "OP00477964"
+    ],
+    "changed": [],
+    "unchanged": [],
+    "cosmetic_only": [],
+    "raw_changed": [],
+    "absent_from_sample": [],
+    "conflicting_ids": [],
+    "comparison_policy": "display-whitespace-nfc-v1",
+    "removed": [],
+    "evidence_class": "CLAIM",
+    "external_action_authorized": false,
+    "previous_sha256": null,
+    "current_sha256": "d6171a43c748b996de6d3d82d4af78560421faf469a5388bd401c4b31bac9a6b",
+    "current_checkpoint_seq": 4,
+    "previous_checkpoint_seq": null,
+    "previous_task_id": null,
+    "baseline_policy": "earlier-bucket-committed-before-current-v1"
+  },
+  "elapsed_seconds": 0.01321419999999307,
+  "source_count": 1,
+  "independent_verification": "INDEPENDENT_SOURCE_MISSING",
+  "external_writes": 0,
+  "scheduler_active": false,
+  "authority_status": "HOLD"
+}

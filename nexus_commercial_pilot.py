@@ -34,6 +34,8 @@ SOURCE = ("https://search.worldbank.org/api/v2/procnotices?format=json&qterm=ste
           + ",".join(FIELDS))
 MAX_BYTES = 65536
 UNKNOWN = "UNKNOWN"
+VERIFICATION_REQUIREMENTS = ("counterparty_identity", "current_demand", "technical_compatibility",
+                             "eligibility", "commercial_feasibility")
 WEIGHTS = {"source_credibility": 0.2, "entity_verification": 0.15, "technical_fit": 0.2,
            "commercial_feasibility": 0.1, "completeness": 0.1, "time_sensitivity": 0.1,
            "economic_value": 0.1, "operational_complexity": 0.05}
@@ -73,10 +75,8 @@ def recommend_decision(item):
     # A new/unrecognized risk must never silently qualify a synthetic or future candidate.
     if hard_reject.intersection(item["risks"]) or set(item["risks"]) - hard_reject - known_nonblocking:
         return "REJECT"
-    if (item["verification_status"] == "VERIFIED" and item["evidence_class"] == "FACT"
-        and item.get("technical_match") == "VERIFIED" and item.get("commercial_feasibility") == "VERIFIED"
-        and item.get("authority_status") == "ADMITTED" and not item["missing_information"]):
-        return "PROCEED"
+    # This single-portal adapter has no independent verification capability.
+    # Labels and scores alone cannot produce a qualified PROCEED recommendation.
     return "INVESTIGATE"
 
 
@@ -204,7 +204,10 @@ def assess(body, observed_at, *, weights=None):
             "delivery_terms": UNKNOWN, "technical_match": UNKNOWN, "commercial_feasibility": UNKNOWN,
             "price_or_budget": UNKNOWN, "estimated_value": UNKNOWN, "deadline": deadline,
             "source_url": notice_url(identity), "retrieved_at": observed_at, "published_at": pub or UNKNOWN,
-            "evidence_class": "CLAIM", "verification_status": "REJECTED_INSUFFICIENT_EVIDENCE",
+            "evidence_class": "CLAIM", "verification_status": "INSUFFICIENT_EVIDENCE",
+            "verification_requirements": {key: {"status": UNKNOWN, "evidence_refs": []}
+                                          for key in VERIFICATION_REQUIREMENTS},
+            "technical_specification_match": UNKNOWN, "independent_technical_compatibility": UNKNOWN,
             "actionable": False, "human_review_ready": False, "risks": reasons,
             "next_action": "READ_ONLY_PRIMARY_DOCUMENT_AND_INDEPENDENT_VERIFICATION_REQUIRED",
             "assertion_type": "SOURCE_CLAIM", "assumptions": [], "estimates": [],
@@ -222,11 +225,13 @@ def assess(body, observed_at, *, weights=None):
             "completeness": completeness,
             "time_sensitivity": (0.0 if expired else 1.0) if expiry else UNKNOWN,
             "economic_value": UNKNOWN, "operational_complexity": UNKNOWN}
-        known_weight = sum(weights[key] for key, val in dimensions.items() if val != UNKNOWN)
+        # Built-in float sum changed between supported Python versions. Freeze
+        # arithmetic so Linux/Windows can reproduce retained artifacts exactly.
+        known_weight = round(math.fsum(weights[key] for key, val in dimensions.items() if val != UNKNOWN), 12)
         # Research priority, not win probability, revenue or commercial qualification.
         opportunity["score"] = {"version": "research-priority-v2", "dimensions": dimensions,
             "weights": weights, "known_weight": known_weight,
-            "priority": round(sum(weights[k] * v for k, v in dimensions.items() if v != UNKNOWN) / known_weight, 6),
+            "priority": round(math.fsum(weights[k] * v for k, v in dimensions.items() if v != UNKNOWN) / known_weight, 6),
             "existing_research_lab_score": score_opportunity(group.members[0].to_research_run_record(
                 run_id="commercial-pilot", query_set_version="commercial-pilot-v1", source_type="official_portal"))}
         opportunity["decision"] = recommend_decision(opportunity)
@@ -246,6 +251,11 @@ def assess(body, observed_at, *, weights=None):
         "source_gate_passed": sum(item["source_quality_gate"]["eligible_for_investigation"] for item in assessments),
         "source_gate_rejected": sum(not item["source_quality_gate"]["eligible_for_investigation"] for item in assessments),
         "actionable_opportunities": 0, "human_review_ready": 0,
+        "insufficient_evidence_count": count, "human_review_workload": passed,
+        "independently_corroborated_claims": 0, "approved_commercial_actions": 0,
+        "completed_commercial_outcomes": 0, "buyer_verification_rate": UNKNOWN,
+        "technical_qualification_rate": UNKNOWN, "commercial_feasibility_rate": UNKNOWN,
+        "false_positive_rate": UNKNOWN,
         "decisions": {key: sum(item["decision"] == key for item in assessments)
                       for key in ("PROCEED", "INVESTIGATE", "REJECT")},
         "evidence_completeness": round(sum(o["score"]["dimensions"]["completeness"] for o in assessments) / count, 4) if count else 0,

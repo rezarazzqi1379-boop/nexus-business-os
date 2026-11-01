@@ -70,6 +70,45 @@
       "write_capable": true,
       "freshness_seconds": 3600,
       "credential_locator": "connector://railway"
+    },
+    {
+      "connector_id": "worldbank",
+      "system": "World Bank Procurement Notices",
+      "authority_scope": [
+        "read",
+        "public_procurement_claims"
+      ],
+      "project_scope": [
+        "PRJ-NEXUS-SANDBOX"
+      ],
+      "read_capable": true,
+      "write_capable": false,
+      "freshness_seconds": 300,
+      "credential_locator": null,
+      "provider_metadata": {
+        "official_identity": "World Bank Group",
+        "access_method": "Fixed unauthenticated HTTPS GET via nexus_commercial_pilot.SOURCE",
+        "license": "CC BY 4.0; retain attribution and provenance",
+        "license_source": "https://datacatalog.worldbank.org/search/dataset/0037795/world-bank-procurement-notices",
+        "official_source_reference": "https://www.worldbank.org/ext/en/what-we-do/project-procurement/for-suppliers",
+        "authentication": "NONE",
+        "update_frequency": "UNKNOWN; publication and retrieval times retained separately",
+        "geographic_coverage": "Multi-country World Bank financed projects",
+        "limitations": [
+          "Portal publication remains CLAIM; no independent buyer verification",
+          "Three-row sample is not market coverage",
+          "Mirrors and different domains are not independent sources"
+        ],
+        "cost": "No paid API dependency",
+        "provider_quota": "UNKNOWN; do not infer unlimited access",
+        "local_limits": "Pilot: one GET,64KiB,three rows; monitor: durable six attempts,three ticks,two per tick",
+        "reliability": "OBSERVED_PER_RUN; not an SLA",
+        "project_id": "PRJ-NEXUS-SANDBOX",
+        "lane_id": "industrial-tender-pilot",
+        "status": "EXISTING_BOUNDED_READ_ONLY_EXPERIMENT",
+        "metadata_observed_at": "2026-10-31",
+        "authority_promotion": false
+      }
     }
   ]
 }

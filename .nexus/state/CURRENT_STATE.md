@@ -1,3 +1,9 @@
+## v6 remaining-gap execution — 2026-11-01
+
+Main e5bc758 unchanged; PR135/136/137 open. Existing installed checker lacked source-age checks:4 red fixtures, local guarded cadence-age fix,42 focused pass,2490 full UTF8 pass/1skip/1warning. Original5 Unicode failures disappear under explicit UTF8; no prompt edits. Two source files preimages/hash/patch replay retained; installed working tree is not main CI certified.
+
+Real OQEP61 normalization reproduced; bounded duplicate removed and overbudget batch rejected. One source-hash-bound owner review and internal RFI registered in existing installed SANDBOX hub; second registration idempotent; independent-process readback1 observation/2assets, integrity/hash/scope verified. Commercial qualification remains UNKNOWN/BLOCKED; no outreach.51 gaps persisted in existing engineering hub. Owner-delegated target choice: existing private Windows loopback8000,0 new paid hosting; production still gated by frozen revision and exact approval. See docs/V6_FINAL_GAP_CLOSURE_20261101_FA.md and data/research/v6-*.json.
+
 ## Universal activation observation — 2026-11-01
 
 Main e5bc758 unchanged; PR135 ad808115 open, not auto-merged. Located installed Windows sandbox at .codex/.chatgpt-projects/.../nexus-business-os revision038bae1 (dirty46 before probes), distinct from main. Actual task NEXUS-Local-Intelligence Running, loopback health/ready200/protected401; process revision UNKNOWN. Existing runtime39 locks/restart probe pass; Steel18 repeat0; radar OQEP61 repeat0, market3 and TED10 real reads with raw hashes and three hub observations independently verified. Existing acquisition offline replay96/169 locks pass, no network/notification.

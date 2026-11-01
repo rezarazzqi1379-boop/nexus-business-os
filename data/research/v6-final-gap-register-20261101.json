@@ -1,0 +1,1207 @@
+{
+  "schema_version": "nexus.final-gap-register.v6",
+  "observed_at": "2026-11-01T10:03:30.939719+00:00",
+  "scope": "Existing NEXUS components,8 projects,16 catalog entries; bounded runtime evidence only",
+  "main_sha": "e5bc75867ed85fa3869018a578d049bfdb5e57bd",
+  "overall": "BLOCKED_PROTECTED_INTEGRATION_AUTHORITY_AND_PRODUCTION",
+  "gaps": [
+    {
+      "id": "windows-loopback-api",
+      "component": "windows-loopback-api",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Installed Windows sandbox http://127.0.0.1:8000",
+      "status": "PARTIALLY_OPERATIONAL",
+      "evidence": [
+        "NEXUS-Local-Intelligence task Running",
+        "health200/ready200/protected401",
+        "data/research/universal-installed-evidence-20261101.json"
+      ],
+      "missing_dependency": "Full commercial/production binding not demonstrated",
+      "root_cause": "Evidence establishes bounded operation, not universal unattended production",
+      "required_correction": "Existing task Status/Start under original owner; do not decrypt/copy DPAPI credential. Test current readiness; no automatic restart performed.",
+      "acceptance_test": "Existing task Status/Start under original owner; do not decrypt/copy DPAPI credential. Test current readiness; no automatic restart performed.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact-scope approval before consequential promotion",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "intelligence-dlt",
+      "component": "intelligence-dlt",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Installed Windows sandbox",
+      "status": "VERIFIED_OPERATIONAL",
+      "evidence": [
+        "Start-NexusIntelligence.ps1 -Action Status",
+        "Start-NexusIntelligence.ps1 -Action Verify",
+        "39 locked packages, pip check clean"
+      ],
+      "missing_dependency": "Full commercial/production binding not demonstrated",
+      "root_cause": "Evidence establishes bounded operation, not universal unattended production",
+      "required_correction": "Verified synthetic cursor restart/repeat/change/cross-scope negative probe; no reinstall/upgrade.",
+      "acceptance_test": "Verified synthetic cursor restart/repeat/change/cross-scope negative probe; no reinstall/upgrade.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact-scope approval before consequential promotion",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "steel-evidence-intake",
+      "component": "steel-evidence-intake",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "SANDBOX/steel-signal-audit",
+      "status": "VERIFIED_OPERATIONAL",
+      "evidence": [
+        "Start-NexusIntelligence.ps1 -Action Steel",
+        "18 input/0 emitted"
+      ],
+      "missing_dependency": "Full commercial/production binding not demonstrated",
+      "root_cause": "Evidence establishes bounded operation, not universal unattended production",
+      "required_correction": "Re-run same input through existing dlt adapter; preserve original hash/history; no buyer promotion.",
+      "acceptance_test": "Re-run same input through existing dlt adapter; preserve original hash/history; no buyer promotion.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact-scope approval before consequential promotion",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "multi-sector-radar",
+      "component": "multi-sector-radar",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Installed SANDBOX/multi-sector-radar",
+      "status": "VERIFIED_OPERATIONAL",
+      "evidence": [
+        "scripts/opportunity_radar.ps1 -Action Run",
+        "data/research/universal-installed-evidence-20261101.json"
+      ],
+      "missing_dependency": "Full commercial/production binding not demonstrated",
+      "root_cause": "Evidence establishes bounded operation, not universal unattended production",
+      "required_correction": "Preserve prior capture on failure; existing lock, cached source stages and hash verification exercised.",
+      "acceptance_test": "Preserve prior capture on failure; existing lock, cached source stages and hash verification exercised.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact-scope approval before consequential promotion",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "source-monitor",
+      "component": "source-monitor",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Engineering checkout existing persistent queue",
+      "status": "VERIFIED_OPERATIONAL",
+      "evidence": [
+        "data/research/universal-monitor-20261101.json",
+        "data/research/universal-monitor-replay-20261101.json"
+      ],
+      "missing_dependency": "Full commercial/production binding not demonstrated",
+      "root_cause": "Evidence establishes bounded operation, not universal unattended production",
+      "required_correction": "Existing queue + ledger count2/cap6, two distinct ticks; no extra HTTP on replay; both integrity_check ok. Three distinct tick cap remains; do not reset for continued operation.",
+      "acceptance_test": "Existing queue + ledger count2/cap6, two distinct ticks; no extra HTTP on replay; both integrity_check ok. Three distinct tick cap remains; do not reset for continued operation.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact-scope approval before consequential promotion",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "public-research",
+      "component": "public-research",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Local bounded process + GitHub Actions",
+      "status": "VERIFIED_OPERATIONAL",
+      "evidence": [
+        "data/research/universal-free-research-20261101.json",
+        "https://github.com/rezarazzqi1379-boop/nexus-business-os/actions/runs/41279454249"
+      ],
+      "missing_dependency": "Full commercial/production binding not demonstrated",
+      "root_cause": "Evidence establishes bounded operation, not universal unattended production",
+      "required_correction": "Reopen journal/checkpoint and suppress replay; exactly-once external HTTP not guaranteed.",
+      "acceptance_test": "Reopen journal/checkpoint and suppress replay; exactly-once external HTTP not guaranteed.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact-scope approval before consequential promotion",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "changedetection",
+      "component": "changedetection",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Installed offline sandbox",
+      "status": "VERIFIED_OPERATIONAL",
+      "evidence": [
+        "scripts/acquisition_lab.ps1 -Mode Replay",
+        "96 crawl/169 change packages locked; pip check clean",
+        "3 source snapshots baseline/repeat/synthetic-change/restore;0 network/notifications"
+      ],
+      "missing_dependency": "Full commercial/production binding not demonstrated",
+      "root_cause": "Evidence establishes bounded operation, not universal unattended production",
+      "required_correction": "Existing replay on captured HTML; watches remain paused/muted. No live server enabled.",
+      "acceptance_test": "Existing replay on captured HTML; watches remain paused/muted. No live server enabled.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact-scope approval before consequential promotion",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "installed-hub-backup",
+      "component": "installed-hub-backup",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Installed existing UnifiedDataHub",
+      "status": "VERIFIED_OPERATIONAL",
+      "evidence": [
+        "data/research/universal-recovery-20261101.json"
+      ],
+      "missing_dependency": "Full commercial/production binding not demonstrated",
+      "root_cause": "Evidence establishes bounded operation, not universal unattended production",
+      "required_correction": "Verified snapshot plus SQLite backup API scratch restore with latest observation readback; never overwrite live stores.",
+      "acceptance_test": "Verified snapshot plus SQLite backup API scratch restore with latest observation readback; never overwrite live stores.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact-scope approval before consequential promotion",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "daily-heartbeat",
+      "component": "daily-heartbeat",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Existing Codex automation nexus-daily-control-plane",
+      "status": "PARTIALLY_OPERATIONAL",
+      "evidence": [
+        "ACTIVE daily09:00; same target and failed_runs_only",
+        "completed heartbeat2026-11-01T05:32:42Z; acquisition check PARTIAL then",
+        "manual full replay succeeded this cycle"
+      ],
+      "missing_dependency": "Current fresh complete source cycle is manual, not proof of scheduled execution of every stage.",
+      "root_cause": "Current fresh complete source cycle is manual, not proof of scheduled execution of every stage.",
+      "required_correction": "Inspect next actual heartbeat and stage digests; preserve schedule/target; do not create duplicate automation.",
+      "acceptance_test": "Inspect next actual heartbeat and stage digests; preserve schedule/target; do not create duplicate automation.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact-scope approval before consequential promotion",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "free-runtime-schedule",
+      "component": "free-runtime-schedule",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "GitHub Actions ephemeral runner",
+      "status": "PARTIALLY_OPERATIONAL",
+      "evidence": [
+        "scheduled run41068854309 SUCCESS",
+        "current-main manual run41279454249 SUCCESS",
+        ".github/workflows/nexus-free-runtime.yml cron17 7 weekdays"
+      ],
+      "missing_dependency": "Full commercial/production binding not demonstrated",
+      "root_cause": "Evidence establishes bounded operation, not universal unattended production",
+      "required_correction": "Inspect actual event/head/conclusion; workflow_dispatch bounds unchanged; delivery timeliness not guaranteed.",
+      "acceptance_test": "Inspect actual event/head/conclusion; workflow_dispatch bounds unchanged; delivery timeliness not guaranteed.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact-scope approval before consequential promotion",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "synthetic-health",
+      "component": "synthetic-health",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "GitHub Actions",
+      "status": "PARTIALLY_OPERATIONAL",
+      "evidence": [
+        "current-main run41279534073 SUCCESS",
+        ".github/workflows/nexus-synthetic-health.yml weekly schedule"
+      ],
+      "missing_dependency": "Full commercial/production binding not demonstrated",
+      "root_cause": "Evidence establishes bounded operation, not universal unattended production",
+      "required_correction": "Synthetic CI checks only; report itself says persistent_service_verified=false, production_ready=false.",
+      "acceptance_test": "Synthetic CI checks only; report itself says persistent_service_verified=false, production_ready=false.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact-scope approval before consequential promotion",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "connector-gmail",
+      "component": "connector-gmail",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Connected read-only metadata",
+      "status": "PARTIALLY_OPERATIONAL",
+      "evidence": [
+        "authenticated profile only; no mailbox body or send",
+        "data/research/universal-preflight-20261101.json"
+      ],
+      "missing_dependency": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "root_cause": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "required_correction": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "acceptance_test": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact message/CRM mutation if requested later; none performed.",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "connector-google_drive",
+      "component": "connector-google_drive",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Connected read-only metadata",
+      "status": "PARTIALLY_OPERATIONAL",
+      "evidence": [
+        "actual Registry/Master bytes fetched/hash matched",
+        "data/research/universal-preflight-20261101.json"
+      ],
+      "missing_dependency": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "root_cause": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "required_correction": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "acceptance_test": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact message/CRM mutation if requested later; none performed.",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "connector-notion",
+      "component": "connector-notion",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Connected read-only metadata",
+      "status": "PARTIALLY_OPERATIONAL",
+      "evidence": [
+        "resume page read; historical content not current authority",
+        "data/research/universal-preflight-20261101.json"
+      ],
+      "missing_dependency": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "root_cause": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "required_correction": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "acceptance_test": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact message/CRM mutation if requested later; none performed.",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "connector-github",
+      "component": "connector-github",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Connected read-only metadata",
+      "status": "PARTIALLY_OPERATIONAL",
+      "evidence": [
+        "exact branch/PR/runs read",
+        "data/research/universal-preflight-20261101.json"
+      ],
+      "missing_dependency": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "root_cause": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "required_correction": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "acceptance_test": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact message/CRM mutation if requested later; none performed.",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "connector-hubspot",
+      "component": "connector-hubspot",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Connected read-only metadata",
+      "status": "PARTIALLY_OPERATIONAL",
+      "evidence": [
+        "authenticated profile and COMPANY/CONTACT/DEAL schema read; no CRM records copied",
+        "data/research/universal-preflight-20261101.json"
+      ],
+      "missing_dependency": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "root_cause": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "required_correction": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "acceptance_test": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact message/CRM mutation if requested later; none performed.",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "connector-vercel",
+      "component": "connector-vercel",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Existing Vercel project",
+      "status": "BLOCKED",
+      "evidence": [
+        "provider deployment READY; source tree only src/index.html; git revision absent"
+      ],
+      "missing_dependency": "Placeholder is not NEXUS Python runtime or durable SQLite host.",
+      "root_cause": "Placeholder is not NEXUS Python runtime or durable SQLite host.",
+      "required_correction": "Existing Docker/compose disposable container acceptance41278556064; no redirect or ephemeral SQLite migration.",
+      "acceptance_test": "Existing Docker/compose disposable container acceptance41278556064; no redirect or ephemeral SQLite migration.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact host/revision/cost/storage/security/rollback approval before production.",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "connector-supabase",
+      "component": "connector-supabase",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Connected Supabase metadata",
+      "status": "BLOCKED",
+      "evidence": [
+        "Project listing returned INACTIVE; no DB queries or changes"
+      ],
+      "missing_dependency": "No active project bound to this SQLite deployment; resumption/cost not authorized.",
+      "root_cause": "No active project bound to this SQLite deployment; resumption/cost not authorized.",
+      "required_correction": "Select approved project and inspect status/schema read-only before any optional integration; production recovery NOT_TESTED.",
+      "acceptance_test": "Select approved project and inspect status/schema read-only before any optional integration; production recovery NOT_TESTED.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Named project, cost and schema/migration scope if required; avoid unnecessary second store.",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "connector-railway",
+      "component": "connector-railway",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Repository configuration only",
+      "status": "BLOCKED",
+      "evidence": [
+        "railway.toml",
+        "Dockerfile"
+      ],
+      "missing_dependency": "No authenticated runtime/approved host/volume/cost demonstrated.",
+      "root_cause": "No authenticated runtime/approved host/volume/cost demonstrated.",
+      "required_correction": "Use existing disposable container acceptance; Railway production path remains untested.",
+      "acceptance_test": "Use existing disposable container acceptance; Railway production path remains untested.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Named account/service/volume/revision/cost and rollback.",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "commercial-qualification",
+      "component": "commercial-qualification",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "All projects",
+      "status": "BLOCKED",
+      "evidence": [
+        "data/research/universal-portfolio-catalog-20261101.json",
+        "data/research/universal-preflight-20261101.json"
+      ],
+      "missing_dependency": "No qualified agent for independent qualification; mandatory buyer/demand/technical/eligibility/feasibility evidence absent.",
+      "root_cause": "No qualified agent for independent qualification; mandatory buyer/demand/technical/eligibility/feasibility evidence absent.",
+      "required_correction": "Collect independent evidence and approved project binding; negative authority tests pass, commercial acceptance not tested.",
+      "acceptance_test": "Collect independent evidence and approved project binding; negative authority tests pass, commercial acceptance not tested.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Authenticated exact-byte Registry/Master decision, then separate exact commercial action approval.",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "cross-environment-production",
+      "component": "cross-environment-production",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "Installed sandbox + main remain distinct",
+      "status": "BLOCKED",
+      "evidence": [
+        "Installed revision038bae1 dirty46; maine5bc758; PR135 open"
+      ],
+      "missing_dependency": "Working-tree/runtime revision and project-ID bindings are not reconciled. No single promoted production revision.",
+      "root_cause": "Working-tree/runtime revision and project-ID bindings are not reconciled. No single promoted production revision.",
+      "required_correction": "Review scoped diffs/locked adapters into small PRs; CI on immutable heads; use existing data stores and metadata federation.",
+      "acceptance_test": "Review scoped diffs/locked adapters into small PRs; CI on immutable heads; use existing data stores and metadata federation.",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact PR integration and deployment target approval; no automatic merge.",
+      "severity": "MEDIUM"
+    },
+    {
+      "id": "project-hydrostatic_tester",
+      "component": "hydrostatic_tester",
+      "project": "hydrostatic_tester",
+      "implementation": "projects.py / existing canonical master candidates",
+      "status": "BLOCKED",
+      "evidence": [
+        "data/research/universal-portfolio-catalog-20261101.json"
+      ],
+      "missing_dependency": [
+        "steel_grade",
+        "pressure_basis",
+        "end_configuration",
+        "pipes_per_hour",
+        "fat_tpi"
+      ],
+      "root_cause": "Canonical IDs/requirements and independent current commercial evidence unresolved",
+      "required_correction": "Recover authenticated master binding; complete only this project evidence; retain hold/forbidden actions",
+      "acceptance_test": "Authority bootstrap SAFE plus independent mandatory qualification gates; currently blocked",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Authenticated exact-byte Registry/Master decision; separate message/bid/payment approval",
+      "severity": "HIGH"
+    },
+    {
+      "id": "project-kcl_mop",
+      "component": "kcl_mop",
+      "project": "kcl_mop",
+      "implementation": "projects.py / existing canonical master candidates",
+      "status": "BLOCKED",
+      "evidence": [
+        "data/research/universal-portfolio-catalog-20261101.json"
+      ],
+      "missing_dependency": [
+        "official_import_rule",
+        "coa_match",
+        "price",
+        "payment_route",
+        "shipment_structure"
+      ],
+      "root_cause": "Canonical IDs/requirements and independent current commercial evidence unresolved",
+      "required_correction": "Recover authenticated master binding; complete only this project evidence; retain hold/forbidden actions",
+      "acceptance_test": "Authority bootstrap SAFE plus independent mandatory qualification gates; currently blocked",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Authenticated exact-byte Registry/Master decision; separate message/bid/payment approval",
+      "severity": "HIGH"
+    },
+    {
+      "id": "project-can_forming",
+      "component": "can_forming",
+      "project": "can_forming",
+      "implementation": "projects.py / existing canonical master candidates",
+      "status": "BLOCKED",
+      "evidence": [
+        "data/research/universal-portfolio-catalog-20261101.json"
+      ],
+      "missing_dependency": [
+        "necking_only_price",
+        "stable_cpm_fat",
+        "scope_matrix",
+        "delivery",
+        "warranty"
+      ],
+      "root_cause": "Canonical IDs/requirements and independent current commercial evidence unresolved",
+      "required_correction": "Recover authenticated master binding; complete only this project evidence; retain hold/forbidden actions",
+      "acceptance_test": "Authority bootstrap SAFE plus independent mandatory qualification gates; currently blocked",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Authenticated exact-byte Registry/Master decision; separate message/bid/payment approval",
+      "severity": "HIGH"
+    },
+    {
+      "id": "project-heat_treatment",
+      "component": "heat_treatment",
+      "project": "heat_treatment",
+      "implementation": "projects.py / existing canonical master candidates",
+      "status": "BLOCKED",
+      "evidence": [
+        "data/research/universal-portfolio-catalog-20261101.json"
+      ],
+      "missing_dependency": [
+        "written_reactivation"
+      ],
+      "root_cause": "Canonical IDs/requirements and independent current commercial evidence unresolved",
+      "required_correction": "Recover authenticated master binding; complete only this project evidence; retain hold/forbidden actions",
+      "acceptance_test": "Authority bootstrap SAFE plus independent mandatory qualification gates; currently blocked",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Authenticated exact-byte Registry/Master decision; separate message/bid/payment approval",
+      "severity": "HIGH"
+    },
+    {
+      "id": "project-food_additives",
+      "component": "food_additives",
+      "project": "food_additives",
+      "implementation": "projects.py / existing canonical master candidates",
+      "status": "BLOCKED",
+      "evidence": [
+        "data/research/universal-portfolio-catalog-20261101.json"
+      ],
+      "missing_dependency": [
+        "buyer_demand",
+        "hs_code",
+        "landed_cost",
+        "regulatory_path"
+      ],
+      "root_cause": "Canonical IDs/requirements and independent current commercial evidence unresolved",
+      "required_correction": "Recover authenticated master binding; complete only this project evidence; retain hold/forbidden actions",
+      "acceptance_test": "Authority bootstrap SAFE plus independent mandatory qualification gates; currently blocked",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Authenticated exact-byte Registry/Master decision; separate message/bid/payment approval",
+      "severity": "HIGH"
+    },
+    {
+      "id": "project-coffee_import",
+      "component": "coffee_import",
+      "project": "coffee_import",
+      "implementation": "projects.py / existing canonical master candidates",
+      "status": "BLOCKED",
+      "evidence": [
+        "data/research/universal-portfolio-catalog-20261101.json"
+      ],
+      "missing_dependency": [
+        "buyer_confirmation",
+        "current_price",
+        "landed_cost",
+        "payment_route"
+      ],
+      "root_cause": "Canonical IDs/requirements and independent current commercial evidence unresolved",
+      "required_correction": "Recover authenticated master binding; complete only this project evidence; retain hold/forbidden actions",
+      "acceptance_test": "Authority bootstrap SAFE plus independent mandatory qualification gates; currently blocked",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Authenticated exact-byte Registry/Master decision; separate message/bid/payment approval",
+      "severity": "HIGH"
+    },
+    {
+      "id": "project-tinplate_pi",
+      "component": "tinplate_pi",
+      "project": "tinplate_pi",
+      "implementation": "projects.py / existing canonical master candidates",
+      "status": "BLOCKED",
+      "evidence": [
+        "data/research/universal-portfolio-catalog-20261101.json"
+      ],
+      "missing_dependency": [
+        "seller_identity",
+        "item_b_quantity",
+        "price",
+        "incoterm",
+        "payment_terms"
+      ],
+      "root_cause": "Canonical IDs/requirements and independent current commercial evidence unresolved",
+      "required_correction": "Recover authenticated master binding; complete only this project evidence; retain hold/forbidden actions",
+      "acceptance_test": "Authority bootstrap SAFE plus independent mandatory qualification gates; currently blocked",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Authenticated exact-byte Registry/Master decision; separate message/bid/payment approval",
+      "severity": "HIGH"
+    },
+    {
+      "id": "project-portfolio_platform",
+      "component": "portfolio_platform",
+      "project": "portfolio_platform",
+      "implementation": "projects.py / existing canonical master candidates",
+      "status": "BLOCKED",
+      "evidence": [
+        "data/research/universal-portfolio-catalog-20261101.json"
+      ],
+      "missing_dependency": [
+        "repository_state",
+        "deployment_owner",
+        "acceptance_test"
+      ],
+      "root_cause": "Canonical IDs/requirements and independent current commercial evidence unresolved",
+      "required_correction": "Recover authenticated master binding; complete only this project evidence; retain hold/forbidden actions",
+      "acceptance_test": "Authority bootstrap SAFE plus independent mandatory qualification gates; currently blocked",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Authenticated exact-byte Registry/Master decision; separate message/bid/payment approval",
+      "severity": "HIGH"
+    },
+    {
+      "id": "adapter-AGT-OPENAI-AGENTS-SDK",
+      "component": "OpenAI Agents SDK",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-OPENAI-AGENTS-SDK",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Run one governed read-only NEXUS vertical with zero authority regressions and full trace correlation.",
+      "acceptance_test": "Run one governed read-only NEXUS vertical with zero authority regressions and full trace correlation.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-OPENAI-SANDBOX",
+      "component": "OpenAI Sandbox Agents",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-OPENAI-SANDBOX",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Complete one frozen coding task in an isolated workspace, pass tests, preserve rollback and emit no external side effect.",
+      "acceptance_test": "Complete one frozen coding task in an isolated workspace, pass tests, preserve rollback and emit no external side effect.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-OPENCODE",
+      "component": "OpenCode",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-OPENCODE",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Beat current coding baseline on same snapshot without policy, security or regression failures.",
+      "acceptance_test": "Beat current coding baseline on same snapshot without policy, security or regression failures.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-OPENHANDS",
+      "component": "OpenHands",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-OPENHANDS",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Benchmark the same frozen repo task; require lower correction burden or materially better parallel execution.",
+      "acceptance_test": "Benchmark the same frozen repo task; require lower correction burden or materially better parallel execution.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-GOOGLE-ADK",
+      "component": "Google Agent Development Kit",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-GOOGLE-ADK",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Benchmark one NEXUS vertical against current runtime and Agents SDK.",
+      "acceptance_test": "Benchmark one NEXUS vertical against current runtime and Agents SDK.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-MS-AGENT-FRAMEWORK",
+      "component": "Microsoft Agent Framework",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-MS-AGENT-FRAMEWORK",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Benchmark resumability, correctness and implementation complexity on identical NEXUS workflow.",
+      "acceptance_test": "Benchmark resumability, correctness and implementation complexity on identical NEXUS workflow.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-LANGGRAPH",
+      "component": "LangGraph",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-LANGGRAPH",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Only test if an existing NEXUS workflow cannot be expressed cleanly; require lower defect rate or simpler recovery.",
+      "acceptance_test": "Only test if an existing NEXUS workflow cannot be expressed cleanly; require lower defect rate or simpler recovery.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-TEMPORAL",
+      "component": "Temporal",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-TEMPORAL",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Demonstrate crash-safe resume with zero duplicate external actions.",
+      "acceptance_test": "Demonstrate crash-safe resume with zero duplicate external actions.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-MCP-OFFICIAL-REGISTRY",
+      "component": "Official MCP Registry",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-MCP-OFFICIAL-REGISTRY",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Discover servers but expose none until provenance, schema, permissions and side-effect policy pass.",
+      "acceptance_test": "Discover servers but expose none until provenance, schema, permissions and side-effect policy pass.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-A2A",
+      "component": "A2A Protocol",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-A2A",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Connect two sandbox agents through A2A without delegating NEXUS authority or approvals.",
+      "acceptance_test": "Connect two sandbox agents through A2A without delegating NEXUS authority or approvals.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-N8N",
+      "component": "n8n",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-N8N",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Trigger one read-only NEXUS workflow with stable IDs, dedupe and blocked external action.",
+      "acceptance_test": "Trigger one read-only NEXUS workflow with stable IDs, dedupe and blocked external action.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-OPEN-SWE",
+      "component": "Open SWE",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-OPEN-SWE",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Run identical frozen coding task in sandbox and compare correction burden, time and regressions.",
+      "acceptance_test": "Run identical frozen coding task in sandbox and compare correction burden, time and regressions.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-GOOSE",
+      "component": "Goose",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-GOOSE",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Run identical frozen coding task with no secrets and compare to current baseline.",
+      "acceptance_test": "Run identical frozen coding task with no secrets and compare to current baseline.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-PLANDEX",
+      "component": "Plandex",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-PLANDEX",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Test on one large-context refactor with frozen acceptance criteria.",
+      "acceptance_test": "Test on one large-context refactor with frozen acceptance criteria.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-BYTEBOT",
+      "component": "Bytebot",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-BYTEBOT",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Complete a read-only browser task in isolated environment with zero unauthorized action.",
+      "acceptance_test": "Complete a read-only browser task in isolated environment with zero unauthorized action.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "adapter-AGT-UI-TARS",
+      "component": "UI-TARS Desktop",
+      "project": "NEXUS_CORE",
+      "implementation": "src/nexus_core/agent_catalog.py:AGT-UI-TARS",
+      "status": "MISSING",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "missing_dependency": "Installed/tested adopted adapter and measured need",
+      "root_cause": "Catalog discovery is not an executable healthy agent; unnecessary components are not installed",
+      "required_correction": "Complete one sandbox GUI task with deterministic stop conditions and no credential exposure.",
+      "acceptance_test": "Complete one sandbox GUI task with deterministic stop conditions and no credential exposure.",
+      "owner": "NEXUS_OWNER",
+      "risk": "LOW",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption.",
+      "severity": "LOW"
+    },
+    {
+      "id": "routing-main-integration",
+      "component": "Observational lifecycle routing",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "project_control_plane.py / PR135",
+      "status": "IMPLEMENTED_NOT_ACTIVATED",
+      "evidence": [
+        "https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/135"
+      ],
+      "missing_dependency": "Exact-head merge approval",
+      "root_cause": "Main still contains pre-fix selection; reviewed correction is unmerged",
+      "required_correction": "Integrate only approved ad808115 then verify main",
+      "acceptance_test": "PR135 focused/full/CI already verified; post-merge acceptance remains",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Merge PR135 at ad8081157e13f9f3a6deb9fe0d8ed37f955c9236",
+      "severity": "HIGH"
+    },
+    {
+      "id": "backup-main-integration",
+      "component": "Missing registered backup assets",
+      "project": "PRJ-NEXUS-SANDBOX",
+      "implementation": "unified_data_environment.py / PR137",
+      "status": "IMPLEMENTED_NOT_ACTIVATED",
+      "evidence": [
+        "https://github.com/rezarazzqi1379-boop/nexus-business-os/pull/137"
+      ],
+      "missing_dependency": "Exact-head merge approval and live catalog coverage decision",
+      "root_cause": "Silent omissions reproduced; guard tested but not merged/deployed",
+      "required_correction": "Integrate approved guard; reconcile source coverage without deleting history",
+      "acceptance_test": "16 focused/1877 full/CI passed;30 paths scratch recovered; no live overwrite",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Merge PR137 at adc060fb8269b2af06ee4daf58bf0d8e9a0fbbda; exact-target source/catalog reconciliation",
+      "severity": "CRITICAL"
+    },
+    {
+      "id": "freshness-observation-age",
+      "component": "Unchanged stale/future/missing timestamp",
+      "project": "SANDBOX",
+      "implementation": "installed tools/check_evidence_changes.py",
+      "status": "VERIFIED_OPERATIONAL",
+      "evidence": [
+        "data/research/v6-freshness-fix-20261101.json",
+        "evidence/v6-installed-freshness-20261101.patch"
+      ],
+      "missing_dependency": "None for scoped local check; immutable-main integration still separate",
+      "root_cause": "Original checker compared content and last attempt only",
+      "required_correction": "Local guard implemented/tested; retain per-cadence alert limits and source artifact history",
+      "acceptance_test": "4 red-before fixtures;42 focused/2490 full UTF8 pass; real repeat has0 source errors",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "None for read/test/draft; exact protected-action approval otherwise",
+      "severity": "HIGH"
+    },
+    {
+      "id": "business-end-to-end",
+      "component": "Source to internal owner review",
+      "project": "SANDBOX",
+      "implementation": "Existing normalize_rows / UnifiedDataHub",
+      "status": "PARTIALLY_OPERATIONAL",
+      "evidence": [
+        "data/research/v6-business-workflow-20261101.json",
+        "data/research/v6-persistence-acceptance-20261101.json"
+      ],
+      "missing_dependency": "Independent demand/technical/eligibility/economics and canonical project binding",
+      "root_cause": "Source is an indicative Q2/2026 plan, not verified current purchasing demand",
+      "required_correction": "Use existing source/owner-review lane; do not relabel as qualified opportunity",
+      "acceptance_test": "61 rows reproduced; bounded duplicate dedup and overbudget rejection; one observation/two assets restart-read; internal RFI only",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "None for internal RFI; separate exact action after mandatory evidence gates",
+      "severity": "HIGH"
+    },
+    {
+      "id": "full-scheduled-source-cycle",
+      "component": "Unattended complete source execution",
+      "project": "SANDBOX",
+      "implementation": "Existing nexus-daily-control-plane and radar runner",
+      "status": "PARTIALLY_OPERATIONAL",
+      "evidence": [
+        "data/research/universal-activation-20261101.json",
+        "data/nexus_system/backups/v6-live-change-repeat.log"
+      ],
+      "missing_dependency": "A newly observed scheduled complete stage trace",
+      "root_cause": "Manual repeatable cycle and scheduled partial lane do not prove every stage unattended",
+      "required_correction": "Inspect next existing scheduled cycle; preserve schedule/target and current file ownership gates",
+      "acceptance_test": "Actual heartbeat turn+stage timestamps/raw digests/persistence; no duplicate schedule",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Existing cadence unchanged; any cadence/cost expansion separately approved",
+      "severity": "HIGH"
+    },
+    {
+      "id": "production-target",
+      "component": "Existing private Windows service",
+      "project": "SANDBOX",
+      "implementation": "NEXUS-Local-Intelligence / loopback8000",
+      "status": "BLOCKED",
+      "evidence": [
+        "data/research/v6-deployment-package-20261101.json"
+      ],
+      "missing_dependency": "Frozen reviewed release and running-revision attestation; exact production approval",
+      "root_cause": "Installed dirty working tree is separate from main; live process revision unknown",
+      "required_correction": "Use chosen actual private host with0 new paid hosting cap; do not replace service/expose API implicitly",
+      "acceptance_test": "Attest revision, readiness/auth, restart persistence, backup/restore/rollback",
+      "owner": "NEXUS_OWNER",
+      "risk": "MEDIUM",
+      "cost": {
+        "new_paid_services": 0,
+        "compute_or_provider_usage": "UNKNOWN"
+      },
+      "approval_requirement": "Exact frozen release/service operation approval; no public exposure or paid service",
+      "severity": "CRITICAL"
+    }
+  ],
+  "status_counts": {
+    "BLOCKED": 14,
+    "CONFIGURED_NOT_TESTED": 0,
+    "DUPLICATED": 0,
+    "IMPLEMENTED_NOT_ACTIVATED": 2,
+    "MISSING": 16,
+    "OBSOLETE": 0,
+    "PARTIALLY_OPERATIONAL": 11,
+    "VERIFIED_OPERATIONAL": 8
+  },
+  "unmeasured_usage": "UNKNOWN"
+}

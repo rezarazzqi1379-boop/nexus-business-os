@@ -1,0 +1,39 @@
+{
+  "selected_target": "Existing Windows owner host / NEXUS-Local-Intelligence",
+  "installation": "C:/Users/AvallPc/.codex/.chatgpt-projects/g-p-6a8492b077348191a541806c6ff52d75/nexus-business-os",
+  "endpoint": "http://127.0.0.1:8000",
+  "exposure": "PRIVATE_LOOPBACK_ONLY",
+  "new_hosting_or_subscription_cost_cap": 0,
+  "currency": "USD",
+  "incremental_energy_compute_cost": "UNKNOWN",
+  "new_cloud_service": false,
+  "new_accounts_or_credentials": false,
+  "existing_auth": "ENABLED; DPAPI locator only, no credential extraction",
+  "revision": {
+    "installed_git_head": "038bae1a4023ef29d2b06503fc33c6875e71a6d1",
+    "dirty_tree": true,
+    "tested_patch": "evidence/v6-installed-freshness-20261101.patch",
+    "actual_running_api_revision": "UNKNOWN",
+    "status": "BLOCKED_FOR_PRODUCTION_PROMOTION_UNTIL_VERSION_BINDING"
+  },
+  "configuration_changes_proposed": [],
+  "schedule_changes_proposed": [],
+  "permissions_required_for_review": "Existing local read/test access only",
+  "permissions_required_for_deploy": "Separate exact revision/target approval; unchanged local task identity; no exposure expansion",
+  "risks": [
+    "Owner host sleep/logoff/reboot may interrupt operation",
+    "Running process revision has not been attested",
+    "Local sandbox and main are divergent; no wholesale replacement",
+    "No off-host disaster-recovery evidence"
+  ],
+  "rollback": "Keep existing service/store/DPAPI untouched. For reviewed future replacement, preserve verified SQLite snapshots and exact previous source revision; restore only separately approved empty target or scoped files. No implicit live overwrite.",
+  "acceptance_tests": [
+    "health/ready200; unauthenticated protected401",
+    "attest running release revision before production claim",
+    "restart/readback/idempotency on current persisted hub/queue",
+    "verify source age errors stay visible",
+    "verify backup/empty-target restore and rollback"
+  ],
+  "required_owner_approval": "Exact frozen release revision and named service operation before production promotion; current response delegated target/cost selection only",
+  "production_action_executed": false
+}

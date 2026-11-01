@@ -1,0 +1,34 @@
+{
+  "id": "v6-owner-review-67cadee8805f0229",
+  "project_id": "SANDBOX",
+  "lane_id": "multi-sector-radar",
+  "source_record_id": "OQEP-PLAN-1",
+  "source_url": "https://oqep.om/tenders",
+  "source_observed_at": "2026-11-01T06:01:12.710090+00:00",
+  "source_sha256": "67cadee8805f0229a58993c200e645309aa8552421d42375cc0c78cff88a4258",
+  "reviewed_at": "2026-11-01T09:55:03.483961+00:00",
+  "source_integrity": "VERIFIED",
+  "normalization": "REPRODUCED_61_RECORDS",
+  "deduplication": "DUPLICATE_REPLAY_UNCHANGED_OVERBUDGET_REJECTED",
+  "commercial_verification": {
+    "counterparty_identity": "UNKNOWN",
+    "current_demand": "UNKNOWN",
+    "technical_compatibility": "UNKNOWN",
+    "eligibility": "UNKNOWN",
+    "commercial_feasibility": "UNKNOWN"
+  },
+  "routing": {
+    "owner": "NEXUS_OWNER",
+    "execution_owner": "OWNER_REVIEW",
+    "canonical_project_binding": "BLOCKED",
+    "qualified_agent": "NOT_AVAILABLE"
+  },
+  "priority": "VERIFY_CURRENT_NOTICE_BEFORE_ANY_COMMERCIAL_ACTION",
+  "decision": "INVESTIGATE_NOT_QUALIFIED",
+  "evidence_class": "CLAIM",
+  "draft_sha256": "450abf5b9dd570af25c5f482fde96e09916b9f53109475a7435167668cb63482",
+  "draft_kind": "INTERNAL_RFI_NOT_FINAL_RFQ",
+  "outbound_actions": 0,
+  "authority": "HOLD",
+  "overall": "PARTIAL_AUTHORITY_AND_INDEPENDENT_VERIFICATION_BLOCKED"
+}

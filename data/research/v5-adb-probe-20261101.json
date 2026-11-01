@@ -1,0 +1,12 @@
+{
+  "project_id": "PRJ-NEXUS-SANDBOX",
+  "lane_id": "official-source-validation",
+  "url": "https://www.adb.org/business/project-procurement",
+  "observed_at": "2026-11-01T05:50:38.896421+00:00",
+  "status": "FAILED",
+  "external_writes": 0,
+  "opportunities_qualified": 0,
+  "error_category": "URLError",
+  "http_status": null,
+  "durable_attempt_count": 1
+}

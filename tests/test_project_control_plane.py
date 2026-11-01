@@ -1,4 +1,6 @@
 import pytest
+from dataclasses import replace
+from src.nexus_core.agent_catalog import seed_catalog
 
 from conversation_control import ConversationSnapshot
 from project_control_plane import WorkRequest, build_coordination_plan, build_portfolio_cycle
@@ -53,6 +55,22 @@ def test_missing_agent_capability_blocks_work():
         (source(),),
     )
     assert ("research-1", "no_qualified_agent") in plan.blocked
+
+
+@pytest.mark.parametrize("lifecycle", ["DISCOVERED", "WATCH", "RESEARCHED", "DEFERRED"])
+def test_observational_catalog_entry_cannot_be_assigned(lifecycle):
+    entry = replace(seed_catalog()[0], lifecycle=lifecycle)
+    plan = build_coordination_plan((request(),), (source(),), catalog=(entry,))
+    assert plan.assignments == ()
+    assert plan.schedule.running == ()
+    assert ("research-1", "no_qualified_agent") in plan.blocked
+
+
+def test_unavailable_catalog_candidate_does_not_hide_tested_candidate():
+    first = replace(seed_catalog()[0], catalog_id="AGT-A", lifecycle="WATCH")
+    second = replace(first, catalog_id="AGT-Z", name="Tested candidate", lifecycle="PILOT")
+    plan = build_coordination_plan((request(),), (source(),), catalog=(first, second))
+    assert plan.assignments[0].agent_id == "AGT-Z"
 
 
 def test_portfolio_cycle_turns_conversation_need_into_scheduled_idea():

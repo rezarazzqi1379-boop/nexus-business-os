@@ -1,0 +1,112 @@
+{
+  "schema_version": "nexus.v5-acceptance.v1",
+  "main_sha": "e5bc75867ed85fa3869018a578d049bfdb5e57bd",
+  "pr133": "MERGED",
+  "pr134": "OPEN_DRAFT_NOT_IMPORTED",
+  "main_runs": {
+    "tests": 41277840729,
+    "commercial": 41278336412,
+    "disposable_container": 41278556064
+  },
+  "artifact_id": 13072575498,
+  "artifact_verification": {
+    "status": "VERIFIED",
+    "commit_sha": "e5bc75867ed85fa3869018a578d049bfdb5e57bd",
+    "archive_sha256": "bdcfbf51b0218336fcd49303da7a561ade896a5e06b1957d10f599630149986e",
+    "source_sha256": "d6171a43c748b996de6d3d82d4af78560421faf469a5388bd401c4b31bac9a6b",
+    "source_bytes": 1444,
+    "assessment_reproduced": true,
+    "persian_report_reproduced": true,
+    "legacy_float_tolerance": 0
+  },
+  "main_regression": {
+    "command": "PYTHONPATH=src;. python -m pytest -q tests evals",
+    "passed": 1875,
+    "warnings": 1,
+    "seconds": 77.75
+  },
+  "routing_red": {
+    "failed": 5,
+    "passed": 6,
+    "command": "python -m pytest -q tests/test_project_control_plane.py"
+  },
+  "routing_focused": {
+    "passed": 185,
+    "seconds": 9.52,
+    "command": "python -m pytest -q tests/test_project_control_plane.py tests/test_agent_catalog.py tests/test_router_runtime.py tests/test_public_research_agent.py tests/test_commercial_pilot.py tests/test_source_monitor.py tests/test_http_attempt_budget.py tests/test_unified_data_environment.py"
+  },
+  "registered_checkout_hub_readback": {
+    "observations": 6,
+    "mode": "read-only SQLite fresh process",
+    "canonical_approval": "NOT_VERIFIED",
+    "project_mapping": "UNRESOLVED",
+    "store": "registered checkout data/nexus_system/nexus.db",
+    "new_database_created": false
+  },
+  "sources": [
+    {
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "lane_id": "official-source-validation",
+      "source": "https://api.ted.europa.eu/v3/notices/search",
+      "query": {
+        "query": "publication-date >= 20261025 AND notice-type = cn-standard",
+        "fields": [
+          "publication-number",
+          "notice-title",
+          "buyer-name",
+          "deadline-receipt-tender-date"
+        ],
+        "page": 1,
+        "limit": 3,
+        "scope": "ACTIVE",
+        "paginationMode": "PAGE_NUMBER"
+      },
+      "observed_at": "2026-11-01T05:50:02.467559+00:00",
+      "external_writes": 0,
+      "status": "FAILED",
+      "qualification": "UNKNOWN",
+      "error_category": "HTTPError",
+      "http_status": 400,
+      "durable_attempt_count": 1
+    },
+    {
+      "project_id": "PRJ-NEXUS-SANDBOX",
+      "lane_id": "official-source-validation",
+      "url": "https://www.adb.org/business/project-procurement",
+      "observed_at": "2026-11-01T05:50:38.896421+00:00",
+      "status": "FAILED",
+      "external_writes": 0,
+      "opportunities_qualified": 0,
+      "error_category": "URLError",
+      "http_status": null,
+      "durable_attempt_count": 1
+    }
+  ],
+  "limits": {
+    "paid_services_activated": false,
+    "provider_token_usage": "UNKNOWN",
+    "hosting_cost": "UNKNOWN_NO_NEW_HOST",
+    "automatic_retries": 0,
+    "production_deployed": false,
+    "commercial_cadence_enabled": false
+  },
+  "authority": "HOLD",
+  "qualified": 0,
+  "actionable": 0,
+  "confirmed_revenue": "UNKNOWN",
+  "statuses": {
+    "ENGINEERING_VERIFIED": "LOCAL_VERIFIED_CANDIDATE_CI_PENDING",
+    "OPERATIONAL_VERIFIED": "BOUNDED_MAIN_PILOT_ONLY",
+    "DATA_INTEGRATION_VERIFIED": "PARTIAL_READBACK_NOT_CANONICAL",
+    "AUTOMATION_VERIFIED": "CONFIGURED_HISTORICAL_RUNS_ONLY_NOT_PERSISTENT_COMMERCIAL",
+    "DEPLOYMENT_VERIFIED": "NOT_PRODUCTION",
+    "COMMERCIAL_ACCEPTED": "BLOCKED",
+    "BUSINESS_OUTCOME_VERIFIED": "NOT_VERIFIED"
+  },
+  "candidate_regression": {
+    "passed": 1880,
+    "warnings": 1,
+    "seconds": 79.63,
+    "command": "PYTHONPATH=src;. python -m pytest -q tests evals"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schedule": {
+    "running": [
+      "watch-hydrostatic_tester"
+    ],
+    "queued": [
+      "watch-can_forming",
+      "watch-kcl_mop",
+      "watch-coffee_import",
+      "watch-food_additives",
+      "watch-portfolio_platform",
+      "watch-tinplate_pi",
+      "watch-heat_treatment"
+    ],
+    "waiting": []
+  },
+  "neglected_projects": [
+    "can_forming",
+    "coffee_import",
+    "food_additives",
+    "heat_treatment",
+    "hydrostatic_tester",
+    "kcl_mop",
+    "portfolio_platform",
+    "tinplate_pi"
+  ],
+  "coverage": [
+    "watch-can_forming",
+    "watch-coffee_import",
+    "watch-food_additives",
+    "watch-heat_treatment",
+    "watch-hydrostatic_tester",
+    "watch-kcl_mop",
+    "watch-portfolio_platform",
+    "watch-tinplate_pi"
+  ],
+  "interpretation": "Recovery/research planning only; original ProjectPolicy HOLD/blocked/forbidden actions remain binding. Missing pulse is UNKNOWN health, never proof of inactivity."
+}

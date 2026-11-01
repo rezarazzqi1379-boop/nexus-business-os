@@ -1,0 +1,9 @@
+{
+  "snapshot": "C:\\Users\\AvallPc\\.codex\\.chatgpt-projects\\g-p-6a8492b077348191a541806c6ff52d75\\nexus-business-os\\data\\nexus_system\\backups\\universal-activation-20261101",
+  "manifest_sha256": "f4a520014baf0488de7cfea66b22ffaa52bf31334fa716374cf3852a8ec9a10e",
+  "snapshot_verified": true,
+  "sqlite_scratch_restore_verified": true,
+  "live_store_overwritten": false,
+  "scope": "REGISTERED_HUB_SNAPSHOT_NOT_FULL_HOST_OR_OFFSITE_DR",
+  "restored_observation": "universal-activation-20261101"
+}

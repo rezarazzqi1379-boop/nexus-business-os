@@ -1,0 +1,60 @@
+{
+  "schema_version": "nexus.connector-preflight.v1",
+  "project_id": "PRJ-NEXUS-SANDBOX",
+  "generated_at": "2026-11-01T06:04:59.287134+00:00",
+  "gate": "BLOCK",
+  "external_action_authorized": false,
+  "required_connectors": [
+    "github",
+    "gmail",
+    "google_drive",
+    "notion",
+    "vercel"
+  ],
+  "evidence_count": 5,
+  "evidence_digests": {
+    "universal-github": "5a08e48194e26969947006304cecdcafd037209f7d41b6ad4d315ce26950e76b",
+    "universal-google_drive": "53747701857d8100667f7714bfcbc2b55b051ee544e8bace49900ee311af4b11",
+    "universal-gmail": "4ba68c7fec9bda354db711e5f5bfc4d95cba944e194bf75ac9bc78b9d7f5094e",
+    "universal-notion": "3cd5aff56518c1b67bc2b16fc63e3c5766fcfe3da659cb8879602b75990fb7c3",
+    "universal-vercel": "c0764048e8993143f35aa2657fe20db61ce5c864d31daccce31543eabac5b13e"
+  },
+  "findings": [
+    {
+      "code": "AUTHORITY_ADMISSION_BLOCKED",
+      "severity": "BLOCK",
+      "subject": "authority_binding_required"
+    },
+    {
+      "code": "REQUIRED_AUTHORITY_MISSING",
+      "severity": "BLOCK",
+      "subject": "authority.source_registry"
+    },
+    {
+      "code": "REQUIRED_AUTHORITY_MISSING",
+      "severity": "BLOCK",
+      "subject": "authority.project_master"
+    }
+  ],
+  "chat_bootstrap": {
+    "must_recover_before_answer": true,
+    "fail_closed": true,
+    "project_isolation": "PRJ-NEXUS-SANDBOX",
+    "allowed_without_approval": [
+      "read",
+      "analyze",
+      "draft",
+      "test"
+    ],
+    "blocked_without_exact_approval": [
+      "send",
+      "publish",
+      "pay",
+      "sign",
+      "deploy",
+      "delete"
+    ]
+  },
+  "chat_id": "universal-activation-20261101",
+  "instruction_contract": "Recover authority and live connector snapshots before consequential work; isolate project evidence; stop on BLOCK; never treat availability as correctness."
+}

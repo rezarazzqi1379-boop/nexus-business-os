@@ -1,3 +1,11 @@
+## Universal activation observation — 2026-11-01
+
+Main e5bc758 unchanged; PR135 ad808115 open, not auto-merged. Located installed Windows sandbox at .codex/.chatgpt-projects/.../nexus-business-os revision038bae1 (dirty46 before probes), distinct from main. Actual task NEXUS-Local-Intelligence Running, loopback health/ready200/protected401; process revision UNKNOWN. Existing runtime39 locks/restart probe pass; Steel18 repeat0; radar OQEP61 repeat0, market3 and TED10 real reads with raw hashes and three hub observations independently verified. Existing acquisition offline replay96/169 locks pass, no network/notification.
+
+Same existing monitor queue accepted new day tick, replay0, ledgercount2/cap6 and both integrity checks ok. Fresh main free-runtime41279454249 and synthetic-health41279534073 SUCCESS.118 core/36 installed focused tests pass after recorded command/temp setup failures. Original Registry/Master bytes re-fetched/hash-matched, but bootstrap BLOCK and project authority unresolved. Existing hub snapshot and scratch restore verified; no live overwrite. No new scheduler/agent/database, email/payment/production/merge. Commercial qualified0; revenue UNKNOWN.
+
+Report: docs/NEXUS_UNIVERSAL_ACTIVATION_REPORT_20261101_FA.md; matrix/evidence data/research/universal-*-20261101.json. Universal mission remains incomplete: canonical approval, project-ID/revision integration, unadopted agents and exact production target/cost approval. Historical notes below retain their prior scope.
+
 ## Active-ledger completion — 2026-11-01
 
 Continue PR133 from the preserved implementation. Final review reproduced a

@@ -1,0 +1,480 @@
+{
+  "schema_version": "nexus.universal-activation.v1",
+  "observed_at": "2026-11-01T09:25:18.106516+00:00",
+  "scope": "Existing NEXUS repository plus located installed Windows sandbox; no claim about every advertised third-party plugin",
+  "overall_status": "BLOCKED",
+  "main_sha": "e5bc75867ed85fa3869018a578d049bfdb5e57bd",
+  "routing_candidate": {
+    "pr": 135,
+    "head": "ad8081157e13f9f3a6deb9fe0d8ed37f955c9236",
+    "merged": false
+  },
+  "components": [
+    {
+      "id": "windows-loopback-api",
+      "status": "RUNNING",
+      "verified_levels": [
+        "CONFIGURED",
+        "TESTED",
+        "RUNNING"
+      ],
+      "environment": "Installed Windows sandbox http://127.0.0.1:8000",
+      "evidence_refs": [
+        "NEXUS-Local-Intelligence task Running",
+        "health200/ready200/protected401",
+        "data/research/universal-installed-evidence-20261101.json"
+      ],
+      "blocker": null,
+      "recovery_path": "Existing task Status/Start under original owner; do not decrypt/copy DPAPI credential. Test current readiness; no automatic restart performed.",
+      "required_authorization": null
+    },
+    {
+      "id": "intelligence-dlt",
+      "status": "ACTIVATED",
+      "verified_levels": [
+        "CONFIGURED",
+        "TESTED",
+        "ACTIVATED"
+      ],
+      "environment": "Installed Windows sandbox",
+      "evidence_refs": [
+        "Start-NexusIntelligence.ps1 -Action Status",
+        "Start-NexusIntelligence.ps1 -Action Verify",
+        "39 locked packages, pip check clean"
+      ],
+      "blocker": null,
+      "recovery_path": "Verified synthetic cursor restart/repeat/change/cross-scope negative probe; no reinstall/upgrade.",
+      "required_authorization": null
+    },
+    {
+      "id": "steel-evidence-intake",
+      "status": "ACTIVATED",
+      "verified_levels": [
+        "TESTED",
+        "INTEGRATED",
+        "ACTIVATED"
+      ],
+      "environment": "SANDBOX/steel-signal-audit",
+      "evidence_refs": [
+        "Start-NexusIntelligence.ps1 -Action Steel",
+        "18 input/0 emitted"
+      ],
+      "blocker": null,
+      "recovery_path": "Re-run same input through existing dlt adapter; preserve original hash/history; no buyer promotion.",
+      "required_authorization": null
+    },
+    {
+      "id": "multi-sector-radar",
+      "status": "ACTIVATED",
+      "verified_levels": [
+        "TESTED",
+        "INTEGRATED",
+        "ACTIVATED"
+      ],
+      "environment": "Installed SANDBOX/multi-sector-radar",
+      "evidence_refs": [
+        "scripts/opportunity_radar.ps1 -Action Run",
+        "data/research/universal-installed-evidence-20261101.json"
+      ],
+      "blocker": null,
+      "recovery_path": "Preserve prior capture on failure; existing lock, cached source stages and hash verification exercised.",
+      "required_authorization": null
+    },
+    {
+      "id": "source-monitor",
+      "status": "ACTIVATED",
+      "verified_levels": [
+        "TESTED",
+        "INTEGRATED",
+        "ACTIVATED"
+      ],
+      "environment": "Engineering checkout existing persistent queue",
+      "evidence_refs": [
+        "data/research/universal-monitor-20261101.json",
+        "data/research/universal-monitor-replay-20261101.json"
+      ],
+      "blocker": null,
+      "recovery_path": "Existing queue + ledger count2/cap6, two distinct ticks; no extra HTTP on replay; both integrity_check ok. Three distinct tick cap remains; do not reset for continued operation.",
+      "required_authorization": null
+    },
+    {
+      "id": "public-research",
+      "status": "ACTIVATED",
+      "verified_levels": [
+        "TESTED",
+        "INTEGRATED",
+        "ACTIVATED"
+      ],
+      "environment": "Local bounded process + GitHub Actions",
+      "evidence_refs": [
+        "data/research/universal-free-research-20261101.json",
+        "https://github.com/rezarazzqi1379-boop/nexus-business-os/actions/runs/41279454249"
+      ],
+      "blocker": null,
+      "recovery_path": "Reopen journal/checkpoint and suppress replay; exactly-once external HTTP not guaranteed.",
+      "required_authorization": null
+    },
+    {
+      "id": "changedetection",
+      "status": "TESTED",
+      "verified_levels": [
+        "CONFIGURED",
+        "TESTED"
+      ],
+      "environment": "Installed offline sandbox",
+      "evidence_refs": [
+        "scripts/acquisition_lab.ps1 -Mode Replay",
+        "96 crawl/169 change packages locked; pip check clean",
+        "3 source snapshots baseline/repeat/synthetic-change/restore;0 network/notifications"
+      ],
+      "blocker": null,
+      "recovery_path": "Existing replay on captured HTML; watches remain paused/muted. No live server enabled.",
+      "required_authorization": null
+    },
+    {
+      "id": "installed-hub-backup",
+      "status": "PERSISTENT",
+      "verified_levels": [
+        "TESTED",
+        "INTEGRATED",
+        "PERSISTENT"
+      ],
+      "environment": "Installed existing UnifiedDataHub",
+      "evidence_refs": [
+        "data/research/universal-recovery-20261101.json"
+      ],
+      "blocker": null,
+      "recovery_path": "Verified snapshot plus SQLite backup API scratch restore with latest observation readback; never overwrite live stores.",
+      "required_authorization": null
+    },
+    {
+      "id": "daily-heartbeat",
+      "status": "AUTOMATED",
+      "verified_levels": [
+        "CONFIGURED",
+        "AUTOMATED"
+      ],
+      "environment": "Existing Codex automation nexus-daily-control-plane",
+      "evidence_refs": [
+        "ACTIVE daily09:00; same target and failed_runs_only",
+        "completed heartbeat2026-11-01T05:32:42Z; acquisition check PARTIAL then",
+        "manual full replay succeeded this cycle"
+      ],
+      "blocker": "Current fresh complete source cycle is manual, not proof of scheduled execution of every stage.",
+      "recovery_path": "Inspect next actual heartbeat and stage digests; preserve schedule/target; do not create duplicate automation.",
+      "required_authorization": null
+    },
+    {
+      "id": "free-runtime-schedule",
+      "status": "AUTOMATED",
+      "verified_levels": [
+        "CONFIGURED",
+        "TESTED",
+        "AUTOMATED"
+      ],
+      "environment": "GitHub Actions ephemeral runner",
+      "evidence_refs": [
+        "scheduled run41068854309 SUCCESS",
+        "current-main manual run41279454249 SUCCESS",
+        ".github/workflows/nexus-free-runtime.yml cron17 7 weekdays"
+      ],
+      "blocker": null,
+      "recovery_path": "Inspect actual event/head/conclusion; workflow_dispatch bounds unchanged; delivery timeliness not guaranteed.",
+      "required_authorization": null
+    },
+    {
+      "id": "synthetic-health",
+      "status": "ACTIVATED",
+      "verified_levels": [
+        "CONFIGURED",
+        "TESTED",
+        "ACTIVATED"
+      ],
+      "environment": "GitHub Actions",
+      "evidence_refs": [
+        "current-main run41279534073 SUCCESS",
+        ".github/workflows/nexus-synthetic-health.yml weekly schedule"
+      ],
+      "blocker": null,
+      "recovery_path": "Synthetic CI checks only; report itself says persistent_service_verified=false, production_ready=false.",
+      "required_authorization": null
+    },
+    {
+      "id": "connector-gmail",
+      "status": "TESTED",
+      "verified_levels": [
+        "AVAILABLE",
+        "TESTED"
+      ],
+      "environment": "Connected read-only metadata",
+      "evidence_refs": [
+        "authenticated profile only; no mailbox body or send",
+        "data/research/universal-preflight-20261101.json"
+      ],
+      "blocker": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "recovery_path": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "required_authorization": "Exact message/CRM mutation if requested later; none performed."
+    },
+    {
+      "id": "connector-google_drive",
+      "status": "TESTED",
+      "verified_levels": [
+        "AVAILABLE",
+        "TESTED"
+      ],
+      "environment": "Connected read-only metadata",
+      "evidence_refs": [
+        "actual Registry/Master bytes fetched/hash matched",
+        "data/research/universal-preflight-20261101.json"
+      ],
+      "blocker": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "recovery_path": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "required_authorization": "Exact message/CRM mutation if requested later; none performed."
+    },
+    {
+      "id": "connector-notion",
+      "status": "TESTED",
+      "verified_levels": [
+        "AVAILABLE",
+        "TESTED"
+      ],
+      "environment": "Connected read-only metadata",
+      "evidence_refs": [
+        "resume page read; historical content not current authority",
+        "data/research/universal-preflight-20261101.json"
+      ],
+      "blocker": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "recovery_path": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "required_authorization": "Exact message/CRM mutation if requested later; none performed."
+    },
+    {
+      "id": "connector-github",
+      "status": "TESTED",
+      "verified_levels": [
+        "AVAILABLE",
+        "TESTED"
+      ],
+      "environment": "Connected read-only metadata",
+      "evidence_refs": [
+        "exact branch/PR/runs read",
+        "data/research/universal-preflight-20261101.json"
+      ],
+      "blocker": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "recovery_path": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "required_authorization": "Exact message/CRM mutation if requested later; none performed."
+    },
+    {
+      "id": "connector-hubspot",
+      "status": "TESTED",
+      "verified_levels": [
+        "AVAILABLE",
+        "TESTED"
+      ],
+      "environment": "Connected read-only metadata",
+      "evidence_refs": [
+        "authenticated profile and COMPANY/CONTACT/DEAL schema read; no CRM records copied",
+        "data/research/universal-preflight-20261101.json"
+      ],
+      "blocker": "Project-scoped canonical binding unresolved; availability does not establish commercial integration.",
+      "recovery_path": "Refresh only named project evidence; pass bootstrap authority gates before consequential use.",
+      "required_authorization": "Exact message/CRM mutation if requested later; none performed."
+    },
+    {
+      "id": "connector-vercel",
+      "status": "BLOCKED",
+      "verified_levels": [
+        "AVAILABLE",
+        "TESTED",
+        "BLOCKED"
+      ],
+      "environment": "Existing Vercel project",
+      "evidence_refs": [
+        "provider deployment READY; source tree only src/index.html; git revision absent"
+      ],
+      "blocker": "Placeholder is not NEXUS Python runtime or durable SQLite host.",
+      "recovery_path": "Existing Docker/compose disposable container acceptance41278556064; no redirect or ephemeral SQLite migration.",
+      "required_authorization": "Exact host/revision/cost/storage/security/rollback approval before production."
+    },
+    {
+      "id": "connector-supabase",
+      "status": "BLOCKED",
+      "verified_levels": [
+        "AVAILABLE",
+        "TESTED",
+        "BLOCKED"
+      ],
+      "environment": "Connected Supabase metadata",
+      "evidence_refs": [
+        "Project listing returned INACTIVE; no DB queries or changes"
+      ],
+      "blocker": "No active project bound to this SQLite deployment; resumption/cost not authorized.",
+      "recovery_path": "Select approved project and inspect status/schema read-only before any optional integration; production recovery NOT_TESTED.",
+      "required_authorization": "Named project, cost and schema/migration scope if required; avoid unnecessary second store."
+    },
+    {
+      "id": "connector-railway",
+      "status": "BLOCKED",
+      "verified_levels": [
+        "CONFIGURED",
+        "BLOCKED"
+      ],
+      "environment": "Repository configuration only",
+      "evidence_refs": [
+        "railway.toml",
+        "Dockerfile"
+      ],
+      "blocker": "No authenticated runtime/approved host/volume/cost demonstrated.",
+      "recovery_path": "Use existing disposable container acceptance; Railway production path remains untested.",
+      "required_authorization": "Named account/service/volume/revision/cost and rollback."
+    },
+    {
+      "id": "commercial-qualification",
+      "status": "BLOCKED",
+      "verified_levels": [
+        "CONFIGURED",
+        "BLOCKED"
+      ],
+      "environment": "All projects",
+      "evidence_refs": [
+        "data/research/universal-portfolio-catalog-20261101.json",
+        "data/research/universal-preflight-20261101.json"
+      ],
+      "blocker": "No qualified agent for independent qualification; mandatory buyer/demand/technical/eligibility/feasibility evidence absent.",
+      "recovery_path": "Collect independent evidence and approved project binding; negative authority tests pass, commercial acceptance not tested.",
+      "required_authorization": "Authenticated exact-byte Registry/Master decision, then separate exact commercial action approval."
+    },
+    {
+      "id": "cross-environment-production",
+      "status": "BLOCKED",
+      "verified_levels": [
+        "CONFIGURED",
+        "BLOCKED"
+      ],
+      "environment": "Installed sandbox + main remain distinct",
+      "evidence_refs": [
+        "Installed revision038bae1 dirty46; maine5bc758; PR135 open"
+      ],
+      "blocker": "Working-tree/runtime revision and project-ID bindings are not reconciled. No single promoted production revision.",
+      "recovery_path": "Review scoped diffs/locked adapters into small PRs; CI on immutable heads; use existing data stores and metadata federation.",
+      "required_authorization": "Exact PR integration and deployment target approval; no automatic merge."
+    }
+  ],
+  "sources": {
+    "opportunity-radar": {
+      "observed_at": "2026-11-01T06:01:12.710090+00:00",
+      "source_url": "https://oqep.om/tenders",
+      "source_sha256": "67cadee8805f0229a58993c200e645309aa8552421d42375cc0c78cff88a4258",
+      "raw_bytes": 52957,
+      "returned": 61,
+      "canonical_promotion": false,
+      "qualification": "NOT_VERIFIED",
+      "capture_sha256": "4df50c7c65ea936d58cf5f87b4e769f0f81f878d4bedb4aa4bd64afc0494b8a6"
+    },
+    "market-context": {
+      "observed_at": "2026-11-01T06:01:23.112032+00:00",
+      "source_url": "https://api.worldbank.org/v2/country/OM;KZ;AM/indicator/NV.IND.MANF.CD?format=json&date=2024&per_page=10",
+      "source_sha256": "fe3584f765d71669889ce8c7248765cf2437df2d3dffd93c6feaf46bf95f5985",
+      "raw_bytes": 780,
+      "returned": 3,
+      "canonical_promotion": false,
+      "qualification": "NOT_VERIFIED",
+      "capture_sha256": "5994f382e1ac12a0b94975317220c89067c35a63c763052ebdf5293b25aea914"
+    },
+    "ted-notices": {
+      "observed_at": "2026-11-01T06:01:24.653026+00:00",
+      "source_url": "https://api.ted.europa.eu/v3/notices/search",
+      "source_sha256": "a30111dd6b445d1d8ba53b2fbbe080caf9dfec4d7a9562ff91c7c7cf80d5d6a8",
+      "raw_bytes": 48006,
+      "returned": 10,
+      "canonical_promotion": false,
+      "qualification": "NOT_VERIFIED",
+      "capture_sha256": "5d7ec65123031a8475bf3846ac9fd3a8c2a7c0f1bcef8a7ead0cddaeb71fdcc1",
+      "query": "publication-date >= 20261025 AND notice-type = \"cn-standard\""
+    }
+  },
+  "workflow_runs": [
+    {
+      "id": 41279454249,
+      "kind": "free-runtime",
+      "sha": "e5bc75867ed85fa3869018a578d049bfdb5e57bd",
+      "conclusion": "success",
+      "event": "workflow_dispatch"
+    },
+    {
+      "id": 41279534073,
+      "kind": "synthetic-health",
+      "sha": "e5bc75867ed85fa3869018a578d049bfdb5e57bd",
+      "conclusion": "success",
+      "event": "workflow_dispatch"
+    },
+    {
+      "id": 41068854309,
+      "kind": "free-runtime",
+      "conclusion": "success",
+      "event": "schedule",
+      "historical": true
+    },
+    {
+      "id": 41278336412,
+      "kind": "commercial",
+      "conclusion": "success",
+      "historical_same_main": true
+    },
+    {
+      "id": 41278556064,
+      "kind": "disposable-container",
+      "conclusion": "success",
+      "historical_same_main": true
+    }
+  ],
+  "tests": {
+    "core": {
+      "passed": 118,
+      "seconds": 9.63,
+      "command": "PYTHONPATH=src;. python -m pytest -q tests/test_router_runtime.py tests/test_public_research_agent.py tests/test_free_research.py tests/test_source_monitor.py tests/test_http_attempt_budget.py tests/test_unified_data_environment.py tests/test_authority_admission.py tests/test_nexus_chat_bootstrap.py"
+    },
+    "installed_adapters": {
+      "passed": 36,
+      "seconds": 0.67,
+      "command": "PYTHONPATH=.;src python -m pytest -q -p no:cacheprovider --basetemp <fresh-workspace-directory> tests/test_ted_notices.py tests/test_market_context.py tests/test_opportunity_radar.py tests/test_intelligence_content_cursor.py tests/test_intelligence_dlt_validation.py"
+    },
+    "failures_preserved": [
+      "Initial installed test run:24 passed/12 setup errors, WinError5 temp folder; same tests passed36 with fresh permitted basetemp",
+      "Initial core command named nonexistent test_chat_bootstrap.py: no tests ran; corrected to test_nexus_chat_bootstrap.py,118 passed"
+    ]
+  },
+  "metrics": {
+    "oqep_sample_records": 61,
+    "oqep_new_emitted": 0,
+    "steel_audit_input": 18,
+    "steel_new_emitted": 0,
+    "ted_returned": 10,
+    "market_context_records": 3,
+    "main_worldbank_pilot_records": 3,
+    "main_worldbank_rejected": 3,
+    "independently_qualified_opportunities": 0,
+    "actionable_opportunities": 0,
+    "independent_cross_source_corroborations": "UNKNOWN",
+    "confirmed_revenue": "UNKNOWN",
+    "verified_margin": "UNKNOWN",
+    "outbound_messages_sent": 0,
+    "new_paid_services": 0,
+    "model_calls_in_exercised_scripts": 0,
+    "session_tokens": "UNKNOWN",
+    "shared_provider_credits": "UNKNOWN",
+    "actions_quota_remaining": "UNKNOWN"
+  },
+  "authority_gate": "BLOCK",
+  "commercial_hold_unchanged": true,
+  "new_schedules_created": 0,
+  "production_deployed": false,
+  "recovery_evidence": "data/research/universal-recovery-20261101.json",
+  "portfolio_catalog_evidence": "data/research/universal-portfolio-catalog-20261101.json",
+  "limitations": [
+    "No universal completion: authority/project bindings, production approval and unadopted agents remain blocked.",
+    "RUNNING is an observation at the timestamp, not an uptime guarantee.",
+    "Installed Windows working tree is modified and not certified by main CI.",
+    "Scratch restore covers registered hub snapshot, not complete host/offsite disaster recovery.",
+    "Source counts are samples/claims, not verified buyers or revenues."
+  ]
+}

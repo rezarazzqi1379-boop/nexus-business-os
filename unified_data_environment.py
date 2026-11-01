@@ -217,6 +217,10 @@ class BackupManager:
                 _safe_relative(self.hub.workspace_root, source)
                 if asset.contains_secrets or _contains_secret_name(source):
                     continue
+                if not source.exists():
+                    # A stale catalog is a recovery problem, not an empty asset.
+                    # Do not publish a manifest that silently loses its coverage.
+                    raise FileNotFoundError("registered_backup_asset_missing")
                 for actual, relative in self._expand(source, Path(asset.relative_path)):
                     destination = temporary / "files" / relative
                     destination.parent.mkdir(parents=True, exist_ok=True)

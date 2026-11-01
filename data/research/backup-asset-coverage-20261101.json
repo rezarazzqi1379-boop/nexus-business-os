@@ -1,0 +1,224 @@
+{
+  "source_catalog_assets": 132,
+  "missing_on_current_branch": 30,
+  "postfix_snapshot_status": "BLOCKED_REGISTERED_ASSET_MISSING",
+  "incomplete_final_snapshot_exists": false,
+  "recovery_snapshot": "master-v5-verified-20261101",
+  "recovery_snapshot_verified": true,
+  "scratch_restored_files": [
+    {
+      "relative_path": "docs/MASTER_V5_ACCEPTANCE_20261101_FA.md",
+      "sha256": "75337fb8b007fbf0a8f687202b5a8ad8d671661f3a06a07aad9c974152a1ee4d"
+    },
+    {
+      "relative_path": "data/research/v5-routing-after-20261101.json",
+      "sha256": "efce3c22b6270d28f5b87ca85cc5940fbc815e65b25e981effed94e00e36475c"
+    },
+    {
+      "relative_path": "data/research/v5-ted-probe-20261101.json",
+      "sha256": "2e15d4cfb82967e7455377dcfc167f58fe3ac895121f6db3b4007900d707e753"
+    },
+    {
+      "relative_path": "data/research/v5-acceptance-20261101.json",
+      "sha256": "a5bd5d3bd4a76be582bb83f68e34083744ea5c8797b9cf3505075402105a5de4"
+    },
+    {
+      "relative_path": "data/research/v5-adb-probe-20261101.json",
+      "sha256": "f084670573cfd64e8478d4a440cf50e89560397623c8ea27abb2d271b131d07d"
+    },
+    {
+      "relative_path": "data/research/v5-portfolio-watch-20261101.json",
+      "sha256": "fc199c347f9cbe136b8540ad85d590058bf8daa08fe32b45a2f7ec8cfa1cc6c3"
+    },
+    {
+      "relative_path": "data/research/v5-preflight-20261101.json",
+      "sha256": "db81d99739476f2f09496b3b65cfa69bc3f28fe15fb55e106a8fe50570f2b958"
+    },
+    {
+      "relative_path": "data/research/v5-routing-20261101.json",
+      "sha256": "44d1c0babfefb5d231f013e777d7950a7a2035dbef05e08d3872fde8b2f64948"
+    }
+  ],
+  "not_in_selected_snapshot": [
+    "data/research/final-acceptance-20261027-authority.json",
+    "data/research/final-acceptance-20261027-ci.json",
+    "data/research/final-acceptance-20261027-preflight.json",
+    "data/research/final-acceptance-20261027-dependencies.json",
+    "data/research/final-acceptance-20261027-focused.log",
+    "data/research/final-acceptance-20261027-cycle.json",
+    "data/research/final-acceptance-20261027-pytest.log",
+    "data/research/final-acceptance-20261027-measurements.json",
+    "tests/test_authority_execution_boundary.py",
+    "docs/authority/FINAL_ENGINEERING_ACCEPTANCE_2026-10-27.md",
+    "data/research/final-acceptance-20261027-unittest.log",
+    "data/research/final-acceptance-20261027-pytest-initial.log",
+    "data/research/final-acceptance-20261027-unittest-initial.log",
+    "docs/NEXUS_UNIVERSAL_ACTIVATION_REPORT_20261101_FA.md",
+    "data/research/universal-activation-20261101.json",
+    "data/research/universal-free-research-20261101.json",
+    "data/research/universal-installed-evidence-20261101.json",
+    "data/research/universal-monitor-20261101.json",
+    "data/research/universal-monitor-replay-20261101.json",
+    "data/research/universal-portfolio-catalog-20261101.json",
+    "data/research/universal-preflight-20261101.json",
+    "data/research/universal-recovery-20261101.json"
+  ],
+  "live_paths_overwritten": false,
+  "current_catalog_still_requires_explicit_reconciliation": true,
+  "additional_scratch_recovery": [
+    {
+      "relative_path": "data/research/final-acceptance-20261027-authority.json",
+      "sha256": "7313b349c0e6866f21170182a3b8b1227df7691cd2e8a02370bce809b5f929be",
+      "source_snapshot": "final-acceptance-20261027",
+      "verification": "VERIFIED_BACKUP_MANIFEST"
+    },
+    {
+      "relative_path": "data/research/final-acceptance-20261027-ci.json",
+      "sha256": "c2193a7b7a940ea91b0fc97f1b68cc9e293ac03bd4ad8360b1907d7ecdd14588",
+      "source_snapshot": "final-acceptance-20261027",
+      "verification": "VERIFIED_BACKUP_MANIFEST"
+    },
+    {
+      "relative_path": "data/research/final-acceptance-20261027-preflight.json",
+      "sha256": "1358924513ddaf2154b4a156727c447d6e1e474ae7cfbcaabe34347c8c1a05b5",
+      "source_snapshot": "final-acceptance-20261027",
+      "verification": "VERIFIED_BACKUP_MANIFEST"
+    },
+    {
+      "relative_path": "data/research/final-acceptance-20261027-dependencies.json",
+      "sha256": "58baddf5ec5445c0facbd0785d194aab35f67689af82d12b23a28e3c9cf44315",
+      "source_snapshot": "final-acceptance-20261027",
+      "verification": "VERIFIED_BACKUP_MANIFEST"
+    },
+    {
+      "relative_path": "data/research/final-acceptance-20261027-focused.log",
+      "sha256": "fffaf616a10e1dc1f39845a3297ddedd0c75cb4b52627767b8cc2f3dbac3b232",
+      "source_snapshot": "final-acceptance-20261027",
+      "verification": "VERIFIED_BACKUP_MANIFEST"
+    },
+    {
+      "relative_path": "data/research/final-acceptance-20261027-cycle.json",
+      "sha256": "ea9ac3d4cab1547e4fc4a36104b75325515f887e7a1955e32d8f1e46d44447bb",
+      "source_snapshot": "final-acceptance-20261027",
+      "verification": "VERIFIED_BACKUP_MANIFEST"
+    },
+    {
+      "relative_path": "data/research/final-acceptance-20261027-pytest.log",
+      "sha256": "b517a260b62aecb587c79c90862650767c0cfa32a723f45c0e1606d90cc88978",
+      "source_snapshot": "final-acceptance-20261027",
+      "verification": "VERIFIED_BACKUP_MANIFEST"
+    },
+    {
+      "relative_path": "data/research/final-acceptance-20261027-measurements.json",
+      "sha256": "ddef834bf261cfe8a6ccdbd66e41425c9ea375c63ee5c374b53bcdb633551e97",
+      "source_snapshot": "final-acceptance-20261027",
+      "verification": "VERIFIED_BACKUP_MANIFEST"
+    },
+    {
+      "relative_path": "tests/test_authority_execution_boundary.py",
+      "sha256": "fb5e1badd219f21c9035b13e6c8884bbc3fa08231ff25316dbeb7dae64e34723",
+      "source_snapshot": "final-acceptance-20261027",
+      "verification": "VERIFIED_BACKUP_MANIFEST"
+    },
+    {
+      "relative_path": "docs/authority/FINAL_ENGINEERING_ACCEPTANCE_2026-10-27.md",
+      "sha256": "550945ca29f76059c2a9d48f313c2113f4cb221463eec6296d574d5937f2b8fa",
+      "source_snapshot": "final-acceptance-20261027",
+      "verification": "VERIFIED_BACKUP_MANIFEST"
+    },
+    {
+      "relative_path": "data/research/final-acceptance-20261027-unittest.log",
+      "sha256": "7f2a8597ec003dfee6794d656cfa8902475c8266ad02f992830aab7acf9673a5",
+      "source_snapshot": "final-acceptance-20261027",
+      "verification": "VERIFIED_BACKUP_MANIFEST"
+    },
+    {
+      "relative_path": "data/research/final-acceptance-20261027-pytest-initial.log",
+      "sha256": "d8277a7c08ba4362ccc435df481a5a1ac2a42d4ce69047808cdc0e539b4b7120",
+      "source_snapshot": "final-acceptance-20261027",
+      "verification": "VERIFIED_BACKUP_MANIFEST"
+    },
+    {
+      "relative_path": "data/research/final-acceptance-20261027-unittest-initial.log",
+      "sha256": "0c8d630fd256c20a2fd4ccb96602c185599c88759a191b52195c87c638529a5b",
+      "source_snapshot": "final-acceptance-20261027",
+      "verification": "VERIFIED_BACKUP_MANIFEST"
+    },
+    {
+      "relative_path": "docs/NEXUS_UNIVERSAL_ACTIVATION_REPORT_20261101_FA.md",
+      "sha256": "f5141387ce222fbf9a31bfcc5fd614705ec2794e8e8d81efc24e16025e5b870f",
+      "source_commit": "d7ac1ba93e6696b402d6ccd8a3e1cd7bdc9acb3e",
+      "verification": "IMMUTABLE_GIT_BLOB_ORIGINAL_CATALOG_DIGEST_UNKNOWN"
+    },
+    {
+      "relative_path": "data/research/universal-activation-20261101.json",
+      "sha256": "98927385ec7390e7dfdcb948f062eb7569e8b7767900d8916aafec3e6f7af7f8",
+      "source_commit": "d7ac1ba93e6696b402d6ccd8a3e1cd7bdc9acb3e",
+      "verification": "IMMUTABLE_GIT_BLOB_ORIGINAL_CATALOG_DIGEST_UNKNOWN"
+    },
+    {
+      "relative_path": "data/research/universal-free-research-20261101.json",
+      "sha256": "ba3d2598067e61a83744ec00ac6bae24d61ed10cd9ed0b086fd9415bd91eee8d",
+      "source_commit": "d7ac1ba93e6696b402d6ccd8a3e1cd7bdc9acb3e",
+      "verification": "IMMUTABLE_GIT_BLOB_ORIGINAL_CATALOG_DIGEST_UNKNOWN"
+    },
+    {
+      "relative_path": "data/research/universal-installed-evidence-20261101.json",
+      "sha256": "507884a3299d99f63f85cc91131338657e7238fb21fa8f2410cf6e1b1c4406dd",
+      "source_commit": "d7ac1ba93e6696b402d6ccd8a3e1cd7bdc9acb3e",
+      "verification": "IMMUTABLE_GIT_BLOB_ORIGINAL_CATALOG_DIGEST_UNKNOWN"
+    },
+    {
+      "relative_path": "data/research/universal-monitor-20261101.json",
+      "sha256": "23c2fbc6174d50614125aa6e51a2439729db3556d30b300b022bca535d6790dc",
+      "source_commit": "d7ac1ba93e6696b402d6ccd8a3e1cd7bdc9acb3e",
+      "verification": "IMMUTABLE_GIT_BLOB_ORIGINAL_CATALOG_DIGEST_UNKNOWN"
+    },
+    {
+      "relative_path": "data/research/universal-monitor-replay-20261101.json",
+      "sha256": "9b0fce07a3ded8520d6bb1176c8154301c66431dc721f3159e68d5d70bc4d79d",
+      "source_commit": "d7ac1ba93e6696b402d6ccd8a3e1cd7bdc9acb3e",
+      "verification": "IMMUTABLE_GIT_BLOB_ORIGINAL_CATALOG_DIGEST_UNKNOWN"
+    },
+    {
+      "relative_path": "data/research/universal-portfolio-catalog-20261101.json",
+      "sha256": "5612d17074aecfa6341caaf4d6f87ff9e935a80595f4677c3b2f5bf5fd904061",
+      "source_commit": "d7ac1ba93e6696b402d6ccd8a3e1cd7bdc9acb3e",
+      "verification": "IMMUTABLE_GIT_BLOB_ORIGINAL_CATALOG_DIGEST_UNKNOWN"
+    },
+    {
+      "relative_path": "data/research/universal-preflight-20261101.json",
+      "sha256": "dea0f5556ee14a24d891e08e1512a8f21b7b3c2d65510dc8677b29c5c79b26a5",
+      "source_commit": "d7ac1ba93e6696b402d6ccd8a3e1cd7bdc9acb3e",
+      "verification": "IMMUTABLE_GIT_BLOB_ORIGINAL_CATALOG_DIGEST_UNKNOWN"
+    },
+    {
+      "relative_path": "data/research/universal-recovery-20261101.json",
+      "sha256": "63d000c97423e15d19497ac5545599e690d390e2e6e18a8f83254a32da460045",
+      "source_commit": "d7ac1ba93e6696b402d6ccd8a3e1cd7bdc9acb3e",
+      "verification": "IMMUTABLE_GIT_BLOB_ORIGINAL_CATALOG_DIGEST_UNKNOWN"
+    }
+  ],
+  "remaining_unrecovered": [],
+  "scratch_total_recovered": 30,
+  "tests": {
+    "red": {
+      "command": "python -m pytest -q tests/test_unified_data_environment.py",
+      "failed": 2,
+      "passed": 4
+    },
+    "focused": {
+      "command": "python -m pytest -q tests/test_unified_data_environment.py tests/test_execution_durability.py tests/test_nexus_system_bootstrap.py",
+      "passed": 16,
+      "seconds": 5.48
+    },
+    "regression": {
+      "command": "python -m pytest -q tests evals",
+      "passed": 1877,
+      "warnings": 1,
+      "seconds": 50.87
+    }
+  },
+  "base_main": "e5bc75867ed85fa3869018a578d049bfdb5e57bd",
+  "fix_not_merged_or_deployed": true
+}

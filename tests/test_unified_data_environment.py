@@ -48,3 +48,23 @@ def test_tampered_snapshot_fails_verification(tmp_path: Path):
     (snapshot / "files" / "a.json").write_text("tampered", encoding="utf-8")
     assert BackupManager.verify_snapshot(snapshot) is False
 
+
+@pytest.mark.parametrize("kind", ["json", "directory"])
+def test_missing_registered_asset_cannot_publish_a_verified_snapshot(tmp_path: Path, kind):
+    source = tmp_path / "registered"
+    if kind == "directory":
+        source.mkdir()
+    else:
+        source.write_text("{}", encoding="utf-8")
+    hub = UnifiedDataHub(tmp_path / "hub.db", tmp_path)
+    hub.register_asset(DataAsset("required", "P1", kind, "registered", "source"))
+    if kind == "directory":
+        source.rmdir()
+    else:
+        source.unlink()
+    manager = BackupManager(hub, tmp_path / "backups")
+    with pytest.raises(FileNotFoundError, match="registered_backup_asset_missing"):
+        manager.create_snapshot("incomplete")
+    assert not (tmp_path / "backups" / "incomplete").exists()
+    assert list((tmp_path / "backups").iterdir()) == []
+

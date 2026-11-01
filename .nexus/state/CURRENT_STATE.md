@@ -1,3 +1,9 @@
+## Master v5 post-merge recovery — 2026-11-01
+
+Main e5bc75867ed85fa3869018a578d049bfdb5e57bd independently fetched; PR133 MERGED, superseding older pending notes below. Main tests41277840729 and commercial41278336412 SUCCESS; actual artifact13072575498 hash and exact report reproduced. Main1875 regression tests pass. PR134 remains separate draft; not imported.
+
+Reproduced main selector assigning WATCH; scoped lifecycle filter plus five red-before fixtures,185 focused pass. Final candidate evidence: data/research/v5-acceptance-20261101.json. Six historical observations physically read back in registered checkout hub; canonical project mapping/authority still unresolved. TED400/ADB connection failure retained with consumed budgets, no reset. No new qualified opportunity, production host or commercial cadence. No merge/email/payment/authority promotion. See docs/MASTER_V5_ACCEPTANCE_20261101_FA.md for component map, deployment candidate and blockers.
+
 ## Active-ledger completion — 2026-11-01
 
 Continue PR133 from the preserved implementation. Final review reproduced a

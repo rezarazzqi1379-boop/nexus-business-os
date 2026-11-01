@@ -1,0 +1,25 @@
+{
+  "project_id": "PRJ-NEXUS-SANDBOX",
+  "lane_id": "official-source-validation",
+  "source": "https://api.ted.europa.eu/v3/notices/search",
+  "query": {
+    "query": "publication-date >= 20261025 AND notice-type = cn-standard",
+    "fields": [
+      "publication-number",
+      "notice-title",
+      "buyer-name",
+      "deadline-receipt-tender-date"
+    ],
+    "page": 1,
+    "limit": 3,
+    "scope": "ACTIVE",
+    "paginationMode": "PAGE_NUMBER"
+  },
+  "observed_at": "2026-11-01T05:50:02.467559+00:00",
+  "external_writes": 0,
+  "status": "FAILED",
+  "qualification": "UNKNOWN",
+  "error_category": "HTTPError",
+  "http_status": 400,
+  "durable_attempt_count": 1
+}

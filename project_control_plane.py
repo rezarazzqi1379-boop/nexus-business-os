@@ -20,6 +20,9 @@ from conversation_control import (
 
 Risk = Literal["read", "local_write", "external"]
 CONTROL_PLANE_VERSION = "nexus.project-control-plane.v1"
+# These are planning candidates only, never proof of installation or health.
+# Discovery/watch/research/deferred entries remain searchable in the catalog.
+_ASSIGNABLE_LIFECYCLES = frozenset({"SANDBOX_READY", "EXPERIMENT", "PILOT", "ADOPTED_ADAPTER"})
 
 
 @dataclass(frozen=True)
@@ -85,7 +88,8 @@ def _select_agent(request: WorkRequest, catalog: tuple[AgentCatalogEntry, ...]) 
             candidates[item.catalog_id] = item
     required = set(request.required_capabilities)
     candidates = {key: value for key, value in candidates.items()
-                  if required.issubset(value.capabilities)}
+                  if required.issubset(value.capabilities)
+                  and value.lifecycle in _ASSIGNABLE_LIFECYCLES}
     ranked = sorted(
         candidates.values(),
         key=lambda item: (-len(required.intersection(item.capabilities)), item.catalog_id),

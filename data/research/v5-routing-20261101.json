@@ -1,0 +1,30 @@
+{
+  "version": "nexus.project-control-plane.v1",
+  "assignments": [
+    {
+      "work_id": "v5-research",
+      "agent_id": "AGT-GOOGLE-ADK",
+      "matched_capabilities": [
+        "agents"
+      ],
+      "lifecycle": "WATCH"
+    }
+  ],
+  "source_routes": {},
+  "schedule": {
+    "running": [
+      "v5-research"
+    ],
+    "queued": [],
+    "waiting": [
+      "v5-qualified"
+    ]
+  },
+  "approval_required": [],
+  "blocked": [
+    [
+      "v5-qualified",
+      "no_qualified_agent"
+    ]
+  ]
+}

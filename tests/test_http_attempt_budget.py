@@ -312,3 +312,14 @@ def test_legacy_live_queue_without_binding_needs_explicit_recovery(tmp_path):
         db.execute("DELETE FROM router_events WHERE kind='http_budget_binding'")
     with pytest.raises(RuntimeError, match='binding.*recovery'):
         MonitoringRuntime(path)
+
+
+def test_active_budget_detects_same_inode_content_replacement(tmp_path):
+    path = tmp_path / 'budget.db'
+    budget = AttemptBudget(path, scope='active-copy')
+    budget.reserve('one')
+    other = tmp_path / 'other.db'
+    AttemptBudget(other, scope='active-copy')
+    path.write_bytes(other.read_bytes())
+    with pytest.raises(RuntimeError, match='replaced.*recovery'):
+        budget.read('two', lambda _: pytest.fail('no HTTP after replacement'), 'https://example.org/')

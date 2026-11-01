@@ -1,3 +1,14 @@
+## Active-ledger completion — 2026-11-01
+
+Continue PR133 from the preserved implementation. Final review reproduced a
+same-inode content replacement while the budget object stayed alive; the
+persisted ledger ID is now checked on connect and inside reservation transaction.
+196 focused tests pass (16.82s); full tests+evals1875 pass (58.80s), one existing
+Starlette warning. The previous real queue reopened offline with valid binding
+and durable count1, without HTTP. Main54e0f82 and its real workflow evidence below
+remain unchanged; this final fix is a PR candidate and requires exact-head CI.
+No merge, authority promotion, cadence activation or production deployment.
+
 ## Verified current-main operation and restart correction candidate — 2026-10-31
 
 Authoritative main independently fetched at 54e0f8242432fb1b07c54584987c01944d1153a5

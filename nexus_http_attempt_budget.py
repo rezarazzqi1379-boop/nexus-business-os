@@ -77,12 +77,26 @@ class AttemptBudget:
         if any(Path(self.path + suffix).exists() for suffix in ('-wal', '-shm')):
             raise RuntimeError("unsupported_budget_journal_requires_recovery")
         db = sqlite3.connect(self.path, timeout=15, isolation_level=None)
-        if db.execute("PRAGMA journal_mode").fetchone()[0] != 'delete':
+        try:
+            if db.execute("PRAGMA journal_mode").fetchone()[0] != 'delete':
+                raise RuntimeError("unsupported_budget_journal_requires_recovery")
+            db.execute("PRAGMA busy_timeout=15000")
+            db.execute("PRAGMA foreign_keys=ON")
+            self._assert_ledger(db)
+        except Exception:
             db.close()
-            raise RuntimeError("unsupported_budget_journal_requires_recovery")
-        db.execute("PRAGMA busy_timeout=15000")
-        db.execute("PRAGMA foreign_keys=ON")
+            raise
         return db
+
+    def _assert_ledger(self, db):
+        if getattr(self, '_ledger_id', None) is None:
+            return  # first initialization creates and binds the identity
+        try:
+            row = db.execute('SELECT ledger_id FROM http_budget_identity WHERE singleton=1').fetchone()
+        except sqlite3.DatabaseError:
+            raise RuntimeError('replaced_durable_http_budget_requires_recovery') from None
+        if row is None or row[0] != self._ledger_id:
+            raise RuntimeError('replaced_durable_http_budget_requires_recovery')
 
     def binding(self):
         self._assert_identity()
@@ -96,6 +110,7 @@ class AttemptBudget:
         with closing(self._connect()) as db:
             db.execute("BEGIN IMMEDIATE")
             self._assert_identity()
+            self._assert_ledger(db)
             used = db.execute("SELECT COUNT(*) FROM http_budget_reservation WHERE scope=?",
                               (self.scope,)).fetchone()[0]
             if used >= self.max_attempts:

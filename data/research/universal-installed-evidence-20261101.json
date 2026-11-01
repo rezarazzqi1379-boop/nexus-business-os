@@ -1,0 +1,73 @@
+{
+  "observed_at": "2026-11-01T06:05:21.486014+00:00",
+  "environment": "INSTALLED_WINDOWS_SANDBOX",
+  "revision": "038bae1a4023ef29d2b06503fc33c6875e71a6d1",
+  "dirty_before_probe": true,
+  "working_tree_status_lines": 46,
+  "not_certified_as_main": true,
+  "captures": {
+    "opportunity-radar": {
+      "observed_at": "2026-11-01T06:01:12.710090+00:00",
+      "source_url": "https://oqep.om/tenders",
+      "source_sha256": "67cadee8805f0229a58993c200e645309aa8552421d42375cc0c78cff88a4258",
+      "raw_bytes": 52957,
+      "returned": 61,
+      "canonical_promotion": false,
+      "qualification": "NOT_VERIFIED",
+      "capture_sha256": "4df50c7c65ea936d58cf5f87b4e769f0f81f878d4bedb4aa4bd64afc0494b8a6"
+    },
+    "market-context": {
+      "observed_at": "2026-11-01T06:01:23.112032+00:00",
+      "source_url": "https://api.worldbank.org/v2/country/OM;KZ;AM/indicator/NV.IND.MANF.CD?format=json&date=2024&per_page=10",
+      "source_sha256": "fe3584f765d71669889ce8c7248765cf2437df2d3dffd93c6feaf46bf95f5985",
+      "raw_bytes": 780,
+      "returned": 3,
+      "canonical_promotion": false,
+      "qualification": "NOT_VERIFIED",
+      "capture_sha256": "5994f382e1ac12a0b94975317220c89067c35a63c763052ebdf5293b25aea914"
+    },
+    "ted-notices": {
+      "observed_at": "2026-11-01T06:01:24.653026+00:00",
+      "source_url": "https://api.ted.europa.eu/v3/notices/search",
+      "source_sha256": "a30111dd6b445d1d8ba53b2fbbe080caf9dfec4d7a9562ff91c7c7cf80d5d6a8",
+      "raw_bytes": 48006,
+      "returned": 10,
+      "canonical_promotion": false,
+      "qualification": "NOT_VERIFIED",
+      "capture_sha256": "5d7ec65123031a8475bf3846ac9fd3a8c2a7c0f1bcef8a7ead0cddaeb71fdcc1",
+      "query": "publication-date >= 20261025 AND notice-type = \"cn-standard\""
+    }
+  },
+  "implementation_sha256": {
+    "tools/run_opportunity_radar.py": "a964ff6bb8881706005c39892b1af9c9a83e4ca3b3b37a7850cd661a281afec4",
+    "scripts/opportunity_radar.ps1": "ad909481f5e140e661d2b3b4a49ffdecc56b01e8a3898d3a86987d9edd07ff20",
+    "tools/refresh_ted_notices.py": "fa1bdbaa3b789d8e90b62da7582e5788a8aafe7f03509534f5dfc083cab629cf",
+    "tools/refresh_market_context.py": "42619a4e8d7e9fad9d9bf1ac7a86803ef088446ff43cb0c1afd91e8a7b6dad08",
+    "intelligence_dlt_adapter.py": "5773d5782ac5d5bd6dd3035978f4a75fcef511922b5c098dd714bce6307de7a1",
+    "ted_notices.py": "78fc229a329027e0b6ad9c2cd8b919a46f32f71984765eeaf34222cb7f392f4b",
+    "opportunity_radar.py": "f1b795a96c3119ddda11e0585e61b5e674087e14e684d2c545fbc91defde2ae1",
+    "api.py": "5e7eea35399e6692b06295a494b38ca8aeb56c61d115b0eac138458519b089e7"
+  },
+  "hub_integrity": "ok",
+  "hub_counts": {
+    "data_assets": 22,
+    "evidence_observations": 57
+  },
+  "fresh_observation_readback": [
+    {
+      "id": "opportunity-radar-20261101T060118029343Z",
+      "project_id": "SANDBOX",
+      "category": "CLAIM"
+    },
+    {
+      "id": "market-context-20261101T060123112032Z",
+      "project_id": "SANDBOX",
+      "category": "CLAIM"
+    },
+    {
+      "id": "ted-notices-20261101T060124653026Z",
+      "project_id": "SANDBOX",
+      "category": "CLAIM"
+    }
+  ]
+}

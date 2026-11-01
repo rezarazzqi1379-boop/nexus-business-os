@@ -1,0 +1,404 @@
+{
+  "observed_at": "2026-11-01T06:06:35.982102+00:00",
+  "catalog": [
+    {
+      "id": "AGT-OPENAI-AGENTS-SDK",
+      "name": "OpenAI Agents SDK",
+      "lifecycle": "EXPERIMENT",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Run one governed read-only NEXUS vertical with zero authority regressions and full trace correlation.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-OPENAI-SANDBOX",
+      "name": "OpenAI Sandbox Agents",
+      "lifecycle": "EXPERIMENT",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Complete one frozen coding task in an isolated workspace, pass tests, preserve rollback and emit no external side effect.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-OPENCODE",
+      "name": "OpenCode",
+      "lifecycle": "EXPERIMENT",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Beat current coding baseline on same snapshot without policy, security or regression failures.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-OPENHANDS",
+      "name": "OpenHands",
+      "lifecycle": "WATCH",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Benchmark the same frozen repo task; require lower correction burden or materially better parallel execution.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-GOOGLE-ADK",
+      "name": "Google Agent Development Kit",
+      "lifecycle": "WATCH",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Benchmark one NEXUS vertical against current runtime and Agents SDK.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-MS-AGENT-FRAMEWORK",
+      "name": "Microsoft Agent Framework",
+      "lifecycle": "WATCH",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Benchmark resumability, correctness and implementation complexity on identical NEXUS workflow.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-LANGGRAPH",
+      "name": "LangGraph",
+      "lifecycle": "DEFERRED",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Only test if an existing NEXUS workflow cannot be expressed cleanly; require lower defect rate or simpler recovery.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-TEMPORAL",
+      "name": "Temporal",
+      "lifecycle": "DEFERRED",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Demonstrate crash-safe resume with zero duplicate external actions.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-MCP-OFFICIAL-REGISTRY",
+      "name": "Official MCP Registry",
+      "lifecycle": "SANDBOX_READY",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Discover servers but expose none until provenance, schema, permissions and side-effect policy pass.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-A2A",
+      "name": "A2A Protocol",
+      "lifecycle": "WATCH",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Connect two sandbox agents through A2A without delegating NEXUS authority or approvals.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-N8N",
+      "name": "n8n",
+      "lifecycle": "WATCH",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Trigger one read-only NEXUS workflow with stable IDs, dedupe and blocked external action.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-OPEN-SWE",
+      "name": "Open SWE",
+      "lifecycle": "DISCOVERED",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Run identical frozen coding task in sandbox and compare correction burden, time and regressions.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-GOOSE",
+      "name": "Goose",
+      "lifecycle": "DISCOVERED",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Run identical frozen coding task with no secrets and compare to current baseline.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-PLANDEX",
+      "name": "Plandex",
+      "lifecycle": "DISCOVERED",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Test on one large-context refactor with frozen acceptance criteria.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-BYTEBOT",
+      "name": "Bytebot",
+      "lifecycle": "DISCOVERED",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Complete a read-only browser task in isolated environment with zero unauthorized action.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    },
+    {
+      "id": "AGT-UI-TARS",
+      "name": "UI-TARS Desktop",
+      "lifecycle": "DISCOVERED",
+      "status": "BLOCKED",
+      "evidence": [
+        "src/nexus_core/agent_catalog.py"
+      ],
+      "blocker": "Catalog discovery/planning entry; installed adapter and runtime health not demonstrated. No new external frameworks installed.",
+      "recovery": "Complete one sandbox GUI task with deterministic stop conditions and no credential exposure.",
+      "recovery_test_status": "NOT_EXECUTED_FOR_UNINSTALLED_AGENT",
+      "approval_required": "Reviewed pinned environment/source/permissions/cost if installation becomes necessary; never automatic adoption."
+    }
+  ],
+  "projects": [
+    {
+      "id": "hydrostatic_tester",
+      "policy_status": "active",
+      "status": "BLOCKED",
+      "objective": "Obtain a technically valid and priced 120 MPa proposal",
+      "missing_evidence": [
+        "steel_grade",
+        "pressure_basis",
+        "end_configuration",
+        "pipes_per_hour",
+        "fat_tpi"
+      ],
+      "forbidden_actions": [
+        "outreach_boyu"
+      ],
+      "blocker": "Canonical master/registry approval and current qualification missing. Research coverage is not commercial activation.",
+      "recovery": "Restore exact project master/IDs; collect listed missing evidence; pass authority preflight before consequential action.",
+      "recovery_test_status": "Authority negative tests and eight-project watchdog coverage verified; commercial acceptance NOT_TESTED."
+    },
+    {
+      "id": "kcl_mop",
+      "policy_status": "active",
+      "status": "BLOCKED",
+      "objective": "Qualify supply for white fine MOP used as SOP feed",
+      "missing_evidence": [
+        "official_import_rule",
+        "coa_match",
+        "price",
+        "payment_route",
+        "shipment_structure"
+      ],
+      "forbidden_actions": [],
+      "blocker": "Canonical master/registry approval and current qualification missing. Research coverage is not commercial activation.",
+      "recovery": "Restore exact project master/IDs; collect listed missing evidence; pass authority preflight before consequential action.",
+      "recovery_test_status": "Authority negative tests and eight-project watchdog coverage verified; commercial acceptance NOT_TESTED."
+    },
+    {
+      "id": "can_forming",
+      "policy_status": "active",
+      "status": "BLOCKED",
+      "objective": "Obtain comparable necking-only and complete-line offers",
+      "missing_evidence": [
+        "necking_only_price",
+        "stable_cpm_fat",
+        "scope_matrix",
+        "delivery",
+        "warranty"
+      ],
+      "forbidden_actions": [],
+      "blocker": "Canonical master/registry approval and current qualification missing. Research coverage is not commercial activation.",
+      "recovery": "Restore exact project master/IDs; collect listed missing evidence; pass authority preflight before consequential action.",
+      "recovery_test_status": "Authority negative tests and eight-project watchdog coverage verified; commercial acceptance NOT_TESTED."
+    },
+    {
+      "id": "heat_treatment",
+      "policy_status": "hold",
+      "status": "BLOCKED",
+      "objective": "Preserve evidence without further supplier activity",
+      "missing_evidence": [
+        "written_reactivation"
+      ],
+      "forbidden_actions": [
+        "supplier_outreach",
+        "commercial_commitment"
+      ],
+      "blocker": "Canonical master/registry approval and current qualification missing. Research coverage is not commercial activation.",
+      "recovery": "Restore exact project master/IDs; collect listed missing evidence; pass authority preflight before consequential action.",
+      "recovery_test_status": "Authority negative tests and eight-project watchdog coverage verified; commercial acceptance NOT_TESTED."
+    },
+    {
+      "id": "food_additives",
+      "policy_status": "research",
+      "status": "BLOCKED",
+      "objective": "Validate demand and margin before supplier outreach",
+      "missing_evidence": [
+        "buyer_demand",
+        "hs_code",
+        "landed_cost",
+        "regulatory_path"
+      ],
+      "forbidden_actions": [],
+      "blocker": "Canonical master/registry approval and current qualification missing. Research coverage is not commercial activation.",
+      "recovery": "Restore exact project master/IDs; collect listed missing evidence; pass authority preflight before consequential action.",
+      "recovery_test_status": "Authority negative tests and eight-project watchdog coverage verified; commercial acceptance NOT_TESTED."
+    },
+    {
+      "id": "coffee_import",
+      "policy_status": "research",
+      "status": "BLOCKED",
+      "objective": "Validate one-container green coffee opportunity",
+      "missing_evidence": [
+        "buyer_confirmation",
+        "current_price",
+        "landed_cost",
+        "payment_route"
+      ],
+      "forbidden_actions": [],
+      "blocker": "Canonical master/registry approval and current qualification missing. Research coverage is not commercial activation.",
+      "recovery": "Restore exact project master/IDs; collect listed missing evidence; pass authority preflight before consequential action.",
+      "recovery_test_status": "Authority negative tests and eight-project watchdog coverage verified; commercial acceptance NOT_TESTED."
+    },
+    {
+      "id": "tinplate_pi",
+      "policy_status": "blocked",
+      "status": "BLOCKED",
+      "objective": "Complete a defensible proforma invoice",
+      "missing_evidence": [
+        "seller_identity",
+        "item_b_quantity",
+        "price",
+        "incoterm",
+        "payment_terms"
+      ],
+      "forbidden_actions": [],
+      "blocker": "Canonical master/registry approval and current qualification missing. Research coverage is not commercial activation.",
+      "recovery": "Restore exact project master/IDs; collect listed missing evidence; pass authority preflight before consequential action.",
+      "recovery_test_status": "Authority negative tests and eight-project watchdog coverage verified; commercial acceptance NOT_TESTED."
+    },
+    {
+      "id": "portfolio_platform",
+      "policy_status": "separate_workstream",
+      "status": "BLOCKED",
+      "objective": "Deliver a credible public portfolio product",
+      "missing_evidence": [
+        "repository_state",
+        "deployment_owner",
+        "acceptance_test"
+      ],
+      "forbidden_actions": [],
+      "blocker": "Canonical master/registry approval and current qualification missing. Research coverage is not commercial activation.",
+      "recovery": "Restore exact project master/IDs; collect listed missing evidence; pass authority preflight before consequential action.",
+      "recovery_test_status": "Authority negative tests and eight-project watchdog coverage verified; commercial acceptance NOT_TESTED."
+    }
+  ],
+  "watchdog": {
+    "schedule": {
+      "running": [
+        "watch-hydrostatic_tester"
+      ],
+      "queued": [
+        "watch-can_forming",
+        "watch-kcl_mop",
+        "watch-coffee_import",
+        "watch-food_additives",
+        "watch-portfolio_platform",
+        "watch-tinplate_pi",
+        "watch-heat_treatment"
+      ],
+      "waiting": []
+    },
+    "neglected_projects": [
+      "can_forming",
+      "coffee_import",
+      "food_additives",
+      "heat_treatment",
+      "hydrostatic_tester",
+      "kcl_mop",
+      "portfolio_platform",
+      "tinplate_pi"
+    ],
+    "coverage": [
+      "watch-can_forming",
+      "watch-coffee_import",
+      "watch-food_additives",
+      "watch-heat_treatment",
+      "watch-hydrostatic_tester",
+      "watch-kcl_mop",
+      "watch-portfolio_platform",
+      "watch-tinplate_pi"
+    ]
+  },
+  "qualification_plan": {
+    "version": "nexus.project-control-plane.v1",
+    "assignments": [],
+    "source_routes": {},
+    "schedule": {
+      "running": [],
+      "queued": [],
+      "waiting": [
+        "universal-qualification"
+      ]
+    },
+    "approval_required": [],
+    "blocked": [
+      [
+        "universal-qualification",
+        "no_qualified_agent"
+      ]
+    ]
+  }
+}

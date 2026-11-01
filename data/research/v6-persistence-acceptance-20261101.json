@@ -1,0 +1,11 @@
+{
+  "independent_process": true,
+  "hub_integrity": "ok",
+  "observation_count": 1,
+  "asset_count": 2,
+  "wrong_project_rows": 0,
+  "draft_hash_verified": true,
+  "survived_process_restart": true,
+  "external_actions": 0,
+  "scope": "SANDBOX internal review, not canonical business integration"
+}

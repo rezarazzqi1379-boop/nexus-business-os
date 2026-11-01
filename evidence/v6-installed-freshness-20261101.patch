@@ -1,0 +1,90 @@
+--- a/tools/check_evidence_changes.py
++++ b/tools/check_evidence_changes.py
+@@ -3,10 +3,13 @@
+ import json
+ import os
+ from contextlib import contextmanager
++from datetime import datetime, timezone
+ from pathlib import Path
+ 
+ ROOT = Path(__file__).resolve().parents[1]
+ LANES = ('opportunity-radar', 'market-context', 'ted-notices')
++# Alert bounds: daily sources + one day grace; seven-day context cache + one day.
++MAX_CAPTURE_AGE = {'opportunity-radar': 172800, 'ted-notices': 172800, 'market-context': 691200}
+ 
+ 
+ def read_document(path, limit=2_000_000):
+@@ -91,7 +94,14 @@
+     for lane in LANES:
+         path = base / lane / 'latest.json'
+         try:
+-            current[lane] = fingerprint(read_document(path))
++            payload = read_document(path)
++            current[lane] = fingerprint(payload)
++            observed = datetime.fromisoformat(payload['observed_at'])
++            if observed.tzinfo is None:
++                raise ValueError('observation_timezone_required')
++            age = (datetime.now(timezone.utc) - observed).total_seconds()
++            if not -300 <= age <= MAX_CAPTURE_AGE[lane]:
++                current[lane] = 'ERROR:source_timestamp_unfresh'
+             attempt = base / lane / 'last-attempt.json'
+             if attempt.exists():
+                 result = read_document(attempt).get('result')
+--- a/tests/test_evidence_change_gate.py
++++ b/tests/test_evidence_change_gate.py
+@@ -59,7 +59,7 @@
+     for lane in gate.LANES:
+         path = tmp_path / '.nexus/acquisition-lab' / lane
+         path.mkdir()
+-        (path / 'latest.json').write_text(json.dumps(dict(project_id='SANDBOX', records=[])))
++        (path / 'latest.json').write_text(json.dumps(dict(project_id='SANDBOX', records=[], observed_at=datetime.now(timezone.utc).isoformat())))
+         (path / 'last-attempt.json').write_text(json.dumps(dict(result='PASS')))
+     assert gate.run(tmp_path)['review_required']
+     report = gate.run(tmp_path)
+@@ -71,7 +71,7 @@
+     for lane in gate.LANES:
+         base = tmp_path / '.nexus/acquisition-lab' / lane
+         base.mkdir(parents=True)
+-        (base / 'latest.json').write_text(json.dumps(dict(project_id='SANDBOX', records=[])))
++        (base / 'latest.json').write_text(json.dumps(dict(project_id='SANDBOX', records=[], observed_at=datetime.now(timezone.utc).isoformat())))
+         (base / 'last-attempt.json').write_text(json.dumps(dict(result='BROKEN')))
+     gate.run(tmp_path)
+     assert gate.run(tmp_path)['review_required']
+@@ -101,3 +101,37 @@
+         with gate.checkpoint_lock(base):
+             raise ValueError('simulated_failure')
+     assert gate.run(tmp_path)['baseline']
++
++
++import pytest
++from datetime import datetime, timezone, timedelta
++
++
++@pytest.mark.parametrize("stamp", [None, "2000-01-01T00:00:00+00:00", "2999-01-01T00:00:00+00:00", "2026-11-01T00:00:00"])
++def test_unfresh_source_remains_visible_without_content_change(tmp_path, stamp):
++    for lane in gate.LANES:
++        folder = tmp_path / '.nexus/acquisition-lab' / lane
++        folder.mkdir(parents=True)
++        payload = dict(project_id='SANDBOX', records=[])
++        if stamp is not None: payload['observed_at'] = stamp
++        (folder / 'latest.json').write_text(json.dumps(payload))
++        (folder / 'last-attempt.json').write_text(json.dumps(dict(result='PASS')))
++    gate.run(tmp_path)
++    report = gate.run(tmp_path)
++    assert report['review_required'] is True
++    assert sorted(report['source_errors']) == sorted(gate.LANES)
++
++
++@pytest.mark.parametrize("lane,days,stale", [('market-context',7,False),('market-context',9,True),('ted-notices',1,False),('ted-notices',3,True),('opportunity-radar',3,True)])
++def test_cache_cadence_specific_age_bounds(tmp_path, lane, days, stale):
++    now = datetime.now(timezone.utc)
++    for name in gate.LANES:
++        folder = tmp_path / '.nexus/acquisition-lab' / name
++        folder.mkdir(parents=True)
++        stamp = now - timedelta(days=days if name == lane else 0)
++        (folder / 'latest.json').write_text(json.dumps(dict(project_id='SANDBOX',records=[],observed_at=stamp.isoformat())))
++        (folder / 'last-attempt.json').write_text(json.dumps(dict(result='PASS')))
++    gate.run(tmp_path)
++    report = gate.run(tmp_path)
++    assert (lane in report['source_errors']) is stale
++    assert report['review_required'] is stale

@@ -1,0 +1,19 @@
+{
+  "snapshot": "v6-gap-closure-20261101",
+  "verified": true,
+  "registered_missing_count": 0,
+  "file_count": 25,
+  "manifest_sha256": "0cc4022ef7f06235ddae943db80e78d2e6a5e62d117e5d2e5f7c66d9b7fe1571",
+  "off_host": false,
+  "live_restore": false,
+  "scope": "installed registered hub assets; not full host DR",
+  "self_improvement": {
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "accepted_exercises": [],
+    "ineligible_exercises": [
+      "v6-gap-closure-20261101"
+    ],
+    "candidates": [],
+    "production_changes_applied": false
+  }
+}

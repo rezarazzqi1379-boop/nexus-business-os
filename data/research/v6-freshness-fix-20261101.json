@@ -1,0 +1,60 @@
+{
+  "installed_base_head": "038bae1a4023ef29d2b06503fc33c6875e71a6d1",
+  "working_tree_preexisting_changes": true,
+  "main_code_changed": false,
+  "patch": "evidence/v6-installed-freshness-20261101.patch",
+  "patch_sha256": "fad9d01fea97663cb0a83a397ea738ba8c110c8122b9c8c231ba6be2345ddf43",
+  "bindings": {
+    "tools/check_evidence_changes.py": {
+      "before_sha256": "a3fa0be80809a11b9040ee8dba65e68adc6caa6c94d7515cee06428d404ccf60",
+      "after_sha256": "3eb15765de7b014d1104becd5e7e4efa37934e0cf110557be87350fc8657aac8",
+      "normalized_after_sha256": "a9444e61572b3f0f969106ffa149ce3e777998863f227b6f4c5caa094fa4fc00"
+    },
+    "tests/test_evidence_change_gate.py": {
+      "before_sha256": "5cb1c0790b5a5324b772a8a20bcb8adc0bd0c5af2b94c90a1b0f7f1b472993b4",
+      "after_sha256": "321d53fab28c85915e9f157350fe24566d00a5d6015afdbb9303ed9c8e59b648",
+      "normalized_after_sha256": "e14f72a77b984d8f4b40e9873557ce3da8f04f6d31524656a719acc75cae7c3f"
+    }
+  },
+  "patch_replay": "VERIFIED_ON_PREIMAGE_WITH_LF_NORMALIZATION",
+  "replay_initial_byte_comparison": "Git line-ending conversion; normalized contents match exactly",
+  "tests": {
+    "red": {
+      "failed": 4,
+      "passed": 9
+    },
+    "focused": {
+      "passed": 42,
+      "seconds": 1.01
+    },
+    "full_utf8": {
+      "passed": 2490,
+      "skipped": 1,
+      "warning_count": 1,
+      "seconds": 64.57
+    },
+    "initial_full_without_utf8": {
+      "failed": 5,
+      "passed": 2485,
+      "skipped": 1,
+      "warning_count": 1,
+      "seconds": 55.75
+    },
+    "affected_unicode_tests_with_utf8": {
+      "passed": 7,
+      "prompt_files_changed": false
+    }
+  },
+  "alert_bounds_seconds": {
+    "opportunity-radar": 172800,
+    "ted-notices": 172800,
+    "market-context": 691200,
+    "future_tolerance": 300
+  },
+  "provider_freshness_sla": "UNKNOWN",
+  "schedule_changed": false,
+  "network_budget_changed": false,
+  "authority_changed": false,
+  "new_http_requests": 0,
+  "remote_ci_covers_installed_patch": false
+}

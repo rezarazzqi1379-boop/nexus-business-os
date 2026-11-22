@@ -1,0 +1,64 @@
+{
+  "observed_at": "2026-11-22T09:14:17.457010+00:00",
+  "code_commit": "2465ba693b97289fdd49108f56ba1e0185058e01",
+  "tests": {
+    "fts_initial": {
+      "passed": 19,
+      "seconds": 0.38
+    },
+    "focused_final": {
+      "passed": 185,
+      "seconds": 6.77
+    },
+    "full_final": {
+      "passed": 1898,
+      "warnings": 1,
+      "seconds": 47.85
+    }
+  },
+  "failures_preserved": [
+    "Initial pytest default temp setup failed; bounded fixture IDs and fresh workspace basetemp corrected",
+    "One existing October report fixture became stale on22November; frozen test clock, no production freshness relaxation",
+    "Source-mode test initially created queue before budget and correctly hit missing-ledger recovery guard; fixture initialization order corrected",
+    "Initial source-report extraction used absent OQEP source_url; corrected to preserved source_ref without changing source data"
+  ],
+  "new_head_ci": "NOT_EXECUTED_LOCAL_ONLY",
+  "main_scheduled_success": 44567201418,
+  "main_scheduled_failure": 44770194843,
+  "scheduled_failure_known": "First source acquisition or subsequent validation failed after1attempt; raw provider reason was redacted; exactHTTPcauseUNKNOWN",
+  "diagnostic_improvement": "New fixed failure_category and optional source index; no provider error/body exported; budget unchanged",
+  "local_service_before": "ConnectionRefusedError10061; taskReady",
+  "local_service_after": "Same taskRunning,health/ready200,protected401; revisionUNKNOWN",
+  "heartbeat_latest": {
+    "thread_id": "01a0945e-81a2-7ef3-870a-600de84d6918",
+    "started_at": "2026-11-22T07:44:21.835Z",
+    "outcome": "failed",
+    "error": "workspace routing discovery failed",
+    "target_path_exists": true,
+    "registered_project_path_exists": true,
+    "duplicate_registration_observed": true,
+    "root_cause": "UNKNOWN; duplicate registration is observation, not proven cause",
+    "required_action": "Repair existing thread/workspace routing in Codex host; preserve existing automation/cadence/target; then observe next actual heartbeat",
+    "end_to_end_recovery_test": "BLOCKED_BY_APP_ROUTING; no replacement scheduler created"
+  },
+  "commercial": {
+    "new_unique_opportunities": "UNKNOWN;3uniqueFTSnoticeIDs, not necessarily3procurements",
+    "verified_counterparties": 0,
+    "qualified_opportunities": 0,
+    "actionable_opportunities": 0,
+    "prepared_final_RFQs": 0,
+    "approved_followups": 0,
+    "outbound_messages": 0,
+    "supplier_responses": "UNKNOWN",
+    "negotiations": "UNKNOWN",
+    "contracts": "UNKNOWN",
+    "financial_outcomes": "UNKNOWN"
+  },
+  "acceptance": {
+    "ENGINEERING_VERIFIED": "Local code/test/source/persistence scope only",
+    "PILOT_ACCEPTED": "NOT_ACCEPTED_GLOBAL; canonical assignment and autonomy blockers",
+    "COMMERCIAL_RELEASE_ACCEPTED": "BLOCKED",
+    "BUSINESS_OUTCOME_VERIFIED": "NO_VERIFIED_OUTCOME"
+  },
+  "authority": "HOLD; current canonical Master/Registry binding unavailable"
+}

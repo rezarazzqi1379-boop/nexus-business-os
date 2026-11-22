@@ -1,0 +1,35 @@
+{
+  "release_code_commit": "2465ba693b97289fdd49108f56ba1e0185058e01",
+  "base_main": "e5bc75867ed85fa3869018a578d049bfdb5e57bd",
+  "files": {
+    "nexus_fts_source.py": "1e09b609a1c6438aa74d1e347175173219a669e2f2a01567b0baa7a432227564",
+    "nexus_free_research.py": "531f73c490d8b2f4fd9054f1469e297c9641f2f596544ae11449932312b71fcd",
+    "tests/test_fts_source.py": "be7501804287d74f2239909309d776b1176a4243902f78825c44dfb22624c1ed",
+    "tests/test_free_research.py": "15354bf8ed5f31ea09f026422307c8645dabced7ef2d75bd09e48f81743a89aa",
+    "tests/test_commercial_pilot.py": "c7a65f8bab20931709c166a038fe7002689cbad5d38185171fc21f287c6b5b00",
+    "deploy/compose.persistent.yml": "215a3523fc7a729cdcc845a1626e028307c3fd10e9d16427dba4b6d22cf4c704",
+    "Dockerfile": "a74890539bfeb82568ead579c31c75101bdcd4c0e490c95a2fe6695c50690d47",
+    ".github/workflows/nexus-free-runtime.yml": "3373de2f6609b88a8b53387dba426a4a1beeb4e395b571105bc532f76384fbf7"
+  },
+  "target": "Existing Windows NEXUS-Local-Intelligence; private127.0.0.1:8000",
+  "target_action": "No replacement performed; existing task resumed unchanged",
+  "current_running_revision": "UNKNOWN",
+  "storage": "Existing SQLite stores, local owner host; no serverless migration",
+  "secrets": "Existing DPAPI/token handling retained; values not read or exported",
+  "health": {
+    "health": 200,
+    "ready": 200,
+    "unauthenticated_protected": 401
+  },
+  "scheduler": "Existing heartbeat only; currently workspace routing BLOCKED",
+  "monitoring": "Existing GitHub/heartbeat failure paths; delivery unverified",
+  "backup": "v61-targeted-backup-20261122.json; queue/ledger only; not full DR",
+  "restoration": "Scratch SQLite restore/readback verified; relocated ledger needs approved identity rebinding",
+  "rollback": "Stop candidate only; preserve existing task, source preimage and SQLite stores. No implicit restore over live DB. Future production rollback needs exact target/revision approval.",
+  "resource_budget": "FTS1GET/3releases/262144bytes/8s transport; existing queue max3attempts but shared HTTPcap1 forbids additional requests. Existing compose alternative1CPU/512MiB/128pids, not launched.",
+  "new_paid_hosting_cap_usd": 0,
+  "existing_host_energy_compute_cost": "UNKNOWN",
+  "operator": "NEXUS_OWNER",
+  "approval_required": "Exact environment/revision/configuration/permissions/cost/rollback approval before production replacement",
+  "production_deployment": false
+}

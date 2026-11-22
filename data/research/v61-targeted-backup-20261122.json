@@ -1,0 +1,21 @@
+{
+  "backup_scope": "Existing bounded queue and HTTP ledger only; not whole hub or host",
+  "files": [
+    {
+      "name": "operational-live-20261031.queue.db",
+      "sha256": "cdf71047278969cb0564cc299a192df1bb025489e4cba81b0d08c35c9207459a",
+      "bytes": 180224
+    },
+    {
+      "name": "operational-live-20261031.queue.db.http-attempts.sqlite",
+      "sha256": "75576629eabdb1cfd618f2eb5996d56436f2695237c995b76ef80dfcdc3394af",
+      "bytes": 24576
+    }
+  ],
+  "manifest_sha256": "e14f7861f0ce48aee09df0d9ecdfcaedac75a5f8c7ad4a991b86d999e3f967a7",
+  "sqlite_backup_api": true,
+  "scratch_restore_readback": true,
+  "live_overwrite": false,
+  "off_host": false,
+  "ledger_identity_rebinding": "NOT_PERFORMED; separate governed recovery required for actual relocated runtime"
+}

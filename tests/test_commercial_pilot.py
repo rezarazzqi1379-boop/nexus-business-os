@@ -154,7 +154,15 @@ def test_parallel_submission_executes_once(tmp_path):
     assert runtime.review("same") == "accepted"
 
 
-def test_wrapper_bounds_replay_and_fixture_label():
+def test_wrapper_bounds_replay_and_fixture_label(monkeypatch):
+    # The fixture describes October demand; advancing wall time must not turn
+    # this report-format test into an unrelated stale-notice rejection test.
+    class FrozenDateTime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            value = datetime.fromisoformat(NOW)
+            return value.astimezone(tz) if tz else value.replace(tzinfo=None)
+    monkeypatch.setattr(pilot, 'datetime', FrozenDateTime)
     calls = []
     summary, evidence = pilot.run(transport=lambda url: calls.append(url) or body(row()), commit_sha="a" * 40)
     assert summary["status"] == "VERIFIED" and summary["source_mode"] == "FROZEN_TEST_FIXTURE"

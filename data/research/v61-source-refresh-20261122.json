@@ -1,0 +1,70 @@
+{
+  "observed_at": "2026-11-22T09:11:34.494615+00:00",
+  "sources": [
+    {
+      "lane": "opportunity-radar",
+      "source_url": "https://oqep.om/tenders",
+      "observed_at": "2026-11-22T09:03:25.517842+00:00",
+      "sha256": "645a34d69b9f7ceb370d9c84f1c0c06cd52418ebfc4e26b90947dcf3b24fbf02",
+      "bytes": 46660,
+      "records": 26,
+      "evidence_class": "CLAIM",
+      "canonical_promotion": false
+    },
+    {
+      "lane": "market-context",
+      "source_url": "https://api.worldbank.org/v2/country/OM;KZ;AM/indicator/NV.IND.MANF.CD?format=json&date=2024&per_page=10",
+      "observed_at": "2026-11-22T09:03:37.199912+00:00",
+      "sha256": "9c4dfc4bbe4d436e20160393a465257bc1309096a2fb92bc6087dbd169c83f2f",
+      "bytes": 780,
+      "records": 3,
+      "evidence_class": "CLAIM",
+      "canonical_promotion": false
+    },
+    {
+      "lane": "ted-notices",
+      "source_url": "https://api.ted.europa.eu/v3/notices/search",
+      "observed_at": "2026-11-22T09:03:38.354482+00:00",
+      "sha256": "56d076e2a9f4c97e417cff449a014b8c2ef683c132b58b52cac1672d605b7bc4",
+      "bytes": 47847,
+      "records": 10,
+      "evidence_class": "CLAIM",
+      "canonical_promotion": false
+    }
+  ],
+  "stale_before": [
+    "opportunity-radar",
+    "market-context",
+    "ted-notices"
+  ],
+  "post_refresh_report": {
+    "project_id": "SANDBOX",
+    "changed_lanes": [
+      "market-context",
+      "opportunity-radar",
+      "ted-notices"
+    ],
+    "review_required": true,
+    "model_calls": 0,
+    "network_calls": 0,
+    "automatic_coding": false,
+    "baseline": false,
+    "checkpoint_error": false,
+    "source_errors": [],
+    "meaning": "CHANGE_CANDIDATE_NOT_VERIFIED_DEMAND; checkpoint is not review acknowledgement"
+  },
+  "execution": "MANUAL_BOUNDED_EXISTING_RUNNER",
+  "source_capture_not_current_demand": true,
+  "repeat_report": {
+    "project_id": "SANDBOX",
+    "changed_lanes": [],
+    "review_required": false,
+    "model_calls": 0,
+    "network_calls": 0,
+    "automatic_coding": false,
+    "baseline": false,
+    "checkpoint_error": false,
+    "source_errors": [],
+    "meaning": "CHANGE_CANDIDATE_NOT_VERIFIED_DEMAND; checkpoint is not review acknowledgement"
+  }
+}

@@ -23,6 +23,7 @@ def require(condition):
 def run(*, transport=None) -> dict:
     """Transport injection is for frozen tests only; the CLI has no such option."""
     reads = 0
+    acquisition_failed = False
     mode = "REAL_PUBLIC_HTTP" if transport is None else "FROZEN_TEST_FIXTURE"
     fetch = public_get if transport is None else transport
     summary = {
@@ -37,11 +38,15 @@ def run(*, transport=None) -> dict:
     }
 
     def bounded_get(url):
-        nonlocal reads
+        nonlocal reads, acquisition_failed
         if reads >= 2:
             raise PermissionError("read_budget_exhausted")
         reads += 1
-        return fetch(url)
+        try:
+            return fetch(url)
+        except Exception:
+            acquisition_failed = True
+            raise
 
     try:
         with TemporaryDirectory(prefix="nexus-public-research-") as directory:
@@ -71,6 +76,10 @@ def run(*, transport=None) -> dict:
     except Exception:
         # Provider responses, paths, DB contents and raw exception text never leave.
         summary["reason"] = "bounded_research_or_verification_failed"
+        summary["failure_category"] = ("SOURCE_ACQUISITION_FAILED" if acquisition_failed
+                                       else "RUNTIME_VERIFICATION_FAILED")
+        if acquisition_failed:
+            summary["failed_source_index"] = reads
     summary["http_reads_attempted"] = reads
     return summary
 

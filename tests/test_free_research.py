@@ -39,6 +39,8 @@ def test_external_failure_is_blocked_and_redacted():
     summary = run(transport=failure)
     assert summary['status'] == 'BLOCKED' and summary['tasks_completed'] == 0
     assert summary['http_reads_attempted'] == 1
+    assert summary['failure_category'] == 'SOURCE_ACQUISITION_FAILED'
+    assert summary['failed_source_index'] == 1
     assert 'PRIVATE_PROVIDER_MESSAGE' not in json.dumps(summary)
     assert 'sources' not in summary
 
@@ -47,6 +49,8 @@ def test_supervisor_rejection_cannot_be_reported_verified(monkeypatch):
     monkeypatch.setattr(PublicResearchRuntime, 'review', lambda *args: 'rejected')
     summary = run(transport=transport([]))
     assert summary['status'] == 'BLOCKED' and summary['tasks_completed'] == 0
+    assert summary['failure_category'] == 'RUNTIME_VERIFICATION_FAILED'
+    assert 'failed_source_index' not in summary
 
 
 def test_real_source_submission_is_never_labelled_synthetic(tmp_path):

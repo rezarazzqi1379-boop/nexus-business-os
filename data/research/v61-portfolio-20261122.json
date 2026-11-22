@@ -1,0 +1,220 @@
+{
+  "canonical_master_status": "BLOCKED_AUTHORITY_BINDING_REQUIRED",
+  "catalog_is_not_master": true,
+  "watch": {
+    "schedule": {
+      "running": [
+        "watch-hydrostatic_tester",
+        "watch-can_forming",
+        "watch-kcl_mop",
+        "watch-coffee_import"
+      ],
+      "queued": [
+        "watch-food_additives",
+        "watch-portfolio_platform",
+        "watch-tinplate_pi",
+        "watch-heat_treatment"
+      ],
+      "waiting": []
+    },
+    "neglected_projects": [
+      "can_forming",
+      "coffee_import",
+      "food_additives",
+      "heat_treatment",
+      "hydrostatic_tester",
+      "kcl_mop",
+      "portfolio_platform",
+      "tinplate_pi"
+    ],
+    "coverage": [
+      "watch-can_forming",
+      "watch-coffee_import",
+      "watch-food_additives",
+      "watch-heat_treatment",
+      "watch-hydrostatic_tester",
+      "watch-kcl_mop",
+      "watch-portfolio_platform",
+      "watch-tinplate_pi"
+    ]
+  },
+  "projects": [
+    {
+      "project_id": "hydrostatic_tester",
+      "status": "active",
+      "priority": 100,
+      "objective": "Obtain a technically valid and priced 120 MPa proposal",
+      "next_evidence": [
+        "steel_grade",
+        "pressure_basis",
+        "end_configuration",
+        "pipes_per_hour",
+        "fat_tpi"
+      ],
+      "forbidden_actions": [
+        "outreach_boyu"
+      ],
+      "counterparties": "UNKNOWN_CURRENT",
+      "latest_verified_evidence": "Master-bound evidence unavailable; prior files are observations",
+      "commercial_stage": "UNKNOWN_CURRENT",
+      "next_permitted_action": "Read-only recovery of exact master and original requirements; no contact or HOLD transition",
+      "responsible_owner": "NEXUS_OWNER",
+      "monitoring": "Existing heartbeat; workspace routing failure unresolved",
+      "follow_up_deadline": "UNASSIGNED_PENDING_MASTER; technical recheck next existing cadence",
+      "expected_outcome": "UNKNOWN_NO_VERIFIED_FINANCIAL_RESULT"
+    },
+    {
+      "project_id": "kcl_mop",
+      "status": "active",
+      "priority": 90,
+      "objective": "Qualify supply for white fine MOP used as SOP feed",
+      "next_evidence": [
+        "official_import_rule",
+        "coa_match",
+        "price",
+        "payment_route",
+        "shipment_structure"
+      ],
+      "forbidden_actions": [],
+      "counterparties": "UNKNOWN_CURRENT",
+      "latest_verified_evidence": "Master-bound evidence unavailable; prior files are observations",
+      "commercial_stage": "UNKNOWN_CURRENT",
+      "next_permitted_action": "Read-only recovery of exact master and original requirements; no contact or HOLD transition",
+      "responsible_owner": "NEXUS_OWNER",
+      "monitoring": "Existing heartbeat; workspace routing failure unresolved",
+      "follow_up_deadline": "UNASSIGNED_PENDING_MASTER; technical recheck next existing cadence",
+      "expected_outcome": "UNKNOWN_NO_VERIFIED_FINANCIAL_RESULT"
+    },
+    {
+      "project_id": "can_forming",
+      "status": "active",
+      "priority": 85,
+      "objective": "Obtain comparable necking-only and complete-line offers",
+      "next_evidence": [
+        "necking_only_price",
+        "stable_cpm_fat",
+        "scope_matrix",
+        "delivery",
+        "warranty"
+      ],
+      "forbidden_actions": [],
+      "counterparties": "UNKNOWN_CURRENT",
+      "latest_verified_evidence": "Master-bound evidence unavailable; prior files are observations",
+      "commercial_stage": "UNKNOWN_CURRENT",
+      "next_permitted_action": "Read-only recovery of exact master and original requirements; no contact or HOLD transition",
+      "responsible_owner": "NEXUS_OWNER",
+      "monitoring": "Existing heartbeat; workspace routing failure unresolved",
+      "follow_up_deadline": "UNASSIGNED_PENDING_MASTER; technical recheck next existing cadence",
+      "expected_outcome": "UNKNOWN_NO_VERIFIED_FINANCIAL_RESULT"
+    },
+    {
+      "project_id": "heat_treatment",
+      "status": "hold",
+      "priority": 10,
+      "objective": "Preserve evidence without further supplier activity",
+      "next_evidence": [
+        "written_reactivation"
+      ],
+      "forbidden_actions": [
+        "supplier_outreach",
+        "commercial_commitment"
+      ],
+      "counterparties": "UNKNOWN_CURRENT",
+      "latest_verified_evidence": "Master-bound evidence unavailable; prior files are observations",
+      "commercial_stage": "UNKNOWN_CURRENT",
+      "next_permitted_action": "Read-only recovery of exact master and original requirements; no contact or HOLD transition",
+      "responsible_owner": "NEXUS_OWNER",
+      "monitoring": "Existing heartbeat; workspace routing failure unresolved",
+      "follow_up_deadline": "UNASSIGNED_PENDING_MASTER; technical recheck next existing cadence",
+      "expected_outcome": "UNKNOWN_NO_VERIFIED_FINANCIAL_RESULT"
+    },
+    {
+      "project_id": "food_additives",
+      "status": "research",
+      "priority": 45,
+      "objective": "Validate demand and margin before supplier outreach",
+      "next_evidence": [
+        "buyer_demand",
+        "hs_code",
+        "landed_cost",
+        "regulatory_path"
+      ],
+      "forbidden_actions": [],
+      "counterparties": "UNKNOWN_CURRENT",
+      "latest_verified_evidence": "Master-bound evidence unavailable; prior files are observations",
+      "commercial_stage": "UNKNOWN_CURRENT",
+      "next_permitted_action": "Read-only recovery of exact master and original requirements; no contact or HOLD transition",
+      "responsible_owner": "NEXUS_OWNER",
+      "monitoring": "Existing heartbeat; workspace routing failure unresolved",
+      "follow_up_deadline": "UNASSIGNED_PENDING_MASTER; technical recheck next existing cadence",
+      "expected_outcome": "UNKNOWN_NO_VERIFIED_FINANCIAL_RESULT"
+    },
+    {
+      "project_id": "coffee_import",
+      "status": "research",
+      "priority": 40,
+      "objective": "Validate one-container green coffee opportunity",
+      "next_evidence": [
+        "buyer_confirmation",
+        "current_price",
+        "landed_cost",
+        "payment_route"
+      ],
+      "forbidden_actions": [],
+      "counterparties": "UNKNOWN_CURRENT",
+      "latest_verified_evidence": "Master-bound evidence unavailable; prior files are observations",
+      "commercial_stage": "UNKNOWN_CURRENT",
+      "next_permitted_action": "Read-only recovery of exact master and original requirements; no contact or HOLD transition",
+      "responsible_owner": "NEXUS_OWNER",
+      "monitoring": "Existing heartbeat; workspace routing failure unresolved",
+      "follow_up_deadline": "UNASSIGNED_PENDING_MASTER; technical recheck next existing cadence",
+      "expected_outcome": "UNKNOWN_NO_VERIFIED_FINANCIAL_RESULT"
+    },
+    {
+      "project_id": "tinplate_pi",
+      "status": "blocked",
+      "priority": 35,
+      "objective": "Complete a defensible proforma invoice",
+      "next_evidence": [
+        "seller_identity",
+        "item_b_quantity",
+        "price",
+        "incoterm",
+        "payment_terms"
+      ],
+      "forbidden_actions": [],
+      "counterparties": "UNKNOWN_CURRENT",
+      "latest_verified_evidence": "Master-bound evidence unavailable; prior files are observations",
+      "commercial_stage": "UNKNOWN_CURRENT",
+      "next_permitted_action": "Read-only recovery of exact master and original requirements; no contact or HOLD transition",
+      "responsible_owner": "NEXUS_OWNER",
+      "monitoring": "Existing heartbeat; workspace routing failure unresolved",
+      "follow_up_deadline": "UNASSIGNED_PENDING_MASTER; technical recheck next existing cadence",
+      "expected_outcome": "UNKNOWN_NO_VERIFIED_FINANCIAL_RESULT"
+    },
+    {
+      "project_id": "portfolio_platform",
+      "status": "separate_workstream",
+      "priority": 30,
+      "objective": "Deliver a credible public portfolio product",
+      "next_evidence": [
+        "repository_state",
+        "deployment_owner",
+        "acceptance_test"
+      ],
+      "forbidden_actions": [],
+      "counterparties": "UNKNOWN_CURRENT",
+      "latest_verified_evidence": "Master-bound evidence unavailable; prior files are observations",
+      "commercial_stage": "UNKNOWN_CURRENT",
+      "next_permitted_action": "Read-only recovery of exact master and original requirements; no contact or HOLD transition",
+      "responsible_owner": "NEXUS_OWNER",
+      "monitoring": "Existing heartbeat; workspace routing failure unresolved",
+      "follow_up_deadline": "UNASSIGNED_PENDING_MASTER; technical recheck next existing cadence",
+      "expected_outcome": "UNKNOWN_NO_VERIFIED_FINANCIAL_RESULT"
+    }
+  ],
+  "additional_lanes": {
+    "steel_octg_sales": "BLOCKED_CANONICAL_ID; separate from hydrostatic procurement",
+    "international_tenders": "PRJ-NEXUS-SANDBOX; FTS3 rejected; no canonical assignment"
+  }
+}

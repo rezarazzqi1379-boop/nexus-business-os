@@ -1,3 +1,7 @@
+## v6.1 operational continuation — 2026-11-22
+
+Local code candidate2465ba693b97289fdd49108f56ba1e0185058e01 on codex/v61-official-source-acceptance; main e5bc758 unchanged.185 focused/1898 full pass,1 warning. Real FTS1GET/3notices/3REJECT/0qualified through existing queue; Supervisor, independent readback/hash/assessment/replay and targeted backup/scratch restore verified. New source not scheduled; durable cap1 spent, no reset. Existing local task resumed unchanged from Ready/refused to Running health/ready200 protected401; process revisionUNKNOWN. Existing OQEP26/context3/TED10 refresh clears stale errors; repeat no changes. Actual main scheduled44567201418 SUCCESS;44770194843 failed after1read, reason not recoverable from redacted log. Local heartbeat22Nov fails workspace routing before repo work. No replacement scheduler. Canonical Master/Registry binding BLOCK,8catalog projects visible but not authoritative masters; HOLD remains. No email/payment/merge/production. New candidate push/PR and CI not executed; prior approval covered only5c568ef. See docs/V61_OPERATIONAL_ACCEPTANCE_20261122_FA.md and data/research/v61-*.json.
+
 ## Active-ledger completion — 2026-11-01
 
 Continue PR133 from the preserved implementation. Final review reproduced a

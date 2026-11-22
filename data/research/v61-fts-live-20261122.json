@@ -1,0 +1,124 @@
+{
+  "observed_at": "2026-11-22T08:59:09.064711+00:00",
+  "task_id": "fts_official_bounded_v61",
+  "submitted": true,
+  "completed": 1,
+  "http_attempts": 1,
+  "http_cap": 1,
+  "mode": "REAL_PUBLIC_HTTP",
+  "status": "TESTED",
+  "external_writes": 0,
+  "authority": "HOLD",
+  "supervisor": "accepted",
+  "source_sha256": "63e596f8c81608bb2f76775192377d73a56afdaaa4dcc13aab52dcf9b93544f5",
+  "source_bytes": 101917,
+  "assessment": {
+    "assessments": [
+      {
+        "actionable": false,
+        "authority": "HOLD",
+        "buyer_claim": "Aberdeen City Council",
+        "decision": "REJECT",
+        "evidence_class": "CLAIM",
+        "independent_technical_compatibility": "UNKNOWN",
+        "keyword_relevance": false,
+        "notice_id": "110342-2026",
+        "ocid": "ocds-h6vhtk-06ce78",
+        "reasons": [
+          "independent_verification_missing",
+          "authority_hold",
+          "keyword_relevance_not_supported"
+        ],
+        "source_url": "https://www.find-tender.service.gov.uk/Notice/110342-2026",
+        "technical_specification_match": "UNKNOWN",
+        "title": "Aberdeen Destination Marketing, Development and Convention Bureau Service",
+        "verification_requirements": {
+          "commercial_feasibility": "UNKNOWN",
+          "counterparty_identity": "UNKNOWN",
+          "current_demand": "UNKNOWN",
+          "eligibility": "UNKNOWN",
+          "technical_compatibility": "UNKNOWN"
+        }
+      },
+      {
+        "actionable": false,
+        "authority": "HOLD",
+        "buyer_claim": "Aberdeen City Council",
+        "decision": "REJECT",
+        "evidence_class": "CLAIM",
+        "independent_technical_compatibility": "UNKNOWN",
+        "keyword_relevance": false,
+        "notice_id": "110343-2026",
+        "ocid": "ocds-h6vhtk-06ce78",
+        "reasons": [
+          "independent_verification_missing",
+          "authority_hold",
+          "keyword_relevance_not_supported"
+        ],
+        "source_url": "https://www.find-tender.service.gov.uk/Notice/110343-2026",
+        "technical_specification_match": "UNKNOWN",
+        "title": "Aberdeen Destination Marketing, Development and Convention Bureau Service",
+        "verification_requirements": {
+          "commercial_feasibility": "UNKNOWN",
+          "counterparty_identity": "UNKNOWN",
+          "current_demand": "UNKNOWN",
+          "eligibility": "UNKNOWN",
+          "technical_compatibility": "UNKNOWN"
+        }
+      },
+      {
+        "actionable": false,
+        "authority": "HOLD",
+        "buyer_claim": "Caledonian Maritime Assets Ltd (Utility)",
+        "decision": "REJECT",
+        "evidence_class": "CLAIM",
+        "independent_technical_compatibility": "UNKNOWN",
+        "keyword_relevance": false,
+        "notice_id": "110327-2026",
+        "ocid": "ocds-h6vhtk-07c0c2",
+        "reasons": [
+          "independent_verification_missing",
+          "authority_hold",
+          "keyword_relevance_not_supported"
+        ],
+        "source_url": "https://www.find-tender.service.gov.uk/Notice/110327-2026",
+        "technical_specification_match": "UNKNOWN",
+        "title": "Contractor Services Framework Agreement",
+        "verification_requirements": {
+          "commercial_feasibility": "UNKNOWN",
+          "counterparty_identity": "UNKNOWN",
+          "current_demand": "UNKNOWN",
+          "eligibility": "UNKNOWN",
+          "technical_compatibility": "UNKNOWN"
+        }
+      }
+    ],
+    "authority": "HOLD",
+    "canonical_project_assignment": "BLOCKED",
+    "commercially_actionable": 0,
+    "commercially_verified": 0,
+    "decisions": {
+      "INVESTIGATE": 0,
+      "PROCEED": 0,
+      "REJECT": 3
+    },
+    "duplicates_removed": 0,
+    "insufficient_evidence": 3,
+    "lane_id": "official-uk-tender-sandbox",
+    "project_id": "PRJ-NEXUS-SANDBOX",
+    "records_received": 3,
+    "result_scope": "BOUNDED_SAMPLE_NOT_MARKET_ABSENCE",
+    "unique_records": 3
+  },
+  "restart_readback": {
+    "independent_process": true,
+    "checkpoint_count": 1,
+    "integrity": "ok",
+    "digest_reproduced": true,
+    "assessment_reproduced": true,
+    "duplicate_submit": false,
+    "replay_completed": 0,
+    "attempt_count_unchanged": 1,
+    "source_mode": "REAL_PUBLIC_HTTP"
+  }
+}

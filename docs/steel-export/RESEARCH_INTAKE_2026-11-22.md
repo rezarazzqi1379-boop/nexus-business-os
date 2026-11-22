@@ -18,8 +18,8 @@ Status: DRAFT / HOLD. Source Registry and Master authority have not been admitte
 Sum of rows: 4520 t; stated total: 3800 t; discrepancy: 720 t. Neither total is independently stock-verified. No firm availability or offer may be issued.
 Second owner image: proposed production diameters 250, 365, 420, 460, 530 mm and lengths 3.3–6 m; do not conflate custom production with stocked material.
 
-## Owner-supplied indicative prices (UNVERIFIED UNIT)
-CK 600; ST 625; 42CrMo4 800; 16/20MnCrS5 670. Currency, weight basis, tax, Incoterms, heat treatment and exact grade remain UNKNOWN.
+## Unverified historical price figures
+Numbers 600, 625, 670, 800 were previously attributed to the user in error. User explicitly states they did not provide prices. These figures are DISPUTED, NOT USER-SUPPLIED, and must not be used for any pricing or margin decision.
 
 ## Technical and commercial gates
 - Verify lot-specific stock list, MTC/EN 10204 3.1, chemical analysis, heat treatment, UT, surface, tolerances, weights and origin.

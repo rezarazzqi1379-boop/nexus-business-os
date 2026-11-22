@@ -13,4 +13,4 @@ Target: Efor Çelik, Turkey (official products page above); Russian stockists Ve
 Request written indicative wholesale pricing for exact matching forged rounds, grade/diameter/length/condition, quantity 20/100 t, stock and delivery date, MTC/UT, VAT, currency and Incoterms. Ask whether they purchase from external suppliers separately; do not imply an offer, inventory verification or confirmed origin.
 
 ## HOLD reasons
-Inventory row sum 4520 t versus printed total 3800 t. Supplier owner indicative figures 600/625/670/800 have UNKNOWN currency and per-unit basis. No verified lot list, MTC, destination route, tax, sanctions/payment compliance or buyer purchase request. These are source observations, not executable offers.
+Inventory row sum 4520 t versus printed total 3800 t. Figures 600/625/670/800 were incorrectly attributed to the user and are DISPUTED; exclude them entirely. No verified lot list, MTC, destination route, tax, sanctions/payment compliance or buyer purchase request. These are source observations, not executable offers.
